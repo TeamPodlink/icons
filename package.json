@@ -1,0 +1,76 @@
+{
+  "name": "@podlink/icons",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Podcast platform icons and badges — framework-agnostic SVG strings + React components",
+  "license": "MIT",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/core/index.d.ts",
+        "default": "./dist/core/index.js"
+      },
+      "require": {
+        "types": "./dist/core/index.d.cts",
+        "default": "./dist/core/index.cjs"
+      }
+    },
+    "./react": {
+      "import": {
+        "types": "./dist/react/index.d.ts",
+        "default": "./dist/react/index.js"
+      },
+      "require": {
+        "types": "./dist/react/index.d.cts",
+        "default": "./dist/react/index.cjs"
+      }
+    },
+    "./static/*": "./static/*"
+  },
+  "main": "./dist/core/index.cjs",
+  "module": "./dist/core/index.js",
+  "types": "./dist/core/index.d.ts",
+  "files": [
+    "dist",
+    "static"
+  ],
+  "scripts": {
+    "codegen": "tsx scripts/codegen.ts",
+    "build:static": "tsx scripts/build-static.ts",
+    "build:lib": "tsup",
+    "build": "pnpm codegen && pnpm build:static && pnpm build:lib",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "clean": "rm -rf dist src/generated static/icons static/badges",
+    "prepublishOnly": "pnpm build"
+  },
+  "peerDependencies": {
+    "react": ">=18",
+    "react-dom": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-dom": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@fontsource/inter": "^5.2.8",
+    "@testing-library/react": "^16.1.0",
+    "@types/opentype.js": "^1.3.8",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "jsdom": "^25.0.0",
+    "opentype.js": "^1.3.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "svgo": "^3.3.0",
+    "tsup": "^8.3.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.9.2",
+    "vitest": "^2.1.0"
+  }
+}

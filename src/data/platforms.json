@@ -1,0 +1,446 @@
+{
+  "platforms": [
+    {
+      "name": "Amazon Music",
+      "id": "amazonmusic",
+      "active": true,
+      "guidelinesUrl": "https://podcasters.amazon.com/promotional-tools"
+    },
+    {
+      "name": "Antennapod",
+      "id": "antennapod",
+      "active": true,
+      "guidelinesUrl": "https://github.com/AntennaPod/Branding"
+    },
+    {
+      "name": "Anytime Player",
+      "id": "anytimeplayer",
+      "active": true
+    },
+    {
+      "name": "Apple Podcasts",
+      "id": "apple",
+      "active": true,
+      "guidelinesUrl": "https://marketing.services.apple/apple-podcasts-identity-guidelines"
+    },
+    {
+      "name": "Audacy",
+      "id": "audacy",
+      "active": true
+    },
+    {
+      "name": "Audible",
+      "id": "audible",
+      "active": true,
+      "guidelinesUrl": "https://www.audible.com/about/newsroom/audible-assets"
+    },
+    {
+      "name": "Breez",
+      "id": "breez",
+      "active": true
+    },
+    {
+      "name": "Castamatic",
+      "id": "castamatic",
+      "active": true
+    },
+    {
+      "name": "Castbox",
+      "id": "castbox",
+      "active": true,
+      "guidelinesUrl": "https://helpcenter.castbox.fm/portal/en/kb/articles/add-castb"
+    },
+    {
+      "name": "Castro",
+      "id": "castro",
+      "active": true,
+      "guidelinesUrl": "https://castro.fm/support/link-to-your-podcast-in-castro"
+    },
+    {
+      "name": "CurioCaster",
+      "id": "curiocaster",
+      "active": true
+    },
+    {
+      "name": "Deezer",
+      "id": "deezer",
+      "active": true,
+      "guidelinesUrl": "https://deezerbrand.com/"
+    },
+    {
+      "name": "Downcast",
+      "id": "downcast",
+      "active": true
+    },
+    {
+      "name": "Fathom",
+      "id": "fathom",
+      "active": true
+    },
+    {
+      "name": "Fountain",
+      "id": "fountain",
+      "active": true,
+      "guidelinesUrl": "https://www.fountain.fm/podcaster-guide#:~:text=Listen%20on%20Fountain%20badges"
+    },
+    {
+      "name": "Gaana",
+      "id": "gaana",
+      "active": true
+    },
+    {
+      "name": "Global Player",
+      "id": "globalplayer",
+      "active": true
+    },
+    {
+      "name": "Goodpods",
+      "id": "goodpods",
+      "active": true,
+      "guidelinesUrl": "https://goodpods.com/badges"
+    },
+    {
+      "name": "Hark",
+      "id": "hark",
+      "active": true
+    },
+    {
+      "name": "gPodder",
+      "id": "gpodder",
+      "active": true,
+      "guidelinesUrl": "https://gpodder.net/publisher/link/"
+    },
+    {
+      "name": "iHeartRadio",
+      "id": "iheartradio",
+      "active": true,
+      "guidelinesUrl": "https://brand.iheart.com/podcastlogo"
+    },
+    {
+      "name": "iVoox",
+      "id": "ivoox",
+      "active": true
+    },
+    {
+      "name": "Listen Notes",
+      "id": "listennotes",
+      "active": true,
+      "guidelinesUrl": "https://brand-assets.listennotes.com/"
+    },
+    {
+      "name": "LN Beats",
+      "id": "lnbeats",
+      "active": true
+    },
+    {
+      "name": "Luminary",
+      "id": "luminary",
+      "active": true,
+      "guidelinesUrl": "https://newsroom.luminarypodcasts.com/brandassets"
+    },
+    {
+      "name": "Metacast",
+      "id": "metacast",
+      "active": true
+    },
+    {
+      "name": "MixerBox",
+      "id": "mixerbox",
+      "active": true
+    },
+    {
+      "name": "Moon FM",
+      "id": "moonfm",
+      "active": true
+    },
+    {
+      "name": "Overcast",
+      "id": "overcast",
+      "active": true,
+      "guidelinesUrl": "https://overcast.fm/podcasterinfo#:~:text=Subscribe%20on%20Overcast"
+    },
+    {
+      "name": "Pandora",
+      "id": "pandora",
+      "active": true,
+      "guidelinesUrl": "https://developer.pandora.com/docs/developer-resources/brand-assets/"
+    },
+    {
+      "name": "Playapod",
+      "id": "playapod",
+      "active": true
+    },
+    {
+      "name": "Player FM",
+      "id": "playerfm",
+      "active": true
+    },
+    {
+      "name": "Pocket Casts",
+      "id": "pocketcasts",
+      "active": true,
+      "guidelinesUrl": "https://pocketcasts.com/podcast-producers/#link-to-your-podcast"
+    },
+    {
+      "name": "Podbean",
+      "id": "podbean",
+      "active": true,
+      "guidelinesUrl": "https://www.podbean.com/site/default/badges"
+    },
+    {
+      "name": "Podcast Addict",
+      "id": "podcastaddict",
+      "active": true
+    },
+    {
+      "name": "Podcast App",
+      "id": "podcastapp",
+      "active": true
+    },
+    {
+      "name": "Podcast Guru",
+      "id": "podcastguru",
+      "active": true,
+      "guidelinesUrl": "https://podcastguru.io/podcast-guru-branding/"
+    },
+    {
+      "name": "Podcast Index",
+      "id": "podcastindex",
+      "active": true
+    },
+    {
+      "name": "Podcast Republic",
+      "id": "podcastrepublic",
+      "active": true
+    },
+    {
+      "name": "Podchaser",
+      "id": "podchaser",
+      "active": true,
+      "guidelinesUrl": "https://support.podchaser.com/en/articles/5253592-generating-a-podchaser-badge-for-your-podcast"
+    },
+    {
+      "name": "Pod Engine",
+      "id": "podengine",
+      "active": true
+    },
+    {
+      "name": "Podimo",
+      "id": "podimo",
+      "active": true
+    },
+    {
+      "name": "Podkicker",
+      "id": "podkicker",
+      "active": true
+    },
+    {
+      "name": "PodLP",
+      "id": "podlp",
+      "active": true
+    },
+    {
+      "name": "Podnews",
+      "id": "podnews",
+      "active": true
+    },
+    {
+      "name": "podStation",
+      "id": "podstation",
+      "active": true
+    },
+    {
+      "name": "Podurama",
+      "id": "podurama",
+      "active": true
+    },
+    {
+      "name": "Podverse",
+      "id": "podverse",
+      "active": true
+    },
+    {
+      "name": "Podyssey",
+      "id": "podyssey",
+      "active": true,
+      "guidelinesUrl": "https://podyssey.fm/podcast-creators#:~:text=Podyssey%20badge"
+    },
+    {
+      "name": "Rephonic",
+      "id": "rephonic",
+      "active": true
+    },
+    {
+      "name": "RSS",
+      "id": "rss",
+      "active": true
+    },
+    {
+      "name": "RSSRadio",
+      "id": "rssradio",
+      "active": true
+    },
+    {
+      "name": "SiriusXM",
+      "id": "siriusxm",
+      "active": true
+    },
+    {
+      "name": "Snipd",
+      "id": "snipd",
+      "active": true
+    },
+    {
+      "name": "Sonnet",
+      "id": "sonnet",
+      "active": true,
+      "guidelinesUrl": "https://sonnet.fm/resources"
+    },
+    {
+      "name": "Soundcloud",
+      "id": "soundcloud",
+      "active": true,
+      "guidelinesUrl": "https://press.soundcloud.com/media_kits/228462/"
+    },
+    {
+      "name": "Spotify",
+      "id": "spotify",
+      "active": true,
+      "guidelinesUrl": "https://support.spotifyforpodcasters.com/hc/en-us/articles/360044285891-Sharing-your-podcast"
+    },
+    {
+      "name": "Spreaker",
+      "id": "spreaker",
+      "active": true
+    },
+    {
+      "name": "Steno.fm",
+      "id": "stenofm",
+      "active": true
+    },
+    {
+      "name": "Subscribe by Email",
+      "id": "subscribebyemail",
+      "active": true,
+      "guidelinesUrl": "https://www.subscribebyemail.com/podcasters/"
+    },
+    {
+      "name": "Subscribe on Android",
+      "id": "subscribeonandroid",
+      "active": true,
+      "guidelinesUrl": "https://www.subscribeonandroid.com/podcasters/"
+    },
+    {
+      "name": "TrueFans",
+      "id": "truefans",
+      "active": true
+    },
+    {
+      "name": "TuneIn",
+      "id": "tunein",
+      "active": true
+    },
+    {
+      "name": "Tunestr",
+      "id": "tunestr",
+      "active": true
+    },
+    {
+      "name": "Wondery",
+      "id": "wondery",
+      "active": true
+    },
+    {
+      "name": "YouTube",
+      "id": "youtube",
+      "active": true,
+      "guidelinesUrl": "https://support.google.com/youtube/answer/13379217?hl=en"
+    },
+    {
+      "name": "YouTube Music",
+      "id": "youtubemusic",
+      "active": true,
+      "guidelinesUrl": "https://support.google.com/youtube/answer/13379217?hl=en"
+    },
+    {
+      "name": "Apollo",
+      "id": "apollo",
+      "active": false
+    },
+    {
+      "name": "Breaker",
+      "id": "breaker",
+      "active": false
+    },
+    {
+      "name": "Bullhorn",
+      "id": "bullhorn",
+      "active": false
+    },
+    {
+      "name": "Deepcast",
+      "id": "deepcast",
+      "active": false
+    },
+    {
+      "name": "Google Podcasts",
+      "id": "google",
+      "active": false
+    },
+    {
+      "name": "Instacast",
+      "id": "instacast",
+      "active": false
+    },
+    {
+      "name": "iTunes",
+      "id": "itunes",
+      "active": false
+    },
+    {
+      "name": "Jam",
+      "id": "jam",
+      "active": false
+    },
+    {
+      "name": "Podfriend",
+      "id": "podfriend",
+      "active": false
+    },
+    {
+      "name": "Podhero",
+      "id": "podhero",
+      "active": false
+    },
+    {
+      "name": "Podknife",
+      "id": "podknife",
+      "active": false
+    },
+    {
+      "name": "Podvine",
+      "id": "podvine",
+      "active": false
+    },
+    {
+      "name": "RadioPublic",
+      "id": "radiopublic",
+      "active": false
+    },
+    {
+      "name": "Resso",
+      "id": "resso",
+      "active": false
+    },
+    {
+      "name": "Samsung Free",
+      "id": "samsungfree",
+      "active": false
+    },
+    {
+      "name": "Stitcher",
+      "id": "stitcher",
+      "active": false
+    }
+  ]
+}
