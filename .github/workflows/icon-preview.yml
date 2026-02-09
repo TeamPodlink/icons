@@ -1,0 +1,171 @@
+name: Icon Preview
+
+on:
+  pull_request:
+    paths:
+      - "src/source-icons/**"
+
+permissions:
+  pull-requests: write
+  contents: write
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - run: pnpm build
+
+      - name: Push preview branch
+        id: push-preview
+        run: |
+          PR_NUM=${{ github.event.pull_request.number }}
+          REPO=${{ github.repository }}
+          BRANCH="preview/pr-${PR_NUM}"
+
+          WORK=$(mktemp -d)
+          cp -r static/* "$WORK/"
+          cd "$WORK"
+          git init -b "$BRANCH"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "Preview for PR #${PR_NUM}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${REPO}.git" "$BRANCH"
+
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Build comment
+        id: comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          REPO="${{ github.repository }}"
+          PR_NUM="${{ github.event.pull_request.number }}"
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          PREVIEW_SHA="${{ steps.push-preview.outputs.sha }}"
+
+          # GitHub Pages URL for "before" images (current main deployment)
+          PAGES_URL=$(gh api "repos/${REPO}/pages" --jq '.html_url' 2>/dev/null || echo "")
+          PAGES_URL="${PAGES_URL%/}"
+
+          # raw.githubusercontent.com base for "after" images
+          RAW_BASE="https://raw.githubusercontent.com/${REPO}/${PREVIEW_SHA}"
+
+          # Detect changed platforms from source-icons diff
+          changed_files=$(git diff --name-only "$BASE_SHA".."$HEAD_SHA" -- src/source-icons/)
+          platforms=$(echo "$changed_files" | sed -n 's|^src/source-icons/\([^/]*\)/.*|\1|p' | sort -u)
+
+          platform_count=$(echo "$platforms" | wc -w)
+          if [ "$platform_count" -eq 0 ]; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "has_changes=true" >> "$GITHUB_OUTPUT"
+
+          truncated=false
+          if [ "$platform_count" -gt 20 ]; then
+            truncated=true
+            platforms=$(echo "$platforms" | head -20)
+          fi
+
+          comment_file=$(mktemp)
+          {
+            echo '<!-- icon-preview-bot -->'
+            echo '## Icon Preview'
+            echo ""
+            echo "> Built from \`${HEAD_SHA:0:7}\` — [view all static assets](https://github.com/${REPO}/tree/preview/pr-${PR_NUM})"
+            echo ""
+          } > "$comment_file"
+
+          # Helpers: before image from Pages, after image from preview branch
+          # These read $status, $PAGES_URL, $RAW_BASE from the calling scope
+          before_img() {
+            local path="$1" height="$2"
+            if [ "$status" = "added" ]; then
+              echo "*(new)*"
+            elif [ -n "$PAGES_URL" ]; then
+              echo "<img src=\"${PAGES_URL}/${path}\" height=\"${height}\">"
+            else
+              echo "*(not yet deployed)*"
+            fi
+          }
+
+          after_img() {
+            local path="$1" height="$2"
+            if [ "$status" = "deleted" ]; then
+              echo "*(deleted)*"
+            else
+              echo "<img src=\"${RAW_BASE}/${path}\" height=\"${height}\">"
+            fi
+          }
+
+          for platform in $platforms; do
+            dir="src/source-icons/$platform"
+            exists_in_base=$(git ls-tree "$BASE_SHA" -- "$dir" 2>/dev/null | head -1)
+            exists_in_head=$(git ls-tree "$HEAD_SHA" -- "$dir" 2>/dev/null | head -1)
+
+            if [ -z "$exists_in_base" ]; then
+              status="added"
+            elif [ -z "$exists_in_head" ]; then
+              status="deleted"
+            else
+              status="changed"
+            fi
+
+            {
+              echo "### \`${platform}\` *(${status})*"
+              echo ""
+              echo "| | Before | After |"
+              echo "|--|--------|-------|"
+            } >> "$comment_file"
+
+            # Icon row
+            echo "| **Icon** | $(before_img "icons/${platform}.svg" 48) | $(after_img "icons/${platform}.svg" 48) |" >> "$comment_file"
+
+            # Badge (light) row
+            echo "| **Badge (light)** | $(before_img "badges/${platform}-light.svg" 40) | $(after_img "badges/${platform}-light.svg" 40) |" >> "$comment_file"
+
+            # Badge (dark) row — show on dark background for visibility
+            echo "| **Badge (dark)** | $(before_img "badges/${platform}-dark.svg" 40) | $(after_img "badges/${platform}-dark.svg" 40) |" >> "$comment_file"
+
+            echo "" >> "$comment_file"
+          done
+
+          if [ "$truncated" = true ]; then
+            echo "> **Note:** ${platform_count} platforms changed — showing first 20." >> "$comment_file"
+          fi
+
+          echo "comment_file=$comment_file" >> "$GITHUB_OUTPUT"
+
+      - name: Find existing comment
+        if: steps.comment.outputs.has_changes == 'true'
+        uses: peter-evans/find-comment@v3
+        id: find
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body-includes: "<!-- icon-preview-bot -->"
+
+      - name: Post or update comment
+        if: steps.comment.outputs.has_changes == 'true'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-id: ${{ steps.find.outputs.comment-id }}
+          body-path: ${{ steps.comment.outputs.comment_file }}
+          edit-mode: replace
