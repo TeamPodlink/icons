@@ -1,3 +1,5 @@
+'use client'
+
 import { createContext, useContext, type ReactNode } from 'react'
 import type { IconShape } from '../core/types.js'
 
@@ -18,11 +20,6 @@ export interface PodlinkProviderProps extends PodlinkConfig {
   children: ReactNode
 }
 
-export function PodlinkProvider({
-  children,
-  ...config
-}: PodlinkProviderProps) {
-  return (
-    <PodlinkContext.Provider value={config}>{children}</PodlinkContext.Provider>
-  )
+export function PodlinkProvider({ children, ...config }: PodlinkProviderProps) {
+  return <PodlinkContext.Provider value={config}>{children}</PodlinkContext.Provider>
 }

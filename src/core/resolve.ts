@@ -6,10 +6,7 @@ import type { IconData } from './types.js'
  * Light: badge → icon content
  * Dark:  badgeDark → badge → icon content
  */
-export function resolveBadgeContent(
-  data: IconData,
-  variant: 'light' | 'dark',
-): string {
+export function resolveBadgeContent(data: IconData, variant: 'light' | 'dark'): string {
   if (variant === 'dark') {
     return data.badgeDark ?? data.badge ?? data.content
   }

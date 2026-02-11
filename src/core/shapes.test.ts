@@ -5,30 +5,22 @@ describe('shapes', () => {
   describe('superellipse', () => {
     it('returns precomputed path for size 32', () => {
       const path = shapes.superellipse.svgPath(32)
-      expect(path).toBe(
-        'M16 0C30.545 0 32 1.455 32 16S30.545 32 16 32S0 30.545 0 16S1.455 0 16 0Z',
-      )
+      expect(path).toBe('M16 0C30.545 0 32 1.455 32 16S30.545 32 16 32S0 30.545 0 16S1.455 0 16 0Z')
     })
 
     it('returns precomputed path for size 24', () => {
       const path = shapes.superellipse.svgPath(24)
-      expect(path).toBe(
-        'M12 0C22.909 0 24 1.091 24 12S22.909 24 12 24S0 22.909 0 12S1.091 0 12 0Z',
-      )
+      expect(path).toBe('M12 0C22.909 0 24 1.091 24 12S22.909 24 12 24S0 22.909 0 12S1.091 0 12 0Z')
     })
 
     it('returns precomputed path for size 48', () => {
       const path = shapes.superellipse.svgPath(48)
-      expect(path).toBe(
-        'M24 0C45.817 0 48 2.183 48 24S45.817 48 24 48S0 45.817 0 24S2.183 0 24 0Z',
-      )
+      expect(path).toBe('M24 0C45.817 0 48 2.183 48 24S45.817 48 24 48S0 45.817 0 24S2.183 0 24 0Z')
     })
 
     it('returns precomputed path for size 64', () => {
       const path = shapes.superellipse.svgPath(64)
-      expect(path).toBe(
-        'M32 0C61.09 0 64 2.91 64 32S61.09 64 32 64S0 61.09 0 32S2.91 0 32 0Z',
-      )
+      expect(path).toBe('M32 0C61.09 0 64 2.91 64 32S61.09 64 32 64S0 61.09 0 32S2.91 0 32 0Z')
     })
 
     it('generates path for non-precomputed size', () => {

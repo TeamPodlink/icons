@@ -8,6 +8,7 @@ export default defineConfig([
     dts: true,
     clean: true,
     splitting: false,
+    minify: true,
   },
   {
     entry: { index: 'src/react/index.ts' },
@@ -16,6 +17,7 @@ export default defineConfig([
     dts: true,
     clean: true,
     splitting: false,
+    minify: true,
     external: ['react', 'react-dom'],
   },
 ])

@@ -1,4 +1,6 @@
-import type { CSSProperties } from 'react'
+'use client'
+
+import { useId, type CSSProperties } from 'react'
 import { getIconData } from '../core/index.js'
 import { getPlatform } from '../core/platforms.js'
 import { shapes } from '../core/shapes.js'
@@ -15,8 +17,6 @@ export interface PlatformIconProps {
   decorative?: boolean
 }
 
-let clipIdCounter = 0
-
 export function PlatformIcon({
   platform,
   shape: shapeProp,
@@ -30,13 +30,13 @@ export function PlatformIcon({
   const shape = shapeProp ?? config.shape ?? 'superellipse'
   const size = sizeProp ?? 32
 
+  const clipId = useId()
+
   const data = getIconData(platform)
   if (!data) return null
 
   const platformInfo = getPlatform(platform)
   const label = ariaLabel ?? `${platformInfo?.name ?? platform} icon`
-
-  const clipId = `pi_${platform}_${++clipIdCounter}`
   const needsClip = shape !== 'square'
   const shapeDef = shapes[shape]
 

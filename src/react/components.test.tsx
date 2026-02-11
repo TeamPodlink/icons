@@ -22,26 +22,20 @@ describe('PlatformIcon', () => {
   })
 
   it('applies custom size', () => {
-    const { container } = render(
-      <PlatformIcon platform="spotify" size={48} />,
-    )
+    const { container } = render(<PlatformIcon platform="spotify" size={48} />)
     const svg = container.querySelector('svg')
     expect(svg?.getAttribute('width')).toBe('48')
   })
 
   it('does not add defs for square shape', () => {
-    const { container } = render(
-      <PlatformIcon platform="spotify" shape="square" />,
-    )
+    const { container } = render(<PlatformIcon platform="spotify" shape="square" />)
     const svg = container.querySelector('svg')
     const defs = svg?.querySelector(':scope > defs')
     expect(defs).toBeNull()
   })
 
   it('adds defs with clipPath for circle shape', () => {
-    const { container } = render(
-      <PlatformIcon platform="spotify" shape="circle" />,
-    )
+    const { container } = render(<PlatformIcon platform="spotify" shape="circle" />)
     const html = container.innerHTML
     // Should have a clipPath with an arc path (circle as path data)
     expect(html).toContain('clipPath')
@@ -55,9 +49,7 @@ describe('PlatformIcon', () => {
   })
 
   it('sets aria-hidden when decorative', () => {
-    const { container } = render(
-      <PlatformIcon platform="spotify" decorative />,
-    )
+    const { container } = render(<PlatformIcon platform="spotify" decorative />)
     const svg = container.querySelector('svg')
     expect(svg?.getAttribute('aria-hidden')).toBe('true')
   })
@@ -78,33 +70,25 @@ describe('PlatformBadge', () => {
   })
 
   it('renders dark theme', () => {
-    const { container } = render(
-      <PlatformBadge platform="spotify" theme="dark" />,
-    )
+    const { container } = render(<PlatformBadge platform="spotify" theme="dark" />)
     const badge = container.querySelector('.podlink-badge') as HTMLElement
     expect(badge?.style.backgroundColor).toBe('rgb(0, 0, 0)')
   })
 
   it('renders custom label', () => {
-    const { container } = render(
-      <PlatformBadge platform="spotify" label="Escuchar en" />,
-    )
+    const { container } = render(<PlatformBadge platform="spotify" label="Escuchar en" />)
     expect(container.textContent).toContain('Escuchar en')
   })
 
   it('renders RTL direction', () => {
-    const { container } = render(
-      <PlatformBadge platform="spotify" dir="rtl" />,
-    )
+    const { container } = render(<PlatformBadge platform="spotify" dir="rtl" />)
     const badge = container.querySelector('.podlink-badge') as HTMLElement
     expect(badge?.getAttribute('dir')).toBe('rtl')
     expect(badge?.style.flexDirection).toBe('row-reverse')
   })
 
   it('overrides platform name', () => {
-    const { container } = render(
-      <PlatformBadge platform="spotify" platformName="Custom Name" />,
-    )
+    const { container } = render(<PlatformBadge platform="spotify" platformName="Custom Name" />)
     expect(container.textContent).toContain('Custom Name')
   })
 })

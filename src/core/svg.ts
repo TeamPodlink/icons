@@ -35,6 +35,14 @@ export function prefixIds(content: string, prefix: string): string {
 }
 
 /**
+ * Extract the root fill attribute from an SVG string
+ */
+export function extractRootFill(svg: string): string | null {
+  const m = svg.match(/<svg[^>]*\sfill=["']([^"']+)["']/)
+  return m ? m[1] : null
+}
+
+/**
  * Minify SVG string by removing unnecessary whitespace
  */
 export function minifySvg(svg: string): string {

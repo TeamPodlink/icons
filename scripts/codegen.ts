@@ -6,50 +6,17 @@
  * - src/generated/platform-ids.ts — TypeScript union type for autocomplete
  */
 
-import {
-  readFileSync,
-  writeFileSync,
-  existsSync,
-  mkdirSync,
-  readdirSync,
-  statSync,
-} from 'fs'
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { optimize } from 'svgo'
+import { extractSvgContent, extractViewBox, prefixIds } from '../src/core/svg.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
 
 const SOURCE_DIR = join(ROOT, 'src/source-icons')
 const GENERATED_DIR = join(ROOT, 'src/generated')
-
-function extractSvgContent(svg: string): string {
-  svg = svg.replace(/<\?xml[^>]*\?>/g, '')
-  const m = svg.match(/<svg[^>]*>([\s\S]*)<\/svg>/i)
-  if (!m) throw new Error('Invalid SVG')
-  return m[1].trim()
-}
-
-function extractViewBox(svg: string): string {
-  const m = svg.match(/viewBox=["']([^"']+)["']/)
-  return m ? m[1] : '0 0 32 32'
-}
-
-function prefixIds(content: string, prefix: string): string {
-  const ids = new Set<string>()
-  for (const m of content.matchAll(/id="([^"]+)"/g)) ids.add(m[1])
-
-  let result = content
-  for (const id of ids) {
-    const pid = `${prefix}_${id}`
-    result = result.split(`id="${id}"`).join(`id="${pid}"`)
-    result = result.split(`url(#${id})`).join(`url(#${pid})`)
-    result = result.split(`href="#${id}"`).join(`href="#${pid}"`)
-    result = result.split(`xlink:href="#${id}"`).join(`xlink:href="#${pid}"`)
-  }
-  return result
-}
 
 function optimizeSvg(raw: string): string {
   const result = optimize(raw, {
@@ -102,10 +69,7 @@ function main() {
     .filter((name) => {
       if (name.startsWith('_') || name.startsWith('.')) return false
       const dirPath = join(SOURCE_DIR, name)
-      return (
-        statSync(dirPath).isDirectory() &&
-        existsSync(join(dirPath, 'icon.svg'))
-      )
+      return statSync(dirPath).isDirectory() && existsSync(join(dirPath, 'icon.svg'))
     })
     .sort()
 
@@ -146,8 +110,8 @@ function main() {
 
       entries.push(entry)
       console.log(`  ${id}`)
-    } catch (e: any) {
-      console.error(`  ${id}: ${e.message}`)
+    } catch (e: unknown) {
+      console.error(`  ${id}: ${e instanceof Error ? e.message : e}`)
     }
   }
 

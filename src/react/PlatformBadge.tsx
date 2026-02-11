@@ -1,4 +1,6 @@
-import type { CSSProperties } from 'react'
+'use client'
+
+import { useId, type CSSProperties } from 'react'
 import { getIconData } from '../core/index.js'
 import { getPlatform } from '../core/platforms.js'
 import { resolveBadgeContent } from '../core/resolve.js'
@@ -19,8 +21,6 @@ export interface PlatformBadgeProps {
   'aria-label'?: string
   decorative?: boolean
 }
-
-let badgeClipCounter = 0
 
 const FONT_FAMILY = "'Inter', system-ui, sans-serif"
 
@@ -43,6 +43,8 @@ export function PlatformBadge({
   const dir = dirProp ?? config.dir ?? 'ltr'
   const shape = shapeProp ?? config.shape ?? 'superellipse'
   const height = heightProp ?? 40
+
+  const clipId = useId()
 
   const data = getIconData(platform)
   if (!data) return null
@@ -71,8 +73,6 @@ export function PlatformBadge({
   let iconContent = resolveBadgeContent(data, theme)
   // Replace currentColor with foreground
   iconContent = iconContent.split('currentColor').join(fg)
-
-  const clipId = `pb_${platform}_${++badgeClipCounter}`
   const needsClip = shape !== 'square'
   const shapeDef = shapes[shape]
 
