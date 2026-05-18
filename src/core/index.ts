@@ -1,13 +1,15 @@
-export { platforms, getPlatform } from './platforms.js'
+export { platforms, getPlatform, resolvePlatformId } from './platforms.js'
 export { shapes } from './shapes.js'
 export { resolveBadgeContent, resolveBadgeViewBox } from './resolve.js'
 export { extractSvgContent, extractViewBox, prefixIds, minifySvg } from './svg.js'
 
 export type { Platform, IconData, IconShape, ShapeDefinition } from './types.js'
+export type { PlatformId } from '../generated/platform-ids.js'
 
 // Re-export icon data access
 import { iconDataMap } from '../generated/icons.js'
 import type { IconData } from './types.js'
+import { resolvePlatformId } from './platforms.js'
 
 const warnedIds = new Set<string>()
 
@@ -15,7 +17,8 @@ const warnedIds = new Set<string>()
 const __DEV__ = (globalThis as any).process?.env?.NODE_ENV !== 'production'
 
 export function getIconData(platformId: string): IconData | undefined {
-  const data = iconDataMap[platformId]
+  const resolvedPlatformId = resolvePlatformId(platformId)
+  const data = resolvedPlatformId ? iconDataMap[resolvedPlatformId] : undefined
   if (!data && __DEV__ && !warnedIds.has(platformId)) {
     warnedIds.add(platformId)
     console.warn(
@@ -23,4 +26,9 @@ export function getIconData(platformId: string): IconData | undefined {
     )
   }
   return data
+}
+
+export function hasPlatformIcon(input: string): boolean {
+  const platformId = resolvePlatformId(input)
+  return platformId ? Boolean(iconDataMap[platformId]) : false
 }

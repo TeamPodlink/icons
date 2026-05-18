@@ -4,6 +4,7 @@
       "name": "Amazon Music",
       "id": "amazonmusic",
       "active": true,
+      "aliases": ["amazon"],
       "guidelinesUrl": "https://podcasters.amazon.com/promotional-tools"
     },
     {
@@ -100,6 +101,11 @@
       "guidelinesUrl": "https://goodpods.com/badges"
     },
     {
+      "name": "Great Pods",
+      "id": "greatpods",
+      "active": true
+    },
+    {
       "name": "Hark",
       "id": "hark",
       "active": true
@@ -152,6 +158,11 @@
       "name": "Moon FM",
       "id": "moonfm",
       "active": true
+    },
+    {
+      "name": "Netflix",
+      "id": "netflix",
+      "active": false
     },
     {
       "name": "Overcast",
