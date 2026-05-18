@@ -1,9 +1,17 @@
 {
   "name": "@podlink/icons",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "description": "Podcast platform icons and badges — framework-agnostic SVG strings + React components",
   "license": "MIT",
+  "homepage": "https://github.com/TeamPodlink/icons#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TeamPodlink/icons.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TeamPodlink/icons/issues"
+  },
   "sideEffects": false,
   "exports": {
     ".": {
@@ -33,7 +41,9 @@
   "types": "./dist/core/index.d.ts",
   "files": [
     "dist",
-    "static"
+    "static/icons",
+    "static/badges",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "codegen": "tsx scripts/codegen.ts",
