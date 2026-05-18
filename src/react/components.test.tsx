@@ -2,7 +2,6 @@ import { describe, it, expect } from 'vitest'
 import { render } from '@testing-library/react'
 import { PlatformIcon } from './PlatformIcon.js'
 import { PlatformBadge } from './PlatformBadge.js'
-import { PodlinkProvider } from './PodlinkProvider.js'
 
 // These tests require codegen to have been run (pnpm codegen).
 // The generated icons module is imported transitively via PlatformIcon/PlatformBadge.
@@ -69,6 +68,12 @@ describe('PlatformBadge', () => {
     expect(badge?.textContent).toContain('Spotify')
   })
 
+  it('uses light theme by default', () => {
+    const { container } = render(<PlatformBadge platform="spotify" />)
+    const badge = container.querySelector('.podlink-badge') as HTMLElement
+    expect(badge?.style.backgroundColor).toBe('rgb(255, 255, 255)')
+  })
+
   it('renders dark theme', () => {
     const { container } = render(<PlatformBadge platform="spotify" theme="dark" />)
     const badge = container.querySelector('.podlink-badge') as HTMLElement
@@ -90,36 +95,5 @@ describe('PlatformBadge', () => {
   it('overrides platform name', () => {
     const { container } = render(<PlatformBadge platform="spotify" platformName="Custom Name" />)
     expect(container.textContent).toContain('Custom Name')
-  })
-})
-
-describe('PodlinkProvider', () => {
-  it('provides default theme to badges', () => {
-    const { container } = render(
-      <PodlinkProvider theme="dark">
-        <PlatformBadge platform="spotify" />
-      </PodlinkProvider>,
-    )
-    const badge = container.querySelector('.podlink-badge') as HTMLElement
-    expect(badge?.style.backgroundColor).toBe('rgb(0, 0, 0)')
-  })
-
-  it('provides default label', () => {
-    const { container } = render(
-      <PodlinkProvider label="Escuchar en">
-        <PlatformBadge platform="spotify" />
-      </PodlinkProvider>,
-    )
-    expect(container.textContent).toContain('Escuchar en')
-  })
-
-  it('allows child props to override provider', () => {
-    const { container } = render(
-      <PodlinkProvider theme="dark">
-        <PlatformBadge platform="spotify" theme="light" />
-      </PodlinkProvider>,
-    )
-    const badge = container.querySelector('.podlink-badge') as HTMLElement
-    expect(badge?.style.backgroundColor).toBe('rgb(255, 255, 255)')
   })
 })

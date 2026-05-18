@@ -1,11 +1,8 @@
-'use client'
-
 import { useId, type CSSProperties } from 'react'
 import { getIconData } from '../core/index.js'
 import { getPlatform } from '../core/platforms.js'
 import { shapes } from '../core/shapes.js'
 import type { IconShape } from '../core/types.js'
-import { usePodlinkConfig } from './PodlinkProvider.js'
 
 export interface PlatformIconProps {
   platform: string
@@ -26,8 +23,7 @@ export function PlatformIcon({
   'aria-label': ariaLabel,
   decorative = false,
 }: PlatformIconProps) {
-  const config = usePodlinkConfig()
-  const shape = shapeProp ?? config.shape ?? 'superellipse'
+  const shape = shapeProp ?? 'superellipse'
   const size = sizeProp ?? 32
 
   const clipId = useId()
