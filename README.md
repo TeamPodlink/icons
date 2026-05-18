@@ -56,6 +56,34 @@ import iconUrl from '@podlink/icons/static/icons/spotify.svg'
 import badgeUrl from '@podlink/icons/static/badges/spotify-light.svg'
 ```
 
+### Next.js App Router
+
+The core entrypoint (`@podlink/icons`) is safe to use from Server Components, route handlers, and shared server helpers because it returns framework-agnostic SVG data.
+
+The React entrypoint (`@podlink/icons/react`) is also safe to render from Server Components. Its components are prop-only and do not use context or browser APIs.
+
+For Podlink-specific defaults, styling, or accessibility choices, prefer local wrappers in your app:
+
+```tsx
+import { PlatformIcon } from '@podlink/icons/react'
+
+export function PlatformAvatarIcon({ platform }: { platform: string }) {
+  return <PlatformIcon platform={platform} decorative />
+}
+```
+
+Server Components can render the package component directly or render your local wrapper:
+
+```tsx
+import { PlatformAvatarIcon } from './PlatformAvatarIcon'
+
+export function PodcastPlatform({ platform }: { platform: string }) {
+  return <PlatformAvatarIcon platform={platform} />
+}
+```
+
+If you only need SVG strings or metadata in server code, import from `@podlink/icons`.
+
 ## React API
 
 ### `<PlatformIcon>`
@@ -89,31 +117,6 @@ Renders a "Listen on {Platform}" badge as an inline HTML element.
 | `style` | `CSSProperties` | — | Inline styles |
 | `aria-label` | `string` | `"{label} {Platform}"` | Accessible label |
 | `decorative` | `boolean` | `false` | If true, hides from assistive tech |
-
-### `<PodlinkProvider>`
-
-Context provider for shared defaults. Nested components inherit these values unless overridden.
-
-```jsx
-import { PodlinkProvider, PlatformIcon, PlatformBadge } from '@podlink/icons/react'
-
-<PodlinkProvider theme="dark" shape="circle" label="Listen on">
-  <PlatformIcon platform="spotify" />
-  <PlatformBadge platform="applepodcasts" />
-</PodlinkProvider>
-```
-
-| Prop | Type | Description |
-|------|------|-------------|
-| `theme` | `'light' \| 'dark'` | Default theme for badges |
-| `shape` | `'superellipse' \| 'circle' \| 'square'` | Default icon shape |
-| `label` | `string` | Default badge label text |
-| `dir` | `'ltr' \| 'rtl'` | Default text direction |
-| `children` | `ReactNode` | — |
-
-### `usePodlinkConfig()`
-
-Hook that returns the current `PodlinkConfig` from the nearest `<PodlinkProvider>`.
 
 ## Core API
 

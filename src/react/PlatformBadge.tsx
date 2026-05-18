@@ -1,12 +1,9 @@
-'use client'
-
 import { useId, type CSSProperties } from 'react'
 import { getIconData } from '../core/index.js'
 import { getPlatform } from '../core/platforms.js'
 import { resolveBadgeContent } from '../core/resolve.js'
 import { shapes } from '../core/shapes.js'
 import type { IconShape } from '../core/types.js'
-import { usePodlinkConfig } from './PodlinkProvider.js'
 
 export interface PlatformBadgeProps {
   platform: string
@@ -37,11 +34,10 @@ export function PlatformBadge({
   'aria-label': ariaLabel,
   decorative = false,
 }: PlatformBadgeProps) {
-  const config = usePodlinkConfig()
-  const theme = themeProp ?? config.theme ?? 'light'
-  const label = labelProp ?? config.label ?? 'Listen on'
-  const dir = dirProp ?? config.dir ?? 'ltr'
-  const shape = shapeProp ?? config.shape ?? 'superellipse'
+  const theme = themeProp ?? 'light'
+  const label = labelProp ?? 'Listen on'
+  const dir = dirProp ?? 'ltr'
+  const shape = shapeProp ?? 'superellipse'
   const height = heightProp ?? 40
 
   const clipId = useId()
