@@ -9,11 +9,16 @@ export function extractSvgContent(svg: string): string {
 }
 
 /**
- * Extract viewBox attribute from an SVG string
+ * Extract viewBox attribute from an SVG string.
+ * Returns '0 0 32 32' with a warning if no viewBox is found.
  */
 export function extractViewBox(svg: string): string {
   const m = svg.match(/viewBox=["']([^"']+)["']/)
-  return m ? m[1] : '0 0 32 32'
+  if (!m) {
+    console.warn('[@podlink/icons] SVG is missing a viewBox attribute, defaulting to "0 0 32 32".')
+    return '0 0 32 32'
+  }
+  return m[1]
 }
 
 /**

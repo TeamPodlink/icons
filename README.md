@@ -122,12 +122,22 @@ All exports are available from `@podlink/icons`.
 ### Platform data
 
 ```ts
-import { platforms, getPlatform, getIconData } from '@podlink/icons'
+import {
+  platforms,
+  resolvePlatformId,
+  hasPlatformIcon,
+  getPlatform,
+  getIconData,
+} from '@podlink/icons'
 
-platforms        // Platform[] — all platforms
-getPlatform(id)  // Platform | undefined
-getIconData(id)  // IconData | undefined
+platforms                 // Platform[] — all platforms
+resolvePlatformId(input)  // PlatformId | undefined
+hasPlatformIcon(input)    // boolean
+getPlatform(input)        // Platform | undefined
+getIconData(input)        // IconData | undefined
 ```
+
+Platform lookups accept canonical IDs and known aliases. They also normalize common slug input, so `amazon`, `Amazon Music`, and `amazon-music` all resolve to the canonical `amazonmusic` ID.
 
 ### Badge resolution
 
@@ -171,7 +181,7 @@ minifySvg(svgString)               // minify SVG markup
 ### Types
 
 ```ts
-import type { Platform, IconData, IconShape, ShapeDefinition } from '@podlink/icons'
+import type { PlatformId, Platform, IconData, IconShape, ShapeDefinition } from '@podlink/icons'
 ```
 
 ## Shapes

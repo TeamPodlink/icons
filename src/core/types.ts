@@ -4,6 +4,7 @@ export interface Platform {
   id: string
   name: string
   active: boolean
+  aliases?: string[]
   guidelinesUrl?: string
 }
 
