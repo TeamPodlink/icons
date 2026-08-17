@@ -175,6 +175,35 @@ lightmap analysis over the adopted recipes.
    open, but the measured gray + hue ladders make a table-driven
    implementation (interpolated anchors) viable now.
 
+## Flat-icon player milestone (measured 2026-08-17)
+
+`packages/engine/tools/translate_icon.py` translates a flat `.icon`
+bundle (no glass layers, SVG art) into an engine recipe with **zero
+ictool measurement**: fills via the solved sRGB-clip/P3-coded color
+model, `automatic-gradient` via the measured ladder, and per-subpath
+SVG fills parsed from the artwork — the capability whose absence
+rejected 35/36 bundles in the original recipe sweep.
+`pipeline/translate-sweep.mjs` validates every flat bundle end-to-end
+against fresh ictool ground truth.
+
+Result across the catalog + first-party corpus: **37 flat bundles
+scored, median RMSE 4.16, 26/37 at ≤ 5.5** — measured-recipe-band
+fidelity from declared values alone (spotify: 4.64 translated vs 2.18
+fully measured; the residual is a small uniform color offset within
+the gamut probe's ±3/255 tolerance plus edge AA). The remaining tail
+is enumerated SVG-feature work, not model error: `<use>`
+instantiation (deepcast 183, podfriend 43), radial + multi-stop
+gradients (tunestr 91, itunes 30), the pre-existing knockout-winding
+limitation (tunein 70), and three unexplained mid-range (sonnet 9.6,
+jam 13.2, podvine 15.6). Iteration history: the first sweep's entire
+40–149 tail was two causes — unrendered-subtree handling
+(defs/clipPath) and the CSS Color 4 `color(display-p3 …)` fill
+syntax.
+
+Glass icons remain gated on the material-response sweep and the
+per-layer lighting model; raster-art bundles on a PNG-decode
+decision. The player's coverage today: flat + SVG.
+
 ## Adding a platform or icon
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md).
