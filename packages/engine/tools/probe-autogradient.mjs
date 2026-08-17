@@ -76,18 +76,29 @@ async function renderColumn(dir) {
   return rows; // sRGB rows, y = 16..239 of 256
 }
 
-const COLORS = [
-  ["gray", [0.5, 0.5, 0.5]],
-  ["black", [0, 0, 0]],
-  ["white", [1, 1, 1]],
-  ["red", [1, 0.2, 0.2]],
-  ["orange", [0.744, 0.297, 0.0]],
-  ["green", [0.235, 0.85, 0.32]],
-  ["blue", [0.0, 0.533, 1.0]],
-  ["purple", [0.35, 0.1, 0.85]],
-  ["dark-blue", [0.05, 0.1, 0.3]],
-  ["pastel", [0.85, 0.9, 0.95]],
-];
+const FIT = process.argv.includes("--fit");
+const COLORS = [];
+if (FIT) {
+  // gray ladder resolves the lightening law + near-white anchoring;
+  // hue ladders check hue independence of the same offsets.
+  for (let v = 0; v <= 20; v++) COLORS.push([`gray-${v * 5}`, [v / 20, v / 20, v / 20]]);
+  for (const l of [0.2, 0.4, 0.6, 0.8])
+    for (const [h, base] of [["red", [1, 0.15, 0.15]], ["blue", [0.1, 0.45, 1]], ["green", [0.2, 0.8, 0.3]]])
+      COLORS.push([`${h}-${l}`, base.map((c) => c * l + (l > 0.6 ? (l - 0.6) : 0))]);
+} else {
+  COLORS.push(
+    ["gray", [0.5, 0.5, 0.5]],
+    ["black", [0, 0, 0]],
+    ["white", [1, 1, 1]],
+    ["red", [1, 0.2, 0.2]],
+    ["orange", [0.744, 0.297, 0.0]],
+    ["green", [0.235, 0.85, 0.32]],
+    ["blue", [0.0, 0.533, 1.0]],
+    ["purple", [0.35, 0.1, 0.85]],
+    ["dark-blue", [0.05, 0.1, 0.3]],
+    ["pastel", [0.85, 0.9, 0.95]]
+  );
+}
 
 const report = [];
 for (const [name, c] of COLORS) {

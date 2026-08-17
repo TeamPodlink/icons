@@ -141,6 +141,27 @@ lightmap analysis over the adopted recipes.
    Open research: reparameterize lightmaps into (edge-distance ×
    angle) coordinates to test transfer *across* geometries — the
    remaining go/no-go for universal glass lighting.
+4. **(d × φ) reparameterization: right idea, too coarse as-is**
+   (`probe-lightmap-lut.py`). Binning lightmap luma by signed
+   distance-to-glass-edge × normal angle explains R² 0.86–0.87 of the
+   near-edge field for blob-like glass (apple, overcast ×2), and the
+   overcast materials correlate at r = 0.986 *in canonical
+   coordinates* — material invariance holds after the transform. But
+   thin features break the single-union parameterization:
+   podcastrepublic (ring + triangle; 97% of its lightmap energy is
+   near-edge) scores R² 0.19 because nearest-edge binning conflates
+   the ring's inner/outer edges. Cross-geometry transfer between
+   blob icons is partial (apple ↔ overcast r ≈ 0.6). Next iteration:
+   per-layer fields instead of the silhouette union, with
+   thin-feature (thickness-normalized) handling.
+5. **`automatic-gradient` fit** (33-color sweep): below ~0.775
+   lightness the gradient is [lightened(input), input]; above, it
+   flips to [input, darkened(input)]. The lightening is
+   hue-preserving (rides the dominant channels, small additive floor
+   near black) with span 7–18 encoded units showing clean sawtooth
+   jumps at the 0.25/0.50/0.75 lightness quartiles — a closed form is
+   open, but the measured gray + hue ladders make a table-driven
+   implementation (interpolated anchors) viable now.
 
 ## Adding a platform or icon
 
