@@ -1,4 +1,15 @@
 {
   "name": "Deepcast",
-  "active": false
+  "active": false,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "deepcast",
+        "title": "Deepcast",
+        "variant": null,
+        "file": "Deepcast.icon",
+        "source": "flat-svg"
+      }
+    ]
+  }
 }

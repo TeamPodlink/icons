@@ -1,4 +1,15 @@
 {
   "name": "Apollo",
-  "active": false
+  "active": false,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "apollo",
+        "title": "Apollo",
+        "variant": null,
+        "file": "Apollo.icon",
+        "source": "flat-svg"
+      }
+    ]
+  }
 }

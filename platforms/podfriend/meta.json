@@ -1,4 +1,15 @@
 {
   "name": "Podfriend",
-  "active": false
+  "active": false,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "podfriend",
+        "title": "Podfriend",
+        "variant": null,
+        "file": "Podfriend.icon",
+        "source": "flat-svg"
+      }
+    ]
+  }
 }

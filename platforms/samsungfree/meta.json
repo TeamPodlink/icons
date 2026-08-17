@@ -1,4 +1,16 @@
 {
   "name": "Samsung Free",
-  "active": false
+  "active": false,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "samsungfree",
+        "title": "Samsung Free",
+        "variant": null,
+        "file": "SamsungFree.icon",
+        "source": "flat-svg-browser",
+        "hasDark": false
+      }
+    ]
+  }
 }
