@@ -8,8 +8,8 @@
 // recipeSlugs) is done by --adopt with an explicit threshold, after
 // reviewing the report.
 //
-// Requirements: macOS + Icon Composer; sibling ../glass-to-LUT
-// checkout; python3 with numpy+Pillow (set PYTHON env to a venv).
+// Requirements: macOS + Icon Composer; python3 with numpy+Pillow
+// (set PYTHON env to a venv). Tools live in packages/engine/tools.
 //
 // Usage:
 //   node pipeline/build-recipes.mjs [--only <slug>]        # measure + report
@@ -27,7 +27,7 @@ import {
 import { join, resolve } from "node:path";
 import { readBundles, root } from "./lib.mjs";
 
-const GL = resolve(root, "../glass-to-LUT");
+const GL = resolve(root, "packages/engine");
 const ICTOOL = "/Applications/Icon Composer.app/Contents/Executables/ictool";
 const PY = process.env.PYTHON ?? "python3";
 const WORK = "/tmp/recipe-sweep";
