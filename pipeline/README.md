@@ -29,6 +29,31 @@ re-apply them if you regenerate it by hand:
 2. the import is attempted only when `process.versions.node` exists, so
    browsers go straight to `DecompressionStream` without a console error.
 
+## Delivery encodings
+
+Measured 2026-08-17 (9-master sample, visible-RGB RMSE vs the
+lanczos-resized 1024 master):
+
+| encoding | 64px avg bytes | 64px avg RMSE |
+| --- | --- | --- |
+| AVIF q60 | 1533 | 2.71 |
+| WebP q92 | 1784 | 5.73 |
+
+AVIF q60 is both smaller and ~2× more accurate than WebP q92 at icon
+sizes — WebP's chroma subsampling visibly degrades the gradient
+squircles — so AVIF is the primary format and WebP q92 the no-AVIF
+fallback at unchanged quality. Masters are re-encoded 8-bit (ictool
+emits 16-bit/channel; the masters were 98% of the package bytes).
+The generated registry component reads sizes/formats from
+`manifest.json` so it can never reference renditions the pinned
+`@podlink/refraction` version doesn't ship (browsers do not fall back
+across `<picture>` sources on 404).
+
+The class-theme component mounts both renditions; `loading="lazy"`
+keeps the hidden one from being fetched (verified: a boxless lazy
+image never loads; it loads on demand when the theme class flips).
+Consumers who override `loading="eager"` reintroduce the double fetch.
+
 ## Known recipe limitations
 
 Measured 2026-08-17 by sweeping all 36 all-SVG bundles:
@@ -47,6 +72,29 @@ Growing the recipe set therefore means engine work in glass-to-LUT
 not pipeline changes here. The `no recipe` QA lens on the site is the
 backlog; `build-recipes.mjs` is the measuring harness ready for when
 the engine learns those tricks.
+
+## Small-lightmap distillation (measured verdict)
+
+Measured 2026-08-17 across the 6 recipes: the baked residual lightmap
+is 86–96% of every recipe's bytes, and all 6 store it at 512×512
+(`ds: 2`) — far above what small renders need. Box-downsampling the
+field and bumping `ds` (no engine changes; the sampler is
+scale-aware) gives:
+
+- **lm 64×64 (`ds: 16`)**: RMSE at 64px stays inside the adopted band
+  for all six (worst 4.63 vs the 5.1 ceiling); the 6-recipe pack drops
+  200.7KB → 9.4KB brotli (~1.6KB/icon).
+- **lm 32×32**: still visually convincing, ~811B/icon packed.
+- **No lightmap**: not faithful — Apple Podcasts' radial glow *is* its
+  lightmap (RMSE 27.9).
+
+Delivery verdict: even so, procedural does not decisively beat the
+tuned rasters for small-size pages (engine renders internally at
+N=1024, ~2–3s/icon; coverage is 6/92), so rasters remain the delivery
+path. The distillation matters upstream: glass-to-LUT's
+`build_recipe.py` should emit small-lightmap recipes by default — same
+adopted quality, ~20× smaller — which changes the economics of the
+site's live-render layer.
 
 ## Adding a platform or icon
 
