@@ -189,8 +189,12 @@ const src = await r.dataUri({ size: 256 });                      // PNG data URI
 which also sets `recipe`/`rmse` in the platform's meta.json and
 regenerates `recipeSlugs`.)
 
-First render computes the full 1024² field pipeline (~1 s) and is memoized
-per size; sizes 16–1024 are area-averaged from the 1024 master.
+Renders are memoized per size. Small outputs run the field pipeline at a
+reduced internal N (smallest power of two ≥ 2× the output; floor 256, or
+128 for ≤ 32px outputs) — 15–70× faster, within ±0.4 RMSE of exact at
+display sizes. `{ exact: true }` forces the full 1024² pipeline; use it
+for any scoring against ictool ground truth (the quality bars in this
+skill are exact-path numbers).
 
 ## Current limitations
 

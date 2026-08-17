@@ -93,8 +93,12 @@ scale-aware) gives:
   lightmap (RMSE 27.9).
 
 Delivery verdict: even so, procedural does not decisively beat the
-tuned rasters for small-size pages (coverage is 6/92; render cost),
-so rasters remain the delivery path.
+tuned rasters for small-size pages (coverage is 6/92), so rasters
+remain the delivery path. The render-cost blocker was since removed:
+the engine picks a small internal field resolution for small outputs
+(≤256px renders in tens-to-hundreds of ms instead of 1–3 s, within
+±0.4 RMSE of the exact path, which `{ exact: true }` preserves
+bit-identically).
 
 **Landed 2026-08-17:** `build_recipe.py --lm-res` (default 128) bakes
 the lightmap natively at low resolution — measurably better than

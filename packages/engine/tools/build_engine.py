@@ -71,7 +71,11 @@ ENGINE = r'''// engine.mjs — Liquid Glass icon render engine (platform-indepen
 // material LUTs, and glass layers (silhouette path, law parameters, overlay
 // alpha, optional baked lighting field). See createLiquidRenderer().
 const EC = __ENGINE_CONST__;
-const N = 1024;
+// Internal field resolution N is chosen per render: 1024 for exact/master
+// renders, a smaller power of two (>=128) for small outputs. Recipe data is
+// always in 1024 canvas units; grids are N-resolution and every lookup
+// converts via S = 1024/N (S === 1 on the master path, so exact renders are
+// bit-identical to the fixed-1024 pipeline).
 
 // ---------- environment shims ----------
 function b64(s) {
@@ -104,14 +108,14 @@ async function deflate(u8) {
 
 // ---------- scanline rasterizer over cubic segments ----------
 // seg = flat [x0,y0,c1x,c1y,c2x,c2y,x1,y1]* ; fillRule "nonzero"|"evenodd"
-function rasterizeMask(seg, fillRule = "evenodd") {
-  const FL = 48, edges = [];
+function rasterizeMask(seg, N, fillRule = "evenodd") {
+  const FL = 48, edges = [], cs = N/1024;
   for (let s = 0; s < seg.length; s += 8) {
-    let px = seg[s], py = seg[s+1];
+    let px = seg[s]*cs, py = seg[s+1]*cs;
     for (let k = 1; k <= FL; k++) {
       const t = k/FL, mt = 1-t;
-      const x = mt*mt*mt*seg[s] + 3*mt*mt*t*seg[s+2] + 3*mt*t*t*seg[s+4] + t*t*t*seg[s+6];
-      const y = mt*mt*mt*seg[s+1] + 3*mt*mt*t*seg[s+3] + 3*mt*t*t*seg[s+5] + t*t*t*seg[s+7];
+      const x = (mt*mt*mt*seg[s] + 3*mt*mt*t*seg[s+2] + 3*mt*t*t*seg[s+4] + t*t*t*seg[s+6])*cs;
+      const y = (mt*mt*mt*seg[s+1] + 3*mt*mt*t*seg[s+3] + 3*mt*t*t*seg[s+5] + t*t*t*seg[s+7])*cs;
       if (y !== py || x !== px) edges.push(px, py, x, y);
       px = x; py = y;
     }
@@ -162,7 +166,7 @@ function rasterizeMask(seg, fillRule = "evenodd") {
 }
 
 // ---------- exact EDT / box blur (calibrated pipeline ports) ----------
-function edt(pmask) {
+function edt(pmask, N) {
   const INF = 1e6, S2 = Math.SQRT2, D = new Float64Array(N*N);
   for (let i = 0; i < N*N; i++) D[i] = pmask[i] > 0.5 ? INF : 0;
   for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) {
@@ -191,7 +195,7 @@ function edt(pmask) {
   scan(true); scan(false); scan(true);
   return D;
 }
-function boxblur(src, r) {
+function boxblur(src, r, N) {
   const tmp = new Float32Array(N*N), out = new Float32Array(N*N), w = 2*r + 1;
   for (let y = 0; y < N; y++) {
     let s = 0;
@@ -240,7 +244,7 @@ function bodySDF(px, py) {
 }
 
 // ---------- output finalization + PNG ----------
-function finalize(fbuf, size) {
+function finalize(fbuf, size, N) {
   const s = N/size;
   const px = new Uint8ClampedArray(size*size*4);
   for (let y = 0; y < size; y++) {
@@ -336,12 +340,13 @@ async function bodyLightLut() {
 
 // ---------- the renderer ----------
 export function createLiquidRenderer(recipe) {
-  let _fields = null;
-  async function fields() {
-    if (_fields) return _fields;
+  const _fieldsByN = new Map();
+  async function fields(N) {
+    if (_fieldsByN.has(N)) return _fieldsByN.get(N);
+    const S = 1024/N;
     const covs = [];
     for (const L2 of recipe.bg) {
-      covs.push(L2.t === "path" ? rasterizeMask(L2.seg, L2.rule || "evenodd") : null);
+      covs.push(L2.t === "path" ? rasterizeMask(L2.seg, N, L2.rule || "evenodd") : null);
     }
     const dluts = [];
     for (const dl of recipe.dluts) {
@@ -356,23 +361,26 @@ export function createLiquidRenderer(recipe) {
     }
     const glass = [];
     for (const g of recipe.glass) {
-      const pmask = rasterizeMask(g.path);
-      const D = edt(pmask);
+      const pmask = rasterizeMask(g.path, N);
+      const D = edt(pmask, N);
       const { A0, R0, pw, sr, sn } = g.law;
       let H = new Float32Array(N*N);
       for (let i = 0; i < N*N; i++) {
         if (D[i] <= 0) continue;
-        const t = Math.min(D[i]/R0, 1);
+        const t = Math.min(D[i]*S/R0, 1);
         H[i] = A0*Math.pow(Math.max(1 - (1-t)*(1-t), 0), pw);
       }
-      for (let k = 0; k < sn; k++) H = boxblur(H, sr);
+      const srg = Math.max(1, Math.round(sr/S));
+      for (let k = 0; k < sn; k++) H = boxblur(H, srg, N);
       for (let i = 0; i < N*N; i++) if (D[i] <= 0) H[i] = 0;
       let SH = null;
       if (g.shadow) {
         SH = new Float32Array(N*N);
+        const dyg = Math.round(g.shadow.dy/S);
         for (let y = 0; y < N; y++) for (let x = 0; x < N; x++)
-          SH[y*N+x] = pmask[(((y-g.shadow.dy)%N + N)%N)*N + x];
-        for (let k = 0; k < g.shadow.n; k++) SH = boxblur(SH, g.shadow.r);
+          SH[y*N+x] = pmask[(((y-dyg)%N + N)%N)*N + x];
+        const shr = Math.max(1, Math.round(g.shadow.r/S));
+        for (let k = 0; k < g.shadow.n; k++) SH = boxblur(SH, shr, N);
       }
       let LMY = null, CAPP = null, CAPS = null;
       if (g.lm) {
@@ -399,13 +407,15 @@ export function createLiquidRenderer(recipe) {
       for (let i = 0; i < yr.length; i++) RLM[i] = (yr[i] - 128)*recipe.lm.q;
     }
     const BLd = recipe.bodyLight === false ? null : await bodyLightLut();
-    _fields = { dluts, glass, BLd, covs, RLM };
-    return _fields;
+    const F = { dluts, glass, BLd, covs, RLM };
+    _fieldsByN.set(N, F);
+    return F;
   }
 
   const X0W = Math.asinh(-40/4), XSW0 = Math.asinh(70/4) - X0W;
-  async function renderPixels() {
-    const F = await fields();
+  async function renderPixels(N) {
+    const F = await fields(N);
+    const S = 1024/N;
     const ETA = 1/1.5;
     const TAPS = [[0,0],[-1,0],[1,0],[0,-1],[0,1],[-0.7,-0.7],[0.7,-0.7],[-0.7,0.7],[0.7,0.7],[-0.5,0],[0.5,0],[0,-0.5],[0,0.5]];
     const out = new Float32Array(N*N*4);
@@ -443,7 +453,7 @@ export function createLiquidRenderer(recipe) {
       for (let li = 0; li < bgL.length; li++) {
         const L2 = bgL[li];
         if (L2.t === "path") {
-          const a2 = bil(F.covs[li], px, py)*(L2.op === undefined ? 1 : L2.op);
+          const a2 = bil(F.covs[li], px/S, py/S)*(L2.op === undefined ? 1 : L2.op);
           if (a2 <= 0) continue;
           let cr, cg, cb2;
           if (L2.fill.t === "solid") { cr = L2.fill.c[0]; cg = L2.fill.c[1]; cb2 = L2.fill.c[2]; }
@@ -480,7 +490,7 @@ export function createLiquidRenderer(recipe) {
       for (let x = 0; x < N; x++) {
         let ar = 0, ag = 0, ab = 0, aa = 0;
         for (let sy = 0; sy < 2; sy++) for (let sx = 0; sx < 2; sx++) {
-          const px = x + 0.25 + 0.5*sx, py = y + 0.25 + 0.5*sy;
+          const px = (x + 0.25 + 0.5*sx)*S, py = (y + 0.25 + 0.5*sy)*S;
           const bd = bodySDF(px, py);
           const bodyA = Math.min(Math.max(bd[0] + 0.5, 0), 1);
           if (bodyA < 0.002) continue;
@@ -488,12 +498,12 @@ export function createLiquidRenderer(recipe) {
           let r = cb[0], g = cb[1], b = cb[2];
           for (let gi = 0; gi < F.glass.length; gi++) {
             const GL = F.glass[gi];
-            const pm = bil(GL.pmask, px, py);
+            const pm = bil(GL.pmask, px/S, py/S);
             if (pm > 0) {
               const e = 0.75;
-              const hc = bil(GL.H, px, py);
-              const hx = (bil(GL.H, px+e, py) - bil(GL.H, px-e, py))/(2*e);
-              const hy = (bil(GL.H, px, py+e) - bil(GL.H, px, py-e))/(2*e);
+              const hc = bil(GL.H, px/S, py/S);
+              const hx = (bil(GL.H, (px+e)/S, py/S) - bil(GL.H, (px-e)/S, py/S))/(2*e);
+              const hy = (bil(GL.H, px/S, (py+e)/S) - bil(GL.H, px/S, (py-e)/S))/(2*e);
               const nz = 1/Math.sqrt(hx*hx + hy*hy + 1);
               const k2 = Math.max(0, 1 - ETA*ETA*(1 - nz*nz));
               const coef = ETA*nz - Math.sqrt(k2);
@@ -509,7 +519,7 @@ export function createLiquidRenderer(recipe) {
                 // own refraction ignored — it is sub-tap-scale)
                 for (let gj = 0; gj < gi; gj++) {
                   const GJ = F.glass[gj];
-                  const pmj = bil(GJ.pmask, tx, ty);
+                  const pmj = bil(GJ.pmask, tx/S, ty/S);
                   if (pmj <= 0) continue;
                   const aj = (GJ.AL[Math.min(GJ.AL.length-1, (ty/1024*GJ.AL.length)|0)]/255)*pmj;
                   const gcj = GJ.g.gc || [255, 255, 255];
@@ -524,7 +534,7 @@ export function createLiquidRenderer(recipe) {
               r += (gr-r)*pm; g += (gg-g)*pm; b += (gbv-b)*pm;
             }
             if (GL.SH) {
-              const shv = bil(GL.SH, px, py)*(1-pm);
+              const shv = bil(GL.SH, px/S, py/S)*(1-pm);
               const amp = GL.g.shadow.amp;
               r = Math.max(r - amp*shv, 0); g = Math.max(g - amp*shv, 0); b = Math.max(b - amp*shv, 0);
             }
@@ -589,24 +599,35 @@ export function createLiquidRenderer(recipe) {
     return out;
   }
 
-  const _renders = new Map(), _uris = new Map();
+  const _renders = new Map(), _uris = new Map(), _pixelsByN = new Map();
+  function pixelsFor(N) {
+    if (!_pixelsByN.has(N)) _pixelsByN.set(N, renderPixels(N));
+    return _pixelsByN.get(N);
+  }
   return {
-    render({ size = 1024 } = {}) {
+    render({ size = 1024, exact = false } = {}) {
       if (!Number.isFinite(size) || size < 16 || size > 1024) throw new Error("size must be 16..1024");
-      const key = size|0;
+      const sz = size|0;
+      // Internal field resolution: full 1024 for exact renders, else the
+      // smallest power-of-two grid >= 2x the output — with a floor of 256
+      // for outputs above 32px (measured: N=128 field artifacts exceed 64px
+      // output detail but average away at 32px). Cost scales ~(1024/N)^2.
+      let N = 1024;
+      if (!exact) { N = sz > 32 ? 256 : 128; while (N < 2*sz && N < 1024) N *= 2; }
+      const key = (exact ? "x" : "") + sz;
       if (!_renders.has(key)) {
         _renders.set(key, (async () => {
-          const fbuf = await renderPixels();
-          return { width: key, height: key, pixels: finalize(fbuf, key) };
+          const fbuf = await pixelsFor(N);
+          return { width: sz, height: sz, pixels: finalize(fbuf, sz, N) };
         })());
       }
       return _renders.get(key);
     },
-    dataUri({ size = 1024 } = {}) {
-      const key = size|0;
+    dataUri({ size = 1024, exact = false } = {}) {
+      const key = (exact ? "x" : "") + (size|0);
       if (!_uris.has(key)) {
         _uris.set(key, (async () => {
-          const png = await encodePng(await this.render({ size: key }));
+          const png = await encodePng(await this.render({ size: size|0, exact }));
           return "data:image/png;base64," + toB64(png);
         })());
       }

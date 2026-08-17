@@ -49,8 +49,12 @@ const { width, height, pixels } = await r.render({ size: 256 }); // RGBA
 const src = await r.dataUri({ size: 256 });                      // PNG data URI
 ```
 
-First render computes the full 1024² field pipeline (~1 s) and is memoized
-per size; sizes 16–1024 are area-averaged from the 1024 master.
+Renders are memoized per size. Small outputs run the field pipeline at a
+reduced internal resolution (smallest power of two ≥ 2× the output; floor
+256, or 128 for outputs ≤ 32px) — 15–70× faster than the full pipeline
+with measured RMSE within ±0.4 of exact at display sizes. Pass
+`{ exact: true }` to force the full 1024² pipeline (bit-identical to the
+pre-small-N engine); sizes ≥ 512 always use it.
 
 ## Building recipes
 
