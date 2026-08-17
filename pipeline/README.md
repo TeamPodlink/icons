@@ -194,8 +194,19 @@ the gamut probe's ±3/255 tolerance plus edge AA). The remaining tail
 is enumerated SVG-feature work, not model error: `<use>`
 instantiation (deepcast 183, podfriend 43), radial + multi-stop
 gradients (tunestr 91, itunes 30), the pre-existing knockout-winding
-limitation (tunein 70), and three unexplained mid-range (sonnet 9.6,
-jam 13.2, podvine 15.6). Iteration history: the first sweep's entire
+limitation (tunein 70), and a now-identified gradient-interpolation
+mismatch (podvine 15.6, likely jam 13.2): CoreSVG interpolates SVG
+gradients by a law that is none of the obvious candidates — measured
+against nine models (encoded/linear sRGB, encoded/linear P3, Oklab,
+OkLCH, HSL, CSS-4 gamut-mapped stops, native-P3 lerp; best miss 11.7
+RMSE on podvine's field) — and is syntax-independent (hex sRGB stops
+show the identical curve as color(display-p3) stops; instrument:
+2-stop gradient bundles through ictool). Saturated violet stops shift
+visibly toward blue mid-ramp. The law is directly solvable with a
+stop-grid instrument sweep (black→white ramps expose the transfer,
+hue pairs the mixing space) — the same measure-don't-theorize
+playbook as the refraction law. sonnet (9.6, gradient-free) remains
+unattributed. Iteration history: the first sweep's entire
 40–149 tail was two causes — unrendered-subtree handling
 (defs/clipPath) and the CSS Color 4 `color(display-p3 …)` fill
 syntax.
