@@ -1,4 +1,16 @@
 {
   "name": "CurioCaster",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "curiocaster",
+        "title": "CurioCaster",
+        "variant": null,
+        "file": "CurioCaster.icon",
+        "source": "flat-svg",
+        "hasDark": false
+      }
+    ]
+  }
 }

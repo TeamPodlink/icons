@@ -1,4 +1,16 @@
 {
   "name": "Fathom",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "fathom",
+        "title": "Fathom",
+        "variant": null,
+        "file": "Fathom.icon",
+        "source": "flat-svg",
+        "hasDark": false
+      }
+    ]
+  }
 }

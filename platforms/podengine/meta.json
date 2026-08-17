@@ -1,4 +1,16 @@
 {
   "name": "Pod Engine",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "podengine",
+        "title": "Pod Engine",
+        "variant": null,
+        "file": "PodEngine.icon",
+        "source": "flat-svg",
+        "hasDark": false
+      }
+    ]
+  }
 }

@@ -1,4 +1,16 @@
 {
   "name": "Tunestr",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "tunestr",
+        "title": "Tunestr",
+        "variant": null,
+        "file": "Tunestr.icon",
+        "source": "flat-svg",
+        "hasDark": false
+      }
+    ]
+  }
 }

@@ -1,4 +1,16 @@
 {
   "name": "Rephonic",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "rephonic",
+        "title": "Rephonic",
+        "variant": null,
+        "file": "Rephonic.icon",
+        "source": "flat-svg",
+        "hasDark": false
+      }
+    ]
+  }
 }

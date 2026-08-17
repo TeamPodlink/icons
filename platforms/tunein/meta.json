@@ -8,9 +8,9 @@
         "title": "TuneIn",
         "variant": null,
         "file": "TuneIn.icon",
-        "source": "appstore-artwork",
+        "source": "decanted",
         "appStoreId": 418987775,
-        "hasDark": false
+        "hasDark": true
       }
     ]
   }

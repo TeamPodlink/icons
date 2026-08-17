@@ -1,4 +1,16 @@
 {
   "name": "Podnews",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "podnews",
+        "title": "Podnews",
+        "variant": null,
+        "file": "Podnews.icon",
+        "source": "flat-svg",
+        "hasDark": false
+      }
+    ]
+  }
 }

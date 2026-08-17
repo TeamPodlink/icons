@@ -1,4 +1,16 @@
 {
   "name": "Wondery",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "wondery",
+        "title": "Wondery",
+        "variant": null,
+        "file": "Wondery.icon",
+        "source": "flat-svg-raster",
+        "hasDark": false
+      }
+    ]
+  }
 }

@@ -1,5 +1,17 @@
 {
   "name": "Podchaser",
   "active": true,
-  "guidelinesUrl": "https://support.podchaser.com/en/articles/5253592-generating-a-podchaser-badge-for-your-podcast"
+  "guidelinesUrl": "https://support.podchaser.com/en/articles/5253592-generating-a-podchaser-badge-for-your-podcast",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "podchaser",
+        "title": "Podchaser",
+        "variant": null,
+        "file": "Podchaser.icon",
+        "source": "flat-svg",
+        "hasDark": false
+      }
+    ]
+  }
 }

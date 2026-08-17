@@ -1,5 +1,17 @@
 {
   "name": "Subscribe by Email",
   "active": true,
-  "guidelinesUrl": "https://www.subscribebyemail.com/podcasters/"
+  "guidelinesUrl": "https://www.subscribebyemail.com/podcasters/",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "subscribebyemail",
+        "title": "Subscribe by Email",
+        "variant": null,
+        "file": "SubscribebyEmail.icon",
+        "source": "flat-svg",
+        "hasDark": false
+      }
+    ]
+  }
 }

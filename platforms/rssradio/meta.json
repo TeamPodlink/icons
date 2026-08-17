@@ -1,4 +1,16 @@
 {
   "name": "RSSRadio",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "rssradio",
+        "title": "RSSRadio",
+        "variant": null,
+        "file": "RSSRadio.icon",
+        "source": "flat-svg",
+        "hasDark": false
+      }
+    ]
+  }
 }

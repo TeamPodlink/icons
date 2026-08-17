@@ -1,5 +1,17 @@
 {
   "name": "Antennapod",
   "active": true,
-  "guidelinesUrl": "https://github.com/AntennaPod/Branding"
+  "guidelinesUrl": "https://github.com/AntennaPod/Branding",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "antennapod",
+        "title": "Antennapod",
+        "variant": null,
+        "file": "Antennapod.icon",
+        "source": "flat-svg-raster",
+        "hasDark": false
+      }
+    ]
+  }
 }

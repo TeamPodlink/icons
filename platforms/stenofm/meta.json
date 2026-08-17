@@ -1,4 +1,16 @@
 {
   "name": "Steno.fm",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "stenofm",
+        "title": "Steno.fm",
+        "variant": null,
+        "file": "Stenofm.icon",
+        "source": "flat-svg",
+        "hasDark": false
+      }
+    ]
+  }
 }

@@ -1,4 +1,16 @@
 {
   "name": "podStation",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "podstation",
+        "title": "podStation",
+        "variant": null,
+        "file": "podStation.icon",
+        "source": "flat-svg",
+        "hasDark": false
+      }
+    ]
+  }
 }

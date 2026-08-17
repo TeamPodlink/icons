@@ -1,4 +1,16 @@
 {
   "name": "Great Pods",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "greatpods",
+        "title": "Great Pods",
+        "variant": null,
+        "file": "GreatPods.icon",
+        "source": "flat-svg",
+        "hasDark": false
+      }
+    ]
+  }
 }

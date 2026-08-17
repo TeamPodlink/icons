@@ -1,4 +1,16 @@
 {
   "name": "Podcast Addict",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "podcastaddict",
+        "title": "Podcast Addict",
+        "variant": null,
+        "file": "PodcastAddict.icon",
+        "source": "flat-svg-raster",
+        "hasDark": false
+      }
+    ]
+  }
 }

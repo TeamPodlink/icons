@@ -1,5 +1,17 @@
 {
   "name": "Sonnet",
   "active": true,
-  "guidelinesUrl": "https://sonnet.fm/resources"
+  "guidelinesUrl": "https://sonnet.fm/resources",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "sonnet",
+        "title": "Sonnet",
+        "variant": null,
+        "file": "Sonnet.icon",
+        "source": "flat-svg",
+        "hasDark": false
+      }
+    ]
+  }
 }

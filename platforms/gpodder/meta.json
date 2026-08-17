@@ -1,5 +1,17 @@
 {
   "name": "gPodder",
   "active": true,
-  "guidelinesUrl": "https://gpodder.net/publisher/link/"
+  "guidelinesUrl": "https://gpodder.net/publisher/link/",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "gpodder",
+        "title": "gPodder",
+        "variant": null,
+        "file": "gPodder.icon",
+        "source": "flat-svg-raster",
+        "hasDark": false
+      }
+    ]
+  }
 }

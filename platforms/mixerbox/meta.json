@@ -1,4 +1,16 @@
 {
   "name": "MixerBox",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "mixerbox",
+        "title": "MixerBox",
+        "variant": null,
+        "file": "MixerBox.icon",
+        "source": "flat-svg",
+        "hasDark": false
+      }
+    ]
+  }
 }

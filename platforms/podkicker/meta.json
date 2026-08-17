@@ -1,4 +1,16 @@
 {
   "name": "Podkicker",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "podkicker",
+        "title": "Podkicker",
+        "variant": null,
+        "file": "Podkicker.icon",
+        "source": "flat-svg",
+        "hasDark": false
+      }
+    ]
+  }
 }

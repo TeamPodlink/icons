@@ -1,5 +1,17 @@
 {
   "name": "Listen Notes",
   "active": true,
-  "guidelinesUrl": "https://brand-assets.listennotes.com/"
+  "guidelinesUrl": "https://brand-assets.listennotes.com/",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "listennotes",
+        "title": "Listen Notes",
+        "variant": null,
+        "file": "ListenNotes.icon",
+        "source": "flat-svg-raster",
+        "hasDark": false
+      }
+    ]
+  }
 }
