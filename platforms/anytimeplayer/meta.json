@@ -9,7 +9,8 @@
         "title": "Anytime Podcast Player",
         "variant": null,
         "file": "AnytimePlayer.icon",
-        "hasDark": false
+        "hasDark": false,
+        "source": "appstore-artwork"
       }
     ]
   }

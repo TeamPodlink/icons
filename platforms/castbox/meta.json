@@ -10,7 +10,8 @@
         "title": "Castbox",
         "variant": null,
         "file": "Castbox.icon",
-        "hasDark": false
+        "hasDark": false,
+        "source": "appstore-artwork"
       }
     ]
   }

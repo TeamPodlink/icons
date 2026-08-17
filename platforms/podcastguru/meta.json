@@ -10,7 +10,8 @@
         "title": "Podcast Guru",
         "variant": null,
         "file": "PodcastGuru.icon",
-        "hasDark": true
+        "hasDark": true,
+        "source": "catalog-artwork"
       }
     ]
   }

@@ -9,7 +9,8 @@
         "title": "Podhome",
         "variant": null,
         "file": "Podhome.icon",
-        "hasDark": false
+        "hasDark": false,
+        "source": "appstore-artwork"
       }
     ]
   }

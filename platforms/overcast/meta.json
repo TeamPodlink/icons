@@ -12,7 +12,8 @@
         "file": "Overcast.icon",
         "recipe": true,
         "rmse": 4.73,
-        "hasDark": true
+        "hasDark": true,
+        "source": "decanted"
       },
       {
         "slug": "overcast-dark",
@@ -21,7 +22,8 @@
         "file": "Overcast-Dark.icon",
         "recipe": true,
         "rmse": 5.05,
-        "hasDark": true
+        "hasDark": true,
+        "source": "decanted"
       },
       {
         "slug": "overcast-premiumblue",
@@ -30,7 +32,8 @@
         "file": "Overcast-PremiumBlue.icon",
         "recipe": true,
         "rmse": 3.32,
-        "hasDark": true
+        "hasDark": true,
+        "source": "decanted"
       }
     ]
   }

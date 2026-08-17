@@ -12,7 +12,8 @@
         "file": "ApplePodcasts.icon",
         "recipe": true,
         "rmse": 3.05,
-        "hasDark": true
+        "hasDark": true,
+        "source": "decanted"
       }
     ]
   }

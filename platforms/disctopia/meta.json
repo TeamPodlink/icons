@@ -9,7 +9,8 @@
         "title": "Disctopia",
         "variant": null,
         "file": "Disctopia.icon",
-        "hasDark": false
+        "hasDark": false,
+        "source": "appstore-artwork"
       }
     ]
   }

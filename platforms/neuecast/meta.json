@@ -9,7 +9,8 @@
         "title": "Neuecast",
         "variant": null,
         "file": "Neuecast.icon",
-        "hasDark": false
+        "hasDark": false,
+        "source": "catalog-artwork"
       }
     ]
   }

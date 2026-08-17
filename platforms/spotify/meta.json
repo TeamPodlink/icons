@@ -12,7 +12,8 @@
         "file": "Spotify.icon",
         "recipe": true,
         "rmse": 1.83,
-        "hasDark": true
+        "hasDark": true,
+        "source": "decanted"
       }
     ]
   }

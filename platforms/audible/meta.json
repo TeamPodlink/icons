@@ -10,7 +10,8 @@
         "title": "Audible",
         "variant": null,
         "file": "Audible.icon",
-        "hasDark": false
+        "hasDark": false,
+        "source": "appstore-artwork"
       }
     ]
   }

@@ -26,6 +26,7 @@ export const platforms: Platform[] = raw as Platform[];
 
 const SOURCE_LABEL: Record<string, string> = {
   decanted: "decanted",
+  "catalog-artwork": "catalog artwork",
   "appstore-artwork": "app store artwork",
   "flat-svg": "svg layer",
   "flat-svg-split": "svg split",

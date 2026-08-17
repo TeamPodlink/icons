@@ -10,7 +10,8 @@
         "title": "Pocket Casts",
         "variant": null,
         "file": "PocketCasts.icon",
-        "hasDark": true
+        "hasDark": true,
+        "source": "decanted"
       }
     ]
   }

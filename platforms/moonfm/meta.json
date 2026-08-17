@@ -9,7 +9,8 @@
         "title": "Moon FM",
         "variant": null,
         "file": "MoonFM.icon",
-        "hasDark": true
+        "hasDark": true,
+        "source": "decanted"
       }
     ]
   }

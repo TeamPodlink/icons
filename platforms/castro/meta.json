@@ -10,14 +10,16 @@
         "title": "Castro",
         "variant": null,
         "file": "Castro-Default.icon",
-        "hasDark": true
+        "hasDark": true,
+        "source": "catalog-artwork"
       },
       {
         "slug": "castro-pumpkin",
         "title": "Castro Pumpkin",
         "variant": "Pumpkin",
         "file": "Castro-Pumpkin1.icon",
-        "hasDark": true
+        "hasDark": true,
+        "source": "decanted"
       }
     ]
   }

@@ -9,7 +9,8 @@
         "title": "RSS Podcasts",
         "variant": null,
         "file": "RSSPodcasts.icon",
-        "hasDark": false
+        "hasDark": false,
+        "source": "appstore-artwork"
       }
     ]
   }

@@ -9,7 +9,8 @@
         "title": "Castamatic",
         "variant": null,
         "file": "Castamatic.icon",
-        "hasDark": true
+        "hasDark": true,
+        "source": "decanted"
       }
     ]
   }
