@@ -84,6 +84,6 @@ tools/
 ## Note on icon artwork
 
 Recipes generated from third-party `.icon` bundles reproduce those apps'
-icon artwork. The tooling here is MIT-licensed (see LICENSE); the *artwork*
-a recipe encodes remains the property of its owner. Ship recipes for logos
-you have the right to use.
+icon artwork. The tooling here is MIT-licensed (repo root LICENSE); the
+*artwork* a recipe encodes remains the property of its owner. Ship recipes
+for logos you have the right to use.
