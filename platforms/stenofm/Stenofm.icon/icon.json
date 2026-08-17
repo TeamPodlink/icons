@@ -1,4 +1,59 @@
 {
+  "fill": {
+    "linear-gradient": [
+      "display-p3:0.97650,0.80780,0.28630,1.00000",
+      "display-p3:0.97650,0.80780,0.28630,1.00000"
+    ],
+    "orientation": {
+      "start": {
+        "x": 0.5,
+        "y": 0
+      },
+      "stop": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "fill-specializations": [
+      {
+        "value": {
+          "linear-gradient": [
+            "display-p3:0.97650,0.80780,0.28630,1.00000",
+            "display-p3:0.97650,0.80780,0.28630,1.00000"
+          ],
+          "orientation": {
+            "start": {
+              "x": 0.5,
+              "y": 0
+            },
+            "stop": {
+              "x": 0.5,
+              "y": 1
+            }
+          }
+        }
+      },
+      {
+        "appearance": "dark",
+        "value": {
+          "linear-gradient": [
+            "gray:0.19200,1.00000",
+            "gray:0.07800,1.00000"
+          ],
+          "orientation": {
+            "start": {
+              "x": 0.5,
+              "y": 0
+            },
+            "stop": {
+              "x": 0.5,
+              "y": 1
+            }
+          }
+        }
+      }
+    ]
+  },
   "groups": [
     {
       "hidden": false,
@@ -10,6 +65,27 @@
       },
       "layers": [
         {
+          "image-name": "icon-dark.svg",
+          "name": "icon-dark",
+          "glass": false,
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          },
+          "opacity-specializations": [
+            {
+              "value": 0
+            },
+            {
+              "appearance": "dark",
+              "value": 1
+            }
+          ]
+        },
+        {
           "image-name": "icon.svg",
           "name": "icon",
           "glass": false,
@@ -19,7 +95,16 @@
               0,
               0
             ]
-          }
+          },
+          "opacity-specializations": [
+            {
+              "value": 1
+            },
+            {
+              "appearance": "dark",
+              "value": 0
+            }
+          ]
         }
       ]
     }

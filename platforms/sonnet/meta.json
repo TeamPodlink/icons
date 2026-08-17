@@ -9,8 +9,8 @@
         "title": "Sonnet",
         "variant": null,
         "file": "Sonnet.icon",
-        "source": "flat-svg",
-        "hasDark": false
+        "source": "flat-svg-split",
+        "hasDark": true
       }
     ]
   }

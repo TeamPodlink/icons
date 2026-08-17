@@ -9,8 +9,8 @@
         "title": "Subscribe by Email",
         "variant": null,
         "file": "SubscribebyEmail.icon",
-        "source": "flat-svg",
-        "hasDark": false
+        "source": "flat-svg-split",
+        "hasDark": true
       }
     ]
   }

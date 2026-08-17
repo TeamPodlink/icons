@@ -8,7 +8,7 @@
         "title": "Wondery",
         "variant": null,
         "file": "Wondery.icon",
-        "source": "flat-svg-raster",
+        "source": "flat-svg-browser",
         "hasDark": false
       }
     ]

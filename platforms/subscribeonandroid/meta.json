@@ -9,8 +9,8 @@
         "title": "Subscribe on Android",
         "variant": null,
         "file": "SubscribeonAndroid.icon",
-        "source": "flat-svg",
-        "hasDark": false
+        "source": "flat-svg-split",
+        "hasDark": true
       }
     ]
   }

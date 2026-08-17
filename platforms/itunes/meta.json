@@ -8,8 +8,8 @@
         "title": "iTunes",
         "variant": null,
         "file": "iTunes.icon",
-        "source": "flat-svg",
-        "hasDark": false
+        "source": "flat-svg-split",
+        "hasDark": true
       }
     ]
   }

@@ -8,7 +8,7 @@
         "title": "LN Beats",
         "variant": null,
         "file": "LNBeats.icon",
-        "source": "flat-svg",
+        "source": "flat-svg-split",
         "hasDark": false
       }
     ]

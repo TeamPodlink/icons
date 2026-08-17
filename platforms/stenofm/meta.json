@@ -8,8 +8,8 @@
         "title": "Steno.fm",
         "variant": null,
         "file": "Stenofm.icon",
-        "source": "flat-svg",
-        "hasDark": false
+        "source": "flat-svg-split",
+        "hasDark": true
       }
     ]
   }

@@ -8,7 +8,7 @@
         "title": "PodLP",
         "variant": null,
         "file": "PodLP.icon",
-        "source": "flat-svg",
+        "source": "flat-svg-split",
         "hasDark": false
       }
     ]

@@ -9,7 +9,7 @@
         "title": "Antennapod",
         "variant": null,
         "file": "Antennapod.icon",
-        "source": "flat-svg-raster",
+        "source": "flat-svg-browser",
         "hasDark": false
       }
     ]

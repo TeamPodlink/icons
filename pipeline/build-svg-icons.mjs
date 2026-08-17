@@ -36,7 +36,31 @@ import sharp from "sharp";
 import { readPlatforms, root } from "./lib.mjs";
 
 const ICTOOL = "/Applications/Icon Composer.app/Contents/Executables/ictool";
+const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const CANVAS = 1024;
+
+// Browser-grade SVG rasterization via headless Chrome. Handles what
+// neither ictool nor librsvg can: foreignObject (Figma conic-gradient
+// exports), color(display-p3 ...) fills, invalid-but-browser-tolerated
+// markup like stop-color="none".
+function chromeRasterize(svgPath, outPng, size) {
+  const dir = join("/tmp/svg-icons-work", `chrome-${Date.now()}`);
+  mkdirSync(dir, { recursive: true });
+  cpSync(svgPath, join(dir, "icon.svg"));
+  writeFileSync(
+    join(dir, "wrap.html"),
+    `<!doctype html><html><head><style>html,body{margin:0;padding:0}img{width:${size}px;height:${size}px;display:block}</style></head><body><img src="icon.svg"></body></html>`
+  );
+  execFileSync(CHROME, [
+    "--headless=new",
+    "--disable-gpu",
+    `--screenshot=${outPng}`,
+    `--window-size=${size},${size}`,
+    "--default-background-color=00000000",
+    join(dir, "wrap.html"),
+  ], { stdio: "ignore" });
+  rmSync(dir, { recursive: true, force: true });
+}
 
 const args = process.argv.slice(2);
 const flag = (name) =>
@@ -45,6 +69,7 @@ const includeInactive = args.includes("--all");
 const only = flag("--only");
 const THRESHOLD = Number(flag("--threshold") ?? 8);
 const forceRaster = new Set((flag("--force-raster") ?? "").split(",").filter(Boolean));
+const forceBrowser = new Set((flag("--browser") ?? "").split(",").filter(Boolean));
 
 function bundleName(name) {
   return name.replace(/[^A-Za-z0-9]/g, "") + ".icon";
@@ -133,7 +158,7 @@ for (const { id, dir, meta } of targets) {
   let rmse = null;
 
   try {
-    if (!forceRaster.has(id)) {
+    if (!forceRaster.has(id) && !forceBrowser.has(id)) {
       const vb = viewBoxSize(svg);
       writeBundle(bdir, "icon.svg", CANVAS / vb);
       cpSync(svgPath, join(bdir, "Assets/icon.svg"));
@@ -146,14 +171,13 @@ for (const { id, dir, meta } of targets) {
         .toFile(ref);
       rmse = await centralRmse(render, ref);
     }
-    if (forceRaster.has(id) || rmse > THRESHOLD) {
-      // Fallback: rasterize the SVG at 1024 and ship pixels.
-      source = "flat-svg-raster";
+    if (forceRaster.has(id) || forceBrowser.has(id) || rmse > THRESHOLD) {
+      // Fallback: rasterize the SVG at 1024 in headless Chrome and ship
+      // pixels. The browser is ground truth for these SVGs — ictool and
+      // librsvg each mangle different subsets of modern SVG.
+      source = "flat-svg-browser";
       const png = join(work, `${id}-1024.png`);
-      await sharp(svgPath, { density: (72 * CANVAS) / viewBoxSize(svg) })
-        .resize(CANVAS, CANVAS)
-        .png()
-        .toFile(png);
+      chromeRasterize(svgPath, png, CANVAS);
       writeBundle(bdir, "light.png", null);
       cpSync(png, join(bdir, "Assets/light.png"));
       ictoolRender(bdir, join(work, `${id}-ictool.png`), 256);
