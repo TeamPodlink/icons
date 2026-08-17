@@ -48,9 +48,19 @@ async function pixelsEqual(a, b) {
   return pa.equals(pb);
 }
 
+// ictool masters are Display-P3-tagged, but their content is sRGB-gamut
+// color expressed in P3 coordinates (ictool composites in sRGB with
+// colorimetric clipping, then encodes as P3 — measured by
+// packages/engine/tools/probe-gamut.mjs). sharp neither converts nor keeps
+// the profile by default, so shipped pixels were P3 numbers that browsers
+// read as sRGB — desaturating every icon (up to ~110/255 per channel).
+// Converting P3 -> sRGB through the embedded profile is lossless for
+// in-gamut content and beats tagging every tiny file with the 536B profile.
+const toSrgb = (s) => s.withIccProfile("srgb", { attach: false });
+
 async function emitSizes(master, prefix) {
   for (const size of SIZES) {
-    const base = sharp(master).resize(size, size);
+    const base = toSrgb(sharp(master).resize(size, size));
     for (const [ext, encode] of FORMATS)
       await encode(base.clone()).toFile(join(OUT, `${prefix}-${size}.${ext}`));
   }
@@ -59,7 +69,7 @@ async function emitSizes(master, prefix) {
 // ictool emits 16-bit/channel RGBA; 8-bit is indistinguishable for delivery
 // and ~5-10x smaller (the 1024 masters were 98% of the tarball).
 async function squashMaster(file) {
-  const buf = await sharp(file)
+  const buf = await toSrgb(sharp(file))
     .png({ compressionLevel: 9, adaptiveFiltering: true })
     .toBuffer();
   writeFileSync(file, buf);

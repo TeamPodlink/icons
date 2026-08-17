@@ -56,6 +56,14 @@ with measured RMSE within ±0.4 of exact at display sizes. Pass
 `{ exact: true }` to force the full 1024² pipeline (bit-identical to the
 pre-small-N engine); sizes ≥ 512 always use it.
 
+Output pixels are sRGB. Recipes are calibrated in Display-P3-coded space
+(measurements come from ictool's P3-tagged renders, whose content is
+sRGB-gamut color in P3 coordinates), and `finalize` converts on output so
+untagged consumers — canvas, data URIs — display the intended colors. Pass
+`{ colorSpace: "display-p3" }` for the raw recipe-space values (bit-identical
+to the historical output); the calibration/scoring tools use this to stay in
+the same space as ictool ground truth.
+
 ## Building recipes
 
 The batch harness is `pipeline/build-recipes.mjs` (measure + report, then

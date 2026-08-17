@@ -7,7 +7,9 @@
 // The engine owns everything universal to macOS-style Liquid Glass icons:
 // the squircle body SDF (analytic corner polynomial), the measured
 // body-light material LUT, the Snell refraction law kernel with its gather
-// blur, additive drop shadows, IGN output dithering, and PNG encoding.
+// blur, additive drop shadows, IGN output dithering, Display-P3 -> sRGB
+// output conversion (recipes are calibrated in P3-coded space), and PNG
+// encoding.
 // Per-icon content arrives as a RECIPE: background layer stack, disk-edge
 // material LUTs, and glass layers (silhouette path, law parameters, overlay
 // alpha, optional baked lighting field). See createLiquidRenderer().
@@ -185,7 +187,23 @@ function bodySDF(px, py) {
 }
 
 // ---------- output finalization + PNG ----------
-function finalize(fbuf, size, N) {
+// Recipe pixel values are Display-P3-coded: every measurement (fills,
+// materials, lightmaps) is sampled from ictool's P3-tagged renders, whose
+// content is sRGB-gamut color expressed in P3 coordinates. Consumers of
+// untagged pixels (canvas, data URIs) assume sRGB, so finalize converts by
+// default — linearize, D65 matrix, re-encode; exact for in-gamut values,
+// with the tiny out-of-gamut rounding residue clipped. colorSpace
+// "display-p3" skips the conversion and is bit-identical to the historical
+// output; the calibration/scoring tools use it to stay in recipe space.
+const P3M = [1.2249401, -0.2249404, 0.0000001,
+             -0.0420569, 1.0420571, 0.0000000,
+             -0.0196376, -0.0786361, 1.0982735];
+const p3lin = (u) => (u <= 0.04045 ? u/12.92 : ((u + 0.055)/1.055)**2.4);
+const p3enc = (u) => {
+  const v = Math.min(Math.max(u, 0), 1);
+  return v <= 0.0031308 ? 12.92*v : 1.055*v**(1/2.4) - 0.055;
+};
+function finalize(fbuf, size, N, srgb) {
   const s = N/size;
   const px = new Uint8ClampedArray(size*size*4);
   for (let y = 0; y < size; y++) {
@@ -204,6 +222,13 @@ function finalize(fbuf, size, N) {
         }
       }
       r /= area; g /= area; b /= area; a2 /= area;
+      if (srgb && a2 > 0) {
+        // fbuf is premultiplied: convert the straight color, re-premultiply
+        const lr = p3lin(r/a2), lg = p3lin(g/a2), lb = p3lin(b/a2);
+        r = p3enc(P3M[0]*lr + P3M[1]*lg + P3M[2]*lb)*a2;
+        g = p3enc(P3M[3]*lr + P3M[4]*lg + P3M[5]*lb)*a2;
+        b = p3enc(P3M[6]*lr + P3M[7]*lg + P3M[8]*lb)*a2;
+      }
       const ign = (52.9829189*((0.06711056*x + 0.00583715*y)%1))%1;
       const o = (y*size + x)*4;
       const a8 = Math.min(255, Math.floor(a2 + 0.5));
@@ -546,8 +571,9 @@ export function createLiquidRenderer(recipe) {
     return _pixelsByN.get(N);
   }
   return {
-    render({ size = 1024, exact = false } = {}) {
+    render({ size = 1024, exact = false, colorSpace = "srgb" } = {}) {
       if (!Number.isFinite(size) || size < 16 || size > 1024) throw new Error("size must be 16..1024");
+      if (colorSpace !== "srgb" && colorSpace !== "display-p3") throw new Error('colorSpace must be "srgb" or "display-p3"');
       const sz = size|0;
       // Internal field resolution: full 1024 for exact renders, else the
       // smallest power-of-two grid >= 2x the output — with a floor of 256
@@ -555,20 +581,20 @@ export function createLiquidRenderer(recipe) {
       // output detail but average away at 32px). Cost scales ~(1024/N)^2.
       let N = 1024;
       if (!exact) { N = sz > 32 ? 256 : 128; while (N < 2*sz && N < 1024) N *= 2; }
-      const key = (exact ? "x" : "") + sz;
+      const key = colorSpace + (exact ? "x" : ":") + sz;
       if (!_renders.has(key)) {
         _renders.set(key, (async () => {
           const fbuf = await pixelsFor(N);
-          return { width: sz, height: sz, pixels: finalize(fbuf, sz, N) };
+          return { width: sz, height: sz, pixels: finalize(fbuf, sz, N, colorSpace === "srgb") };
         })());
       }
       return _renders.get(key);
     },
-    dataUri({ size = 1024, exact = false } = {}) {
-      const key = (exact ? "x" : "") + (size|0);
+    dataUri({ size = 1024, exact = false, colorSpace = "srgb" } = {}) {
+      const key = colorSpace + (exact ? "x" : ":") + (size|0);
       if (!_uris.has(key)) {
         _uris.set(key, (async () => {
-          const png = await encodePng(await this.render({ size: size|0, exact }));
+          const png = await encodePng(await this.render({ size: size|0, exact, colorSpace }));
           return "data:image/png;base64," + toB64(png);
         })());
       }
