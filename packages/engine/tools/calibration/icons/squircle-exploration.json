@@ -1,0 +1,14 @@
+{
+  "fill" : {
+    "solid" : "extended-gray:0.50000,1.00000"
+  },
+  "groups" : [
+
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

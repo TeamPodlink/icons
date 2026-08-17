@@ -1,10 +1,26 @@
 # Calibration data provenance
 
-The files in `calibration/` are measured constants, produced in the
-[recomposer](https://github.com/nathangathright) project by instrumenting
-Apple's Liquid Glass renderer (ictool / Icon Composer) with purpose-built
-calibration icons. They are universal to Liquid Glass icons — nothing here
-is specific to any one app's artwork.
+The files in `calibration/` are measured constants, produced by
+instrumenting Apple's Liquid Glass renderer (ictool / Icon Composer) with
+purpose-built calibration icons (2026-07 research sessions). The engine
+consumes three of them (`body-corner-poly.npy`,
+`body-light-lut-analytic.npy`, `refraction-profile.json`); they are
+universal to Liquid Glass icons — nothing here is specific to any one
+app's artwork.
+
+The measurement machinery is archived in-repo: `tools/calibration/`
+holds the fit/measure/decode scripts and, in `tools/calibration/icons/`,
+the `icon.json` specs of every calibration instrument (the instrument
+`.icon` bundles and their ictool renders regenerate from those specs —
+see `tools/calibration/README.md` for the workflow and its caveats).
+The refraction law's canonical field implementation is
+`tools/build_displacement_field.py`. Small measured by-products the
+scripts consume (`ring_calib14.json`, `checker_calib.json`,
+`checker45_calib.json`, `person-mask-1024.png`,
+`person-overlay-alpha*.f32`) are archived alongside the engine's
+constants in `calibration/`. Large intermediate arrays (padded body
+EDTs, raw body-light LUT, per-disk LUTs) are not stored — they
+regenerate from the scripts plus ictool renders.
 
 ## `body-corner-poly.npy`
 
