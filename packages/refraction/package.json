@@ -1,0 +1,21 @@
+{
+  "name": "@podlink/refraction",
+  "version": "0.1.0",
+  "description": "Liquid Glass podcast app icons — ground-truth rasters from Apple's Icon Composer renderer, light + dark, sized for the web. Serve via jsDelivr or self-host.",
+  "license": "MIT",
+  "homepage": "https://github.com/TeamPodlink/icons#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TeamPodlink/icons.git"
+  },
+  "files": [
+    "assets/",
+    "manifest.json"
+  ],
+  "keywords": [
+    "liquid-glass",
+    "icons",
+    "podcast",
+    "podlink"
+  ]
+}

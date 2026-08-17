@@ -1,0 +1,34 @@
+{
+  "name": "web",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "predev": "node ../../pipeline/build-data.mjs && node ../../pipeline/sync-web-assets.mjs && node ../../pipeline/build-registry.mjs",
+    "dev": "next dev -p 4173",
+    "prebuild": "node ../../pipeline/build-data.mjs && node ../../pipeline/sync-web-assets.mjs && node ../../pipeline/build-registry.mjs",
+    "build": "next build",
+    "start": "next start -p 4173"
+  },
+  "dependencies": {
+    "refraction-engine": "workspace:*",
+    "clsx": "^2.1.1",
+    "fuse.js": "^7.0.0",
+    "lucide-react": "^0.539.0",
+    "next": "^15.4.6",
+    "next-themes": "^0.4.6",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.11",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.11",
+    "typescript": "^5.9.2"
+  }
+}

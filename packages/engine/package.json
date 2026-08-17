@@ -1,0 +1,15 @@
+{
+  "name": "refraction-engine",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Procedural Liquid Glass render engine + calibrated per-bundle recipes (research layer). Renders anywhere JavaScript runs; calibrated by RMSE against Apple's ictool.",
+  "license": "MIT",
+  "type": "module",
+  "main": "index.mjs",
+  "exports": {
+    ".": "./index.mjs",
+    "./engine": "./engine.mjs",
+    "./recipes/*": "./recipes/*.mjs"
+  },
+  "sideEffects": false
+}

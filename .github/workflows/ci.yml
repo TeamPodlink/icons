@@ -2,35 +2,23 @@ name: CI
 
 on:
   pull_request:
-
-permissions:
-  contents: read
+  push:
+    branches: [main, refraction]
 
 jobs:
-  check:
+  validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
-
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
-
       - run: pnpm install --frozen-lockfile
-
-      - name: Lint
-        run: pnpm lint
-
-      - name: Validate icons
-        run: pnpm validate
-
-      - name: Build
-        run: pnpm build
-
-      - name: Test
-        run: pnpm test
+      # Structural checks only — rendering requires macOS + Icon Composer
+      # and happens on a maintainer machine at release time.
+      - run: node pipeline/validate.mjs
+      - run: pnpm --filter @podlink/icons build
+      - run: pnpm --filter @podlink/icons test
+      - run: pnpm --filter web build

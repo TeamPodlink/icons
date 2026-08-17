@@ -1,0 +1,45 @@
+name: Submit an icon (.icon bundle)
+description: For app developers — submit your app's Liquid Glass icon.
+title: "[icon] "
+labels: ["icon-submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        **The fast path:** if you're the app's developer, export your `.icon`
+        file from Icon Composer (or grab it from your Xcode project), zip it,
+        and attach it below. That gives us the authoritative source — no
+        decompilation needed — and your submission doubles as permission to
+        include your icon in the directory.
+  - type: input
+    id: app
+    attributes:
+      label: App name
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: App website
+      placeholder: https://
+    validations:
+      required: true
+  - type: input
+    id: store
+    attributes:
+      label: App Store link
+      placeholder: https://apps.apple.com/...
+  - type: checkboxes
+    id: rights
+    attributes:
+      label: Rights
+      options:
+        - label: I am the developer of this app (or authorized to submit its icon)
+          required: true
+  - type: textarea
+    id: bundle
+    attributes:
+      label: Attach the zipped .icon bundle
+      description: Drag & drop the .zip here. Alternatively, open a PR adding it under icons/ (see CONTRIBUTING.md).
+    validations:
+      required: true
