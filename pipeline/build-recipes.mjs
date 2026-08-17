@@ -122,14 +122,18 @@ for (const b of candidates) {
         `cd "${GL}" && "${PY}" tools/build_recipe.py --bundle "${b.bundlePath}" --gt "${gt}" --id "${b.slug}" --outdir "${WORK}/out" ${extra}`,
         { stdio: "pipe" }
       );
+    // --p3: the calibration loop lives in Display-P3-coded space (ictool
+    // ground truth decodes to P3 numbers) — the residual lightmap bake and
+    // the RMSE score must both compare in that space, not the engine's
+    // default sRGB-converted output.
     run("");
     execSync(
-      `cd "${GL}" && node tools/render.mjs "${WORK}/out" "${WORK}/out/recipes/${b.slug}.mjs" "${WORK}/${b.slug}-pass1.png"`,
+      `cd "${GL}" && node tools/render.mjs "${WORK}/out" "${WORK}/out/recipes/${b.slug}.mjs" "${WORK}/${b.slug}-pass1.png" --p3`,
       { stdio: "pipe" }
     );
     run(`--lightmap "${WORK}/${b.slug}-pass1.png"`);
     execSync(
-      `cd "${GL}" && node tools/render.mjs "${WORK}/out" "${WORK}/out/recipes/${b.slug}.mjs" "${WORK}/${b.slug}-final.png"`,
+      `cd "${GL}" && node tools/render.mjs "${WORK}/out" "${WORK}/out/recipes/${b.slug}.mjs" "${WORK}/${b.slug}-final.png" --p3`,
       { stdio: "pipe" }
     );
     const out = execSync(

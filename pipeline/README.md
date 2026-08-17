@@ -54,6 +54,17 @@ The generated registry component reads sizes/formats from
 `@podlink/refraction` version doesn't ship (browsers do not fall back
 across `<picture>` sources on 404).
 
+**Color management:** ictool masters are Display-P3-tagged, but their
+content is sRGB-gamut color expressed in P3 coordinates (measured by
+`probe-gamut.mjs` — ictool composites in sRGB with colorimetric clipping,
+then encodes as P3). sharp neither converts nor keeps ICC profiles by
+default, so every emitted tier and the squashed masters pass through
+`withIccProfile("srgb", { attach: false })`: a lossless-for-this-content
+P3→sRGB conversion, cheaper than tagging each tiny file with the 536B
+profile. The engine's `finalize` applies the same conversion to live
+renders (`colorSpace: "display-p3"` opts out; the recipe calibration and
+scoring loop uses it, since ictool ground truth decodes to P3 numbers).
+
 The class-theme component mounts both renditions; `loading="lazy"`
 keeps the hidden one from being fetched (verified: a boxless lazy
 image never loads; it loads on demand when the theme class flips).
@@ -123,8 +134,9 @@ lightmap analysis over the adopted recipes.
    are P3-tagged). Measured across 23 declared colors: converting the
    rendered P3 pixels to sRGB matches naive matrix+clip conversion to
    worst-case 3/255. Player fills are pure math. (Side discovery: the
-   shipped rasters strip the P3 profile, so browsers desaturate every
-   saturated icon — being fixed separately.)
+   shipped rasters stripped the P3 profile without converting, so browsers
+   desaturated every saturated icon — fixed: `build-assets.mjs` and the
+   engine's `finalize` now convert P3→sRGB, see "Delivery encodings".)
 2. **`automatic-gradient` is a small fixed function.** Bottom stop =
    the declared color exactly (in sRGB); top stop = the same color
    lightened toward white by ~10–12 encoded units; linear vertical

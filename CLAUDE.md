@@ -51,5 +51,10 @@ pipeline/                  lib.mjs (readPlatforms/readBundles) + generators.
   packages/icons/{src/generated,src/data/platforms.json,static,dist}.
 - Rendering runs ONLY on a maintainer Mac (ictool). CI validates
   structure and builds; it never renders.
+- Color: ictool renders are P3-coded sRGB-gamut content. Everything
+  shipped (rasters, engine output) is converted P3→sRGB untagged; only
+  the calibration/scoring loop stays in P3 coded space
+  (`render.mjs --p3`, engine `colorSpace: "display-p3"`). See
+  "Delivery encodings" in pipeline/README.md.
 - Registry namespace is `@refraction`; asset CDN URLs pin the exact
   `@podlink/refraction` version (regenerate registry after publish).
