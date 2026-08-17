@@ -50,3 +50,6 @@ apps/web/lib/platforms.gen.json
 # Assets package payload (published to npm, not committed)
 packages/refraction/assets/
 packages/refraction/manifest.json
+
+# TypeScript incremental build cache
+*.tsbuildinfo
