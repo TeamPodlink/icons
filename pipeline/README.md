@@ -110,6 +110,38 @@ old recipes is ≤0.12 RMSE at 64px (spotify improved). Recipes shrank
 25–60 KB → 5–12 KB raw; the 6-recipe brotli pack 200.7 KB → 24.3 KB.
 `--lm-res 512` remains available when 1024-master fidelity matters.
 
+## .icon player feasibility probes (measured 2026-08-17)
+
+Toward a universal `.icon` player (render Apple's format directly from
+declared values, no per-icon measurement). Instruments:
+`packages/engine/tools/probe-gamut.mjs` and `probe-autogradient.mjs`;
+lightmap analysis over the adopted recipes.
+
+1. **The "undocumented gamut mapping" is solved — it never existed.**
+   ictool composites in sRGB with plain colorimetric clipping and
+   exports the result *expressed in Display-P3 coordinates* (the PNGs
+   are P3-tagged). Measured across 23 declared colors: converting the
+   rendered P3 pixels to sRGB matches naive matrix+clip conversion to
+   worst-case 3/255. Player fills are pure math. (Side discovery: the
+   shipped rasters strip the P3 profile, so browsers desaturate every
+   saturated icon — being fixed separately.)
+2. **`automatic-gradient` is a small fixed function.** Bottom stop =
+   the declared color exactly (in sRGB); top stop = the same color
+   lightened toward white by ~10–12 encoded units; linear vertical
+   ramp (mid-deviation < 1 except where channel clipping bends it);
+   anchors at the top when the input is near white. One lightness-grid
+   fit away from implementable.
+3. **Glass lighting is geometry-determined, material-invariant.** The
+   overcast and overcast-premiumblue lightmaps (same geometry,
+   different glass materials) correlate at **r = 0.976** with matched
+   amplitude — the property a universal geometry-driven lighting model
+   requires. The dark rendition's field is uncorrelated (r ≈ 0): Dark
+   is separate rendering physics, needing its own model. Flat icons
+   need almost none (spotify lightmap RMS 1.4 vs apple 27.2).
+   Open research: reparameterize lightmaps into (edge-distance ×
+   angle) coordinates to test transfer *across* geometries — the
+   remaining go/no-go for universal glass lighting.
+
 ## Adding a platform or icon
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md).
