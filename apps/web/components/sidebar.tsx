@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Cloud, House, Package, Server, Sparkles } from "lucide-react";
+import { Braces, Cloud, House, Package, Server, Sparkles } from "lucide-react";
 import { cards, categorySlug, getCategories, glassCards } from "@/lib/platforms";
 import { cn } from "@/lib/cn";
 
@@ -34,6 +34,7 @@ export function Sidebar() {
     { href: "/docs/registry", label: "Registry", icon: Package },
     { href: "/docs/self-hosting", label: "Self-hosting", icon: Server },
     { href: "/docs/api", label: "API", icon: Cloud },
+    { href: "/docs/icon-format", label: ".icon Format", icon: Braces },
   ];
 
   return (
