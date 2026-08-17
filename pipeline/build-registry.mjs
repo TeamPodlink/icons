@@ -47,6 +47,11 @@ const BASE_COMPONENT = `/*
  * Liquid Glass podcast app icon — ground-truth renders of macOS 26
  * .icon bundles, light + dark.
  *
+ * Note: images default to loading="lazy", which also suppresses the
+ * hidden variant's fetch in theme="class" mode. If you override
+ * loading="eager" (e.g. an above-fold LCP icon), both variants will
+ * fetch.
+ *
  * Self-hosting (recommended):
  *   npm i @podlink/refraction
  *   cp -R node_modules/@podlink/refraction/assets public/refraction

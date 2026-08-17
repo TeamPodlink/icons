@@ -51,11 +51,16 @@ const previewCommon = {
 function GlassPreview({ card, src }: { card: Card; src?: string }) {
   const b = card.bundle!;
   const alt = `${card.title} app icon`;
+  // 96px box: 128 rendition on 1x displays, 256 on 2x.
+  const sized = (dark: boolean) => ({
+    src: assetPath(b.slug, { size: 128, dark }),
+    srcSet: `${assetPath(b.slug, { size: 128, dark })} 1x, ${assetPath(b.slug, { size: 256, dark })} 2x`,
+  });
   if (src) return <img src={src} alt={alt} {...previewCommon} className={previewCls} />;
   if (!b.hasDark)
     return (
       <img
-        src={assetPath(b.slug, { size: 256 })}
+        {...sized(false)}
         alt={alt}
         {...previewCommon}
         className={previewCls}
@@ -64,13 +69,13 @@ function GlassPreview({ card, src }: { card: Card; src?: string }) {
   return (
     <>
       <img
-        src={assetPath(b.slug, { size: 256 })}
+        {...sized(false)}
         alt={alt}
         {...previewCommon}
         className={cn(previewCls, "dark:hidden")}
       />
       <img
-        src={assetPath(b.slug, { size: 256, dark: true })}
+        {...sized(true)}
         alt={alt}
         {...previewCommon}
         className={cn(previewCls, "hidden dark:block")}
