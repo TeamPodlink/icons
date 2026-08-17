@@ -1,4 +1,17 @@
 {
   "name": "TuneIn",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "tunein",
+        "title": "TuneIn",
+        "variant": null,
+        "file": "TuneIn.icon",
+        "source": "appstore-artwork",
+        "appStoreId": 319295332,
+        "hasDark": false
+      }
+    ]
+  }
 }

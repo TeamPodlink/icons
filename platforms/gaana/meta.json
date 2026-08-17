@@ -1,4 +1,17 @@
 {
   "name": "Gaana",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "gaana",
+        "title": "Gaana",
+        "variant": null,
+        "file": "Gaana.icon",
+        "source": "appstore-artwork",
+        "appStoreId": 585270521,
+        "hasDark": false
+      }
+    ]
+  }
 }

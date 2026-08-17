@@ -1,4 +1,17 @@
 {
   "name": "TrueFans",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "truefans",
+        "title": "TrueFans",
+        "variant": null,
+        "file": "TrueFans.icon",
+        "source": "appstore-artwork",
+        "appStoreId": 6747340246,
+        "hasDark": false
+      }
+    ]
+  }
 }

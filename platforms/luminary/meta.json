@@ -1,5 +1,18 @@
 {
   "name": "Luminary",
   "active": true,
-  "guidelinesUrl": "https://newsroom.luminarypodcasts.com/brandassets"
+  "guidelinesUrl": "https://newsroom.luminarypodcasts.com/brandassets",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "luminary",
+        "title": "Luminary",
+        "variant": null,
+        "file": "Luminary.icon",
+        "source": "appstore-artwork",
+        "appStoreId": 1398370417,
+        "hasDark": false
+      }
+    ]
+  }
 }

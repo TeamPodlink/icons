@@ -1,5 +1,18 @@
 {
   "name": "Pandora",
   "active": true,
-  "guidelinesUrl": "https://developer.pandora.com/docs/developer-resources/brand-assets/"
+  "guidelinesUrl": "https://developer.pandora.com/docs/developer-resources/brand-assets/",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "pandora",
+        "title": "Pandora",
+        "variant": null,
+        "file": "Pandora.icon",
+        "source": "appstore-artwork",
+        "appStoreId": 284035177,
+        "hasDark": false
+      }
+    ]
+  }
 }

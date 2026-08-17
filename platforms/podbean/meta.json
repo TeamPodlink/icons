@@ -1,5 +1,18 @@
 {
   "name": "Podbean",
   "active": true,
-  "guidelinesUrl": "https://www.podbean.com/site/default/badges"
+  "guidelinesUrl": "https://www.podbean.com/site/default/badges",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "podbean",
+        "title": "Podbean",
+        "variant": null,
+        "file": "Podbean.icon",
+        "source": "appstore-artwork",
+        "appStoreId": 973361050,
+        "hasDark": false
+      }
+    ]
+  }
 }

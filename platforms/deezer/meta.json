@@ -1,5 +1,18 @@
 {
   "name": "Deezer",
   "active": true,
-  "guidelinesUrl": "https://deezerbrand.com/"
+  "guidelinesUrl": "https://deezerbrand.com/",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "deezer",
+        "title": "Deezer",
+        "variant": null,
+        "file": "Deezer.icon",
+        "source": "appstore-artwork",
+        "appStoreId": 292738169,
+        "hasDark": false
+      }
+    ]
+  }
 }

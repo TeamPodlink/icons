@@ -1,4 +1,17 @@
 {
   "name": "Downcast",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "downcast",
+        "title": "Downcast",
+        "variant": null,
+        "file": "Downcast.icon",
+        "source": "appstore-artwork",
+        "appStoreId": 393858566,
+        "hasDark": false
+      }
+    ]
+  }
 }

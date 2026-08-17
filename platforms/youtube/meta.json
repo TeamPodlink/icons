@@ -1,5 +1,18 @@
 {
   "name": "YouTube",
   "active": true,
-  "guidelinesUrl": "https://support.google.com/youtube/answer/13379217?hl=en"
+  "guidelinesUrl": "https://support.google.com/youtube/answer/13379217?hl=en",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "youtube",
+        "title": "YouTube",
+        "variant": null,
+        "file": "YouTube.icon",
+        "source": "appstore-artwork",
+        "appStoreId": 544007664,
+        "hasDark": false
+      }
+    ]
+  }
 }

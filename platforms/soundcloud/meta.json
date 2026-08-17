@@ -1,5 +1,18 @@
 {
   "name": "Soundcloud",
   "active": true,
-  "guidelinesUrl": "https://press.soundcloud.com/media_kits/228462/"
+  "guidelinesUrl": "https://press.soundcloud.com/media_kits/228462/",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "soundcloud",
+        "title": "Soundcloud",
+        "variant": null,
+        "file": "Soundcloud.icon",
+        "source": "appstore-artwork",
+        "appStoreId": 336353151,
+        "hasDark": false
+      }
+    ]
+  }
 }

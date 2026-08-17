@@ -1,5 +1,18 @@
 {
   "name": "iHeartRadio",
   "active": true,
-  "guidelinesUrl": "https://brand.iheart.com/podcastlogo"
+  "guidelinesUrl": "https://brand.iheart.com/podcastlogo",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "iheartradio",
+        "title": "iHeartRadio",
+        "variant": null,
+        "file": "iHeartRadio.icon",
+        "source": "appstore-artwork",
+        "appStoreId": 290638154,
+        "hasDark": false
+      }
+    ]
+  }
 }

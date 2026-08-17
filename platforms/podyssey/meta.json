@@ -1,5 +1,18 @@
 {
   "name": "Podyssey",
   "active": true,
-  "guidelinesUrl": "https://podyssey.fm/podcast-creators#:~:text=Podyssey%20badge"
+  "guidelinesUrl": "https://podyssey.fm/podcast-creators#:~:text=Podyssey%20badge",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "podyssey",
+        "title": "Podyssey",
+        "variant": null,
+        "file": "Podyssey.icon",
+        "source": "appstore-artwork",
+        "appStoreId": 6499520102,
+        "hasDark": false
+      }
+    ]
+  }
 }

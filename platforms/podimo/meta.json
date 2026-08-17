@@ -1,4 +1,17 @@
 {
   "name": "Podimo",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "podimo",
+        "title": "Podimo",
+        "variant": null,
+        "file": "Podimo.icon",
+        "source": "appstore-artwork",
+        "appStoreId": 1476538730,
+        "hasDark": false
+      }
+    ]
+  }
 }

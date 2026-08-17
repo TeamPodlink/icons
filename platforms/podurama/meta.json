@@ -1,4 +1,17 @@
 {
   "name": "Podurama",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "podurama",
+        "title": "Podurama",
+        "variant": null,
+        "file": "Podurama.icon",
+        "source": "appstore-artwork",
+        "appStoreId": 1497491520,
+        "hasDark": false
+      }
+    ]
+  }
 }

@@ -1,4 +1,17 @@
 {
   "name": "Audacy",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "audacy",
+        "title": "Audacy",
+        "variant": null,
+        "file": "Audacy.icon",
+        "source": "appstore-artwork",
+        "appStoreId": 323701765,
+        "hasDark": false
+      }
+    ]
+  }
 }

@@ -1,4 +1,17 @@
 {
   "name": "Playapod",
-  "active": true
+  "active": true,
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "playapod",
+        "title": "Playapod",
+        "variant": null,
+        "file": "Playapod.icon",
+        "source": "appstore-artwork",
+        "appStoreId": 1246857049,
+        "hasDark": false
+      }
+    ]
+  }
 }
