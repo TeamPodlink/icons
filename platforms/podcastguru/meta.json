@@ -3,9 +3,6 @@
   "active": true,
   "guidelinesUrl": "https://podcastguru.io/podcast-guru-branding/",
   "url": "https://podcastguru.io",
-  "categories": [
-    "Podcast Players"
-  ],
   "liquidGlass": {
     "bundles": [
       {

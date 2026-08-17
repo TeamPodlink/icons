@@ -2,9 +2,6 @@
   "name": "Neuecast",
   "active": true,
   "url": "https://neuecast.app",
-  "categories": [
-    "Podcast Players"
-  ],
   "liquidGlass": {
     "bundles": [
       {

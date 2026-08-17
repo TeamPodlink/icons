@@ -2,9 +2,6 @@
   "name": "RSS",
   "active": true,
   "url": "https://rss.com",
-  "categories": [
-    "Podcast Players"
-  ],
   "liquidGlass": {
     "bundles": [
       {

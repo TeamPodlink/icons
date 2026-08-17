@@ -2,9 +2,6 @@
   "name": "Castamatic",
   "active": true,
   "url": "https://castamatic.com",
-  "categories": [
-    "Podcast Players"
-  ],
   "liquidGlass": {
     "bundles": [
       {

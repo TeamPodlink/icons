@@ -4,7 +4,7 @@ Every podcast platform lives in one folder: `platforms/<id>/`.
 
 ```
 platforms/overcast/
-  meta.json            name, url, categories, aliases, guidelinesUrl,
+  meta.json            name, url, aliases, guidelinesUrl,
                        liquidGlass bundle list
   icon.svg             flat 32×32 vector icon
   badge.svg            badge artwork (badge-dark.svg if it differs)

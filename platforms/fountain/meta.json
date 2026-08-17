@@ -3,9 +3,6 @@
   "active": true,
   "guidelinesUrl": "https://www.fountain.fm/podcaster-guide#:~:text=Listen%20on%20Fountain%20badges",
   "url": "https://fountain.fm",
-  "categories": [
-    "Podcast Players"
-  ],
   "liquidGlass": {
     "bundles": [
       {

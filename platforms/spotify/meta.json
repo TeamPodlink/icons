@@ -3,9 +3,6 @@
   "active": true,
   "guidelinesUrl": "https://support.spotifyforpodcasters.com/hc/en-us/articles/360044285891-Sharing-your-podcast",
   "url": "https://spotify.com",
-  "categories": [
-    "Music & Streaming"
-  ],
   "liquidGlass": {
     "bundles": [
       {

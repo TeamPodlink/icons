@@ -3,9 +3,6 @@
   "active": true,
   "guidelinesUrl": "https://helpcenter.castbox.fm/portal/en/kb/articles/add-castb",
   "url": "https://castbox.fm",
-  "categories": [
-    "Podcast Players"
-  ],
   "liquidGlass": {
     "bundles": [
       {

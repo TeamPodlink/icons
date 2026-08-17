@@ -1,26 +1,43 @@
 // Build minimal .icon bundles from platforms' flat icon.svg — for
-// platforms with no Liquid Glass bundle yet. macOS + Icon Composer only.
+// platforms with no Liquid Glass bundle yet — then (by default) attempt
+// the dark-variant SPLIT on each: decompose a detectable full-canvas
+// solid background into the bundle's canvas fill so the glyph rides a
+// proper dark canvas in the Dark rendition. macOS + Icon Composer +
+// Chrome.
 //
-// The whole 32x32 icon.svg becomes a single full-bleed layer (neutral
-// material, no glass), mirroring build_flat_icon.py but with a vector
-// source. ictool's SVG renderer doesn't support everything (filters,
-// blend modes, CSS color() fills), so every bundle is verified: the
-// ictool render is compared against a librsvg (sharp) rasterization of
-// the same SVG over the central region (inside the squircle). Bundles
-// that disagree beyond --threshold automatically fall back to a 1024px
-// PNG rasterization of the SVG (source: flat-svg-raster), which always
-// matches by construction.
+// Build modes (per icon, recorded as the bundle's `source`):
+//   flat-svg          whole SVG as one full-bleed neutral layer
+//   flat-svg-browser  1024px raster from headless Chrome — used when
+//                     ictool mangles the SVG (filters, foreignObject...)
+//   flat-svg-split    background lifted into the canvas fill; glyph
+//                     layer alone (+ white-recolored dark glyph for
+//                     monochrome-dark marks via opacity-specializations)
+//
+// Split rules (learned the hard way — keep in sync with reality):
+//   - ictool's Dark rendition ALWAYS auto-darkens the canvas and tints
+//     white glyphs with the former background color (Apple's automatic
+//     derivation), even against fill-specializations. Bright/colorful
+//     glyphs therefore need no recoloring.
+//   - Whitening is only safe for effectively-monochrome dark glyphs
+//     (low luminance AND low saturation). Illustrated dark art must not
+//     be recolored.
+//   - Knockout designs (glyph punched out of an overlay above a white
+//     base) are unsplittable: near-full glyph coverage detects them.
 //
 // Usage:
 //   node pipeline/build-svg-icons.mjs [--all] [--only <id>]
-//     [--threshold 8] [--force-raster <id,id,...>]
-//   --all           include inactive platforms
-//   --force-raster  skip the SVG layer for these ids, go straight to PNG
+//     [--threshold 8] [--force-raster <id,...>] [--browser <id,...>]
+//     [--no-split] [--split-existing]
+//   --all             include inactive platforms
+//   --browser         skip the SVG layer for these ids, go straight to
+//                     a Chrome raster
+//   --no-split        build single-layer bundles only
+//   --split-existing  also re-attempt the split on bundles already built
+//                     as flat-svg (not just ones built this run)
 //
-// After building, writes a contact sheet of all new renders to
-// /tmp/svg-icons-review.png for visual QA. Update meta.json entries and
-// re-run pipeline/build-assets.mjs afterwards (this script only creates
-// bundles + registers them; it does not emit the web asset set).
+// Review sheets for visual QA:
+//   /tmp/svg-icons-review.png      light renders of built bundles
+//   /tmp/dark-variants-review.png  light|dark pairs of split bundles
 
 import { execFileSync } from "node:child_process";
 import {
@@ -33,34 +50,15 @@ import {
 } from "node:fs";
 import { join } from "node:path";
 import sharp from "sharp";
-import { readPlatforms, root } from "./lib.mjs";
+import { readPlatforms } from "./lib.mjs";
 
 const ICTOOL = "/Applications/Icon Composer.app/Contents/Executables/ictool";
 const CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
 const CANVAS = 1024;
-
-// Browser-grade SVG rasterization via headless Chrome. Handles what
-// neither ictool nor librsvg can: foreignObject (Figma conic-gradient
-// exports), color(display-p3 ...) fills, invalid-but-browser-tolerated
-// markup like stop-color="none".
-function chromeRasterize(svgPath, outPng, size) {
-  const dir = join("/tmp/svg-icons-work", `chrome-${Date.now()}`);
-  mkdirSync(dir, { recursive: true });
-  cpSync(svgPath, join(dir, "icon.svg"));
-  writeFileSync(
-    join(dir, "wrap.html"),
-    `<!doctype html><html><head><style>html,body{margin:0;padding:0}img{width:${size}px;height:${size}px;display:block}</style></head><body><img src="icon.svg"></body></html>`
-  );
-  execFileSync(CHROME, [
-    "--headless=new",
-    "--disable-gpu",
-    `--screenshot=${outPng}`,
-    `--window-size=${size},${size}`,
-    "--default-background-color=00000000",
-    join(dir, "wrap.html"),
-  ], { stdio: "ignore" });
-  rmSync(dir, { recursive: true, force: true });
-}
+const DARK_GRADIENT = {
+  "linear-gradient": ["gray:0.19200,1.00000", "gray:0.07800,1.00000"],
+  orientation: { start: { x: 0.5, y: 0 }, stop: { x: 0.5, y: 1 } },
+};
 
 const args = process.argv.slice(2);
 const flag = (name) =>
@@ -70,6 +68,13 @@ const only = flag("--only");
 const THRESHOLD = Number(flag("--threshold") ?? 8);
 const forceRaster = new Set((flag("--force-raster") ?? "").split(",").filter(Boolean));
 const forceBrowser = new Set((flag("--browser") ?? "").split(",").filter(Boolean));
+const doSplit = !args.includes("--no-split");
+const splitExisting = args.includes("--split-existing");
+
+const work = "/tmp/svg-icons-work";
+mkdirSync(work, { recursive: true });
+
+// ------------------------------------------------------------ helpers
 
 function bundleName(name) {
   return name.replace(/[^A-Za-z0-9]/g, "") + ".icon";
@@ -83,7 +88,35 @@ function viewBoxSize(svg) {
   return w;
 }
 
-function writeBundle(dir, layerFile, scale) {
+function ictoolRender(bundle, out, size, rendition = "Default") {
+  execFileSync(ICTOOL, [
+    bundle, "--export-image", "--output-file", out, "--platform", "macOS",
+    "--rendition", rendition, "--width", String(size), "--height",
+    String(size), "--scale", "1",
+  ]);
+}
+
+// Browser-grade SVG rasterization via headless Chrome. Handles what
+// neither ictool nor librsvg can: foreignObject (Figma conic-gradient
+// exports), color(display-p3 ...) fills, invalid-but-browser-tolerated
+// markup like stop-color="none".
+function chromeRasterize(svgText, outPng, size) {
+  const dir = join(work, `chrome-${Math.floor(Math.random() * 1e9)}`);
+  mkdirSync(dir, { recursive: true });
+  writeFileSync(join(dir, "icon.svg"), svgText);
+  writeFileSync(
+    join(dir, "wrap.html"),
+    `<!doctype html><html><head><style>html,body{margin:0;padding:0}img{width:${size}px;height:${size}px;display:block}</style></head><body><img src="icon.svg"></body></html>`
+  );
+  execFileSync(CHROME, [
+    "--headless=new", "--disable-gpu", `--screenshot=${outPng}`,
+    `--window-size=${size},${size}`, "--default-background-color=00000000",
+    join(dir, "wrap.html"),
+  ], { stdio: "ignore" });
+  rmSync(dir, { recursive: true, force: true });
+}
+
+function writeSingleLayerBundle(dir, layerFile, scale) {
   rmSync(dir, { recursive: true, force: true });
   mkdirSync(join(dir, "Assets"), { recursive: true });
   const layer = {
@@ -93,32 +126,22 @@ function writeBundle(dir, layerFile, scale) {
   };
   if (scale && Math.abs(scale - 1) > 1e-6)
     layer.position = { scale, "translation-in-points": [0, 0] };
-  const doc = {
-    groups: [
+  writeFileSync(
+    join(dir, "icon.json"),
+    JSON.stringify(
       {
-        hidden: false,
-        "blend-mode": "normal",
-        specular: false,
-        translucency: { enabled: false, value: 0 },
-        layers: [layer],
+        groups: [
+          {
+            hidden: false, "blend-mode": "normal", specular: false,
+            translucency: { enabled: false, value: 0 },
+            layers: [layer],
+          },
+        ],
+        "supported-platforms": { squares: "shared" },
       },
-    ],
-    "supported-platforms": { squares: "shared" },
-  };
-  writeFileSync(join(dir, "icon.json"), JSON.stringify(doc, null, 2) + "\n");
-}
-
-function ictoolRender(bundle, out, size) {
-  execFileSync(ICTOOL, [
-    bundle,
-    "--export-image",
-    "--output-file", out,
-    "--platform", "macOS",
-    "--rendition", "Default",
-    "--width", String(size),
-    "--height", String(size),
-    "--scale", "1",
-  ]);
+      null, 2
+    ) + "\n"
+  );
 }
 
 // RMSE over the central 60% square (inside the squircle mask) at 256px.
@@ -137,19 +160,188 @@ async function centralRmse(pngA, pngB) {
   return Math.sqrt(sum / a.length);
 }
 
-const targets = readPlatforms().filter(({ id, dir, meta }) => {
+// ----------------------------------------------------- split machinery
+
+function parseColor(s) {
+  let m = s.match(/^#([0-9a-f]{6})$/i);
+  if (m) {
+    const [r, g, b] = [0, 2, 4].map((i) =>
+      (parseInt(m[1].slice(i, i + 2), 16) / 255).toFixed(5)
+    );
+    return `srgb:${r},${g},${b},1.00000`;
+  }
+  m = s.match(/^#([0-9a-f]{3})$/i);
+  if (m) {
+    const [r, g, b] = [...m[1]].map((c) =>
+      (parseInt(c + c, 16) / 255).toFixed(5)
+    );
+    return `srgb:${r},${g},${b},1.00000`;
+  }
+  m = s.match(/^color\(display-p3\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*\)$/);
+  if (m)
+    return `display-p3:${(+m[1]).toFixed(5)},${(+m[2]).toFixed(5)},${(+m[3]).toFixed(5)},1.00000`;
+  if (s === "white") return "srgb:1.00000,1.00000,1.00000,1.00000";
+  if (s === "black") return "srgb:0.00000,0.00000,0.00000,1.00000";
+  return null;
+}
+
+const FULL = String.raw`[Mm]0[ ,]0\s*h\s*32\s*v\s*32\s*[Hh]0\s*[zZ]`;
+
+// Detect + strip a leading full-canvas solid background. Two patterns:
+//   A: <path fill="C" d="M0 0h32v32H0z"/> (repeated paints all belong
+//      to the background stack; the LAST removed is the visible color)
+//   B: podcastindex-style defs path with fill, painted by a <use> at
+//      the head of the clip group (never touch the clipPath's <use>)
+function splitBackground(svg) {
+  let color = null;
+  let out = svg;
+  for (let i = 0; i < 3; i++) {
+    const re = new RegExp(
+      `<(?:path|rect)\\s+fill="([^"]+)"(?:\\s+fill-opacity="1")?\\s+d="${FULL}"\\s*/>`
+    );
+    const m = out.match(re);
+    if (!m) break;
+    const c = parseColor(m[1]);
+    if (!c) break;
+    color = c;
+    out = out.replace(m[0], "");
+  }
+  if (color) return { color, glyphSvg: out };
+  const m = svg.match(
+    new RegExp(
+      `<path id="([^"]+)" fill="([^"]+)"[^>]*d="${FULL}"[^>]*/>[\\s\\S]*?<use href="#\\1"\\s*/>`
+    )
+  );
+  if (m) {
+    const c = parseColor(m[2]);
+    if (c) {
+      const painted = svg.replace(
+        new RegExp(`(<g clip-path="[^"]*">)\\s*<use href="#${m[1]}"\\s*/>`),
+        "$1"
+      );
+      if (painted !== svg) return { color: c, glyphSvg: painted };
+    }
+  }
+  return null;
+}
+
+/** Coverage-weighted mean luminance + saturation of visible pixels. */
+async function glyphStats(png) {
+  const { data } = await sharp(png).raw().toBuffer({ resolveWithObject: true });
+  let n = 0, luma = 0, sat = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i + 3] > 25) {
+      n++;
+      const [r, g, b] = [data[i], data[i + 1], data[i + 2]];
+      luma += 0.2126 * r + 0.7152 * g + 0.0722 * b;
+      const mx = Math.max(r, g, b);
+      sat += mx === 0 ? 0 : (mx - Math.min(r, g, b)) / mx;
+    }
+  }
+  return {
+    luma: n ? luma / n : 255,
+    sat: n ? sat / n : 0,
+    coverage: n / (data.length / 4),
+  };
+}
+
+/** Recolor dark fills to white for the dark-appearance glyph. */
+function whiten(svg) {
+  return svg
+    .replace(/fill="#([0-4][0-9a-f]{2}|[0-4][0-9a-f]{5})"/gi, 'fill="#ffffff"')
+    .replace(/fill="(black|#000|#000000)"/gi, 'fill="#ffffff"')
+    .replace(/stroke="(black|#000|#000000)"/gi, 'stroke="#ffffff"');
+}
+
+/**
+ * Attempt the background/glyph split on a platform's bundle.
+ * Returns "split" | a skip-reason string.
+ */
+async function trySplit(id, dir, meta) {
+  const b = meta.liquidGlass.bundles[0];
+  const svg = readFileSync(join(dir, "icon.svg"), "utf8");
+  const split = splitBackground(svg);
+  if (!split) return "no-detectable-bg";
+
+  const glyphPng = join(work, `${id}-glyph.png`);
+  chromeRasterize(split.glyphSvg, glyphPng, 256);
+  const { luma, sat, coverage } = await glyphStats(glyphPng);
+  if (coverage > 0.65) return "knockout-or-leftover-bg";
+  const needsWhiteGlyph = luma < 110 && sat < 0.18 && coverage > 0.01;
+
+  const bdir = join(dir, b.file);
+  rmSync(bdir, { recursive: true, force: true });
+  mkdirSync(join(bdir, "Assets"), { recursive: true });
+  writeFileSync(join(bdir, "Assets/icon.svg"), split.glyphSvg);
+  const layers = [];
+  if (needsWhiteGlyph) {
+    writeFileSync(join(bdir, "Assets/icon-dark.svg"), whiten(split.glyphSvg));
+    layers.push({
+      "image-name": "icon-dark.svg", name: "icon-dark", glass: false,
+      position: { scale: 32, "translation-in-points": [0, 0] },
+      "opacity-specializations": [
+        { value: 0 }, { appearance: "dark", value: 1 },
+      ],
+    });
+  }
+  layers.push({
+    "image-name": "icon.svg", name: "icon", glass: false,
+    position: { scale: 32, "translation-in-points": [0, 0] },
+    ...(needsWhiteGlyph
+      ? {
+          "opacity-specializations": [
+            { value: 1 }, { appearance: "dark", value: 0 },
+          ],
+        }
+      : {}),
+  });
+  const solid = {
+    "linear-gradient": [split.color, split.color],
+    orientation: { start: { x: 0.5, y: 0 }, stop: { x: 0.5, y: 1 } },
+  };
+  writeFileSync(
+    join(bdir, "icon.json"),
+    JSON.stringify(
+      {
+        fill: {
+          ...solid,
+          "fill-specializations": [
+            { value: solid },
+            { appearance: "dark", value: DARK_GRADIENT },
+          ],
+        },
+        groups: [
+          {
+            hidden: false, "blend-mode": "normal", specular: false,
+            translucency: { enabled: false, value: 0 },
+            layers,
+          },
+        ],
+        "supported-platforms": { squares: "shared" },
+      },
+      null, 2
+    ) + "\n"
+  );
+  ictoolRender(bdir, join(work, `${id}-light.png`), 256, "Default");
+  ictoolRender(bdir, join(work, `${id}-dark.png`), 256, "Dark");
+  b.source = "flat-svg-split";
+  writeFileSync(join(dir, "meta.json"), JSON.stringify(meta, null, 2) + "\n");
+  return "split";
+}
+
+// -------------------------------------------------------------- build
+
+const buildTargets = readPlatforms().filter(({ id, dir, meta }) => {
   if (only && id !== only) return false;
   if ((meta.liquidGlass?.bundles ?? []).length > 0) return false;
   if (!includeInactive && meta.active === false) return false;
   return existsSync(join(dir, "icon.svg"));
 });
 
-console.log(`${targets.length} platforms to build\n`);
+console.log(`${buildTargets.length} platforms to build\n`);
 const results = [];
-const work = "/tmp/svg-icons-work";
-mkdirSync(work, { recursive: true });
 
-for (const { id, dir, meta } of targets) {
+for (const { id, dir, meta } of buildTargets) {
   const svgPath = join(dir, "icon.svg");
   const svg = readFileSync(svgPath, "utf8");
   const bname = bundleName(meta.name);
@@ -160,25 +352,24 @@ for (const { id, dir, meta } of targets) {
   try {
     if (!forceRaster.has(id) && !forceBrowser.has(id)) {
       const vb = viewBoxSize(svg);
-      writeBundle(bdir, "icon.svg", CANVAS / vb);
+      writeSingleLayerBundle(bdir, "icon.svg", CANVAS / vb);
       cpSync(svgPath, join(bdir, "Assets/icon.svg"));
       const render = join(work, `${id}-ictool.png`);
       ictoolRender(bdir, render, 256);
       const ref = join(work, `${id}-ref.png`);
-      await sharp(svgPath, { density: (72 * 256) / viewBoxSize(svg) })
+      await sharp(svgPath, { density: (72 * 256) / vb })
         .resize(256, 256)
         .png()
         .toFile(ref);
       rmse = await centralRmse(render, ref);
     }
     if (forceRaster.has(id) || forceBrowser.has(id) || rmse > THRESHOLD) {
-      // Fallback: rasterize the SVG at 1024 in headless Chrome and ship
-      // pixels. The browser is ground truth for these SVGs — ictool and
-      // librsvg each mangle different subsets of modern SVG.
+      // The browser is ground truth for these SVGs — ictool and librsvg
+      // each mangle different subsets of modern SVG.
       source = "flat-svg-browser";
       const png = join(work, `${id}-1024.png`);
-      chromeRasterize(svgPath, png, CANVAS);
-      writeBundle(bdir, "light.png", null);
+      chromeRasterize(svg, png, CANVAS);
+      writeSingleLayerBundle(bdir, "light.png", null);
       cpSync(png, join(bdir, "Assets/light.png"));
       ictoolRender(bdir, join(work, `${id}-ictool.png`), 256);
     }
@@ -199,35 +390,80 @@ for (const { id, dir, meta } of targets) {
   }
 }
 
-// Contact sheet of ictool renders for visual review (row-major, the
-// printed order below maps index -> id).
-const okIds = results.filter((r) => r.source !== "FAILED").map((r) => r.id);
-if (okIds.length) {
-  const cols = Math.ceil(Math.sqrt(okIds.length));
-  const rows = Math.ceil(okIds.length / cols);
+// -------------------------------------------------------- split pass
+
+const splitResults = [];
+if (doSplit) {
+  const builtIds = new Set(
+    results.filter((r) => r.source === "flat-svg").map((r) => r.id)
+  );
+  for (const { id, dir, meta } of readPlatforms()) {
+    if (only && id !== only) continue;
+    const b = meta.liquidGlass?.bundles?.[0];
+    if (!b || b.source !== "flat-svg" || meta.liquidGlass.bundles.length > 1)
+      continue;
+    if (!splitExisting && !builtIds.has(id)) continue;
+    try {
+      const outcome = await trySplit(id, dir, meta);
+      splitResults.push({ id, outcome });
+      console.log(`split ${id}: ${outcome}`);
+    } catch (e) {
+      splitResults.push({ id, outcome: `FAILED: ${e.message}` });
+      console.error(`split FAIL ${id}: ${e.message}`);
+    }
+  }
+}
+
+// ------------------------------------------------------ review sheets
+
+async function sheet(cells, out, cols) {
   const cell = 256;
+  const rows = Math.ceil(cells.length / cols);
   await sharp({
     create: {
-      width: cols * cell,
-      height: rows * cell,
-      channels: 4,
-      background: { r: 235, g: 235, b: 235, alpha: 1 },
+      width: cols * cell, height: rows * cell, channels: 4,
+      background: { r: 128, g: 128, b: 128, alpha: 1 },
     },
   })
     .composite(
-      okIds.map((id, i) => ({
-        input: join(work, `${id}-ictool.png`),
-        left: (i % cols) * cell,
-        top: Math.floor(i / cols) * cell,
+      cells.map((input, i) => ({
+        input, left: (i % cols) * cell, top: Math.floor(i / cols) * cell,
       }))
     )
     .png()
-    .toFile("/tmp/svg-icons-review.png");
-  console.log(`\nreview sheet: /tmp/svg-icons-review.png (${cols} per row)`);
+    .toFile(out);
+}
+
+const okIds = results.filter((r) => r.source !== "FAILED").map((r) => r.id);
+if (okIds.length) {
+  const cols = Math.ceil(Math.sqrt(okIds.length));
+  await sheet(
+    okIds.map((id) => join(work, `${id}-ictool.png`)),
+    "/tmp/svg-icons-review.png",
+    cols
+  );
+  console.log(`\nlight review: /tmp/svg-icons-review.png (${cols} per row)`);
   console.log(okIds.join(", "));
 }
+const splitIds = splitResults
+  .filter((r) => r.outcome === "split")
+  .map((r) => r.id);
+if (splitIds.length) {
+  await sheet(
+    splitIds.flatMap((id) => [
+      join(work, `${id}-light.png`),
+      join(work, `${id}-dark.png`),
+    ]),
+    "/tmp/dark-variants-review.png",
+    6
+  );
+  console.log(`\ndark pairs review: /tmp/dark-variants-review.png`);
+  console.log(splitIds.join(", "));
+}
+
 console.log(
-  `\n${results.filter((r) => r.source === "flat-svg").length} svg, ` +
-    `${results.filter((r) => r.source === "flat-svg-raster").length} raster fallback, ` +
-    `${results.filter((r) => r.source === "FAILED").length} failed`
+  `\nbuilt: ${results.filter((r) => r.source === "flat-svg").length} svg, ` +
+    `${results.filter((r) => r.source === "flat-svg-browser").length} browser, ` +
+    `${results.filter((r) => r.source === "FAILED").length} failed; ` +
+    `split: ${splitIds.length} of ${splitResults.length} attempted`
 );

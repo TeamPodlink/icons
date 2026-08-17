@@ -2,9 +2,6 @@
   "name": "Disctopia",
   "active": true,
   "url": "https://disctopia.com",
-  "categories": [
-    "Hosting & Networks"
-  ],
   "liquidGlass": {
     "bundles": [
       {

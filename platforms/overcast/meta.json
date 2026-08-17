@@ -3,9 +3,6 @@
   "active": true,
   "guidelinesUrl": "https://overcast.fm/podcasterinfo#:~:text=Subscribe%20on%20Overcast",
   "url": "https://overcast.fm",
-  "categories": [
-    "Podcast Players"
-  ],
   "liquidGlass": {
     "bundles": [
       {

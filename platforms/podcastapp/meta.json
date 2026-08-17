@@ -2,9 +2,6 @@
   "name": "Podcast App",
   "active": true,
   "url": "https://podcast.app",
-  "categories": [
-    "Podcast Players"
-  ],
   "liquidGlass": {
     "bundles": [
       {

@@ -2,9 +2,6 @@
   "name": "Podcast Republic",
   "active": true,
   "url": "https://www.podcastrepublic.net",
-  "categories": [
-    "Podcast Players"
-  ],
   "liquidGlass": {
     "bundles": [
       {

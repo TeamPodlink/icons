@@ -2,9 +2,6 @@
   "name": "Yoto",
   "active": true,
   "url": "https://yotoplay.com",
-  "categories": [
-    "Kids & Family"
-  ],
   "liquidGlass": {
     "bundles": [
       {

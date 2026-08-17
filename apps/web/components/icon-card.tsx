@@ -169,7 +169,7 @@ export function IconCard({ card }: { card: Card }) {
           {card.title}
         </p>
         <div className="flex h-6 items-center justify-center space-x-1">
-          {card.platform.categories.map((c) => (
+          {card.categories.slice(0, 2).map((c) => (
             <Link
               key={c}
               href={`/directory/${categorySlug(c)}`}

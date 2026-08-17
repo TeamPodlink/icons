@@ -11,7 +11,6 @@ const out = readPlatforms().map(({ id, dir, meta }) => ({
   active: meta.active !== false,
   url: meta.url ?? null,
   guidelinesUrl: meta.guidelinesUrl ?? null,
-  categories: meta.categories ?? [],
   hasFlat: existsSync(join(dir, "icon.svg")),
   hasBadge: existsSync(join(dir, "badge.svg")),
   bundles: (meta.liquidGlass?.bundles ?? []).map((b) => ({
@@ -21,6 +20,7 @@ const out = readPlatforms().map(({ id, dir, meta }) => ({
     recipe: b.recipe ?? false,
     rmse: b.rmse ?? null,
     hasDark: b.hasDark ?? false,
+    source: b.source ?? null,
   })),
 }));
 

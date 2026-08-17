@@ -3,9 +3,6 @@
   "active": true,
   "guidelinesUrl": "https://marketing.services.apple/apple-podcasts-identity-guidelines",
   "url": "https://www.apple.com/apple-podcasts/",
-  "categories": [
-    "Podcast Players"
-  ],
   "liquidGlass": {
     "bundles": [
       {

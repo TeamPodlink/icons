@@ -2,9 +2,6 @@
   "name": "Moon FM",
   "active": true,
   "url": "https://moon.fm",
-  "categories": [
-    "Podcast Players"
-  ],
   "liquidGlass": {
     "bundles": [
       {

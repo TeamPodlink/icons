@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { categorySlug, platforms } from "@/lib/platforms";
 import { platformJson } from "@/lib/platform-json";
 
+// `category` filters over the computed debug categories (see
+// debugCategories in lib/platforms.ts), e.g. ?category=no-recipe.
+
 export function GET(req: NextRequest) {
   const { searchParams, origin } = req.nextUrl;
   let list = platforms.map((p) => platformJson(origin, p));

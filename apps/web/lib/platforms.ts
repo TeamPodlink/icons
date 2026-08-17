@@ -7,6 +7,8 @@ export interface GlassBundle {
   recipe: boolean;
   rmse: number | null;
   hasDark: boolean;
+  /** Provenance rung: decanted | appstore-artwork | flat-svg | flat-svg-split | flat-svg-browser | null (pre-monorepo, unlabeled). */
+  source: string | null;
 }
 
 export interface Platform {
@@ -15,13 +17,39 @@ export interface Platform {
   active: boolean;
   url: string | null;
   guidelinesUrl: string | null;
-  categories: string[];
   hasFlat: boolean;
   hasBadge: boolean;
   bundles: GlassBundle[];
 }
 
 export const platforms: Platform[] = raw as Platform[];
+
+const SOURCE_LABEL: Record<string, string> = {
+  decanted: "decanted",
+  "appstore-artwork": "app store artwork",
+  "flat-svg": "svg layer",
+  "flat-svg-split": "svg split",
+  "flat-svg-browser": "browser raster",
+  "flat-svg-raster": "browser raster",
+};
+
+/**
+ * Debug categories: computed QA lenses over the collection, replacing
+ * editorial taxonomy. Each is a worklist — "no recipe" is the recipe
+ * backlog, "no dark variant" the icons that render a light background
+ * everywhere, "unlabeled source" the provenance backfill, and the
+ * source rungs show how far up the upgrade ladder each icon sits.
+ */
+export function debugCategories(p: Platform, b: GlassBundle | null): string[] {
+  const cats: string[] = [];
+  if (b) {
+    if (!b.recipe) cats.push("no recipe");
+    if (!b.hasDark) cats.push("no dark variant");
+    cats.push(b.source ? SOURCE_LABEL[b.source] ?? b.source : "unlabeled source");
+  }
+  if (!p.active) cats.push("inactive");
+  return cats;
+}
 
 /**
  * A directory card: one per liquid glass bundle, plus one per platform
@@ -33,6 +61,7 @@ export interface Card {
   platform: Platform;
   facet: "glass" | "flat";
   bundle: GlassBundle | null;
+  categories: string[];
 }
 
 export const cards: Card[] = platforms.flatMap((p): Card[] => {
@@ -43,9 +72,19 @@ export const cards: Card[] = platforms.flatMap((p): Card[] => {
       platform: p,
       facet: "glass",
       bundle: b,
+      categories: debugCategories(p, b),
     }));
   if (p.hasFlat)
-    return [{ key: p.id, title: p.name, platform: p, facet: "flat", bundle: null }];
+    return [
+      {
+        key: p.id,
+        title: p.name,
+        platform: p,
+        facet: "flat",
+        bundle: null,
+        categories: debugCategories(p, null),
+      },
+    ];
   return [];
 });
 
@@ -57,8 +96,7 @@ export const ASSET_BASE = process.env.NEXT_PUBLIC_ASSET_BASE ?? "/library";
 export function getCategories(): { name: string; count: number }[] {
   const counts = new Map<string, number>();
   for (const c of cards)
-    for (const cat of c.platform.categories)
-      counts.set(cat, (counts.get(cat) ?? 0) + 1);
+    for (const cat of c.categories) counts.set(cat, (counts.get(cat) ?? 0) + 1);
   return [...counts.entries()]
     .map(([name, count]) => ({ name, count }))
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -74,7 +112,7 @@ export function categorySlug(name: string): string {
 
 export function getCardsByCategory(slug: string): Card[] {
   return cards.filter((c) =>
-    c.platform.categories.some((cat) => categorySlug(cat) === slug)
+    c.categories.some((cat) => categorySlug(cat) === slug)
   );
 }
 

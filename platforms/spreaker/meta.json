@@ -2,9 +2,6 @@
   "name": "Spreaker",
   "active": true,
   "url": "https://spreaker.com",
-  "categories": [
-    "Hosting & Networks"
-  ],
   "liquidGlass": {
     "bundles": [
       {

@@ -3,9 +3,6 @@
   "active": true,
   "guidelinesUrl": "https://www.audible.com/about/newsroom/audible-assets",
   "url": "https://audible.com",
-  "categories": [
-    "Music & Streaming"
-  ],
   "liquidGlass": {
     "bundles": [
       {

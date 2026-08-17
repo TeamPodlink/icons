@@ -3,9 +3,6 @@
   "active": true,
   "guidelinesUrl": "https://castro.fm/support/link-to-your-podcast-in-castro",
   "url": "https://castro.fm",
-  "categories": [
-    "Podcast Players"
-  ],
   "liquidGlass": {
     "bundles": [
       {

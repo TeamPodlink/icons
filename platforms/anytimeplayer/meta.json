@@ -2,9 +2,6 @@
   "name": "Anytime Player",
   "active": true,
   "url": "https://anytimeplayer.app",
-  "categories": [
-    "Podcast Players"
-  ],
   "liquidGlass": {
     "bundles": [
       {
