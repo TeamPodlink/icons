@@ -8,7 +8,8 @@
         "title": "Podvine",
         "variant": null,
         "file": "Podvine.icon",
-        "source": "flat-svg"
+        "source": "flat-svg",
+        "hasDark": false
       }
     ]
   }

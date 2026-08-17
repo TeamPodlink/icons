@@ -8,7 +8,8 @@
         "title": "Bullhorn",
         "variant": null,
         "file": "Bullhorn.icon",
-        "source": "flat-svg"
+        "source": "flat-svg",
+        "hasDark": false
       }
     ]
   }

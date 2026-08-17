@@ -8,7 +8,8 @@
         "title": "Breaker",
         "variant": null,
         "file": "Breaker.icon",
-        "source": "flat-svg"
+        "source": "flat-svg",
+        "hasDark": false
       }
     ]
   }

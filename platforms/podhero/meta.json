@@ -8,7 +8,8 @@
         "title": "Podhero",
         "variant": null,
         "file": "Podhero.icon",
-        "source": "flat-svg"
+        "source": "flat-svg",
+        "hasDark": false
       }
     ]
   }

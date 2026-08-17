@@ -8,7 +8,8 @@
         "title": "Stitcher",
         "variant": null,
         "file": "Stitcher.icon",
-        "source": "flat-svg"
+        "source": "flat-svg",
+        "hasDark": false
       }
     ]
   }

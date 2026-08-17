@@ -8,7 +8,8 @@
         "title": "Podfriend",
         "variant": null,
         "file": "Podfriend.icon",
-        "source": "flat-svg"
+        "source": "flat-svg",
+        "hasDark": false
       }
     ]
   }

@@ -8,7 +8,8 @@
         "title": "Google Podcasts",
         "variant": null,
         "file": "GooglePodcasts.icon",
-        "source": "flat-svg"
+        "source": "flat-svg",
+        "hasDark": false
       }
     ]
   }
