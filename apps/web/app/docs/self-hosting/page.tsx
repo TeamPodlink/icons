@@ -58,7 +58,7 @@ export default function SelfHostingDocs() {
           to wherever your app serves static files and set{" "}
           <code className="font-mono">ASSET_BASE</code> accordingly. Naming:{" "}
           <code className="font-mono">
-            &lt;slug&gt;[-dark][-64|-128|-256].webp
+            &lt;slug&gt;[-dark][-32|-64|-128|-256|-512].(avif|webp)
           </code>{" "}
           plus a 1024px <code className="font-mono">&lt;slug&gt;.png</code>{" "}
           master. <code className="font-mono">manifest.json</code> lists every
@@ -68,7 +68,7 @@ export default function SelfHostingDocs() {
 
       <Section title="Why not next/image?">
         <P>
-          The assets are already sized (64/128/256) and compressed; a plain{" "}
+          The assets are already sized (32-512) and compressed; a plain{" "}
           <code className="font-mono">&lt;picture&gt;</code> with srcset serves
           the exact bytes with no optimizer in the path, and works identically
           outside Next.js.

@@ -2,20 +2,23 @@ import { debugCategories, type Platform } from "@/lib/platforms";
 
 /** REST representation: metadata + absolute asset/registry URLs per facet. */
 export function platformJson(origin: string, p: Platform) {
-  const glassAssets = (slug: string, hasDark: boolean) => ({
-    png1024: `${origin}/library/${slug}.png`,
-    webp256: `${origin}/library/${slug}-256.webp`,
-    webp128: `${origin}/library/${slug}-128.webp`,
-    webp64: `${origin}/library/${slug}-64.webp`,
-    ...(hasDark
-      ? {
-          darkPng1024: `${origin}/library/${slug}-dark.png`,
-          darkWebp256: `${origin}/library/${slug}-dark-256.webp`,
-          darkWebp128: `${origin}/library/${slug}-dark-128.webp`,
-          darkWebp64: `${origin}/library/${slug}-dark-64.webp`,
-        }
-      : {}),
-  });
+  const SIZES = [32, 64, 128, 256, 512] as const;
+  const FORMATS = ["avif", "webp"] as const;
+  const glassAssets = (slug: string, hasDark: boolean) => {
+    const out: Record<string, string> = {
+      png1024: `${origin}/library/${slug}.png`,
+    };
+    for (const f of FORMATS)
+      for (const s of SIZES) out[`${f}${s}`] = `${origin}/library/${slug}-${s}.${f}`;
+    if (hasDark) {
+      out.darkPng1024 = `${origin}/library/${slug}-dark.png`;
+      for (const f of FORMATS)
+        for (const s of SIZES)
+          out[`dark${f[0].toUpperCase()}${f.slice(1)}${s}`] =
+            `${origin}/library/${slug}-dark-${s}.${f}`;
+    }
+    return out;
+  };
   return {
     id: p.id,
     name: p.name,

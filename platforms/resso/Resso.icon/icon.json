@@ -65,7 +65,7 @@
       },
       "layers": [
         {
-          "image-name": "icon-dark.svg",
+          "image-name": "icon.svg",
           "name": "icon-dark",
           "glass": false,
           "position": {

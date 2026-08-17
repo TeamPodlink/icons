@@ -8,9 +8,8 @@ Per bundle slug (see `manifest.json` for the full list):
 
 ```
 assets/<slug>.png            1024px master (light)
-assets/<slug>-64.webp        64px  (32px CSS @2x)
-assets/<slug>-128.webp       128px
-assets/<slug>-256.webp       256px
+assets/<slug>-{32,64,128,256,512}.avif   AVIF-primary sized set
+assets/<slug>-{32,64,128,256,512}.webp   WebP fallback set
 assets/<slug>-dark*.png/webp same set, Dark rendition — only present
                              when it differs from light
 ```
@@ -21,7 +20,7 @@ alternates append the variant (`overcast-dark`, `castro-pumpkin`).
 ## Use from a CDN
 
 ```
-https://cdn.jsdelivr.net/npm/@podlink/refraction@<version>/assets/overcast-128.webp
+https://cdn.jsdelivr.net/npm/@podlink/refraction@<version>/assets/overcast-128.avif
 ```
 
 ## Self-host

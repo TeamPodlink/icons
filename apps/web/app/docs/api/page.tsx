@@ -18,7 +18,7 @@ GET /api/platforms/{id}                one platform`}</Code>
         <P>
           Each entry includes the flat icon URL, badge URLs (light/dark), and
           every Liquid Glass bundle with light (and, where distinct, dark)
-          asset URLs at 64/128/256px WebP + 1024px PNG, its registry item URL,
+          asset URLs at 32-512px AVIF+WebP + 1024px PNG, its registry item URL,
           and the shadcn install command. Static files are served at{" "}
           <code className="font-mono">/flat/&#123;id&#125;.svg</code>,{" "}
           <code className="font-mono">/badges/&#123;id&#125;-light|dark.svg</code>, and{" "}

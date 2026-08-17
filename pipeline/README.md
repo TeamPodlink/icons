@@ -10,7 +10,7 @@ scripts.
 | `build-data.mjs` | any | Emits `apps/web/lib/platforms.gen.json` — the merged dataset the site renders (debug categories are computed in the site lib from these fields) |
 | `build-registry.mjs` | any | Emits the shadcn registry (`apps/web/public/r/*.json`); `SITE_URL` env sets absolute URLs; asset URLs pin the current `@podlink/refraction` version |
 | `sync-web-assets.mjs` | any | Copies Liquid Glass rasters + flat/badge SVGs into `apps/web/public/` (non-fatal when sources missing) |
-| `build-assets.mjs` | **macOS + Icon Composer** | Renders every Liquid Glass bundle via ictool (Default + Dark), dedupes identical dark renditions by pixel compare, emits 64/128/256 WebP + 1024 PNG into `packages/refraction/assets`, writes `hasDark` back into meta.json |
+| `build-assets.mjs` | **macOS + Icon Composer** | Renders every Liquid Glass bundle via ictool (Default + Dark), dedupes identical dark renditions by pixel compare, emits 32-512 AVIF+WebP + 1024 PNG into `packages/refraction/assets`, writes `hasDark` back into meta.json |
 | `build-svg-icons.mjs` | **macOS + Icon Composer + Chrome** | Builds `.icon` bundles from platforms' flat `icon.svg` (glassless platforms only), then attempts the dark-variant SPLIT on each by default. Emits review sheets for visual QA. See the header comment for modes, flags, and the split rules (Apple's automatic dark derivation, monochrome-only whitening, knockout detection) |
 | `build-recipes.mjs` | **macOS + Icon Composer + sibling `../glass-to-LUT`** | Runs the two-phase procedural-recipe pipeline over all-SVG bundles and reports RMSE vs ictool; `--adopt <maxRmse>` copies winners into `packages/engine`, sets recipe/rmse in meta.json, and regenerates `recipeSlugs`. Set `PYTHON` to a venv with numpy+Pillow |
 

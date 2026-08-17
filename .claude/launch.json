@@ -6,6 +6,18 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--filter", "web", "dev"],
       "port": 4173
+    },
+    {
+      "name": "lazytest",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": [
+        "-m",
+        "http.server",
+        "4199",
+        "-d",
+        "/private/tmp/claude-501/-Users-nathan-Developer-podlink-icons/15fa4de3-1ac6-4cb5-ab7e-3b6febad6214/scratchpad/lazytest"
+      ],
+      "port": 4199
     }
   ]
 }

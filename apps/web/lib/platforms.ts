@@ -123,14 +123,18 @@ export function categoryNameFromSlug(slug: string): string | undefined {
   return getCategories().find((c) => categorySlug(c.name) === slug)?.name;
 }
 
-/** Liquid glass raster path for a bundle slug. */
+/** Liquid glass raster path for a bundle slug (AVIF-primary asset set). */
 export function assetPath(
   slug: string,
-  opts: { size?: 64 | 128 | 256; dark?: boolean } = {}
+  opts: {
+    size?: 32 | 64 | 128 | 256 | 512;
+    dark?: boolean;
+    format?: "avif" | "webp";
+  } = {}
 ): string {
   const d = opts.dark ? "-dark" : "";
   return opts.size
-    ? `${ASSET_BASE}/${slug}${d}-${opts.size}.webp`
+    ? `${ASSET_BASE}/${slug}${d}-${opts.size}.${opts.format ?? "avif"}`
     : `${ASSET_BASE}/${slug}${d}.png`;
 }
 

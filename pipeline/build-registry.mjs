@@ -20,6 +20,18 @@ const assetsPkg = JSON.parse(
 const SITE_URL = process.env.SITE_URL ?? "http://localhost:4173";
 const CDN = `https://cdn.jsdelivr.net/npm/@podlink/refraction@${assetsPkg.version}/assets`;
 
+// Sizes/formats come from the rendered manifest so the generated component
+// always matches the published asset set. Fallback = the last published
+// layout, for environments (CI) where assets were never rendered.
+let manifest = { sizes: [64, 128, 256], formats: ["webp"] };
+try {
+  const m = JSON.parse(
+    readFileSync(join(root, "packages/refraction/manifest.json"), "utf8")
+  );
+  manifest = { sizes: m.sizes, formats: m.formats ?? ["webp"] };
+} catch {}
+const HAS_AVIF = manifest.formats.includes("avif");
+
 function componentName(title) {
   return (
     title
@@ -44,7 +56,11 @@ import * as React from "react";
 
 const ASSET_BASE = "${CDN}";
 
-const SIZES = [64, 128, 256] as const;
+const SIZES = ${JSON.stringify(manifest.sizes)} as const;
+// Baked at generation time from the rendered manifest. AVIF sources are
+// emitted only when the published asset set actually contains .avif —
+// browsers that choose an AVIF <source> do NOT fall back on a 404.
+const HAS_AVIF = ${HAS_AVIF};
 
 export interface LiquidGlassIconProps
   extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src" | "srcSet"> {
@@ -63,15 +79,18 @@ export interface LiquidGlassIconProps
   alt: string;
 }
 
-function variant(px: number): string {
+function variant(px: number, ext: "avif" | "webp"): string {
   const v = SIZES.find((s) => s >= px);
-  return v ? \`-\${v}.webp\` : ".png";
+  return v ? \`-\${v}.\${ext}\` : ".png";
 }
 
-function srcSet(slug: string, size: number, dark: boolean) {
+// AVIF is primary (smaller AND more accurate at icon sizes); WebP is the
+// fallback for browsers without AVIF support. The master .png serves
+// requests beyond the largest generated size.
+function srcSet(slug: string, size: number, dark: boolean, ext: "avif" | "webp") {
   const d = dark ? "-dark" : "";
-  const one = \`\${ASSET_BASE}/\${slug}\${d}\${variant(size)}\`;
-  const two = \`\${ASSET_BASE}/\${slug}\${d}\${variant(size * 2)}\`;
+  const one = \`\${ASSET_BASE}/\${slug}\${d}\${variant(size, ext)}\`;
+  const two = \`\${ASSET_BASE}/\${slug}\${d}\${variant(size * 2, ext)}\`;
   return { src: one, srcSet: \`\${one} 1x, \${two} 2x\` };
 }
 
@@ -84,7 +103,6 @@ export function LiquidGlassIcon({
   className,
   ...rest
 }: LiquidGlassIconProps) {
-  const light = srcSet(slug, size, false);
   const common = {
     width: size,
     height: size,
@@ -92,41 +110,65 @@ export function LiquidGlassIcon({
     loading: "lazy" as const,
     decoding: "async" as const,
   };
+  const sized = { width: size, height: size };
+  const lightAvif = srcSet(slug, size, false, "avif");
+  const lightWebp = srcSet(slug, size, false, "webp");
 
   if (!hasDark) {
-    return <img {...light} {...common} className={className} {...rest} />;
+    return (
+      <picture>
+        {HAS_AVIF && (
+          <source type="image/avif" srcSet={lightAvif.srcSet} {...sized} />
+        )}
+        <img {...lightWebp} {...common} className={className} {...rest} />
+      </picture>
+    );
   }
 
-  const dark = srcSet(slug, size, true);
+  const darkAvif = srcSet(slug, size, true, "avif");
+  const darkWebp = srcSet(slug, size, true, "webp");
 
   if (theme === "class") {
+    // Visibility classes live on <picture> (suppressing the hidden
+    // variant's fetch via loading="lazy"); the caller's className stays
+    // on <img>, consistent with the other branches.
     return (
       <>
-        <img
-          {...light}
-          {...common}
-          className={\`dark:hidden \${className ?? ""}\`}
-          {...rest}
-        />
-        <img
-          {...dark}
-          {...common}
-          className={\`hidden dark:block \${className ?? ""}\`}
-          {...rest}
-        />
+        <picture className="dark:hidden">
+          {HAS_AVIF && (
+            <source type="image/avif" srcSet={lightAvif.srcSet} {...sized} />
+          )}
+          <img {...lightWebp} {...common} className={className} {...rest} />
+        </picture>
+        <picture className="hidden dark:block">
+          {HAS_AVIF && (
+            <source type="image/avif" srcSet={darkAvif.srcSet} {...sized} />
+          )}
+          <img {...darkWebp} {...common} className={className} {...rest} />
+        </picture>
       </>
     );
   }
 
   return (
     <picture>
+      {HAS_AVIF && (
+        <source
+          media="(prefers-color-scheme: dark)"
+          type="image/avif"
+          srcSet={darkAvif.srcSet}
+          {...sized}
+        />
+      )}
       <source
         media="(prefers-color-scheme: dark)"
-        srcSet={dark.srcSet}
-        width={size}
-        height={size}
+        srcSet={darkWebp.srcSet}
+        {...sized}
       />
-      <img {...light} {...common} className={className} {...rest} />
+      {HAS_AVIF && (
+        <source type="image/avif" srcSet={lightAvif.srcSet} {...sized} />
+      )}
+      <img {...lightWebp} {...common} className={className} {...rest} />
     </picture>
   );
 }

@@ -12,7 +12,15 @@ import { readBundles, root } from "./lib.mjs";
 
 const ICTOOL = "/Applications/Icon Composer.app/Contents/Executables/ictool";
 const OUT = join(root, "packages/refraction/assets");
-const SIZES = [64, 128, 256];
+const SIZES = [32, 64, 128, 256, 512];
+// AVIF q60 measures both smaller AND lower-error than WebP q92 at icon sizes
+// (64px, 9-master sample: RMSE 2.7 @ 1533B vs 5.7 @ 1784B — WebP's chroma
+// subsampling visibly hurts the gradient squircles). WebP stays as the
+// no-AVIF fallback at unchanged quality.
+const FORMATS = [
+  ["avif", (s) => s.avif({ quality: 60 })],
+  ["webp", (s) => s.webp({ quality: 92 })],
+];
 
 const only = process.argv.includes("--only")
   ? process.argv[process.argv.indexOf("--only") + 1]
@@ -42,11 +50,19 @@ async function pixelsEqual(a, b) {
 
 async function emitSizes(master, prefix) {
   for (const size of SIZES) {
-    await sharp(master)
-      .resize(size, size)
-      .webp({ quality: 92 })
-      .toFile(join(OUT, `${prefix}-${size}.webp`));
+    const base = sharp(master).resize(size, size);
+    for (const [ext, encode] of FORMATS)
+      await encode(base.clone()).toFile(join(OUT, `${prefix}-${size}.${ext}`));
   }
+}
+
+// ictool emits 16-bit/channel RGBA; 8-bit is indistinguishable for delivery
+// and ~5-10x smaller (the 1024 masters were 98% of the tarball).
+async function squashMaster(file) {
+  const buf = await sharp(file)
+    .png({ compressionLevel: 9, adaptiveFiltering: true })
+    .toBuffer();
+  writeFileSync(file, buf);
 }
 
 const bundles = readBundles();
@@ -68,7 +84,11 @@ for (const b of bundles) {
   hasDarkBySlug.set(b.slug, hasDark);
 
   await emitSizes(light, b.slug);
-  if (hasDark) await emitSizes(dark, `${b.slug}-dark`);
+  await squashMaster(light);
+  if (hasDark) {
+    await emitSizes(dark, `${b.slug}-dark`);
+    await squashMaster(dark);
+  }
   console.log(`ok ${b.slug}${hasDark ? " (+dark)" : ""}`);
 }
 
@@ -91,6 +111,7 @@ for (const [dir, meta] of byPlatform) {
 // Manifest for the assets package
 const manifest = {
   sizes: SIZES,
+  formats: FORMATS.map(([ext]) => ext),
   bundles: bundles.map((b) => ({
     slug: b.slug,
     title: b.title,
