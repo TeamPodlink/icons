@@ -1,0 +1,19 @@
+{
+  "name": "Disctopia",
+  "active": true,
+  "url": "https://disctopia.com",
+  "categories": [
+    "Hosting & Networks"
+  ],
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "disctopia",
+        "title": "Disctopia",
+        "variant": null,
+        "file": "Disctopia.icon",
+        "hasDark": false
+      }
+    ]
+  }
+}

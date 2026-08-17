@@ -1,0 +1,19 @@
+{
+  "name": "Podhome",
+  "active": true,
+  "url": "https://podhome.fm",
+  "categories": [
+    "Hosting & Networks"
+  ],
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "podhome",
+        "title": "Podhome",
+        "variant": null,
+        "file": "Podhome.icon",
+        "hasDark": false
+      }
+    ]
+  }
+}

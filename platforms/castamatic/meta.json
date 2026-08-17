@@ -1,0 +1,19 @@
+{
+  "name": "Castamatic",
+  "active": true,
+  "url": "https://castamatic.com",
+  "categories": [
+    "Podcast Players"
+  ],
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "castamatic",
+        "title": "Castamatic",
+        "variant": null,
+        "file": "Castamatic.icon",
+        "hasDark": true
+      }
+    ]
+  }
+}

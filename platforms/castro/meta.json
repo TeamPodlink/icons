@@ -1,0 +1,27 @@
+{
+  "name": "Castro",
+  "active": true,
+  "guidelinesUrl": "https://castro.fm/support/link-to-your-podcast-in-castro",
+  "url": "https://castro.fm",
+  "categories": [
+    "Podcast Players"
+  ],
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "castro",
+        "title": "Castro",
+        "variant": null,
+        "file": "Castro-Default.icon",
+        "hasDark": true
+      },
+      {
+        "slug": "castro-pumpkin",
+        "title": "Castro Pumpkin",
+        "variant": "Pumpkin",
+        "file": "Castro-Pumpkin1.icon",
+        "hasDark": true
+      }
+    ]
+  }
+}

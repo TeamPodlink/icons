@@ -1,0 +1,23 @@
+{
+  "name": "Amazon Music",
+  "active": true,
+  "aliases": [
+    "amazon"
+  ],
+  "guidelinesUrl": "https://podcasters.amazon.com/promotional-tools",
+  "url": "https://music.amazon.com",
+  "categories": [
+    "Music & Streaming"
+  ],
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "amazonmusic",
+        "title": "Amazon Music",
+        "variant": null,
+        "file": "AmazonMusic.icon",
+        "hasDark": false
+      }
+    ]
+  }
+}

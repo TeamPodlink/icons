@@ -1,0 +1,20 @@
+{
+  "name": "Goodpods",
+  "active": true,
+  "guidelinesUrl": "https://goodpods.com/badges",
+  "url": "https://goodpods.com",
+  "categories": [
+    "Podcast Players"
+  ],
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "goodpods",
+        "title": "Goodpods",
+        "variant": null,
+        "file": "Goodpods.icon",
+        "hasDark": false
+      }
+    ]
+  }
+}

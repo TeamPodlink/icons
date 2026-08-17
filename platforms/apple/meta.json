@@ -1,0 +1,22 @@
+{
+  "name": "Apple Podcasts",
+  "active": true,
+  "guidelinesUrl": "https://marketing.services.apple/apple-podcasts-identity-guidelines",
+  "url": "https://www.apple.com/apple-podcasts/",
+  "categories": [
+    "Podcast Players"
+  ],
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "apple",
+        "title": "Apple Podcasts",
+        "variant": null,
+        "file": "ApplePodcasts.icon",
+        "recipe": true,
+        "rmse": 3.05,
+        "hasDark": true
+      }
+    ]
+  }
+}

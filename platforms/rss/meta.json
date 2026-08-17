@@ -1,0 +1,19 @@
+{
+  "name": "RSS",
+  "active": true,
+  "url": "https://rss.com",
+  "categories": [
+    "Podcast Players"
+  ],
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "rss",
+        "title": "RSS Podcasts",
+        "variant": null,
+        "file": "RSSPodcasts.icon",
+        "hasDark": false
+      }
+    ]
+  }
+}

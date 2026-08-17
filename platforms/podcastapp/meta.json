@@ -1,0 +1,19 @@
+{
+  "name": "Podcast App",
+  "active": true,
+  "url": "https://podcast.app",
+  "categories": [
+    "Podcast Players"
+  ],
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "podcastapp",
+        "title": "Podcast App",
+        "variant": null,
+        "file": "PodcastApp.icon",
+        "hasDark": false
+      }
+    ]
+  }
+}

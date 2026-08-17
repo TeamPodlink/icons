@@ -1,0 +1,19 @@
+{
+  "name": "Anytime Player",
+  "active": true,
+  "url": "https://anytimeplayer.app",
+  "categories": [
+    "Podcast Players"
+  ],
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "anytimeplayer",
+        "title": "Anytime Podcast Player",
+        "variant": null,
+        "file": "AnytimePlayer.icon",
+        "hasDark": false
+      }
+    ]
+  }
+}

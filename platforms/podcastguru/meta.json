@@ -1,0 +1,20 @@
+{
+  "name": "Podcast Guru",
+  "active": true,
+  "guidelinesUrl": "https://podcastguru.io/podcast-guru-branding/",
+  "url": "https://podcastguru.io",
+  "categories": [
+    "Podcast Players"
+  ],
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "podcastguru",
+        "title": "Podcast Guru",
+        "variant": null,
+        "file": "PodcastGuru.icon",
+        "hasDark": true
+      }
+    ]
+  }
+}

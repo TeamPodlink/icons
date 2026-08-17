@@ -1,0 +1,20 @@
+{
+  "name": "Audible",
+  "active": true,
+  "guidelinesUrl": "https://www.audible.com/about/newsroom/audible-assets",
+  "url": "https://audible.com",
+  "categories": [
+    "Music & Streaming"
+  ],
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "audible",
+        "title": "Audible",
+        "variant": null,
+        "file": "Audible.icon",
+        "hasDark": false
+      }
+    ]
+  }
+}

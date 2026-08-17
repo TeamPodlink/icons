@@ -1,0 +1,19 @@
+{
+  "name": "Spreaker",
+  "active": true,
+  "url": "https://spreaker.com",
+  "categories": [
+    "Hosting & Networks"
+  ],
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "spreaker",
+        "title": "Spreaker",
+        "variant": null,
+        "file": "Spreaker.icon",
+        "hasDark": false
+      }
+    ]
+  }
+}

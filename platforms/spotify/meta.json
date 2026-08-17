@@ -1,0 +1,22 @@
+{
+  "name": "Spotify",
+  "active": true,
+  "guidelinesUrl": "https://support.spotifyforpodcasters.com/hc/en-us/articles/360044285891-Sharing-your-podcast",
+  "url": "https://spotify.com",
+  "categories": [
+    "Music & Streaming"
+  ],
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "spotify",
+        "title": "Spotify",
+        "variant": null,
+        "file": "Spotify.icon",
+        "recipe": true,
+        "rmse": 1.83,
+        "hasDark": true
+      }
+    ]
+  }
+}

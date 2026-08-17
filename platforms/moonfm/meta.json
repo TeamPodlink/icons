@@ -1,0 +1,19 @@
+{
+  "name": "Moon FM",
+  "active": true,
+  "url": "https://moon.fm",
+  "categories": [
+    "Podcast Players"
+  ],
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "moonfm",
+        "title": "Moon FM",
+        "variant": null,
+        "file": "MoonFM.icon",
+        "hasDark": true
+      }
+    ]
+  }
+}

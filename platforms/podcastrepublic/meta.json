@@ -1,0 +1,21 @@
+{
+  "name": "Podcast Republic",
+  "active": true,
+  "url": "https://www.podcastrepublic.net",
+  "categories": [
+    "Podcast Players"
+  ],
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "podcastrepublic",
+        "title": "Podcast Republic",
+        "variant": null,
+        "file": "PodcastRepublic.icon",
+        "recipe": true,
+        "rmse": 3.05,
+        "hasDark": true
+      }
+    ]
+  }
+}
