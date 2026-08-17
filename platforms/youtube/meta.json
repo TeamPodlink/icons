@@ -9,9 +9,9 @@
         "title": "YouTube",
         "variant": null,
         "file": "YouTube.icon",
-        "source": "appstore-artwork",
+        "source": "appstore-artwork-split",
         "appStoreId": 544007664,
-        "hasDark": false
+        "hasDark": true
       }
     ]
   }

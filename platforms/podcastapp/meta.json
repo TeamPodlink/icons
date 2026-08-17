@@ -9,8 +9,8 @@
         "title": "Podcast App",
         "variant": null,
         "file": "PodcastApp.icon",
-        "hasDark": false,
-        "source": "appstore-artwork"
+        "hasDark": true,
+        "source": "appstore-artwork-split"
       }
     ]
   }

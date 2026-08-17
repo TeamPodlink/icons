@@ -8,9 +8,9 @@
         "title": "Gaana",
         "variant": null,
         "file": "Gaana.icon",
-        "source": "appstore-artwork",
+        "source": "appstore-artwork-split",
         "appStoreId": 585270521,
-        "hasDark": false
+        "hasDark": true
       }
     ]
   }

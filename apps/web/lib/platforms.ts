@@ -28,6 +28,8 @@ const SOURCE_LABEL: Record<string, string> = {
   decanted: "decanted",
   "catalog-artwork": "catalog artwork",
   "appstore-artwork": "app store artwork",
+  "appstore-artwork-split": "artwork split",
+  "catalog-artwork-split": "artwork split",
   "flat-svg": "svg layer",
   "flat-svg-split": "svg split",
   "flat-svg-browser": "browser raster",

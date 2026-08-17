@@ -9,9 +9,9 @@
         "title": "YouTube Music",
         "variant": null,
         "file": "YouTubeMusic.icon",
-        "source": "appstore-artwork",
+        "source": "appstore-artwork-split",
         "appStoreId": 1017492454,
-        "hasDark": false
+        "hasDark": true
       }
     ]
   }

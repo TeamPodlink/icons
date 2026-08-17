@@ -8,9 +8,9 @@
         "title": "Podverse",
         "variant": null,
         "file": "Podverse.icon",
-        "source": "appstore-artwork",
+        "source": "appstore-artwork-split",
         "appStoreId": 1390888454,
-        "hasDark": false
+        "hasDark": true
       }
     ]
   }

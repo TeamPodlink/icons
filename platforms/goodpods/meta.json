@@ -10,8 +10,8 @@
         "title": "Goodpods",
         "variant": null,
         "file": "Goodpods.icon",
-        "hasDark": false,
-        "source": "catalog-artwork"
+        "hasDark": true,
+        "source": "catalog-artwork-split"
       }
     ]
   }

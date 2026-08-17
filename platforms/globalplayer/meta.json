@@ -10,7 +10,7 @@
         "file": "GlobalPlayer.icon",
         "source": "appstore-artwork",
         "appStoreId": 1142951331,
-        "hasDark": false
+        "hasDark": true
       }
     ]
   }

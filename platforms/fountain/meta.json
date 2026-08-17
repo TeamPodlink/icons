@@ -10,8 +10,8 @@
         "title": "Fountain",
         "variant": null,
         "file": "Fountain.icon",
-        "hasDark": false,
-        "source": "appstore-artwork"
+        "hasDark": true,
+        "source": "appstore-artwork-split"
       }
     ]
   }

@@ -9,8 +9,8 @@
         "title": "Podhome",
         "variant": null,
         "file": "Podhome.icon",
-        "hasDark": false,
-        "source": "appstore-artwork"
+        "hasDark": true,
+        "source": "appstore-artwork-split"
       }
     ]
   }

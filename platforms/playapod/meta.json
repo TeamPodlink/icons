@@ -8,9 +8,9 @@
         "title": "Playapod",
         "variant": null,
         "file": "Playapod.icon",
-        "source": "appstore-artwork",
+        "source": "appstore-artwork-split",
         "appStoreId": 1246857049,
-        "hasDark": false
+        "hasDark": true
       }
     ]
   }

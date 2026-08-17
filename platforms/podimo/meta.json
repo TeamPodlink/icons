@@ -8,9 +8,9 @@
         "title": "Podimo",
         "variant": null,
         "file": "Podimo.icon",
-        "source": "appstore-artwork",
+        "source": "appstore-artwork-split",
         "appStoreId": 1476538730,
-        "hasDark": false
+        "hasDark": true
       }
     ]
   }

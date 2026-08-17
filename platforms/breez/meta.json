@@ -8,9 +8,9 @@
         "title": "Breez",
         "variant": null,
         "file": "Breez.icon",
-        "source": "appstore-artwork",
+        "source": "appstore-artwork-split",
         "appStoreId": 1463604142,
-        "hasDark": false
+        "hasDark": true
       }
     ]
   }

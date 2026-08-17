@@ -9,9 +9,9 @@
         "title": "Luminary",
         "variant": null,
         "file": "Luminary.icon",
-        "source": "appstore-artwork",
+        "source": "appstore-artwork-split",
         "appStoreId": 1398370417,
-        "hasDark": false
+        "hasDark": true
       }
     ]
   }

@@ -8,9 +8,9 @@
         "title": "Metacast",
         "variant": null,
         "file": "Metacast.icon",
-        "source": "appstore-artwork",
+        "source": "appstore-artwork-split",
         "appStoreId": 6462012536,
-        "hasDark": false
+        "hasDark": true
       }
     ]
   }

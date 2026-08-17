@@ -8,9 +8,9 @@
         "title": "iVoox",
         "variant": null,
         "file": "iVoox.icon",
-        "source": "appstore-artwork",
+        "source": "appstore-artwork-split",
         "appStoreId": 542673545,
-        "hasDark": false
+        "hasDark": true
       }
     ]
   }
