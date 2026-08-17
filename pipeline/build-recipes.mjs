@@ -13,6 +13,7 @@
 //
 // Usage:
 //   node pipeline/build-recipes.mjs [--only <slug>]        # measure + report
+//   node pipeline/build-recipes.mjs --rebake [--only <s>]  # include recipe-backed bundles
 //   node pipeline/build-recipes.mjs --adopt <maxRmse>      # adopt from last run
 
 import { execFileSync, execSync } from "node:child_process";
@@ -35,6 +36,7 @@ const REPORT = join(WORK, "report.json");
 
 const args = process.argv.slice(2);
 const only = args.includes("--only") ? args[args.indexOf("--only") + 1] : null;
+const rebake = args.includes("--rebake");
 const adopt = args.includes("--adopt")
   ? Number(args[args.indexOf("--adopt") + 1])
   : null;
@@ -47,7 +49,10 @@ function svgOnly(bundlePath) {
 }
 
 const candidates = readBundles().filter(
-  (b) => (!only || b.slug === only) && !b.recipe && svgOnly(b.bundlePath)
+  (b) =>
+    (!only || b.slug === only) &&
+    (rebake || !b.recipe) &&
+    svgOnly(b.bundlePath)
 );
 
 // ------------------------------------------------------------- adopt

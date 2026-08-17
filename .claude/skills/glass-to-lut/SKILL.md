@@ -159,11 +159,17 @@ re-score every recipe.
 
 ### Quality bar (all scored at 1024 vs ictool)
 
+At the default `--lm-res 128` (adopted set, re-baked 2026-08-17):
+
 | Icon class | Achieved | Example |
 | --- | --- | --- |
-| Flat art, no glass | ~1.8 | Spotify 1.83 |
-| Single glass layer | ~4 | Podcast Republic 3.99, Apple Podcasts 4.05 |
-| Stacked glass (3 layers) | ~7 | Overcast 7.03 |
+| Flat art, no glass | ~2.2 | Spotify 2.18 |
+| Single glass layer | ~4.4–5 | Podcast Republic 4.44, Apple Podcasts 4.97 |
+| Stacked glass (3 layers) | ~7 | Overcast 7.12 |
+
+At `--lm-res 512` (max fidelity, ~5× larger recipes): flat ~1.8, single
+glass ~3–4, stacked ~7. The gap between the two settings exists only in
+the 1024 master — at display sizes ≤128 they differ by ≤0.12 RMSE.
 
 Scores meaningfully above these for a comparable icon mean a step failed —
 find it, don't ship it. Downsampled renders score better still (averaging);

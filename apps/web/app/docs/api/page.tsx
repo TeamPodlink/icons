@@ -32,11 +32,12 @@ GET /api/platforms/{id}                one platform`}</Code>
       <Section title="Procedural recipes (research)">
         <P>
           Six bundles additionally exist as calibrated procedural recipes —
-          data modules rendered by a shared ~26&nbsp;KB engine, no rasters
-          involved, within 1.8–5.1 visible-RGB RMSE of Apple&apos;s renderer at
-          1024px. They power the &quot;live&quot; toggle on the directory cards. This is
-          the research layer, not the recommended delivery path — the raster
-          components are smaller and exact.
+          data modules (5–12&nbsp;KB each) rendered by a shared ~26&nbsp;KB
+          engine, no rasters involved, within 2.2–7.6 visible-RGB RMSE of
+          Apple&apos;s renderer at 1024px and indistinguishable from the exact
+          renders at display sizes. They power the &quot;live&quot; toggle on the
+          directory cards. This is the research layer, not the recommended
+          delivery path — the raster components are smaller and exact.
         </P>
         <Code>{`import { createLiquidRenderer } from "refraction-engine/engine";
 import { recipe } from "refraction-engine/recipes/overcast";

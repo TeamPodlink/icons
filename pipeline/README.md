@@ -93,12 +93,17 @@ scale-aware) gives:
   lightmap (RMSE 27.9).
 
 Delivery verdict: even so, procedural does not decisively beat the
-tuned rasters for small-size pages (engine renders internally at
-N=1024, ~2–3s/icon; coverage is 6/92), so rasters remain the delivery
-path. The distillation is now a local backlog item:
-`packages/engine/tools/build_recipe.py` should emit small-lightmap
-recipes by default — same adopted quality, ~20× smaller — which
-changes the economics of the site's live-render layer.
+tuned rasters for small-size pages (coverage is 6/92; render cost),
+so rasters remain the delivery path.
+
+**Landed 2026-08-17:** `build_recipe.py --lm-res` (default 128) bakes
+the lightmap natively at low resolution — measurably better than
+post-hoc downsampling — and all six recipes were re-baked and
+re-adopted with it (`build-recipes.mjs --rebake`). Recorded 1024 RMSE
+band moved 1.8–5.1 → 2.2–7.6; at display sizes ≤128 the delta vs the
+old recipes is ≤0.12 RMSE at 64px (spotify improved). Recipes shrank
+25–60 KB → 5–12 KB raw; the 6-recipe brotli pack 200.7 KB → 24.3 KB.
+`--lm-res 512` remains available when 1024-master fidelity matters.
 
 ## Adding a platform or icon
 

@@ -11,7 +11,7 @@
         "variant": null,
         "file": "Spotify.icon",
         "recipe": true,
-        "rmse": 1.83,
+        "rmse": 2.18,
         "hasDark": true,
         "source": "decanted"
       }
