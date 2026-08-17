@@ -28,6 +28,12 @@ const DARK_GRADIENT = {
 const args = process.argv.slice(2);
 const only = args.includes("--only") ? args[args.indexOf("--only") + 1] : null;
 const TOL = Number(args.includes("--tol") ? args[args.indexOf("--tol") + 1] : 12);
+const allowDarkGlyph = new Set(
+  (args.includes("--allow-dark-glyph")
+    ? args[args.indexOf("--allow-dark-glyph") + 1]
+    : ""
+  ).split(",").filter(Boolean)
+);
 const work = "/tmp/raster-split";
 mkdirSync(work, { recursive: true });
 
@@ -53,37 +59,66 @@ async function centralRmse(pngA, pngB) {
 }
 
 /**
- * Border-connected flood fill over near-background pixels.
- * Returns { bg: [r,g,b], glyph: Buffer(RGBA) } or null when the border
- * isn't uniform enough to define a background.
+ * Border-connected flood fill over near-background pixels. Handles both
+ * uniform and VERTICAL-GRADIENT backgrounds: the reference background
+ * color varies per row (mean of each row's left+right border pixels,
+ * smoothed), which is exactly what the bundle's 2-stop linear-gradient
+ * canvas fill can represent. The light-rendition RMSE guard downstream
+ * rejects backgrounds a linear gradient can't reproduce.
+ * Returns { bgTop, bgBottom, bgMid: [r,g,b], glyph: Buffer } or null.
  */
 function keyBackground(data, w, h, tol) {
   const px = (x, y) => (y * w + x) * 4;
-  // border ring stats
-  let n = 0, rs = 0, gs = 0, bs = 0;
-  const ring = [];
-  for (let x = 0; x < w; x++) ring.push([x, 0], [x, h - 1]);
-  for (let y = 0; y < h; y++) ring.push([0, y], [w - 1, y]);
-  for (const [x, y] of ring) {
-    const i = px(x, y);
-    rs += data[i]; gs += data[i + 1]; bs += data[i + 2]; n++;
+  // per-row background reference from left/right border columns
+  const rowBg = new Array(h);
+  for (let y = 0; y < h; y++) {
+    let rs = 0, gs = 0, bs = 0, n = 0;
+    for (const x of [0, 1, 2, w - 3, w - 2, w - 1]) {
+      const i = px(x, y);
+      rs += data[i]; gs += data[i + 1]; bs += data[i + 2]; n++;
+    }
+    rowBg[y] = [rs / n, gs / n, bs / n];
   }
-  const bg = [rs / n, gs / n, bs / n];
-  let varSum = 0;
-  for (const [x, y] of ring) {
-    const i = px(x, y);
-    varSum +=
-      (data[i] - bg[0]) ** 2 + (data[i + 1] - bg[1]) ** 2 + (data[i + 2] - bg[2]) ** 2;
+  // left vs right must agree per row (else the bg isn't a vertical field)
+  for (let y = 0; y < h; y += 7) {
+    const l = px(0, y), r = px(w - 1, y);
+    const d = Math.hypot(
+      data[l] - data[r], data[l + 1] - data[r + 1], data[l + 2] - data[r + 2]
+    );
+    if (d > tol * 1.5) return null;
   }
-  if (Math.sqrt(varSum / n) > 10) return null; // non-uniform border
+  // smoothness: adjacent rows must vary gently (gradient, not texture)
+  for (let y = 1; y < h; y++) {
+    const d = Math.hypot(
+      rowBg[y][0] - rowBg[y - 1][0],
+      rowBg[y][1] - rowBg[y - 1][1],
+      rowBg[y][2] - rowBg[y - 1][2]
+    );
+    if (d > 3) return null;
+  }
+  // top/bottom rows must be horizontally uniform against their rowBg
+  for (const y of [0, h - 1])
+    for (let x = 0; x < w; x += 5) {
+      const i = px(x, y);
+      const d = Math.hypot(
+        data[i] - rowBg[y][0], data[i + 1] - rowBg[y][1], data[i + 2] - rowBg[y][2]
+      );
+      if (d > tol * 1.5) return null;
+    }
 
-  const dist = (i) =>
-    Math.sqrt(
+  const dist = (i) => {
+    const y = Math.floor(i / 4 / w);
+    const bg = rowBg[y];
+    return Math.sqrt(
       (data[i] - bg[0]) ** 2 + (data[i + 1] - bg[1]) ** 2 + (data[i + 2] - bg[2]) ** 2
     );
+  };
   const mask = new Uint8Array(w * h); // 1 = background
   const stack = [];
-  for (const [x, y] of ring)
+  const border = [];
+  for (let x = 0; x < w; x++) border.push([x, 0], [x, h - 1]);
+  for (let y = 0; y < h; y++) border.push([0, y], [w - 1, y]);
+  for (const [x, y] of border)
     if (dist(px(x, y)) <= tol) {
       mask[y * w + x] = 1;
       stack.push(x, y);
@@ -118,7 +153,13 @@ function keyBackground(data, w, h, tol) {
         out[i * 4 + 3] = Math.round(out[i * 4 + 3] * a);
       }
     }
-  return { bg: bg.map((v) => Math.round(v)), glyph: out };
+  const round3 = (c) => c.map((v) => Math.round(v));
+  return {
+    bgTop: round3(rowBg[0]),
+    bgBottom: round3(rowBg[h - 1]),
+    bgMid: round3(rowBg[Math.floor(h / 2)]),
+    glyph: out,
+  };
 }
 
 import { existsSync as _exists, readdirSync as _readdir } from "node:fs";
@@ -139,6 +180,9 @@ const pairs = [];
 for (const b of targets) {
   const bdir = b.bundlePath;
   const backup = join(work, `${b.slug}-backup.icon`);
+  // Clear any stale backup from a previous run so a pre-mutation failure
+  // can never "restore" outdated bundle contents.
+  rmSync(backup, { recursive: true, force: true });
   try {
     const assets = join(bdir, "Assets");
     const lightPng = join(assets, "light.png");
@@ -151,22 +195,36 @@ for (const b of targets) {
       console.log(`skip ${b.slug}: non-uniform background`);
       continue;
     }
-    // Same rule the SVG split learned: a mostly-dark glyph vanishes on
-    // the auto-derived dark canvas (SoundCloud's black cloud, Podyssey's
-    // black boat). Skip those — their light art stays full-bleed.
+    // Dark-glyph handling, mirroring the SVG split's learned rules:
+    // ictool's derivation leaves dark glyphs near-invisible on the dark
+    // canvas (Amazon's black wordmark), while iOS on-device LIGHTENS
+    // monochrome dark glyphs. So: monochrome-dark glyphs get a
+    // white-recolored dark twin; dark-but-colorful glyphs (Podyssey's
+    // illustrated boat) are skipped entirely.
+    let whitenDark = false;
     {
-      let n = 0, luma = 0;
+      // Whitening flattens EVERY glyph pixel to white, so it is only
+      // safe for strictly-binary monochrome marks: require that almost
+      // no visible pixel is saturated (mean saturation can hide small
+      // colorful details — Podyssey's tan boat cutouts).
+      let n = 0, luma = 0, satFrac = 0;
       for (let i = 0; i < keyed.glyph.length; i += 4)
         if (keyed.glyph[i + 3] > 25) {
           n++;
-          luma +=
-            0.2126 * keyed.glyph[i] +
-            0.7152 * keyed.glyph[i + 1] +
-            0.0722 * keyed.glyph[i + 2];
+          const [r, g, bb] = [keyed.glyph[i], keyed.glyph[i + 1], keyed.glyph[i + 2]];
+          luma += 0.2126 * r + 0.7152 * g + 0.0722 * bb;
+          const mx = Math.max(r, g, bb);
+          if (mx > 0 && (mx - Math.min(r, g, bb)) / mx > 0.25) satFrac++;
         }
       if (n && luma / n < 90) {
-        console.log(`skip ${b.slug}: dark glyph (luma ${(luma / n).toFixed(0)})`);
-        continue;
+        if (satFrac / n < 0.03 || allowDarkGlyph.has(b.slug)) {
+          whitenDark = true;
+        } else {
+          console.log(
+            `skip ${b.slug}: colored dark glyph (luma ${(luma / n).toFixed(0)}, sat-frac ${(satFrac / n).toFixed(2)})`
+          );
+          continue;
+        }
       }
     }
     const before = join(work, `${b.slug}-before.png`);
@@ -179,23 +237,62 @@ for (const b of targets) {
     })
       .png()
       .toFile(join(assets, "glyph.png"));
+    if (whitenDark) {
+      const wg = Buffer.from(keyed.glyph);
+      for (let i = 0; i < wg.length; i += 4) {
+        wg[i] = 255; wg[i + 1] = 255; wg[i + 2] = 255;
+      }
+      await sharp(wg, {
+        raw: { width: info.width, height: info.height, channels: 4 },
+      })
+        .png()
+        .toFile(join(assets, "glyph-dark.png"));
+    }
     rmSync(lightPng);
-    const solid = {
-      "linear-gradient": [
-        `srgb:${keyed.bg.map((v) => (v / 255).toFixed(5)).join(",")},1.00000`,
-        `srgb:${keyed.bg.map((v) => (v / 255).toFixed(5)).join(",")},1.00000`,
-      ],
+    const col = (c) => `srgb:${c.map((v) => (v / 255).toFixed(5)).join(",")},1.00000`;
+    const fillValue = {
+      "linear-gradient": [col(keyed.bgTop), col(keyed.bgBottom)],
       orientation: { start: { x: 0.5, y: 0 }, stop: { x: 0.5, y: 1 } },
     };
     const scale = info.width === 1024 ? undefined : 1024 / info.width;
+    const baseLayer = {
+      "image-name": "glyph.png", name: "glyph", glass: false,
+      ...(scale ? { position: { scale, "translation-in-points": [0, 0] } } : {}),
+    };
+    // Dim backgrounds tint white glyphs into near-invisibility under
+    // Apple's dark derivation (Apollo's navy). Pin the glyph with a
+    // dark-only twin layer — explicit dark layers escape the tinting.
+    const bgLuma =
+      0.2126 * keyed.bgMid[0] + 0.7152 * keyed.bgMid[1] + 0.0722 * keyed.bgMid[2];
+    const darkTwin = whitenDark
+      ? { ...baseLayer, "image-name": "glyph-dark.png", name: "glyph-dark" }
+      : bgLuma < 80
+        ? { ...baseLayer, name: "glyph-dark" }
+        : null;
+    const layers = darkTwin
+      ? [
+          {
+            ...darkTwin,
+            "opacity-specializations": [
+              { value: 0 }, { appearance: "dark", value: 1 },
+            ],
+          },
+          {
+            ...baseLayer,
+            "opacity-specializations": [
+              { value: 1 }, { appearance: "dark", value: 0 },
+            ],
+          },
+        ]
+      : [baseLayer];
     writeFileSync(
       join(bdir, "icon.json"),
       JSON.stringify(
         {
           fill: {
-            ...solid,
+            ...fillValue,
             "fill-specializations": [
-              { value: solid },
+              { value: fillValue },
               { appearance: "dark", value: DARK_GRADIENT },
             ],
           },
@@ -203,14 +300,7 @@ for (const b of targets) {
             {
               hidden: false, "blend-mode": "normal", specular: false,
               translucency: { enabled: false, value: 0 },
-              layers: [
-                {
-                  "image-name": "glyph.png", name: "glyph", glass: false,
-                  ...(scale
-                    ? { position: { scale, "translation-in-points": [0, 0] } }
-                    : {}),
-                },
-              ],
+              layers,
             },
           ],
           "supported-platforms": { squares: "shared" },
@@ -236,9 +326,13 @@ for (const b of targets) {
       JSON.stringify(b.platformMeta, null, 2) + "\n"
     );
     pairs.push(b.slug);
-    console.log(`ok ${b.slug} (light rmse ${rmse.toFixed(2)}, bg rgb(${keyed.bg}))`);
+    console.log(
+      `ok ${b.slug} (light rmse ${rmse.toFixed(2)}, bg rgb(${keyed.bgTop})->rgb(${keyed.bgBottom}))`
+    );
   } catch (e) {
-    if (rmSync && backup) {
+    // Restore ONLY if we actually took a backup (i.e. we mutated the
+    // bundle); otherwise the bundle was never touched — leave it alone.
+    if (_exists(backup)) {
       try {
         rmSync(bdir, { recursive: true, force: true });
         cpSync(backup, bdir, { recursive: true });

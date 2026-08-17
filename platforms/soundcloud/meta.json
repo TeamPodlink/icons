@@ -9,9 +9,9 @@
         "title": "Soundcloud",
         "variant": null,
         "file": "Soundcloud.icon",
-        "source": "appstore-artwork",
+        "source": "appstore-artwork-split",
         "appStoreId": 336353151,
-        "hasDark": false
+        "hasDark": true
       }
     ]
   }

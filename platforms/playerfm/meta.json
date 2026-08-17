@@ -8,9 +8,9 @@
         "title": "Player FM",
         "variant": null,
         "file": "PlayerFM.icon",
-        "source": "appstore-artwork",
+        "source": "appstore-artwork-split",
         "appStoreId": 940568467,
-        "hasDark": false
+        "hasDark": true
       }
     ]
   }

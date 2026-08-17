@@ -13,8 +13,8 @@
         "title": "Amazon Music",
         "variant": null,
         "file": "AmazonMusic.icon",
-        "hasDark": false,
-        "source": "appstore-artwork"
+        "hasDark": true,
+        "source": "appstore-artwork-split"
       }
     ]
   }

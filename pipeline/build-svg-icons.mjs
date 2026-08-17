@@ -273,6 +273,14 @@ async function trySplit(id, dir, meta) {
   rmSync(bdir, { recursive: true, force: true });
   mkdirSync(join(bdir, "Assets"), { recursive: true });
   writeFileSync(join(bdir, "Assets/icon.svg"), split.glyphSvg);
+  // Dim backgrounds tint white glyphs into near-invisibility under
+  // Apple's dark derivation (Apollo's navy castle). Pin the glyph with
+  // a dark-only twin layer — explicit dark layers escape the tinting.
+  const cm = split.color.match(/^[a-z0-9-]+:([\d.]+),([\d.]+),([\d.]+)/);
+  const bgLuma = cm
+    ? (0.2126 * +cm[1] + 0.7152 * +cm[2] + 0.0722 * +cm[3]) * 255
+    : 255;
+  const pinGlyph = !needsWhiteGlyph && bgLuma < 80;
   const layers = [];
   if (needsWhiteGlyph) {
     writeFileSync(join(bdir, "Assets/icon-dark.svg"), whiten(split.glyphSvg));
@@ -284,10 +292,19 @@ async function trySplit(id, dir, meta) {
       ],
     });
   }
+  if (pinGlyph) {
+    layers.push({
+      "image-name": "icon.svg", name: "icon-dark", glass: false,
+      position: { scale: 32, "translation-in-points": [0, 0] },
+      "opacity-specializations": [
+        { value: 0 }, { appearance: "dark", value: 1 },
+      ],
+    });
+  }
   layers.push({
     "image-name": "icon.svg", name: "icon", glass: false,
     position: { scale: 32, "translation-in-points": [0, 0] },
-    ...(needsWhiteGlyph
+    ...(needsWhiteGlyph || pinGlyph
       ? {
           "opacity-specializations": [
             { value: 1 }, { appearance: "dark", value: 0 },
