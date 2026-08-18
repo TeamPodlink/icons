@@ -316,27 +316,88 @@ def svg_color_to_render(spec, fullbleed=False):
     return srgb_to_render(c)
 
 
-# CoreSVG gradient-stop law (measured 2026-08-17, probe-gradient-law.py):
-# stops — and only stops; solid fills are exact — pass through a working
-# space that clamps linear green to a range set by the other channels
-# (G' = clamp(G, kR*R + kB*B, span + kR*R + kB*B)), then the ramp is a
-# plain lerp of the clamped stops in encoded sRGB. Fit RMSE 0.18/255
-# over a 4x4x4 stop grid; all ten instrument pair-curves <= 1.2 RMSE.
-_STOP_KR, _STOP_KB, _STOP_SPAN = 0.0185, 0.0320, 0.9540
+# CoreSVG gradient-stop law (measured 2026-08-17, probe-gradient-law.py +
+# probe-p3-gradient.py). Stops — and only stops; solid fills are exact —
+# are clamped PER CHANNEL in UNCLIPPED linear sRGB (out-of-gamut
+# display-p3 stops keep their extended-range values until then):
+#   R' = clamp(R, -0.0258 G + 0.0018 B - 0.0009, 1.0054 - 0.0075 G)
+#   G' = clamp(G, 0.0185 R + 0.0320 B, gceil(R, B))   [the original law]
+#   B' = clamp(B, -0.0015 R - 0.0017 G - 0.0002, 1.0024)
+# with gceil a measured 2x3 table over (R, B) clamped to [0,1] — the
+# green ceiling saturates toward 1 as either other channel rises. The
+# ramp is a plain lerp of the MIRROR-ENCODED clamped stops in extended
+# encoded sRGB; per pixel the (possibly negative) result converts
+# sRGB->P3 in linear light and only the final P3-coded value clips.
+# All 18 instrument pair-curves fit at <= 1.6 RMSE (the old law left
+# out-of-gamut p3 pairs at up to 4.4; podvine's field missed by 27/255
+# in red under the engine's P3-coded lerp).
 
 
-def gradient_stop_srgb(spec):
-    # resolved stop color -> composite-space sRGB 0..1 with the stop law
+def _lin_ext(u):  # mirrored (extended-range) sRGB decode
+    u = np.asarray(u, np.float64)
+    return np.sign(u) * np.where(np.abs(u) <= 0.04045, np.abs(u) / 12.92,
+                                 ((np.abs(u) + 0.055) / 1.055) ** 2.4)
+
+
+def _enc_ext(u):  # mirrored (extended-range) sRGB encode
+    u = np.asarray(u, np.float64)
+    return np.sign(u) * np.where(np.abs(u) <= 0.0031308, 12.92 * np.abs(u),
+                                 1.055 * np.abs(u) ** (1 / 2.4) - 0.055)
+
+
+def gradient_stop_ext(spec):
+    # resolved stop color -> transformed stop in EXTENDED encoded sRGB
     space, c = spec
-    srgb = np.clip(_P3_TO_SRGB @ _lin(c), 0, 1) if space == "p3" else _lin(np.clip(c, 0, 1))
-    lo = _STOP_KR * srgb[0] + _STOP_KB * srgb[2]
-    g = np.clip(srgb[1], lo, lo + _STOP_SPAN)
-    return np.array([srgb[0], g, srgb[2]])
+    srgb = _P3_TO_SRGB @ _lin(c) if space == "p3" else _lin(np.clip(c, 0, 1))
+    R, G, B = (float(v) for v in srgb)
+    Rc, Bc = min(max(R, 0.0), 1.0), min(max(B, 0.0), 1.0)
+    g0 = np.interp(Bc, [0.0, 0.152, 1.0], [0.9520, 0.9838, 0.9940])
+    g1 = np.interp(Bc, [0.0, 0.152, 1.0], [0.9907, 0.9907, 1.0])
+    return _enc_ext(np.array([
+        np.clip(R, -0.0258 * G + 0.0018 * B - 0.0009, 1.0054 - 0.0075 * G),
+        np.clip(G, 0.0185 * R + 0.0320 * B, g0 + (g1 - g0) * Rc),
+        np.clip(B, -0.0015 * R - 0.0017 * G - 0.0002, 1.0024),
+    ]))
 
 
-def gradient_stop_to_render(spec):
-    p3 = _enc(_SRGB_TO_P3 @ gradient_stop_srgb(spec))
+def _ramp_to_render(e):
+    # extended encoded sRGB ramp value -> P3-coded 0..255 (negatives
+    # propagate through the linear-light conversion; clip only at output)
+    p3 = np.clip(_enc_ext(_SRGB_TO_P3 @ _lin_ext(e)), 0, 1)
     return [round(float(v) * 255, 1) for v in p3]
+
+
+def resample_law_stops(stops):
+    # [(offset, spec)] -> (st, cs) sampling the law curve densely enough
+    # that the engine's piecewise-linear P3-coded lerp stays within tol.
+    # The engine lerps stored P3-coded colors; the law curve lives in
+    # extended encoded sRGB, so intermediate stops are inserted wherever
+    # the two disagree.
+    knots = [(float(o), gradient_stop_ext(spec)) for o, spec in stops]
+    TOL = 0.4  # 0..255 units
+
+    def law_at(e0, e1, u):
+        return _ramp_to_render(e0 + (e1 - e0) * u)
+
+    out = [(knots[0][0], law_at(knots[0][1], knots[0][1], 0.0))]
+    for (o0, e0), (o1, e1) in zip(knots, knots[1:]):
+        seg = [(0.0, np.array(law_at(e0, e1, 0.0))), (1.0, np.array(law_at(e0, e1, 1.0)))]
+        for _ in range(5 if o1 - o0 > 1e-6 else 0):  # up to 33 samples/segment
+            refined = [seg[0]]
+            split = False
+            for (u0, c0), (u1, c1) in zip(seg, seg[1:]):
+                um = (u0 + u1) / 2
+                cm = np.array(law_at(e0, e1, um))
+                if np.abs((c0 + c1) / 2 - cm).max() > TOL:
+                    refined.append((um, cm))
+                    split = True
+                refined.append((u1, c1))
+            seg = refined
+            if not split:
+                break
+        for u, c in seg[1:]:
+            out.append((o0 + (o1 - o0) * u, [round(float(v), 1) for v in c]))
+    return ([round(o, 4) for o, _ in out], [c for _, c in out])
 
 
 def attr(attrs, name, style):
@@ -782,12 +843,11 @@ for g in reversed(doc.get("groups", [])):
                                      "x0": round(p0[0], 1), "y0": round(p0[1], 1),
                                      "x1": round(p1[0], 1), "y1": round(p1[1], 1)}
                         if fdesc["t"] in ("lin", "rad"):
-                            if len(stops) == 2:
-                                fdesc["c0"] = gradient_stop_to_render(stops[0][1])
-                                fdesc["c1"] = gradient_stop_to_render(stops[-1][1])
+                            st, cs = resample_law_stops(stops)
+                            if len(st) == 2:
+                                fdesc["c0"], fdesc["c1"] = cs
                             else:
-                                fdesc["st"] = [round(o, 4) for o, _ in stops]
-                                fdesc["cs"] = [gradient_stop_to_render(c) for _, c in stops]
+                                fdesc["st"], fdesc["cs"] = st, cs
                 else:
                     warn(f"gradient #{gid} not found -> black")
                     fdesc = {"t": "solid", "c": [0, 0, 0]}

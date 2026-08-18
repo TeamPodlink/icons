@@ -300,12 +300,41 @@ the per-layer lighting model. Open cell before the translator can
 synthesize glass: canvas-y vs glass-bounds-y ramp anchoring (one
 small-circle render decides).
 
+**The extended gradient-stop law + the engine lerp-space gap (solved
+2026-08-17, `probe-p3-gradient.py`).** podvine's background missed by
+27/255 in red. Region attribution refuted the recorded "glyph edges"
+lead — 97.8% of the squared error was the background field — and a
+probe rerender showed the real bundle's ramp MATCHES the standalone
+probe curve: the model was wrong twice over. (1) The engine lerps
+stored P3-coded stops in P3 coordinate space, but the law curve is a
+lerp in encoded sRGB — for hue-crossing saturated stops the channel
+mixing differs by up to 27/255. Fixed data-only: the translator now
+resamples the law curve into adaptive multi-stops (tol 0.4/255,
+existing `st`/`cs` machinery; simple ramps stay 2-stop). (2) Stops
+declared `color(display-p3 …)` can sit OUTSIDE the sRGB gamut, where
+the old clip-at-stop model breaks: a 26-render C→white grid measured
+the full per-channel transform in UNCLIPPED linear sRGB —
+    R' = clamp(R, −0.0258·G + 0.0018·B − 0.0009, 1.0054 − 0.0075·G)
+    G' = clamp(G, 0.0185·R + 0.0320·B, gceil(R,B))   [floor = old law]
+    B' = clamp(B, −0.0015·R − 0.0017·G − 0.0002, 1.0024)
+with gceil a measured 2×3 table over clamped (R,B) — the green
+ceiling saturates toward 1 as either other channel rises (a single
+working-space matrix round-trip fits everything else but not that
+saturation; tried, rejected at 4/255). Transformed stops are
+MIRROR-ENCODED (negative endpoints measured exactly at −enc(|v|)),
+the ramp lerps in extended encoded sRGB, and negatives survive the
+sRGB→P3 conversion per-pixel — only the final P3-coded value clips
+(clip-before-convert loses 5/255 on green→black ramps). All 18
+instrument pair-curves (10 sRGB + 8 p3, in- and out-of-gamut) fit at
+≤ 1.6 RMSE, total 11.1 vs 23.1 under the old law. Sweep: podvine
+14.62 → 2.12, itunes 2.20 → 1.78, tunestr 9.00 → 8.78; resso
+2.40 → 2.45 (red-ceiling constant, see below).
+
 Glass icons now await the per-layer lighting model (the material
 family is measured); raster-art bundles a PNG-decode decision. The player's coverage today: flat + SVG, 38 bundles at
-median RMSE 3.4, **31/38 ≤ 5.5, worst 14.6** (the first sweep's
-worst was 183 with fifteen bundles above 40); remaining: podvine
-14.6 (glyph-edge), sonnet 9.6, tunestr 9.0, podfriend 8.5, podhero
-8.5, podcastindex 7.7, mixerbox 7.1.
+median RMSE 3.4, **31/38 ≤ 5.5, worst 9.6**; remaining: sonnet 9.6,
+tunestr 8.8, podfriend 8.5, podhero 8.5, podcastindex 7.7, mixerbox
+7.1 — the display-p3 solid deviation is the shared suspect.
 
 ## Adding a platform or icon
 
