@@ -11,8 +11,7 @@
         "file": "Downcast.icon",
         "source": "appstore-artwork-split",
         "appStoreId": 393858566,
-        "hasDark": false,
-        "darkStatus": "missing"
+        "hasDark": true
       }
     ]
   }

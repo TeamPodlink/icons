@@ -11,8 +11,7 @@
         "variant": null,
         "file": "gPodder.icon",
         "source": "official-svg",
-        "hasDark": false,
-        "darkStatus": "missing"
+        "hasDark": true
       }
     ]
   }

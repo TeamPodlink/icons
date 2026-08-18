@@ -12,8 +12,7 @@
         "file": "iHeartRadio.icon",
         "source": "appstore-artwork-split",
         "appStoreId": 290638154,
-        "hasDark": false,
-        "darkStatus": "missing"
+        "hasDark": true
       }
     ]
   }

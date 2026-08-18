@@ -11,8 +11,7 @@
         "variant": null,
         "file": "ListenNotes.icon",
         "source": "official-artwork",
-        "hasDark": false,
-        "darkStatus": "missing"
+        "hasDark": true
       }
     ]
   }
