@@ -10,7 +10,8 @@
         "variant": null,
         "file": "Spreaker.icon",
         "hasDark": false,
-        "source": "catalog-artwork"
+        "source": "catalog-artwork",
+        "darkStatus": "missing"
       }
     ]
   }

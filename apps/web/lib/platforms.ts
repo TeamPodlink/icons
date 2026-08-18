@@ -7,6 +7,15 @@ export interface GlassBundle {
   recipe: boolean;
   rmse: number | null;
   hasDark: boolean;
+  /**
+   * For hasDark:false bundles (identical light/dark renditions), the
+   * measured classification from pipeline/audit-dark-status.mjs:
+   * "native" — the artwork is already dark, identical renditions are
+   * correct and final; "missing" — light artwork whose Apple-darkened
+   * rendition doesn't exist yet. null when hasDark is true (a real
+   * dark rendition exists) or the bundle hasn't been audited.
+   */
+  darkStatus: "native" | "missing" | null;
   /** Provenance rung: decanted | appstore-artwork | flat-svg | flat-svg-split | flat-svg-browser | null (pre-monorepo, unlabeled). */
   source: string | null;
 }
@@ -39,15 +48,19 @@ const SOURCE_LABEL: Record<string, string> = {
 /**
  * Debug categories: computed QA lenses over the collection, replacing
  * editorial taxonomy. Each is a worklist — "no recipe" is the recipe
- * backlog, "no dark variant" the icons that render a light background
- * everywhere, "unlabeled source" the provenance backfill, and the
- * source rungs show how far up the upgrade ladder each icon sits.
+ * backlog, "missing dark" the icons whose Apple-darkened rendition we
+ * don't have yet (the dark-variant backlog), "dark as-is" the icons
+ * whose artwork is already dark so identical light/dark is correct
+ * (measured split: pipeline/audit-dark-status.mjs), "unlabeled source"
+ * the provenance backfill, and the source rungs show how far up the
+ * upgrade ladder each icon sits.
  */
 export function debugCategories(p: Platform, b: GlassBundle | null): string[] {
   const cats: string[] = [];
   if (b) {
     if (!b.recipe) cats.push("no recipe");
-    if (!b.hasDark) cats.push("no dark variant");
+    if (!b.hasDark)
+      cats.push(b.darkStatus === "native" ? "dark as-is" : "missing dark");
     cats.push(b.source ? SOURCE_LABEL[b.source] ?? b.source : "unlabeled source");
   }
   if (!p.active) cats.push("inactive");

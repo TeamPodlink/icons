@@ -42,6 +42,7 @@ export function platformJson(origin: string, p: Platform) {
       recipe: b.recipe,
       rmse: b.rmse,
       hasDark: b.hasDark,
+      darkStatus: b.darkStatus,
       source: b.source,
       assets: glassAssets(b.slug, b.hasDark),
       registryItem: `${origin}/r/${b.slug}.json`,

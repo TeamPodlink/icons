@@ -11,7 +11,8 @@
         "file": "Podbean.icon",
         "source": "appstore-artwork",
         "appStoreId": 973361050,
-        "hasDark": false
+        "hasDark": false,
+        "darkStatus": "native"
       }
     ]
   }

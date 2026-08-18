@@ -11,7 +11,8 @@
         "variant": null,
         "file": "Audible.icon",
         "hasDark": false,
-        "source": "appstore-artwork"
+        "source": "appstore-artwork",
+        "darkStatus": "missing"
       }
     ]
   }

@@ -20,6 +20,7 @@ const out = readPlatforms().map(({ id, dir, meta }) => ({
     recipe: b.recipe ?? false,
     rmse: b.rmse ?? null,
     hasDark: b.hasDark ?? false,
+    darkStatus: b.darkStatus ?? null,
     source: b.source ?? null,
   })),
 }));

@@ -9,7 +9,8 @@
         "variant": null,
         "file": "LNBeats.icon",
         "source": "flat-svg-split",
-        "hasDark": false
+        "hasDark": false,
+        "darkStatus": "native"
       }
     ]
   }

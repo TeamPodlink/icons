@@ -14,7 +14,8 @@
         "file": "iCatcher.icon",
         "source": "appstore-artwork",
         "appStoreId": 414419105,
-        "hasDark": false
+        "hasDark": false,
+        "darkStatus": "missing"
       }
     ]
   }
