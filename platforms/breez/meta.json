@@ -1,6 +1,6 @@
 {
   "name": "Breez",
-  "active": true,
+  "active": false,
   "liquidGlass": {
     "bundles": [
       {

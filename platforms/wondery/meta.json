@@ -1,6 +1,6 @@
 {
   "name": "Wondery",
-  "active": true,
+  "active": false,
   "liquidGlass": {
     "bundles": [
       {

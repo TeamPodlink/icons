@@ -1,6 +1,6 @@
 {
   "name": "LN Beats",
-  "active": true,
+  "active": false,
   "liquidGlass": {
     "bundles": [
       {

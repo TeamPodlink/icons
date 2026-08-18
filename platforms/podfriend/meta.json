@@ -1,6 +1,6 @@
 {
   "name": "Podfriend",
-  "active": false,
+  "active": true,
   "liquidGlass": {
     "bundles": [
       {
