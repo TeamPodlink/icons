@@ -1,36 +1,10 @@
 {
   "fill": {
-    "linear-gradient": [
-      "srgb:0.00000,0.00000,0.00000,1.00000",
-      "srgb:0.00000,0.00000,0.00000,1.00000"
-    ],
-    "orientation": {
-      "start": {
-        "x": 0.5,
-        "y": 0
-      },
-      "stop": {
-        "x": 0.5,
-        "y": 1
-      }
-    },
+    "solid": "srgb:0.00000,0.00000,0.00000,1.00000",
     "fill-specializations": [
       {
         "value": {
-          "linear-gradient": [
-            "srgb:0.00000,0.00000,0.00000,1.00000",
-            "srgb:0.00000,0.00000,0.00000,1.00000"
-          ],
-          "orientation": {
-            "start": {
-              "x": 0.5,
-              "y": 0
-            },
-            "stop": {
-              "x": 0.5,
-              "y": 1
-            }
-          }
+          "solid": "srgb:0.00000,0.00000,0.00000,1.00000"
         }
       },
       {
@@ -65,16 +39,9 @@
       },
       "layers": [
         {
-          "image-name": "icon.svg",
-          "name": "icon",
-          "glass": false,
-          "position": {
-            "scale": 32,
-            "translation-in-points": [
-              0,
-              0
-            ]
-          }
+          "image-name": "glyph.png",
+          "name": "glyph",
+          "glass": false
         }
       ]
     }

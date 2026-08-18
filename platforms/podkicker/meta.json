@@ -8,7 +8,7 @@
         "title": "Podkicker",
         "variant": null,
         "file": "Podkicker.icon",
-        "source": "flat-svg-split",
+        "source": "adaptive-icon",
         "hasDark": true
       }
     ]
