@@ -87,8 +87,10 @@ Measured 2026-08-17 by sweeping all 36 all-SVG bundles:
 Growing the recipe set therefore means builder work in
 `packages/engine/tools/build_recipe.py` (per-subpath fills parsed from
 SVG artwork, hole-preserving winding), not pipeline changes here. The
-`no recipe` QA lens on the site is the backlog; `build-recipes.mjs` is
-the measuring harness ready for when the builder learns those tricks.
+backlog is queryable as `recipe: false` in the bundle data (the site no
+longer lensifies it — recipes are research, not a delivery problem);
+`build-recipes.mjs` is the measuring harness ready for when the builder
+learns those tricks.
 
 ## Small-lightmap distillation (measured verdict)
 
@@ -808,9 +810,11 @@ where identical renditions are the correct final state — and light
 artwork whose Apple-darkened rendition simply doesn't exist yet. The
 split is recorded per bundle as meta.json `darkStatus`
 (`"native" | "missing"`, set only when `hasDark` is false; validate.mjs
-enforces the enum and flags stale fields on `hasDark:true` bundles) and
-surfaces on the site as two lenses, "dark as-is" and "missing dark"
-(`debugCategories` in `apps/web/lib/platforms.ts`).
+enforces the enum and flags stale fields on `hasDark:true` bundles). On
+the site only the actionable half is a lens — "missing dark", the
+dark-variant backlog (`debugCategories` in `apps/web/lib/platforms.ts`);
+natively-dark artwork is correct as-is, so `darkStatus: "native"` stays
+a data field, not a lens.
 
 The verdict is measured from the bundle's own 1024 layer composite
 (canvas fill + placed artwork — the composite ictool's raster
