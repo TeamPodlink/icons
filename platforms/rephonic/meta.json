@@ -1,6 +1,7 @@
 {
   "name": "Rephonic",
   "active": true,
+  "url": "https://rephonic.com",
   "liquidGlass": {
     "bundles": [
       {

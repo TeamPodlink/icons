@@ -1,6 +1,7 @@
 {
   "name": "Podimo",
   "active": true,
+  "url": "https://podimo.com",
   "liquidGlass": {
     "bundles": [
       {

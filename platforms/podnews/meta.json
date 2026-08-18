@@ -1,6 +1,7 @@
 {
   "name": "Podnews",
   "active": true,
+  "url": "https://podnews.net",
   "liquidGlass": {
     "bundles": [
       {

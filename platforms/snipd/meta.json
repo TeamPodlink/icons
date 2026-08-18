@@ -1,6 +1,7 @@
 {
   "name": "Snipd",
   "active": true,
+  "url": "https://www.snipd.com",
   "liquidGlass": {
     "bundles": [
       {
