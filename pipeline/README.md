@@ -460,15 +460,111 @@ closing instruments:
   radiopublic's flat fields match GT exactly at sampled pixels; its
   3.31 is the same edge class.
 
-Glass lighting has a measured conditional GO (feasibility probe 5:
-per-contour edge LUT + the translucency-declared material ramp,
-predicted-lightmap RMSE 5.4–7.3 on normal-alpha glass; low-alpha
-interior bloom still open); raster-art bundles a PNG-decode decision. The player's coverage today: flat + SVG, 38 bundles at
-median RMSE 2.36, **38/38 ≤ 4.0, worst 3.98** (the first sweep's
-worst was 183 with fifteen bundles above 40; the milestone sweep's
-median was 4.16 with eleven above 5.5, worst 14.6). What remains is
-bounded: tunein 3.98 (colored auto-gradient, unfit), podlp 3.69,
-curiocaster 3.36, radiopublic 3.31 (rasterizer edge AA).
+Raster-art bundles remain a PNG-decode decision. The player's coverage
+today: every all-SVG bundle, flat or glass. Flat: 38 bundles at median
+RMSE 2.36, **38/38 ≤ 4.0, worst 3.69** (the first sweep's worst was
+183 with fifteen bundles above 40; the milestone sweep's median was
+4.16 with eleven above 5.5, worst 14.6). Glass: the five catalog
+bundles at 4.3–7.7 plus apple's bounded 17.3 (see "Glass synthesis"
+below). What remains in the flat tail is bounded: podlp 3.69,
+curiocaster 3.36, tunein 3.33 (colored auto-gradient, approximate),
+radiopublic 3.31 (rasterizer edge AA).
+
+## Glass synthesis in the translator (landed 2026-08-17)
+
+`translate_icon.py` now emits glass layers from declared values alone —
+material + lighting, zero ictool measurement — validated against fresh
+ictool ground truth on all five all-SVG catalog glass bundles. The
+declared-value laws, each measured:
+
+- **The declared-alpha decode.** Effective glass alpha is
+  `fillAlpha × family_alpha(u, translucency)` with
+  `u = (y − boundsTop)/boundsHeight` (probe-ramp-anchor), and layer ×
+  group opacity is a separate POST-COMPOSITE blend (below). The
+  opacity/family product reproduces the measured recipe alphas to
+  ±0.01 on 8/11 catalog glass layers — including apple's "low-alpha
+  glass": its α 0.165 circle is simply layer opacity 0.18 × family
+  t0.36, and its person layer's 0.722 = 0.95 (layer op) × 0.874
+  (family t0.4) × 0.87 (the declared fill's own alpha component). The
+  WS1 "corpus never sampled α < 0.72" cell was an opacity decode, not
+  a material regime.
+- **Colored fills obey the scalar family law**
+  (`probe-colored-glass.py`, two-gray × {black, navy, red, white} ×
+  {t0.1, t0.5}): k(y) is the family transmission curve regardless of
+  fill color, and the overlay is exactly `fill × alpha(y)` (red's c
+  walks (184,46,38)→(106,23,19) = fill·α; black t0.5 k = white's
+  0.005/0.15/0.42). Glass gc therefore comes from the declared fill or
+  the artwork's area-weighted fill through the standard sRGB→P3
+  composite conversion (overcast's #ff7f00 waves measure (245,125,49)
+  = exactly that path). Deviation recorded, unmodeled:
+  display-p3-DECLARED fills show small per-channel k (navy: R 0.047 /
+  G 0.023 / B 0.007 at bottom, minima to −0.02).
+- **The measured t0.1 family row.** Linear t-interpolation between the
+  family's t0 and t0.25 rows overestimates transmission at t0.1
+  (interp α_bot 0.945 vs measured 0.977); the probe's white-t0.1 row
+  joined `glass-material-family.json`.
+- **Opacity is compositor semantics.** Overcast's op-0.9 tower group
+  passes 10% of the UNREFRACTED canvas (ring bottom GT (29,12,0) =
+  0.1·canvas + 0.9·near-opaque navy); folding opacity into material
+  alpha instead refracts that 10% through the thin ring's height field
+  and pulls white-circle taps ((40,38,39): +37/255 blue). The engine
+  gained optional glass `op` (post-composite blend with the clean
+  base) and optional `gc1`/`gcy` (vertical material-color gradient —
+  the tower's declared navy→black fill renders as a ramp in GT,
+  (43,43,51)→(29,14,1)). Both fields absent → old recipes
+  bit-identical (all six adopted recipes hash-identical at 256
+  `{ exact: true }`; regen byte-stable).
+- **The shared edge LUT is a committed calibration artifact**:
+  `calibration/glass-edge-lut.json`, built by `build_glass_lut.py` —
+  shared-bin ridge LSQ (λ 3) of the per-contour
+  (signed-distance × normal-angle × thickness-class) kernel over the
+  bounds-anchored ramp-removed residual fields of the 10 authored
+  instruments + the 4 catalog glass bundles (probe-layer-lightmap
+  workdir; 2256 bins, 2011 sampled, white-restore b 0.202 = the
+  adopted-recipe mean). The translator sums it over every glass
+  contour into the recipe's global lightmap. Instrument-only sources
+  were measured and rejected: they hold podcastrepublic (5.12) but
+  cost overcast/premiumblue ~1.8 RMSE each — the overcast pair's
+  fields carry geometry the instruments don't span.
+
+Zero-measurement validation (leave-target-out LUTs — the target's
+residual field never enters the fit — vs fresh ictool GT):
+
+| bundle | @1024 | @64 | WS1 predicted-lm band |
+| --- | --- | --- | --- |
+| podcastrepublic | **4.64** | 7.14 | 5.36 / 6.41 |
+| overcast-premiumblue | **5.90** | 5.59 | 6.28 / 6.14 |
+| overcast | **7.60** | 7.85 | 7.28 / 8.26 |
+| overcast-dark | **7.66** | 6.82 | (measured recipe: 7.6) |
+| apple | 17.49 | 17.02 | 28.1 (bounded) |
+
+With the committed full-fit LUT the sweep scores 4.30 / 5.86 / 7.69 /
+7.66 / 17.27. The flat gate held exactly through all of it: 38/38
+≤ 4.0, median 2.36 — and the colored automatic-gradient model that
+fixed podcastrepublic's canvas (below) moved tunein 3.98 → 3.33 and
+spotify 2.47 → 2.84.
+
+**Colored automatic-gradient, modeled** (same session; upgrades the
+"left UNFIT" cell). From the probe-autogradient-colored dataset:
+bottom stop = the SOLID soft-knee conversion of the input (dBot within
+−3..+0.5 across all 12), per-channel lift =
+`(1−S)·grayLadder(vmax) + S·(6.78 + 20.52·v_c/vmax)` with
+`S = 1 − vmin/vmax` (LSQ, rms 3.2 / max 9.8 in-sample; grays stay
+exactly on the ladder), and the flip criterion is MEAN lightness — no
+colored sample flips, including max-channel 0.8, while the old
+max-channel test flipped podcastrepublic's blue canvas into a downward
+ramp (~20/255 top error; its glass bundle scored 13.99 before this
+fix, 4.64 after). Still an approximate cell — the sawtooth×saturation
+interaction is unfit — but now measured-model, not gray-ladder-only.
+
+Bounded limitations, recorded: apple's low-alpha interior bloom
+(lavender radial glow; half its residual energy >48px from any edge —
+needs the translucent-artwork instrument sweep; 17.5 here vs 28.1 in
+WS1 because the declared-alpha decode fixed its materials), the
+display-p3 per-channel-k deviation (≤0.05), and overcast's last
++0.3 over the WS1 band (tower-region residual after the op/gc1 fixes —
+the remaining B-channel floor at the ring bottom is refraction-tap
+bleed the scalar-alpha composite keeps).
 
 ## Adding a platform or icon
 
