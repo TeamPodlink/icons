@@ -61,16 +61,83 @@ export default function IconFormatPage() {
           x-coordinates are 0.5 in all {firstParty + catalog} surveyed icons,
           with start.y ∈ [0, 1] and stop.y ∈ [0.3, 1].{" "}
           <code>automatic-gradient</code> takes a single color and derives a
-          gradient by rules Apple does not document; this project measures the
-          derived result from renders rather than guessing it. Color
-          resolution is not one pipeline but several, each measured
-          separately: canvas fills composite in sRGB (display-p3 values
-          gamut-clipped); solid layer-artwork colors and fill overrides
-          declared in sRGB leak through <em>unconverted</em> when the artwork
-          has an opaque full-bleed background darker than ~0.30 mean
-          luminance (a fast-path quirk), and composite in sRGB otherwise;
-          display-p3 layer colors always convert; gradient stops pass through
-          their own measured transform before a plain encoded-space ramp.
+          gradient by rules Apple does not document; the measured derivation
+          is in its own section below. Which colorspace conversion a declared
+          color actually receives depends on <em>where</em> it is declared —
+          the next section gives the measured resolution paths.
+        </P>
+      </Section>
+
+      <Section title="Color resolution (measured)">
+        <P>
+          There is no undocumented gamut mapping. The renderer composites in
+          sRGB with plain colorimetric clipping, then encodes the result in
+          Display-P3 coordinates — rendered output is P3-tagged, but its
+          content is sRGB-gamut. Measured across 23 declared colors:
+          converting rendered P3 pixels back to sRGB matches naive
+          matrix-and-clip conversion to worst-case 3/255. A conforming player
+          computes fills as pure math in sRGB. Resolution is not one pipeline
+          but four, split by declaration site:
+        </P>
+        <Code>{`canvas fills       composite in sRGB; display-p3 values gamut-clipped
+sRGB layer colors  composite in sRGB — EXCEPT the raw leak below
+display-p3 layer   always convert (with a small unexplained deviation
+  colors           from the canvas law on gamut-clipped channels)
+gradient stops     transformed by the stop law below, then ramped as a
+                   plain lerp in encoded sRGB`}</Code>
+        <P>
+          <strong>The raw leak.</strong> Solid layer colors and fill
+          overrides declared in sRGB (hex or <code>srgb:</code>) pass through{" "}
+          <em>unconverted</em> — the declared numbers relabeled as P3
+          coordinates — when the layer&apos;s artwork has an opaque{" "}
+          <em>exact</em> full-bleed background with mean encoded luminance
+          below ~0.30 (threshold bracketed to (0.282, 0.314); both{" "}
+          <code>&lt;use&gt;</code>-referenced and <code>&lt;path&gt;</code>{" "}
+          covers trigger it, coverage one pixel short does not, light
+          backgrounds do not). Almost certainly a dark-artwork classifier
+          choosing an opaque-blit fast path that skips color conversion. A
+          conforming player must reproduce it: the same hex color composites
+          in sRGB over a white background and leaks raw over a dark one.
+        </P>
+        <P>
+          <strong>The gradient-stop law.</strong> Gradient stops — hex sRGB
+          and <code>color(display-p3 …)</code> declarations produce the
+          identical curve — behave as if round-tripped through a working
+          space with a different green primary and clipped there: only the
+          green channel changes, clamped in linear sRGB to a range set by the
+          other two channels,
+        </P>
+        <Code>{`G' = clamp(G, kR·R + kB·B, span + kR·R + kB·B)
+kR = 0.0185   kB = 0.0320   span = 0.9540      (linear light)`}</Code>
+        <P>
+          measured directly from a 4×4×4 constant-stop sweep (64 renders of
+          color→white gradients); fit RMSE 0.18/255 over the grid, and ten
+          instrument gradient pairs reproduce at ≤ 1.2 RMSE. The ramp itself
+          is a plain lerp of the <em>transformed</em> stops in encoded sRGB —
+          a blue→black ramp (both stops zero green) shows the added green
+          perfectly linear in t. Skipping the law leaves midtones off by up
+          to 45/255 in green while solid fills of the same colors stay exact.
+        </P>
+      </Section>
+
+      <Section title="The automatic-gradient derivation (measured)">
+        <P>
+          Measured over a 33-color sweep, <code>automatic-gradient</code>{" "}
+          derives a two-stop vertical linear ramp in encoded sRGB
+          (mid-ramp deviation &lt; 1 except where channel clipping bends
+          it), keyed on the declared color&apos;s lightness: below ~0.775
+          the stops are [lightened(input), input] — the declared color sits
+          at the bottom, exact; above ~0.775 the ramp flips to [input,
+          darkened(input)], anchoring the declared color at the top. The
+          lightening is hue-preserving — it rides the dominant channels,
+          with a small additive floor near black — and spans 7–18 encoded
+          units, jumping in a sawtooth at the 0.25/0.50/0.75 lightness
+          quartiles. No closed form is known; the measured gray and hue
+          ladders make a table-driven implementation with interpolated
+          anchors viable. The derivation composes with the color model
+          above exactly once — a player that applies the transfer a second
+          time for display-p3-declared inputs renders dark colors near
+          black (measured on a navy canvas).
         </P>
       </Section>
 
@@ -132,7 +199,12 @@ export default function IconFormatPage() {
           artwork&apos;s natural size (the SVG viewBox, or pixel size — not
           the 1024 canvas) multiplied by <code>position.scale</code>, centered
           on the canvas, then offset by{" "}
-          <code>position.translation-in-points</code>.
+          <code>position.translation-in-points</code>. When{" "}
+          <code>position</code> is omitted entirely, the default is{" "}
+          <em>not</em> fit-to-canvas: the layer renders at scale 1 — one SVG
+          unit per canvas unit — centered, and clipped to the canvas
+          (measured with a seven-case viewBox sweep; a 1200×500 viewBox
+          spills and clips rather than shrinking to fit).
         </P>
         <Code>{`{ "name": "glyph",
   "image-name": "glyph.svg",
@@ -147,6 +219,24 @@ export default function IconFormatPage() {
           and casts the glass shadow. A layer <code>fill</code> overrides the
           artwork&apos;s own colors with a solid or gradient; observed scale
           spans 0.24–32 and translations −340–512 points.
+        </P>
+      </Section>
+
+      <Section title="The glass material (measured)">
+        <P>
+          The interior of a glass layer is one universal material family,
+          not a per-icon effect. Per-row affine solves over two-gray
+          canvases, across translucency {"{0, .25, .5, .75, 1}"} crossed
+          with the specular modes, measure it as: a neutral response (chroma
+          of the gain term ≤ 0.017), a <em>white</em> overlay (constant term
+          ≈ 255·alpha), with alpha varying smoothly in both vertical
+          position and translucency — one interpolable 2D family covers
+          every material setting. <code>specular</code> has zero measured
+          effect on the interior: it is edge lighting only. A conforming
+          player therefore renders a glass interior as a white overlay whose
+          alpha it looks up from the (y, translucency) family, and treats
+          specular purely as an edge-lighting pass; edge lighting itself
+          remains unmodeled here.
         </P>
       </Section>
 
@@ -204,7 +294,11 @@ export default function IconFormatPage() {
           </a>{" "}
           (host-CoreUI extraction; refraction and specular-location details
           may be incomplete on this path), then surveyed as aggregate facts —
-          key paths, counts, value spaces. Apple&apos;s artwork is not
+          key paths, counts, value spaces. The rendering laws — color
+          resolution, the gradient derivations, placement, the glass
+          material — were measured by rendering purpose-built instrument
+          bundles through Apple&apos;s own renderer (<code>ictool</code>)
+          and fitting the pixels. Apple&apos;s artwork is not
           redistributed here: the corpus informs the documentation, and the
           format itself is documented for interoperability. Everything on this
           page is observation, not specification — Apple can change any of it.
