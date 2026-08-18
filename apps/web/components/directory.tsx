@@ -145,11 +145,12 @@ export function Directory({
     if (sort === "alphabetical")
       list.sort((a, b) => byTitle(a.title, b.title));
     else if (sort === "popular")
-      // "popular": OP3 download share (percent) descending; platforms
-      // without OP3 data sink to the bottom; ties A-Z.
+      // "popular": snapshot rank (curated pins for OP3-unmeasurable
+      // platforms like YouTube, then OP3 share order); unranked sink
+      // to the bottom; ties A-Z.
       list.sort(
         (a, b) =>
-          (b.popularity ?? -1) - (a.popularity ?? -1) ||
+          (a.popularityRank ?? Infinity) - (b.popularityRank ?? Infinity) ||
           byTitle(a.title, b.title)
       );
     else

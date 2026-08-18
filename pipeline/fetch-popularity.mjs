@@ -5,7 +5,12 @@
 // workflow) refreshes it explicitly; dev and CI builds read the
 // committed baseline and never touch the network.
 //
-// Shape: { "fetched": "YYYY-MM-DD", "shares": { "<platformId>": <pct> } }
+// Shape: { "fetched": "YYYY-MM-DD",
+//           "adjustments": { "<id>": { "pinRank": <n>, "basis": "<cite>" } },
+//           "shares": { "<platformId>": <pct> } }
+// "adjustments" is CURATED (maintainer-owned, preserved across
+// refreshes): platforms OP3 structurally cannot measure (e.g. YouTube's
+// native video) pinned to a cited rank.
 // Only OP3 apps that map to a catalog platform appear; several OP3
 // entries may sum into one platform (e.g. iTunes → apple). On any
 // fetch/parse failure this exits nonzero WITHOUT touching the existing
@@ -13,7 +18,7 @@
 //
 // Env: OP3_TOKEN — API token; defaults to OP3's public preview token.
 
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { readPlatforms, root } from "./lib.mjs";
 
@@ -115,6 +120,14 @@ for (const [name, share] of Object.entries(appShares)) {
     fyi.push([name, share]);
 }
 
+const existing = (() => {
+  try {
+    return JSON.parse(readFileSync(OUT, "utf8"));
+  } catch {
+    return null;
+  }
+})();
+
 const shares = Object.fromEntries(
   [...sums.entries()]
     .map(([id, share]) => [id, Math.round(share * 1e4) / 1e4])
@@ -123,7 +136,15 @@ const shares = Object.fromEntries(
 
 writeFileSync(
   OUT,
-  JSON.stringify({ fetched: new Date().toISOString().slice(0, 10), shares }, null, 2) + "\n"
+  JSON.stringify(
+    {
+      fetched: new Date().toISOString().slice(0, 10),
+      adjustments: existing?.adjustments ?? {},
+      shares,
+    },
+    null,
+    2
+  ) + "\n"
 );
 
 console.log(

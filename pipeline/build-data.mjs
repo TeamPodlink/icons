@@ -7,9 +7,22 @@ import { readPlatforms, root } from "./lib.mjs";
 
 // Committed OP3 download-share snapshot (pipeline/fetch-popularity.mjs).
 const popularityPath = join(root, "apps/web/lib/op3-popularity.json");
-const popularity = existsSync(popularityPath)
-  ? JSON.parse(readFileSync(popularityPath, "utf8")).shares
-  : {};
+const op3 = existsSync(popularityPath)
+  ? JSON.parse(readFileSync(popularityPath, "utf8"))
+  : { shares: {}, adjustments: {} };
+const popularity = op3.shares ?? {};
+// Rank order: curated pins (adjustments, cited in the snapshot) occupy
+// their pinRank positions; measured platforms follow by share desc.
+const pinned = Object.entries(op3.adjustments ?? {}).sort(
+  (a, b) => a[1].pinRank - b[1].pinRank
+);
+const measured = Object.entries(popularity)
+  .filter(([id]) => !(op3.adjustments ?? {})[id])
+  .sort((a, b) => b[1] - a[1])
+  .map(([id]) => id);
+for (const [id, adj] of pinned)
+  measured.splice(Math.max(0, adj.pinRank - 1), 0, id);
+const popularityRank = Object.fromEntries(measured.map((id, i) => [id, i + 1]));
 
 const out = readPlatforms().map(({ id, dir, meta }) => ({
   id,
@@ -18,6 +31,7 @@ const out = readPlatforms().map(({ id, dir, meta }) => ({
   url: meta.url ?? null,
   added: meta.added ?? null,
   popularity: popularity[id] ?? null,
+  popularityRank: popularityRank[id] ?? null,
   guidelinesUrl: meta.guidelinesUrl ?? null,
   hasFlat: existsSync(join(dir, "icon.svg")),
   hasBadge: existsSync(join(dir, "badge.svg")),

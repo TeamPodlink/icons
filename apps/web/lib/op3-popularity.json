@@ -1,5 +1,11 @@
 {
   "fetched": "2026-08-18",
+  "adjustments": {
+    "youtube": {
+      "pinRank": 1,
+      "basis": "OP3 cannot observe native video consumption; Edison Podcast Metrics and Cumulus/Signal Hill surveys consistently rank YouTube the #1 US podcast destination (maintainer decision 2026-08-18)"
+    }
+  },
   "shares": {
     "apple": 38.5617,
     "spotify": 24.4528,

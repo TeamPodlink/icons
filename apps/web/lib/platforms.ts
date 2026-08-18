@@ -34,6 +34,8 @@ export interface Platform {
    *  (pipeline/fetch-popularity.mjs). null when OP3 has no data for
    *  the platform. Drives the directory's "Sort by popular". */
   popularity: number | null;
+  /** Position in the Popular sort: curated pins (snapshot adjustments) + OP3 share order. */
+  popularityRank: number | null;
   guidelinesUrl: string | null;
   hasFlat: boolean;
   hasBadge: boolean;
@@ -132,6 +134,8 @@ export interface Card {
   added: string | null;
   /** OP3 download share (percent) — see Platform.popularity. */
   popularity: number | null;
+  /** Position in the Popular sort: curated pins (snapshot adjustments) + OP3 share order. */
+  popularityRank: number | null;
 }
 
 export const cards: Card[] = platforms.flatMap((p): Card[] => {
@@ -145,6 +149,7 @@ export const cards: Card[] = platforms.flatMap((p): Card[] => {
       categories: debugCategories(p, b),
       added: p.added,
       popularity: p.popularity,
+      popularityRank: p.popularityRank,
     }));
   if (p.hasFlat)
     return [
@@ -157,6 +162,7 @@ export const cards: Card[] = platforms.flatMap((p): Card[] => {
         categories: debugCategories(p, null),
         added: p.added,
         popularity: p.popularity,
+        popularityRank: p.popularityRank,
       },
     ];
   return [];
