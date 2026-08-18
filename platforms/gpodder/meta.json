@@ -9,7 +9,7 @@
         "title": "gPodder",
         "variant": null,
         "file": "gPodder.icon",
-        "source": "flat-svg-browser",
+        "source": "official-svg",
         "hasDark": false,
         "darkStatus": "missing"
       }
