@@ -288,9 +288,20 @@ split. netflix 12.4 → **1.86**, tunein 18.2 → **3.98** (the bundle
 recorded as "knockout winding, RMSE 45" since the first recipe sweep
 is now in band), deepcast/spotify/jam unchanged.
 
-Glass icons remain gated on the material-response sweep and the
-per-layer lighting model; raster-art bundles on a PNG-decode
-decision. The player's coverage today: flat + SVG, 38 bundles at
+**The universal glass material family (measured 2026-08-17,
+`probe-material.py`).** Per-row affine solves over two-gray canvases
+across translucency {0,.25,.5,.75,1} × specular modes
+(`calibration/glass-material-family.json`): the response is neutral
+(k chroma ≤ 0.017), the overlay is white (c ≈ 255·alpha), alpha
+varies smoothly in y and translucency (an interpolable 2D family),
+and **specular has zero effect on the interior material** — it is
+edge lighting, which scopes the remaining glass research entirely to
+the per-layer lighting model. Open cell before the translator can
+synthesize glass: canvas-y vs glass-bounds-y ramp anchoring (one
+small-circle render decides).
+
+Glass icons now await the per-layer lighting model (the material
+family is measured); raster-art bundles a PNG-decode decision. The player's coverage today: flat + SVG, 38 bundles at
 median RMSE 3.4, **31/38 ≤ 5.5, worst 14.6** (the first sweep's
 worst was 183 with fifteen bundles above 40); remaining: podvine
 14.6 (glyph-edge), sonnet 9.6, tunestr 9.0, podfriend 8.5, podhero

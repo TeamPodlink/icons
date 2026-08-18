@@ -72,3 +72,17 @@ Fill colors, canvas background gradients, glass material responses
 (`k·bg + c`, via the automated two-gray instrument), and residual lighting
 fields are all measured from ictool renders of the specific bundle being
 converted — see SKILL.md. No per-icon constants live in this repository.
+
+## `glass-material-family.json`
+
+The glass material response measured across the DECLARED parameter grid
+(probe-material.py, 2026-08-17): per-row affine solves over two-gray
+canvases for translucency ∈ {0, .25, .5, .75, 1} and the three specular
+modes. Findings: the response is neutral (k chroma ≤ 0.017 — one luma
+alpha ramp suffices), the overlay is white (c ≈ 255·alpha throughout),
+alpha varies smoothly in both y and translucency (interpolable family),
+and specular has zero effect on the interior material — it is purely an
+edge/lighting phenomenon, cleanly separated from the material model.
+Open cell: whether the ramp anchors to canvas y or glass-bounds y
+(one small-circle render decides; required before the translator can
+synthesize glass layers).
