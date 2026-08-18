@@ -1153,11 +1153,17 @@ for g in reversed(doc.get("groups", [])):
                 shadow = {"dy": 29, "r": 23, "n": 3,
                           "amp": round(17.385 * sh.get("opacity", 0.5) / 0.5, 3)}
             entry = {"path": seg, "law": GLASS_LAW,
-                     "alpha": glass_alpha_b64(segf, tv, l_op * g_op * gcspec["al"]),
+                     "alpha": glass_alpha_b64(segf, tv, gcspec["al"]),
                      "gc": gcspec["gc"], "shadow": shadow, "lm": None}
             if "gc1" in gcspec:
                 entry["gc1"] = gcspec["gc1"]
                 entry["gcy"] = gcspec["gcy"]
+            # layer x group opacity is POST-COMPOSITE (the engine blends the
+            # finished glass composite with the clean base), NOT material
+            # alpha — measured on overcast's op-0.9 tower group, whose ring
+            # bottom keeps 10% of the UNREFRACTED canvas
+            if l_op * g_op < 0.9995:
+                entry["op"] = round(l_op * g_op, 4)
             glass_entries.append(entry)
             continue
         if glass_entries:

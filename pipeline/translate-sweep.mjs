@@ -1,6 +1,8 @@
 // Validate the zero-measurement icon.json -> recipe translator
 // (packages/engine/tools/translate_icon.py) against ictool ground truth
-// over every FLAT bundle (no glass:true layers, all-SVG art).
+// over every all-SVG bundle. Flat and glass bundles are reported as
+// separate cohorts (glass carries the predicted-lighting error budget;
+// flat is gated at its own historical band).
 //
 // Sources: the catalog (platforms/*) and optionally a local corpus of
 // first-party bundles (--corpus <dir>). Reports visible-RGB RMSE per
@@ -63,6 +65,7 @@ for (const t of targets) {
     continue;
   }
   const warns = (translated.match(/^ {2}! .*$/gm) ?? []).map((w) => w.slice(4));
+  const glass = Number(translated.match(/(\d+) glass layer\(s\)/)?.[1] ?? 0) > 0;
   try {
     const gt = join(WORK, `${t.slug}-gt.png`);
     execFileSync(ICTOOL, [
@@ -78,10 +81,10 @@ for (const t of targets) {
       { stdio: "pipe" }
     ).toString();
     const rmse = Number(out.match(/RMSE:\s*([\d.]+)/)?.[1]);
-    report.push({ slug: t.slug, bucket: t.bucket, rmse, warns });
-    console.log(`ok   ${t.slug}: RMSE ${rmse}${warns.length ? ` (${warns.length} warn)` : ""}`);
+    report.push({ slug: t.slug, bucket: t.bucket, glass, rmse, warns });
+    console.log(`ok   ${t.slug}${glass ? " [glass]" : ""}: RMSE ${rmse}${warns.length ? ` (${warns.length} warn)` : ""}`);
   } catch (e) {
-    report.push({ slug: t.slug, bucket: t.bucket, error: String(e.message).slice(0, 120), warns });
+    report.push({ slug: t.slug, bucket: t.bucket, glass, error: String(e.message).slice(0, 120), warns });
     console.error(`FAIL ${t.slug}: ${String(e.message).slice(0, 120)}`);
   }
   writeFileSync(REPORT, JSON.stringify(report, null, 2));
@@ -90,7 +93,15 @@ for (const t of targets) {
 writeFileSync(REPORT, JSON.stringify(report, null, 2));
 const scored = report.filter((r) => r.rmse != null).sort((a, b) => a.rmse - b.rmse);
 const skipped = report.filter((r) => r.skip);
-console.log(`\n${scored.length} scored, ${skipped.length} skipped (not flat / not SVG), ${report.length - scored.length - skipped.length} failed`);
-for (const r of scored)
-  console.log(`  ${r.rmse.toFixed(2).padStart(7)}  ${r.bucket === "firstParty" ? "*" : " "} ${r.slug}`);
+console.log(`\n${scored.length} scored, ${skipped.length} skipped (not SVG), ${report.length - scored.length - skipped.length} failed`);
+for (const cohort of ["flat", "glass"]) {
+  const rows = scored.filter((r) => (cohort === "glass") === !!r.glass);
+  if (!rows.length) continue;
+  const med = rows.length % 2
+    ? rows[(rows.length - 1) / 2].rmse
+    : (rows[rows.length / 2 - 1].rmse + rows[rows.length / 2].rmse) / 2;
+  console.log(`\n${cohort} (${rows.length}, median ${med.toFixed(2)}):`);
+  for (const r of rows)
+    console.log(`  ${r.rmse.toFixed(2).padStart(7)}  ${r.bucket === "firstParty" ? "*" : " "} ${r.slug}`);
+}
 console.log(`\nreport: ${REPORT}  (* = first-party)`);
