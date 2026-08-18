@@ -764,6 +764,40 @@ pixel-identical; the 14 changed dark renditions now measure glyph hue
 class (border sampling now insets 3px past baked edge artifacts) and
 gained its first dark rendition.
 
+## Variant consolidation (2026-08-18)
+
+Overcast and Castro collapsed to one bundle per platform — the
+alternate-icon bundles `overcast-dark` (AppIconDark),
+`overcast-premiumblue` (AppIconPremiumBlue), and `castro-pumpkin`
+(Pumpkin1Icon) left the catalog; each platform is now a single grid
+entry whose default bundle carries light and dark. Both defaults were
+re-sourced from fresh App Store IPAs (Overcast 2026.8, Castro
+2026.7.1): Overcast's default stack ships a genuine per-appearance
+dark (icon.json byte-identical to the prior decant; only the CoreSVG
+generator comment moved, GT byte-identical), and Castro's flat
+default renditions are byte-identical to the committed bundle (its
+1024px dark is genuine distinct art, not a CoreUI fallback). Nothing
+was folded from alternate stacks.
+
+- **Recipes**: `overcast-dark`/`overcast-premiumblue` recipes deleted,
+  `recipeSlugs` regenerated (apple, overcast, podcastrepublic,
+  spotify). The surviving overcast recipe re-scores **7.12** vs fresh
+  GT from the re-decanted bundle — exactly its recorded adoption RMSE
+  (GT unchanged, no re-adoption).
+- **`calibration/glass-edge-lut.json` is unchanged.** Its recorded
+  provenance (ridge fit over the 10 instruments + 4 catalog glass
+  bundles) included the overcast-dark and overcast-premiumblue
+  residual fields; those two bundles have left the catalog but the
+  committed artifact and its fit stand as recorded above.
+- **Sweep after removal** (fresh GT, 94/94 scored, 0 failed): glass
+  cohort is now 6 — podcastrepublic 4.30, sodes 4.35, castamatic
+  4.71, moonfm 5.46, overcast 7.69, apple 17.27 — **median 5.08**
+  (was 8 bundles, median 6.76). Every surviving glass bundle
+  reproduced its recorded score exactly. Flat cohort (88): median
+  1.77, worst podlp 3.70 (vs 3.69 recorded; reproduces at 3.70 on
+  re-run — ±0.01 fresh-GT wiggle, translator and bundle untouched).
+  No surviving bundle regressed.
+
 ## Adding a platform or icon
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md).
