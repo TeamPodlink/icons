@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router";
-import { Braces, Cloud, House } from "lucide-react";
+import { Braces, House } from "lucide-react";
 
 /** Apple HIG "materials" glyph (developer.apple.com/tutorials/images/com.apple.HIG/materials.svg), recolored to currentColor. */
 function MaterialsIcon({ size = 16 }: { size?: number; strokeWidth?: number }) {
@@ -38,7 +38,6 @@ export function Sidebar() {
       icon: MaterialsIcon,
       badge: glassCards.length,
     },
-    { href: "/docs/api", label: "API", icon: Cloud },
     { href: "/docs/icon-format", label: ".icon Format", icon: Braces },
   ];
 

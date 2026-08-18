@@ -8,7 +8,6 @@ scripts.
 | --- | --- | --- |
 | `validate.mjs` | any (CI) | Structural checks: meta.json schema, bundle slugs/dirs, icon.json parses, layer assets exist, size caps, recipe presence |
 | `build-data.mjs` | any | Emits `apps/web/lib/platforms.gen.json` — the merged dataset the site renders (debug categories are computed in the site lib from these fields) |
-| `build-api.mjs` | any | Emits the static JSON API (`apps/web/public/api/platforms.json` + `platforms/<id>.json`) — the same shapes the retired Next `/api/platforms` routes served; glass asset URLs from `VITE_ASSET_BASE` when set, else `<SITE_URL>/library` |
 | `sync-web-assets.mjs` | any | Copies Liquid Glass rasters + flat/badge SVGs into `apps/web/public/` (non-fatal when sources missing); skips the raster copy when `VITE_ASSET_BASE` is set (production builds serve them from R2) |
 | `upload-assets.mjs` | maintainer (R2 credentials) | Uploads `packages/refraction/assets` + `manifest.json` to R2 under the immutable `<version>/` prefix (refuses to overwrite; `--force-verify` checksum-compares, report only); `--zip <out>` writes the GitHub-Release archive for self-hosters; `--dry-run` previews without credentials. Env: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` |
 | `build-assets.mjs` | **macOS + Icon Composer** | Renders every Liquid Glass bundle via ictool (Default + Dark), dedupes identical dark renditions by pixel compare, emits 32-512 AVIF+WebP + 1024 PNG into `packages/refraction/assets`, writes `hasDark` back into meta.json |

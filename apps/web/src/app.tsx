@@ -2,7 +2,6 @@ import { Route, Routes } from "react-router";
 import { Toaster } from "sonner";
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
-import { ApiDocs } from "@/src/pages/docs-api";
 import { IconFormatDocs } from "@/src/pages/docs-icon-format";
 import { CategoryPage } from "@/src/pages/directory-category";
 import { Home } from "@/src/pages/home";
@@ -20,7 +19,6 @@ export function App() {
           <Route path="/" element={<Home />} />
           <Route path="/liquid-glass" element={<LiquidGlassPage />} />
           <Route path="/directory/:category" element={<CategoryPage />} />
-          <Route path="/docs/api" element={<ApiDocs />} />
           <Route path="/docs/icon-format" element={<IconFormatDocs />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
