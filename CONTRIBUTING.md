@@ -60,11 +60,10 @@ at release time (see below).
 node pipeline/build-assets.mjs     # render light+dark, set hasDark flags
 node pipeline/validate.mjs
 pnpm --filter @podlink/icons build # flat icons + badges + lib
-pnpm --filter web build            # sanity: data + registry + site
+pnpm --filter web build            # sanity: data + api + site
 # bump version in packages/refraction/package.json
-npm publish --access public ./packages/refraction
-# regenerate the registry so components pin the new version, then deploy
-node pipeline/build-registry.mjs
+pnpm release:assets                # upload renders to R2 (immutable prefix)
+# deploy the site so asset URLs pin the new version
 ```
 
 For new all-SVG-layer bundles, also run the recipe pipeline (see

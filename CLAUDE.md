@@ -1,14 +1,14 @@
 # refraction (monorepo)
 
 Podcast platform icons in three facets — flat vectors, badges, Liquid
-Glass — plus the directory website and shadcn registry.
+Glass — plus the directory website.
 
 ## Commands
 
 - `pnpm install` — workspace install
 - `pnpm --filter @podlink/icons build` — codegen + static SVGs + lib
 - `pnpm --filter @podlink/icons test` — vitest (runs codegen first)
-- `pnpm dev` — website on :4173 (runs data/asset/registry generation first)
+- `pnpm dev` — website on :4173 (runs data/asset/api generation first)
 - `node pipeline/validate.mjs` — structural validation (any platform)
 - `node pipeline/build-assets.mjs` — render Liquid Glass rasters (macOS + Icon Composer ONLY)
 
@@ -41,8 +41,8 @@ packages/engine            refraction-engine (private) — procedural engine +
 apps/web                   Vite + React SPA (Cloudflare static assets,
                            icons.podlink.com — zero server code). Reads
                            lib/platforms.gen.json (pipeline/build-data.mjs).
-                           Serves the shadcn registry from public/r/ and the
-                           static JSON API from public/api/ (both generated).
+                           Serves the static JSON API from public/api/
+                           (generated).
 pipeline/                  lib.mjs (readPlatforms/readBundles) + generators.
 ```
 
@@ -51,7 +51,7 @@ pipeline/                  lib.mjs (readPlatforms/readBundles) + generators.
 - Platform ids: flat lowercase alphanumeric (`pocketcasts`). Bundle
   slugs: platform id, `-variant` suffix for alternates (none today).
 - Aliases for old/alternate spellings live in meta.json `aliases`.
-- Generated files are NEVER committed: web public/{library,flat,badges,r,api},
+- Generated files are NEVER committed: web public/{library,flat,badges,api},
   lib/platforms.gen.json, packages/refraction/{assets,manifest.json},
   packages/icons/{src/generated,src/data/platforms.json,static,dist}.
 - Rendering runs ONLY on a maintainer Mac (ictool). CI validates
@@ -61,7 +61,8 @@ pipeline/                  lib.mjs (readPlatforms/readBundles) + generators.
   the calibration/scoring loop stays in P3 coded space
   (`render.mjs --p3`, engine `colorSpace: "display-p3"`). See
   "Delivery encodings" in pipeline/README.md.
-- Registry namespace is `@refraction`; asset URLs pin the immutable R2
-  release prefix `https://assets.icons.podlink.com/<version>` (version =
-  packages/refraction/package.json; upload with `pnpm release:assets`,
-  then regenerate the registry).
+- Distribution: `npm i @podlink/icons` is the one programmatic consumer
+  path (flat icons + badges); Liquid Glass icons are downloaded per
+  icon from the live site. Asset URLs pin the immutable R2 release
+  prefix `https://assets.icons.podlink.com/<version>` (version =
+  packages/refraction/package.json; upload with `pnpm release:assets`).

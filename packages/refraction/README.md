@@ -33,12 +33,12 @@ https://assets.icons.podlink.com/<version>/overcast-128.avif
 The prefix is immutable and served with
 `Cache-Control: public, max-age=31536000, immutable`.
 
-## Self-host
+## Bulk download
 
-Download `assets-<version>.zip` from the repo's GitHub Release
-(produced by `node pipeline/upload-assets.mjs --zip <out>`), extract it
-into a static directory (e.g. `public/refraction`), and point
-`ASSET_BASE` in the installed registry component at it.
+`node pipeline/upload-assets.mjs --zip <out>` produces a flat
+`assets-<version>.zip` (all files + `manifest.json`) for attaching to
+the GitHub Release. For individual icons, the directory site
+(icons.podlink.com) offers per-card downloads.
 
 Icon artwork remains the property of each app's owner; it is reproduced
 here for identification purposes.

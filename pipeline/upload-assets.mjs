@@ -1,6 +1,6 @@
 // Upload the rendered Liquid Glass rasters to Cloudflare R2 under an
-// immutable release prefix, and/or produce the GitHub-Release zip for
-// self-hosters.
+// immutable release prefix, and/or produce the GitHub-Release zip
+// (bulk download of a whole release).
 //
 //   node pipeline/upload-assets.mjs [--dry-run] [--force-verify] [--zip <out.zip>]
 //
@@ -25,7 +25,7 @@
 // `--dry-run` needs no credentials: it enumerates what would upload.
 // `--zip <out.zip>` additionally writes assets-<version>.zip content
 // (flat: <slug>*.png/avif/webp + manifest.json) for attaching to the
-// GitHub Release, so self-hosters never need R2 or npm.
+// GitHub Release as a bulk download of the whole release.
 
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";

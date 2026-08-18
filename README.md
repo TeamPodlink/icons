@@ -6,7 +6,7 @@ Every podcast platform's icon, served three ways — by
 
 | Facet | What | How it ships |
 | --- | --- | --- |
-| **Liquid Glass** | Ground-truth renders of real `.icon` bundles by Apple's own Icon Composer renderer, light + dark renditions | shadcn registry (`npx shadcn@latest add @refraction/overcast`) + `@podlink/refraction` asset package (jsDelivr CDN / self-host) |
+| **Liquid Glass** | Ground-truth renders of real `.icon` bundles by Apple's own Icon Composer renderer, light + dark renditions | Per-icon downloads on the [directory site](https://icons.podlink.com); images served from the immutable CDN prefix `assets.icons.podlink.com/<version>/` |
 | **Flat icons** | Hand-drawn 32×32 vectors, 89 platforms | [`@podlink/icons`](packages/icons) — SVG strings + React components |
 | **Badges** | "Listen on …" badges, light + dark | `@podlink/icons` static assets |
 
@@ -27,7 +27,7 @@ packages/icons         @podlink/icons — flat icons + badges library
 packages/refraction    @podlink/refraction — rendered Liquid Glass
                        rasters (generated; exists only in npm tarballs)
 packages/engine        procedural render engine + recipes (research)
-apps/web               directory website + shadcn registry + REST API
+apps/web               directory website + static JSON API
 pipeline               generation + validation scripts
 ```
 
