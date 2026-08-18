@@ -11,7 +11,7 @@
         "variant": null,
         "file": "Castbox.icon",
         "hasDark": false,
-        "source": "appstore-artwork",
+        "source": "appstore-artwork-split",
         "darkStatus": "missing"
       }
     ]
