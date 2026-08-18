@@ -12,12 +12,3 @@
 }
 
 /* Scroll fade mask for the page card (svgl-style). */
-.scroll-mask {
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0,
-    black 40px,
-    black calc(100% - 40px),
-    transparent 100%
-  );
-}

@@ -10,6 +10,7 @@ function MaterialsIcon({ size = 16 }: { size?: number; strokeWidth?: number }) {
   );
 }
 import { categorySlug, getCategories, glassCards, visibleCards } from "@/lib/platforms";
+import { ScrollFade } from "@/components/scroll-fade";
 import { cn } from "@/lib/cn";
 
 const itemBase =
@@ -59,7 +60,11 @@ export function Sidebar() {
         ))}
       </nav>
       <div className="h-px w-full bg-neutral-200 dark:bg-neutral-800" />
-      <nav className="scroll-mask flex flex-col space-y-0.5 overflow-y-auto pb-6">
+      <ScrollFade
+        className="min-h-0 flex-1"
+        viewportClassName="pb-6"
+      >
+        <nav className="flex flex-col space-y-0.5">
         {categories.map((c) => {
           const href = `/directory/${categorySlug(c.name)}`;
           return (
@@ -73,7 +78,8 @@ export function Sidebar() {
             </Link>
           );
         })}
-      </nav>
+        </nav>
+      </ScrollFade>
     </aside>
   );
 }
