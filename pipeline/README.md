@@ -296,9 +296,21 @@ across translucency {0,.25,.5,.75,1} × specular modes
 varies smoothly in y and translucency (an interpolable 2D family),
 and **specular has zero effect on the interior material** — it is
 edge lighting, which scopes the remaining glass research entirely to
-the per-layer lighting model. Open cell before the translator can
-synthesize glass: canvas-y vs glass-bounds-y ramp anchoring (one
-small-circle render decides).
+the per-layer lighting model.
+
+**Ramp anchoring: glass-bounds-y (measured 2026-08-17,
+`probe-ramp-anchor.py`).** Small circles (r = 4.5 units = 144 px) at
+top (cy 336 px) and bottom (cy 688 px) placements, solved per-row at
+t = 0.5 against an in-run big-circle reference (r = 10.5 units,
+bounds y 176–848): alpha RMSE vs the canvas-y prediction 0.148 /
+0.161 (top/bottom), vs the bounds-normalized prediction **0.0040 /
+0.0040**. Both placements yield the identical interior ramp
+(0.977 → 0.641 over eroded rows), i.e. the material alpha is a
+function of `(y − boundsTop) / boundsHeight`, independent of absolute
+canvas position and of glass size (144 px and 336 px circles fit the
+same normalized curve). The translator can synthesize glass material
+by resampling `glass-material-family.json` into each glass layer's
+bounding box.
 
 Glass icons now await the per-layer lighting model (the material
 family is measured); raster-art bundles a PNG-decode decision. The player's coverage today: flat + SVG, 38 bundles at
