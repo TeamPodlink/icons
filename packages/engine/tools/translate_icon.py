@@ -34,6 +34,13 @@
 #     sRGB-composite unless the dark classifier leaks raw bytes;
 #     P3-tagged = the p3-solid soft-knee), baked into the recipe as an
 #     engine img primitive in render space
+#   - GLASS layers with PNG artwork (probe-raster-glass): per-pixel
+#     material via the engine's optional mi image — color = the artwork
+#     through the sRGB->P3 composite conversion (never the raw dark
+#     path), coverage = straight artwork alpha, material ramp anchored
+#     to the PLACED LAYER RECT (not the silhouette bounds, unlike SVG
+#     glass), geometry (height/shadow/edge LUT) from the alpha>=0.5
+#     contours; diffuse (mostly-partial-alpha) artwork is material-only
 #
 # Shares its path/transform/placement machinery with build_recipe.py
 # (copied; keep in sync). Supported SVG subset: path/rect/circle/ellipse/
@@ -957,18 +964,209 @@ def seg_bounds_y(seg):
     return float(ys.min()), float(ys.max())
 
 
-def glass_alpha_b64(seg, transl, opacity):
+def glass_alpha_b64_range(top, bot, transl, opacity):
     """Engine per-canvas-y alpha bytes: the family curve at the declared
-    translucency, resampled into the layer's bounds (bounds-y anchoring),
-    scaled by the declared opacity product."""
+    translucency resampled into (top, bot), scaled by the declared
+    opacity product. SVG glass anchors to the SILHOUETTE bounds
+    (probe-ramp-anchor); raster glass anchors to the PLACED LAYER RECT
+    (probe-raster-glass: rms 0.0042 vs 0.046/0.043 for silhouette/canvas
+    anchoring on the 512px-PNG discriminating case)."""
     curve = family_alpha_curve(transl)
-    top, bot = seg_bounds_y(seg)
     n = 256
     yc = (np.arange(n) + 0.5) * (1024.0 / n)
     u = (yc - top) / max(bot - top, 1e-9)
     al = np.interp(np.clip(u, _FAM_U[0], _FAM_U[-1]), _FAM_U, curve) * opacity
     return base64.b64encode(bytes(np.clip(np.round(al * 255), 0, 255)
                                   .astype(np.uint8).tolist())).decode()
+
+
+def glass_alpha_b64(seg, transl, opacity):
+    top, bot = seg_bounds_y(seg)
+    return glass_alpha_b64_range(top, bot, transl, opacity)
+
+
+# ---------------- raster-artwork glass ------------------------------------
+def trace_mask_contours(mask):
+    """Binary HxW mask -> closed polygons [(x, y), ...] on the pixel-corner
+    lattice, inside kept on the left (holes come out wound opposite; the
+    engine rasterizes glass paths with parity, so orientation is free).
+    Saddle vertices prefer the left turn, keeping contours simple."""
+    h, w = mask.shape
+    pad = np.zeros((h + 2, w + 2), bool)
+    pad[1:-1, 1:-1] = mask
+    starts = {}
+
+    def add_edges(ys, xs, dx0, dy0, dx1, dy1):
+        for y, x in zip(ys.tolist(), xs.tolist()):
+            a2 = (x + dx0, y + dy0)
+            starts.setdefault(a2, []).append((x + dx1, y + dy1))
+
+    ys, xs = np.nonzero(mask & ~pad[:-2, 1:-1])   # outside above: top edge
+    add_edges(ys, xs, 1, 0, 0, 0)                 # (x+1,y) -> (x,y)
+    ys, xs = np.nonzero(mask & ~pad[2:, 1:-1])    # outside below: bottom
+    add_edges(ys, xs, 0, 1, 1, 1)                 # (x,y+1) -> (x+1,y+1)
+    ys, xs = np.nonzero(mask & ~pad[1:-1, :-2])   # outside left
+    add_edges(ys, xs, 0, 0, 0, 1)                 # (x,y) -> (x,y+1)
+    ys, xs = np.nonzero(mask & ~pad[1:-1, 2:])    # outside right
+    add_edges(ys, xs, 1, 1, 1, 0)                 # (x+1,y+1) -> (x+1,y)
+
+    polys = []
+    while starts:
+        v0 = next(iter(starts))
+        poly = [v0]
+        cur = v0
+        prev_dir = None
+        while True:
+            outs = starts.get(cur)
+            if not outs:
+                break
+            if len(outs) == 1 or prev_dir is None:
+                nxt = outs.pop()
+            else:
+                # left of direction (dx,dy) in y-down coords is (dy,-dx)
+                want = (cur[0] + prev_dir[1], cur[1] - prev_dir[0])
+                nxt = outs.pop(outs.index(want)) if want in outs else outs.pop()
+            if not outs:
+                del starts[cur]
+            prev_dir = (nxt[0] - cur[0], nxt[1] - cur[1])
+            cur = nxt
+            if cur == v0:
+                break
+            poly.append(cur)
+        if len(poly) >= 4:
+            polys.append(poly)
+    return polys
+
+
+def rdp(pts, tol):
+    """Iterative Ramer-Douglas-Peucker on a closed polygon."""
+    n = len(pts)
+    if n < 8:
+        return pts
+    P = np.asarray(pts, np.float64)
+    keep = np.zeros(n, bool)
+    # split at the two mutually farthest-ish anchors (index 0 + farthest)
+    d0 = np.hypot(P[:, 0] - P[0, 0], P[:, 1] - P[0, 1])
+    k = int(np.argmax(d0))
+    keep[0] = keep[k] = True
+    stack = [(0, k), (k, n - 1)]
+    keep[n - 1] = True
+    while stack:
+        i, j = stack.pop()
+        if j <= i + 1:
+            continue
+        A, B = P[i], P[j]
+        AB = B - A
+        L = np.hypot(*AB)
+        seg2 = P[i + 1:j] - A
+        dev = (np.abs(seg2[:, 0] * AB[1] - seg2[:, 1] * AB[0]) / max(L, 1e-9)
+               if L > 1e-9 else np.hypot(seg2[:, 0], seg2[:, 1]))
+        m = int(np.argmax(dev))
+        if dev[m] > tol:
+            keep[i + 1 + m] = True
+            stack.append((i, i + 1 + m))
+            stack.append((i + 1 + m, j))
+    return [tuple(p) for p in P[keep]]
+
+
+def poly_area(pts):
+    P = np.asarray(pts, np.float64)
+    Q = np.roll(P, -1, 0)
+    return 0.5 * float((P[:, 0] * Q[:, 1] - Q[:, 0] * P[:, 1]).sum())
+
+
+def raster_glass_sheet(bundle_dir, group, items):
+    """A GROUP's raster glass layers -> ONE engine glass entry with the
+    mi per-pixel material image. Every element measured
+    (probe-raster-glass, incl. the overlap-model part):
+      - same-group glass layers form a SINGLE SHEET: their artwork
+        composites source-over (first layer in the array on top,
+        straight alpha in encoded space), then the glass material
+        applies ONCE (overlap of two same-group disks measures exactly
+        the top layer's sheet value; separate groups stack, matching
+        the engine's existing cross-glass model)
+      - material color = per-pixel composite artwork color through the
+        standard sRGB->P3 composite conversion; the raw dark path NEVER
+        applies to glass material
+      - coverage = the composite's straight alpha; effective material
+        alpha = coverage * family(u) with u anchored to the union of
+        the PLACED LAYER RECTS (single-layer case measured at rms
+        0.0042 vs 0.046/0.043 for silhouette/canvas anchoring)
+      - height/refraction/shadow/edge-LUT geometry from the composite's
+        opaque (alpha >= 0.9) contours; sheets with mostly-partial
+        alpha ("diffuse", solidity < 0.3) get material only — a bounded
+        approximation for soft overlay artwork
+
+    items: [(layer, name, l_op)] in BOTTOM-FIRST order.
+    """
+    from PIL import Image
+    comp_rgb = np.zeros((1024, 1024, 3))
+    comp_a = np.zeros((1024, 1024))
+    Xc, Yc = np.mgrid[0:1024, 0:1024][1] + 0.5, np.mgrid[0:1024, 0:1024][0] + 0.5
+    rect_top, rect_bot = None, None
+    for layer, name, l_op in items:  # bottom to top: each goes OVER comp
+        im = Image.open(os.path.join(bundle_dir, "Assets", name))
+        icc = im.info.get("icc_profile") or b""
+        if b"Display P3" in icc or "Display P3".encode("utf-16-be") in icc:
+            warn(f"{name}: Display-P3-tagged glass artwork treated as sRGB "
+                 "in the sheet composite (unmeasured cell)")
+        rgba = np.asarray(im.convert("RGBA")).astype(np.float64) / 255
+        h, w = rgba.shape[:2]
+        pos = layer.get("position", {})
+        sc = pos.get("scale", 1.0)
+        tr = pos.get("translation-in-points", [0.0, 0.0])
+        ox = (1024.0 - w * sc) / 2 + tr[0]
+        oy = (1024.0 - h * sc) / 2 + tr[1]
+        rect_top = oy if rect_top is None else min(rect_top, oy)
+        rect_bot = oy + h * sc if rect_bot is None else max(rect_bot, oy + h * sc)
+        ix = np.floor((Xc - ox) / sc).astype(int)
+        iy = np.floor((Yc - oy) / sc).astype(int)
+        ok = (ix >= 0) & (iy >= 0) & (ix < w) & (iy < h)
+        px = rgba[np.clip(iy, 0, h - 1), np.clip(ix, 0, w - 1)]
+        a = px[..., 3] * l_op * ok
+        # straight-alpha source-over in encoded space (the measured
+        # raster alpha law: alpha composites in encoded sRGB)
+        anew = a + comp_a * (1 - a)
+        num = px[..., :3] * a[..., None] + comp_rgb * (comp_a * (1 - a))[..., None]
+        comp_rgb = np.where(anew[..., None] > 1e-6, num / np.maximum(anew, 1e-6)[..., None], comp_rgb)
+        comp_a = anew
+    a8 = np.clip(np.round(comp_a * 255), 0, 255).astype(np.uint8)
+    out = srgb_to_render_img(comp_rgb)
+    q = np.clip(np.round(out), 0, 255).astype(np.uint8)
+    q[a8 == 0] = 0
+    # crop the sheet to its nonzero-alpha bounding box
+    nzy, nzx = np.nonzero(a8)
+    if not len(nzy):
+        return None
+    x0, x1 = int(nzx.min()), int(nzx.max()) + 1
+    y0, y1 = int(nzy.min()), int(nzy.max()) + 1
+    payload = np.dstack([q[y0:y1, x0:x1], a8[y0:y1, x0:x1, None]]).tobytes()
+    mi = {"w": x1 - x0, "h": y1 - y0, "x": x0, "y": y0, "s": 1,
+          "z": base64.b64encode(zlib.compress(payload, 9)).decode()}
+    nz = int((a8 > 25).sum())
+    solidity = float((a8 >= 230).sum()) / max(nz, 1)
+    seg = []
+    if solidity >= 0.3:
+        for poly in trace_mask_contours(a8 >= 230):
+            spoly = rdp(poly, 0.8)
+            if abs(poly_area(spoly)) < 100:
+                continue
+            pts = [(round(float(x), 2), round(float(y), 2)) for x, y in spoly]
+            for p, q2 in zip(pts, pts[1:] + pts[:1]):
+                seg.extend([p[0], p[1], p[0], p[1], q2[0], q2[1], q2[0], q2[1]])
+    else:
+        warn(f"glass sheet ({len(items)} layer(s)): diffuse artwork "
+             f"(solidity {solidity:.2f}) — material only, no geometry")
+    trd = light_value(group, "translucency") or {}
+    tv = float(trd.get("value", 0.0)) if trd.get("enabled", True) else 0.0
+    sh = group.get("shadow")
+    shadow = None
+    if sh and sh.get("kind") != "none" and seg:
+        shadow = {"dy": 29, "r": 23, "n": 3,
+                  "amp": round(17.385 * sh.get("opacity", 0.5) / 0.5, 3)}
+    return {"path": seg, "law": GLASS_LAW,
+            "alpha": glass_alpha_b64_range(rect_top, rect_bot, tv, 1.0),
+            "mi": mi, "shadow": shadow, "lm": None}
 
 
 # ---------------- icon.json walk ------------------------------------------
@@ -1273,6 +1471,7 @@ for g in reversed(doc.get("groups", [])):
     bm = light_value(g, "blend-mode")
     if bm not in (None, "normal"):
         warn(f"group blend-mode '{bm}' unsupported, treated as normal")
+    sheet_items = []  # this group's raster glass layers, bottom-first
     for l in reversed(g.get("layers", [])):
         op = light_value(l, "opacity")
         if op == 0:
@@ -1283,10 +1482,19 @@ for g in reversed(doc.get("groups", [])):
         if name.lower().endswith(".png"):
             if light_value(l, "fill"):
                 warn(f"{name}: fill override on a raster layer ignored")
+            if light_value(l, "glass") is True:
+                if g.get("blur-material"):
+                    warn(f"{name}: blur-material {g['blur-material']} ignored")
+                # layer opacity folds into the sheet composite's alpha;
+                # group opacity stays POST-COMPOSITE (as for SVG glass)
+                sheet_items.append((l, name, l_op))
+                continue
             if _raster_raw is None:
                 _raster_raw = raster_dark_verdict(doc, a.bundle)
                 if _raster_raw:
                     warn("dark composite border ring: raster pixels on the raw path")
+            if glass_entries:
+                warn(f"{name}: non-glass layer above glass rendered beneath it")
             bg.append(raster_img_layer(os.path.join(a.bundle, "Assets", name),
                                        l, op, _raster_raw))
             continue
@@ -1335,7 +1543,7 @@ for g in reversed(doc.get("groups", [])):
             gcspec = glass_color(override, els, grads)
             sh = g.get("shadow")
             shadow = None
-            if sh:
+            if sh and sh.get("kind") != "none":
                 shadow = {"dy": 29, "r": 23, "n": 3,
                           "amp": round(17.385 * sh.get("opacity", 0.5) / 0.5, 3)}
             entry = {"path": seg, "law": GLASS_LAW,
@@ -1444,6 +1652,12 @@ for g in reversed(doc.get("groups", [])):
             if eff_op != 1:
                 lay["op"] = round(eff_op, 3)
             bg.append(lay)
+    if sheet_items:
+        entry = raster_glass_sheet(a.bundle, g, sheet_items)
+        if entry is not None:
+            if g_op < 0.9995:
+                entry["op"] = round(g_op, 4)
+            glass_entries.append(entry)
 
 recipe = {"bg": bg, "dluts": [], "glass": glass_entries}
 if glass_entries:
