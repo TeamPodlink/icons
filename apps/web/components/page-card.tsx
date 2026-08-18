@@ -15,14 +15,14 @@ export function PageCard({
     <div className="p-px">
       <div className="shadow-xs overflow-hidden rounded-md border border-neutral-200 bg-white dark:border-neutral-800 dark:bg-neutral-900/40">
         <ScrollFade
-          className={cn(
+          fadeHeight={50}
+          topClassName="from-transparent"
+          bottomClassName="from-white dark:from-[#0f0f0f]"
+          viewportClassName={cn(
             withSearch
               ? "max-h-[calc(100vh-7.6rem)] min-h-[calc(100vh-7.6rem)]"
               : "max-h-[calc(100vh-4.5rem)] min-h-[calc(100vh-4.5rem)]"
           )}
-          fadeHeight={50}
-          topClassName="from-transparent"
-          bottomClassName="from-white dark:from-[#0f0f0f]"
         >
           {children}
         </ScrollFade>
