@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-# Translate a FLAT .icon bundle (no glass:true layers) into an engine
-# recipe with ZERO ictool measurement — the first slice of a universal
-# .icon player. Everything comes from declared values:
+# Translate an .icon bundle (flat or Liquid Glass, SVG art) into an
+# engine recipe with ZERO ictool measurement — the universal .icon
+# player. Everything comes from declared values:
 #
 #   - fills via the solved color model (ictool composites in sRGB with
 #     colorimetric clipping and encodes in Display-P3 coordinates; the
@@ -13,6 +13,23 @@
 #   - per-subpath SVG fills parsed from the artwork itself (the gap that
 #     rejected 35/36 bundles in the recipe sweep: build_recipe.py only
 #     accepts icon.json fill overrides)
+#   - GLASS layers from the measured declared-value laws:
+#       alpha(y) = groupOpacity * layerOpacity * fillAlpha
+#                  * family_alpha(u, translucency)
+#     with u = (y - boundsTop)/boundsHeight (probe-ramp-anchor: the
+#     material ramp anchors to GLASS BOUNDS, size-invariant) and the
+#     family curve from calibration/glass-material-family.json
+#     (probe-material: white overlay, neutral gain, specular has zero
+#     interior effect). The opacity product reproduces the measured
+#     recipe alphas to +-0.01 on 8/11 catalog glass layers — including
+#     apple's "low-alpha" circles, which are simply layer opacity
+#     0.17/0.18. gc = the artwork/declared fill color through the
+#     standard sRGB->P3 composite conversion (overcast's #ff7f00 waves
+#     measure (245,125,49) = exactly that path). Edge lighting is
+#     PREDICTED from the shared per-contour (distance x normal-angle x
+#     thickness-class) LUT (calibration/glass-edge-lut.json, fit by
+#     build_glass_lut.py per probe-layer-lightmap's conditional-GO
+#     verdict) and baked as the recipe's global lightmap.
 #
 # Shares its path/transform/placement machinery with build_recipe.py
 # (copied; keep in sync). Supported SVG subset: path/rect/circle/ellipse/
@@ -110,22 +127,36 @@ _AG_V = np.array([0, .05, .1, .15, .2, .25, .3, .35, .4, .45, .5, .55, .6,
 _AG_SPAN = np.array([9.8, 9.5, 9.2, 8.6, 8.1, 7.1, 14.3, 13.0, 12.3, 11.1,
                      10.0, 17.7, 15.9, 13.1, 10.8, 9.0, 10.2, 11.0, 12.0,
                      12.1, 11.9])
-_AG_FLIP = 0.775  # above this lightness the gradient anchors at the top
+_AG_FLIP = 0.775  # above this MEAN lightness the gradient anchors at the top
+# colored-input lift (probe-autogradient-colored, 12-canvas dataset):
+# bottom stop = the SOLID soft-knee conversion of the input (dBot within
+# -3..+0.5 across the dataset); per-channel lift blends the gray ladder
+# (exact at saturation 0) with a dominant-channel ratio model fit on the
+# dataset — lift_c = (1-S)*ladder(vmax) + S*(a + b*v_c/vmax), S =
+# 1 - vmin/vmax — at rms 3.2 / max 9.8 (0..255) in-sample. No colored
+# sample flips (incl. max-channel 0.8), so the flip criterion is mean
+# lightness, not max (grays are unchanged either way). Still the
+# ledger's approximate cell; this is the best measured model of it.
+_AGC_A, _AGC_B = 6.78, 20.52
 
 
-def auto_gradient(rgb01):
-    # returns (top_render, bottom_render) — colored inputs approximate
-    L = float(np.max(rgb01))
-    span = float(np.interp(L, _AG_V, _AG_SPAN)) / 255.0
-    srgb = np.clip(_P3_TO_SRGB @ _lin(rgb01), 0, 1) if True else None
-    base = np.clip(np.asarray(rgb01, np.float64), 0, 1)
-    if L < _AG_FLIP:
-        top = np.clip(base + span, 0, 1)
-        bottom = base
+def auto_gradient_render(kind, v):
+    # declared automatic-gradient color -> (top_render, bottom_render)
+    if kind == "gray":
+        v = [v[0]] * 3
+        kind = "srgb"
+    bottom = np.array(p3_to_render(v) if kind == "display-p3"
+                      else srgb_to_render(v), np.float64)
+    b01 = bottom / 255.0
+    vmax = float(b01.max())
+    S = 1 - float(b01.min()) / max(vmax, 1e-9)
+    lift = ((1 - S) * float(np.interp(vmax, _AG_V, _AG_SPAN))
+            + S * (_AGC_A + _AGC_B * b01 / max(vmax, 1e-9)))
+    if float(b01.mean()) < _AG_FLIP:
+        top, bot = np.clip(bottom + lift, 0, 255), bottom
     else:
-        top = base
-        bottom = np.clip(base - span, 0, 1)
-    return srgb_to_render(top), srgb_to_render(bottom)
+        top, bot = bottom, np.clip(bottom - lift, 0, 255)
+    return ([round(float(x), 1) for x in top], [round(float(x), 1) for x in bot])
 
 
 # ---------------- SVG path machinery (shared with build_recipe.py) --------
@@ -688,6 +719,228 @@ def stroke_annulus(cubics, width):
     return out or None
 
 
+# ---------------- glass: material family + shared edge-lighting LUT -------
+_CAL = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "calibration")
+
+
+def _family():
+    fam = json.load(open(os.path.join(_CAL, "glass-material-family.json")))
+    ts = sorted(float(k[1:]) for k in fam if k.startswith("t"))
+    curves = {t: np.array(fam[f"t{t}"]["alpha_full"], np.float64) for t in ts}
+    # the family rows are the ERODED interior of the reference circle:
+    # rows y0..y1 within glass bounds 176..848 (r=10.5u circle at 32px/u).
+    # Normalized-bounds coordinates of the curve samples:
+    y0, y1 = fam["t0.5"]["y0"], fam["t0.5"]["y1"]
+    u0, u1 = (y0 - 176.0) / 672.0, (y1 - 176.0) / 672.0
+    return ts, curves, np.linspace(u0, u1, len(curves[ts[0]]))
+
+
+_FAM_TS, _FAM_CURVES, _FAM_U = _family()
+
+
+def family_alpha_curve(transl):
+    t = min(max(transl, _FAM_TS[0]), _FAM_TS[-1])
+    i = min(max(int(np.searchsorted(_FAM_TS, t)), 1), len(_FAM_TS) - 1)
+    t0, t1 = _FAM_TS[i - 1], _FAM_TS[i]
+    f = (t - t0) / max(t1 - t0, 1e-9)
+    return (1 - f) * _FAM_CURVES[t0] + f * _FAM_CURVES[t1]
+
+
+# GLASS_LUT overrides the committed artifact (leave-target-out validation)
+_LUT = json.load(open(os.environ.get("GLASS_LUT")
+                      or os.path.join(_CAL, "glass-edge-lut.json")))
+_LGRID = _LUT["grid"]
+_LS = 1024.0 / _LGRID
+_LDB = np.array(_LUT["db"], np.float64)
+_LND = len(_LDB) - 1
+_LNPHI = _LUT["nphi"]
+_LTCLASS = np.array(_LUT["tclass"], np.float64)
+_LNT = len(_LTCLASS) - 1
+_LK = np.array(_LUT["k"], np.float64)
+
+
+# per-contour geometry fields (kept in sync with probe-layer-lightmap.py,
+# the instrument that measured this model)
+def contours_of(seg):
+    cs, cur = [], []
+    prev_end = None
+    for i in range(0, len(seg), 8):
+        c = seg[i:i + 8]
+        if prev_end is not None and (abs(c[0] - prev_end[0]) > 1e-6 or abs(c[1] - prev_end[1]) > 1e-6):
+            cs.append(cur)
+            cur = []
+        cur.append(c)
+        prev_end = (c[6], c[7])
+    if cur:
+        cs.append(cur)
+    return cs
+
+
+def glass_polyline(contour, spacing=0.75):
+    pts = []
+    for c in contour:
+        p = np.array(c, np.float64).reshape(4, 2)
+        approx = (np.hypot(*(p[1] - p[0])) + np.hypot(*(p[2] - p[1]))
+                  + np.hypot(*(p[3] - p[2])))
+        n = max(3, int(np.ceil(approx / spacing)) + 1)
+        t = np.linspace(0, 1, n)[:, None]
+        mt = 1 - t
+        xy = mt**3 * p[0] + 3 * mt**2 * t * p[1] + 3 * mt * t**2 * p[2] + t**3 * p[3]
+        pts.append(xy[:-1])
+    P = np.vstack(pts)
+    keep = [0]
+    acc = 0.0
+    for i in range(1, len(P)):
+        acc += float(np.hypot(*(P[i] - P[i - 1])))
+        if acc >= spacing:
+            keep.append(i)
+            acc = 0.0
+    return P[keep]
+
+
+def rast_parity(contours, grid):
+    E = []
+    for cont in contours:
+        P = glass_polyline(cont, spacing=0.5) / _LS
+        Q = np.vstack([P, P[:1]])
+        for j in range(len(Q) - 1):
+            if Q[j][1] != Q[j + 1][1]:
+                E.append((Q[j][0], Q[j][1], Q[j + 1][0], Q[j + 1][1]))
+    E = np.array(E)
+    cov = np.zeros((grid, grid), bool)
+    if not len(E):
+        return cov
+    for row in range(grid):
+        yy = row + 0.5
+        m = (np.minimum(E[:, 1], E[:, 3]) <= yy) & (np.maximum(E[:, 1], E[:, 3]) > yy)
+        if not m.any():
+            continue
+        e = E[m]
+        xs = np.sort(e[:, 0] + (yy - e[:, 1]) * (e[:, 2] - e[:, 0]) / (e[:, 3] - e[:, 1]))
+        for a2, b2 in zip(xs[0::2], xs[1::2]):
+            cov[row, max(int(np.ceil(a2 - 0.5)), 0): min(int(np.floor(b2 + 0.5)) + 1, grid)] = True
+    return cov
+
+
+def contour_normals(P, cov):
+    Q = np.vstack([P, P[:1]])
+    tang = Q[1:] - Q[:-1]
+    k = 5
+    tw = np.vstack([np.roll(tang, s2, axis=0) for s2 in range(-(k // 2), k // 2 + 1)]).reshape(k, -1, 2).mean(axis=0)
+    L = np.hypot(tw[:, 0], tw[:, 1])
+    L[L == 0] = 1
+    nx = -tw[:, 1] / L
+    ny = tw[:, 0] / L
+    xi = np.clip(((P[:, 0] + nx * 4) / _LS).astype(int), 0, _LGRID - 1)
+    yi = np.clip(((P[:, 1] + ny * 4) / _LS).astype(int), 0, _LGRID - 1)
+    flip = ~cov[yi, xi]
+    nx = np.where(flip, -nx, nx)
+    ny = np.where(flip, -ny, ny)
+    return nx, ny
+
+
+def contour_field(P, cov):
+    gy, gx = np.mgrid[0:_LGRID, 0:_LGRID]
+    px = ((gx + 0.5) * _LS).ravel().astype(np.float32)
+    py = ((gy + 0.5) * _LS).ravel().astype(np.float32)
+    Q = P.astype(np.float32)
+    n = px.shape[0]
+    dist = np.empty(n, np.float32)
+    idx = np.empty(n, np.int32)
+    chunk = max(1, int(64e6 // (4 * max(len(Q), 1))))
+    for i in range(0, n, chunk):
+        dx = px[i:i + chunk, None] - Q[None, :, 0]
+        dy = py[i:i + chunk, None] - Q[None, :, 1]
+        d2 = dx * dx + dy * dy
+        j = np.argmin(d2, axis=1)
+        idx[i:i + chunk] = j
+        dist[i:i + chunk] = np.sqrt(d2[np.arange(len(j)), j])
+    dist = dist.reshape(_LGRID, _LGRID)
+    idx = idx.reshape(_LGRID, _LGRID)
+    sgn = np.where(cov, 1.0, -1.0).astype(np.float32)
+    s = dist * sgn
+    nx, ny = contour_normals(P, cov)
+    phi = np.arctan2(ny[idx.ravel()], nx[idx.ravel()]).reshape(_LGRID, _LGRID).astype(np.float32)
+    return s, phi, idx
+
+
+def sample_thickness(P, cov):
+    n = len(P)
+    T = np.full(n, 1e9, np.float32)
+    nx, ny = contour_normals(P, cov)
+
+    def inside_at(x, y):
+        xi = np.clip((x / _LS).astype(int), 0, _LGRID - 1)
+        yi = np.clip((y / _LS).astype(int), 0, _LGRID - 1)
+        return cov[yi, xi]
+
+    alive = np.ones(n, bool)
+    for t in np.arange(3.0, 400.0, 2.0):
+        ins = inside_at(P[:, 0] + nx * t, P[:, 1] + ny * t)
+        newly = alive & ~ins & (t > 6.0)
+        T[newly] = t
+        alive &= ~newly
+        if not alive.any():
+            break
+    T[T > 9e8] = 400.0
+    return T
+
+
+def lut_bin_ids(s, phi, T):
+    di = np.digitize(s, _LDB) - 1
+    ok = (di >= 0) & (di < _LND)
+    pi = ((phi + np.pi) / (2 * np.pi) * _LNPHI).astype(int) % _LNPHI
+    ti = np.clip(np.digitize(T, _LTCLASS) - 1, 0, _LNT - 1)
+    bid = (ti * _LND + di) * _LNPHI + pi
+    return np.where(ok, bid, -1)
+
+
+def predicted_lightmap(glass_entries):
+    """Sum the shared edge-LUT contribution of every glass contour into a
+    GRID x GRID luma field (the material ramp lives in the alpha curves,
+    NOT here)."""
+    pred = np.zeros(_LGRID * _LGRID)
+    for entry in glass_entries:
+        conts = contours_of(entry["path"])
+        cov = rast_parity(conts, _LGRID)
+        for cont in conts:
+            P = glass_polyline(cont)
+            if len(P) < 8:
+                continue
+            s, phi, idx = contour_field(P, cov)
+            T = sample_thickness(P, cov)
+            bid = lut_bin_ids(s, phi, T[idx]).ravel()
+            m = bid >= 0
+            pred[m] += _LK[bid[m]]
+    return pred.reshape(_LGRID, _LGRID)
+
+
+def seg_bounds_y(seg):
+    ys = []
+    for i in range(0, len(seg), 8):
+        p = np.array(seg[i:i + 8], np.float64).reshape(4, 2)
+        t = np.linspace(0, 1, 9)[:, None]
+        mt = 1 - t
+        xy = mt**3 * p[0] + 3 * mt**2 * t * p[1] + 3 * mt * t**2 * p[2] + t**3 * p[3]
+        ys.append(xy[:, 1])
+    ys = np.concatenate(ys)
+    return float(ys.min()), float(ys.max())
+
+
+def glass_alpha_b64(seg, transl, opacity):
+    """Engine per-canvas-y alpha bytes: the family curve at the declared
+    translucency, resampled into the layer's bounds (bounds-y anchoring),
+    scaled by the declared opacity product."""
+    curve = family_alpha_curve(transl)
+    top, bot = seg_bounds_y(seg)
+    n = 256
+    yc = (np.arange(n) + 0.5) * (1024.0 / n)
+    u = (yc - top) / max(bot - top, 1e-9)
+    al = np.interp(np.clip(u, _FAM_U[0], _FAM_U[-1]), _FAM_U, curve) * opacity
+    return base64.b64encode(bytes(np.clip(np.round(al * 255), 0, 255)
+                                  .astype(np.uint8).tolist())).decode()
+
+
 # ---------------- icon.json walk ------------------------------------------
 def light_value(spec, key):
     if key in spec:
@@ -702,12 +955,98 @@ def light_value(spec, key):
 
 doc = json.load(open(os.path.join(a.bundle, "icon.json")))
 
-for g in doc.get("groups", []):
-    for l in g.get("layers", []):
-        if light_value(l, "glass") is True:
-            raise SystemExit(f"NOT FLAT: layer {l.get('name')} is glass")
-
 bg = []
+glass_entries = []
+_PROF = json.load(open(os.path.join(_CAL, "refraction-profile.json")))
+GLASS_LAW = {"A0": _PROF["A0"], "R0": _PROF["R0"], "pw": _PROF["pw"],
+             "sr": _PROF.get("smooth_r", 3), "sn": _PROF.get("smooth_n", 2)}
+
+
+def icon_color_and_alpha(cstr):
+    kind, vals = cstr.split(":")
+    v = [float(x) for x in vals.split(",")]
+    if kind == "gray":
+        return srgb_to_render([v[0]] * 3), (v[1] if len(v) > 1 else 1.0)
+    al = v[3] if len(v) > 3 else 1.0
+    if kind == "display-p3":
+        return p3_to_render(v[:3]), al
+    return srgb_to_render(v[:3]), al
+
+
+def el_area(cubics):
+    # signed shoelace over the flattened subpaths (knockout holes wound
+    # opposite subtract); used only as a color-averaging weight
+    tot = 0.0
+    for sub in contours_of([v for cu in cubics for pt in cu for v in pt]):
+        pts = []
+        for c in sub:
+            p = np.array(c, np.float64).reshape(4, 2)
+            t = np.linspace(0, 1, 9)[:-1, None]
+            mt = 1 - t
+            pts.append(mt**3 * p[0] + 3 * mt**2 * t * p[1] + 3 * mt * t**2 * p[2] + t**3 * p[3])
+        P = np.vstack(pts)
+        Q = np.roll(P, -1, 0)
+        tot += 0.5 * float((P[:, 0] * Q[:, 1] - Q[:, 0] * P[:, 1]).sum())
+    return abs(tot)
+
+
+def glass_color(override, els, grads):
+    """Material color spec for a glass layer: {gc[, gc1, gcy], al} — the
+    declared icon.json fill if present, else the artwork's area-weighted
+    fill. Measured (overcast waves #ff7f00 -> gc (245,125,49)): glass
+    artwork colors take the standard sRGB->P3 composite conversion.
+    Vertical linear-gradient fills emit the engine's optional gc1/gcy
+    material gradient (overcast's tower renders its declared navy->black
+    ramp in ground truth; a constant mean color misses by up to 42/255
+    at the bottom)."""
+    if override:
+        if "solid" in override:
+            gc, al = icon_color_and_alpha(override["solid"])
+            return {"gc": gc, "al": al}
+        grad = override.get("linear-gradient")
+        if grad:
+            pairs = [icon_color_and_alpha(c) for c in grad]
+            al = float(np.mean([p[1] for p in pairs]))
+            o = override.get("orientation",
+                             {"start": {"x": 0.5, "y": 0}, "stop": {"x": 0.5, "y": 1}})
+            if abs(o["start"]["x"] - o["stop"]["x"]) < 0.02 and len(pairs) >= 2:
+                if len(pairs) > 2:
+                    warn("glass gradient fill: >2 stops -> endpoints")
+                return {"gc": pairs[0][0], "gc1": pairs[-1][0],
+                        "gcy": [round(o["start"]["y"] * 1024, 1),
+                                round(o["stop"]["y"] * 1024, 1)], "al": al}
+            warn("glass gradient fill: non-vertical -> mean color")
+            return {"gc": [round(float(np.mean([p[0][i] for p in pairs])), 1)
+                           for i in range(3)], "al": al}
+        if "automatic-gradient" in override:
+            kind, vals = override["automatic-gradient"].split(":")
+            v = [float(x) for x in vals.split(",")]
+            top, bottom = auto_gradient_render(kind, v[:3])
+            al = (v[1] if kind == "gray" and len(v) > 1
+                  else v[3] if len(v) > 3 else 1.0)
+            return {"gc": top, "gc1": bottom, "gcy": [0, 1024], "al": al}
+    acc = np.zeros(3)
+    tot = 0.0
+    for el in els:
+        f = el["fill"]
+        if isinstance(f, tuple) and f[0] == "grad":
+            gr = grads.get(f[1])
+            stops = [s2 for s2 in (gr["stops"] if gr else [])
+                     if s2[1] not in (None, "UNPARSED")]
+            if not stops:
+                continue
+            c = np.mean([svg_color_to_render(s2[1]) for s2 in stops], axis=0)
+        elif isinstance(f, tuple):
+            c = np.array(svg_color_to_render(f))
+        else:
+            continue
+        w = max(el_area(el["cubics"]), 1e-9) * el["op"]
+        acc += c * w
+        tot += w
+    if tot <= 0:
+        warn("glass layer artwork has no parsable fill -> white material")
+        return {"gc": [255.0, 255.0, 255.0], "al": 1.0}
+    return {"gc": [round(float(v), 1) for v in acc / tot], "al": 1.0}
 
 # canvas fill -> full-bleed rect path (engine's path-gradient handles any
 # orientation, unlike the fixed 0..1024 vgrad)
@@ -738,11 +1077,7 @@ def fill_desc_from_icon(fill, direct=False):
     if "automatic-gradient" in fill:
         kind, vals = fill["automatic-gradient"].split(":")
         v = [float(x) for x in vals.split(",")][:3]
-        if kind == "gray":
-            v = [v[0]] * 3
-        elif kind == "display-p3":
-            v = list(_enc(np.clip(_P3_TO_SRGB @ _lin(v), 0, 1)))
-        top, bottom = auto_gradient(v)
+        top, bottom = auto_gradient_render(kind, v)
         warn("automatic-gradient translated from measured ladder (approx for colored inputs)")
         return {"t": "lin", "c0": top, "c1": bottom,
                 "x0": 512, "y0": 0, "x1": 512, "y1": 1024}
@@ -766,7 +1101,8 @@ for g in reversed(doc.get("groups", [])):
         op = light_value(l, "opacity")
         if op == 0:
             continue
-        op = (1.0 if op is None else op) * g_op
+        l_op = 1.0 if op is None else op
+        op = l_op * g_op
         name = l["image-name"]
         if not name.lower().endswith(".svg"):
             raise SystemExit(f"NOT SVG: layer art {name}")
@@ -791,6 +1127,41 @@ for g in reversed(doc.get("groups", [])):
             return ((x - vb[0]) * sc + ox, (y - vb[1]) * sc + oy)
 
         override = light_value(l, "fill")
+
+        if light_value(l, "glass") is True:
+            if g.get("blur-material"):
+                warn(f"{name}: blur-material {g['blur-material']} ignored")
+            seg = []
+            segf = []
+            for el in els:
+                for cu in el["cubics"]:
+                    for (x, y) in cu:
+                        cx, cy = to_canvas(x, y)
+                        segf.append(cx)
+                        segf.append(cy)
+                        seg.append(round(cx, 2))
+                        seg.append(round(cy, 2))
+            if not seg:
+                warn(f"{name}: glass layer has no geometry, skipped")
+                continue
+            trd = light_value(g, "translucency") or {}
+            tv = float(trd.get("value", 0.0)) if trd.get("enabled", True) else 0.0
+            gcspec = glass_color(override, els, grads)
+            sh = g.get("shadow")
+            shadow = None
+            if sh:
+                shadow = {"dy": 29, "r": 23, "n": 3,
+                          "amp": round(17.385 * sh.get("opacity", 0.5) / 0.5, 3)}
+            entry = {"path": seg, "law": GLASS_LAW,
+                     "alpha": glass_alpha_b64(segf, tv, l_op * g_op * gcspec["al"]),
+                     "gc": gcspec["gc"], "shadow": shadow, "lm": None}
+            if "gc1" in gcspec:
+                entry["gc1"] = gcspec["gc1"]
+                entry["gcy"] = gcspec["gcy"]
+            glass_entries.append(entry)
+            continue
+        if glass_entries:
+            warn(f"{name}: non-glass layer above glass rendered beneath it")
 
         for el in els:
             seg = []
@@ -882,7 +1253,20 @@ for g in reversed(doc.get("groups", [])):
                 lay["op"] = round(eff_op, 3)
             bg.append(lay)
 
-recipe = {"bg": bg, "dluts": [], "glass": []}
+recipe = {"bg": bg, "dluts": [], "glass": glass_entries}
+if glass_entries:
+    # zero-measurement edge lighting: the shared per-contour LUT summed
+    # over every glass contour, baked as the recipe's global lightmap
+    # (builder quantization: deadzone 1, step 1.5, half-res)
+    pred = predicted_lightmap(glass_entries)
+    Q = 1.5
+    q = np.round(pred / Q)
+    q = np.where(np.abs(pred) >= 1.0, q, 0)
+    q = np.clip(q, -100, 100)
+    recipe["lm"] = {
+        "y": base64.b64encode(zlib.compress((q + 128).astype(np.uint8).tobytes(), 9)).decode(),
+        "q": Q, "b": _LUT["b"], "x0": 0, "y0": 0, "ds": int(1024 // _LGRID),
+        "w": _LGRID, "h": _LGRID}
 os.makedirs(os.path.join(a.outdir, "recipes"), exist_ok=True)
 out = os.path.join(a.outdir, "recipes", f"{a.id}.mjs")
 open(out, "w").write(
@@ -891,4 +1275,4 @@ open(out, "w").write(
     f"{os.path.basename(a.bundle)} — zero ictool measurement.\n"
     "export const recipe = " + json.dumps(recipe, separators=(",", ":")) + ";\n")
 print(f"wrote {out}: {os.path.getsize(out)} bytes, {len(bg)} bg layers, "
-      f"{len(warnings)} warning(s)")
+      f"{len(glass_entries)} glass layer(s), {len(warnings)} warning(s)")
