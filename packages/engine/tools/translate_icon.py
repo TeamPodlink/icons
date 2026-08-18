@@ -328,7 +328,7 @@ def gradient_stop_to_render(spec):
 
 
 def attr(attrs, name, style):
-    v = re.findall(rf'{name}="([^"]*)"', attrs)
+    v = re.findall(rf'(?:^|\s){name}="([^"]*)"', attrs)
     if v:
         return v[0]
     m = re.search(rf"(?:^|;)\s*{name}\s*:\s*([^;]+)", style or "")
@@ -337,7 +337,7 @@ def attr(attrs, name, style):
 
 def shape_to_path_d(tag, attrs):
     def f(n, d=0.0):
-        v = re.findall(rf'{n}="([^"]*)"', attrs)
+        v = re.findall(rf'(?:^|\s){n}="([^"]*)"', attrs)
         return float(v[0]) if v else d
     if tag == "rect":
         x, y, w, h = f("x"), f("y"), f("width"), f("height")
@@ -366,13 +366,15 @@ def shape_to_path_d(tag, attrs):
 def parse_gradients(s):
     grads = {}
     sop_note = set()
-    for m in re.finditer(r"<linearGradient([^>]*)>(.*?)</linearGradient>", s, re.S):
-        attrs, body = m.group(1), m.group(2)
+    for m in re.finditer(
+        r"<(linearGradient|radialGradient)([^>]*)>(.*?)</\1>", s, re.S
+    ):
+        kind, attrs, body = m.group(1), m.group(2), m.group(3)
         gid = re.findall(r'id="([^"]*)"', attrs)
         if not gid:
             continue
         def f(n, d):
-            v = re.findall(rf'{n}="([^"]*)"', attrs)
+            v = re.findall(rf'(?:^|\s){n}="([^"]*)"', attrs)
             return v[0] if v else d
         stops = []
         for sm in re.finditer(r"<stop([^>]*)/?>", body):
@@ -388,18 +390,19 @@ def parse_gradients(s):
             c = parse_svg_color(col if not col.startswith("stop-color") else col)
             stops.append((float(off.rstrip("%")) / (100 if "%" in off else 1), c))
         grads[gid[0]] = {
+            "kind": "radial" if kind == "radialGradient" else "linear",
             "x1": f("x1", "0"), "y1": f("y1", "0"),
             "x2": f("x2", "1" if f("gradientUnits", "objectBoundingBox") == "objectBoundingBox" else "0"),
             "y2": f("y2", "0"),
+            "cx": f("cx", "0.5"), "cy": f("cy", "0.5"), "r": f("r", "0.5"),
+            "fx": f("fx", None), "fy": f("fy", None),
             "units": f("gradientUnits", "objectBoundingBox"),
             "transform": f("gradientTransform", ""),
             "stops": stops,
         }
-    # radial gradients: record ids so fills can fall back with a warning
-    radial = set(re.findall(r'<radialGradient[^>]*id="([^"]*)"', s))
     for gid in sorted(sop_note):
         warn(f"gradient #{gid}: stop-opacity < 0.9 ignored")
-    return grads, radial
+    return grads, set()
 
 
 def svg_elements(path):
@@ -415,7 +418,79 @@ def svg_elements(path):
     uses = 0
     hidden = 0  # depth inside non-rendered containers (defs/clipPath/mask/...)
     HIDE = ("defs", "clipPath", "mask", "symbol", "pattern")
+    SHAPES = ("path", "rect", "circle", "ellipse", "polygon")
     stack = [(np.eye(3), root_fill[0] if root_fill else None, 1.0)]
+
+    # id -> (tag, attrs) for every shape anywhere (defs included), so <use>
+    # can instantiate them
+    by_id = {}
+    for sm in re.finditer(r"<(path|rect|circle|ellipse|polygon)([^>]*?)/?>", s):
+        gid = re.findall(r'\bid="([^"]*)"', sm.group(2))
+        if gid:
+            by_id[gid[0]] = (sm.group(1), sm.group(2))
+
+    def resolve_paint(ps):
+        gm = re.match(r"url\(#([^)]+)\)", ps.strip()) if ps else None
+        if gm:
+            return ("grad", gm.group(1))
+        c = parse_svg_color(ps)
+        if c == "UNPARSED":
+            warn(f"unparsed paint '{ps}' -> black")
+            return ("srgb", (0, 0, 0))
+        return c  # None = nothing painted
+
+    def handle_shape(tag, attrs, extra_m):
+        nonlocal strokes, clipped
+        style = attr(attrs, "style", None)
+        d = attr(attrs, "d", None) if tag == "path" else shape_to_path_d(tag, attrs)
+        if not d:
+            return
+        parent = stack[-1]
+        tr = attr(attrs, "transform", style)
+        M = parent[0] @ extra_m @ (parse_transform(tr) if tr else np.eye(3))
+        if attr(attrs, "clip-path", style):
+            clipped += 1
+        op = parent[2]
+        v = attr(attrs, "opacity", style)
+        if v:
+            op *= float(v)
+        cubics = []
+        for cu in parse_path(d):
+            tc = []
+            for (x, y) in cu:
+                p = M @ np.array([x, y, 1.0])
+                tc.append((float(p[0]), float(p[1])))
+            cubics.append(tuple(tc))
+        if not cubics:
+            return
+        fill_s = attr(attrs, "fill", style)
+        if fill_s is None:
+            fill_s = parent[1] if parent[1] is not None else "#000"
+        fill = resolve_paint(fill_s)
+        if fill is not None:
+            fop = op
+            v = attr(attrs, "fill-opacity", style)
+            if v:
+                fop *= float(v)
+            rule = attr(attrs, "fill-rule", style) or "nonzero"
+            els.append({"cubics": cubics, "rule": rule, "fill": fill, "op": fop})
+        stroke_s = attr(attrs, "stroke", style)
+        if stroke_s not in (None, "none"):
+            paint = resolve_paint(stroke_s)
+            if paint is not None:
+                w = float(attr(attrs, "stroke-width", style) or 1)
+                # width scales by the element transform (uniform-scale assumption)
+                w *= float(np.sqrt(abs(np.linalg.det(M[:2, :2]))))
+                ring = stroke_annulus(cubics, w)
+                if ring is None:
+                    strokes += 1  # open/degenerate subpath: still unsupported
+                else:
+                    sop = op
+                    v = attr(attrs, "stroke-opacity", style)
+                    if v:
+                        sop *= float(v)
+                    els.append({"cubics": ring, "rule": "evenodd", "fill": paint, "op": sop})
+
     for m in re.finditer(
         r"<(g|path|rect|circle|ellipse|polygon|use|defs|clipPath|mask|symbol|pattern"
         r"|/g|/defs|/clipPath|/mask|/symbol|/pattern)([^>]*?)(/?)>",
@@ -436,8 +511,19 @@ def svg_elements(path):
                 hidden = max(hidden - 1, 0)
             continue
         if tag == "use":
-            if not hidden:
-                uses += 1
+            href = attr(attrs, "href", None) or attr(attrs, "xlink:href", None)
+            target = by_id.get(href.lstrip("#")) if href else None
+            if target is None:
+                uses += 1  # unresolvable (group targets etc.): still warned
+                continue
+            ux = float(attr(attrs, "x", None) or 0)
+            uy = float(attr(attrs, "y", None) or 0)
+            style = attr(attrs, "style", None)
+            tr = attr(attrs, "transform", style)
+            T = np.eye(3)
+            T[0, 2], T[1, 2] = ux, uy
+            extra = (parse_transform(tr) if tr else np.eye(3)) @ T
+            handle_shape(target[0], target[1], extra)
             continue
         style = attr(attrs, "style", None)
         if tag == "g":
@@ -455,67 +541,8 @@ def svg_elements(path):
             if len(stack) > 1:
                 stack.pop()
             continue
-        d = attr(attrs, "d", None) if tag == "path" else shape_to_path_d(tag, attrs)
-        if not d:
-            continue
-        parent = stack[-1]
-        tr = attr(attrs, "transform", style)
-        M = parent[0] @ (parse_transform(tr) if tr else np.eye(3))
-        if attr(attrs, "clip-path", style):
-            clipped += 1
-        op = parent[2]
-        v = attr(attrs, "opacity", style)
-        if v:
-            op *= float(v)
-
-        def resolve_paint(s):
-            gm = re.match(r"url\(#([^)]+)\)", s.strip()) if s else None
-            if gm:
-                return ("grad", gm.group(1))
-            c = parse_svg_color(s)
-            if c == "UNPARSED":
-                warn(f"unparsed paint '{s}' -> black")
-                return ("srgb", (0, 0, 0))
-            return c  # None = nothing painted
-
-        cubics = []
-        for cu in parse_path(d):
-            tc = []
-            for (x, y) in cu:
-                p = M @ np.array([x, y, 1.0])
-                tc.append((float(p[0]), float(p[1])))
-            cubics.append(tuple(tc))
-        if not cubics:
-            continue
-
-        fill_s = attr(attrs, "fill", style)
-        if fill_s is None:
-            fill_s = parent[1] if parent[1] is not None else "#000"
-        fill = resolve_paint(fill_s)
-        if fill is not None:
-            fop = op
-            v = attr(attrs, "fill-opacity", style)
-            if v:
-                fop *= float(v)
-            rule = attr(attrs, "fill-rule", style) or "nonzero"
-            els.append({"cubics": cubics, "rule": rule, "fill": fill, "op": fop})
-
-        stroke_s = attr(attrs, "stroke", style)
-        if stroke_s not in (None, "none"):
-            paint = resolve_paint(stroke_s)
-            if paint is not None:
-                w = float(attr(attrs, "stroke-width", style) or 1)
-                # width scales by the element transform (uniform-scale assumption)
-                w *= float(np.sqrt(abs(np.linalg.det(M[:2, :2]))))
-                ring = stroke_annulus(cubics, w)
-                if ring is None:
-                    strokes += 1  # open/degenerate subpath: still unsupported
-                else:
-                    sop = op
-                    v = attr(attrs, "stroke-opacity", style)
-                    if v:
-                        sop *= float(v)
-                    els.append({"cubics": ring, "rule": "evenodd", "fill": paint, "op": sop})
+        if tag in SHAPES:
+            handle_shape(tag, attrs, np.eye(3))
     return vb, els, grads, radial, strokes, clipped, uses
 
 
@@ -675,10 +702,7 @@ for g in reversed(doc.get("groups", [])):
                     pass
             elif isinstance(el["fill"], tuple) and el["fill"][0] == "grad":
                 gid = el["fill"][1]
-                if gid in radial:
-                    warn(f"radial gradient #{gid} -> midpoint solid")
-                    fdesc = {"t": "solid", "c": svg_color_to_render(("srgb", (0.5, 0.5, 0.5)))}
-                elif gid in grads:
+                if gid in grads:
                     gr = grads[gid]
                     stops = [s2 for s2 in gr["stops"] if s2[1] is not None]
                     if len(stops) < 2:
@@ -688,6 +712,9 @@ for g in reversed(doc.get("groups", [])):
                     else:
                         stops.sort(key=lambda s2: s2[0])
                         GM = parse_transform(gr["transform"])
+                        A_tc = np.array([[sc, 0, ox - vb[0] * sc],
+                                         [0, sc, oy - vb[1] * sc],
+                                         [0, 0, 1.0]])
                         def gpt(xs_, ys_):
                             if gr["units"] == "userSpaceOnUse":
                                 p = GM @ np.array([float(xs_), float(ys_), 1.0])
@@ -697,17 +724,33 @@ for g in reversed(doc.get("groups", [])):
                             fx = float(str(xs_).rstrip("%")) / (100 if "%" in str(xs_) else 1)
                             fy = float(str(ys_).rstrip("%")) / (100 if "%" in str(ys_) else 1)
                             return (bx0 + fx * (bx1 - bx0), by0 + fy * (by1 - by0))
-                        p0 = gpt(gr["x1"], gr["y1"])
-                        p1 = gpt(gr["x2"], gr["y2"])
-                        fdesc = {"t": "lin",
-                                 "x0": round(p0[0], 1), "y0": round(p0[1], 1),
-                                 "x1": round(p1[0], 1), "y1": round(p1[1], 1)}
-                        if len(stops) == 2:
-                            fdesc["c0"] = gradient_stop_to_render(stops[0][1])
-                            fdesc["c1"] = gradient_stop_to_render(stops[-1][1])
+                        if gr["kind"] == "radial":
+                            if gr["units"] != "userSpaceOnUse":
+                                warn(f"radial gradient #{gid}: objectBoundingBox units -> midpoint solid")
+                                fdesc = {"t": "solid", "c": svg_color_to_render(("srgb", (0.5, 0.5, 0.5)))}
+                            else:
+                                if gr["fx"] is not None and (gr["fx"], gr["fy"]) != (gr["cx"], gr["cy"]):
+                                    warn(f"radial gradient #{gid}: focal point ignored")
+                                T = np.array([[float(gr["r"]), 0, float(gr["cx"])],
+                                              [0, float(gr["r"]), float(gr["cy"])],
+                                              [0, 0, 1.0]])
+                                Fm = A_tc @ GM @ T
+                                Mi = np.linalg.inv(Fm)
+                                fdesc = {"t": "rad",
+                                         "m": [round(float(v), 6) for v in Mi[:2].ravel()]}
                         else:
-                            fdesc["st"] = [round(o, 4) for o, _ in stops]
-                            fdesc["cs"] = [gradient_stop_to_render(c) for _, c in stops]
+                            p0 = gpt(gr["x1"], gr["y1"])
+                            p1 = gpt(gr["x2"], gr["y2"])
+                            fdesc = {"t": "lin",
+                                     "x0": round(p0[0], 1), "y0": round(p0[1], 1),
+                                     "x1": round(p1[0], 1), "y1": round(p1[1], 1)}
+                        if fdesc["t"] in ("lin", "rad"):
+                            if len(stops) == 2:
+                                fdesc["c0"] = gradient_stop_to_render(stops[0][1])
+                                fdesc["c1"] = gradient_stop_to_render(stops[-1][1])
+                            else:
+                                fdesc["st"] = [round(o, 4) for o, _ in stops]
+                                fdesc["cs"] = [gradient_stop_to_render(c) for _, c in stops]
                 else:
                     warn(f"gradient #{gid} not found -> black")
                     fdesc = {"t": "solid", "c": [0, 0, 0]}

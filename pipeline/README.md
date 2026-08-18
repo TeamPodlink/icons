@@ -236,12 +236,24 @@ warned). itunes: 29.8 → **2.20** (its two failure causes were the
 muted endpoint-only gradients and the dropped stroked ring).
 Per-stop `stop-opacity` ≥ 0.9 is dropped silently, lower values warn.
 
+**`<use>` + radial gradients (2026-08-17).** `<use>` instantiates
+shape targets by id (defs included) with x/y/transform context;
+radial gradients render through a new engine fill primitive — an
+inverse affine into unit-circle space (`t = |M·p|`), sharing the
+multi-stop machinery, translated from `radialGradient` cx/cy/r +
+gradientTransform (userSpaceOnUse; focal points and
+objectBoundingBox warned). Fixing them also unearthed a latent
+attribute-parsing bug (`d=` matched inside `id=`; lookups now anchor
+on whitespace) that had hidden netflix from the sweep entirely.
+deepcast 183 → **2.17**, podfriend 43 → 8.5, tunestr 91 → 9.0.
+
 Glass icons remain gated on the material-response sweep and the
 per-layer lighting model; raster-art bundles on a PNG-decode
-decision. The player's coverage today: flat + SVG, 37 bundles at
-median RMSE 3.93, 28/37 ≤ 5.5; remaining tail: use-instantiation
-(deepcast 183, podfriend 43), radial gradients (tunestr 91), knockout
-winding (tunein 70), podvine glyph-edge residual (14.6), sonnet (9.6).
+decision. The player's coverage today: flat + SVG, 38 bundles at
+median RMSE 3.98, 29/38 ≤ 5.5; remaining tail: netflix 27 (newly
+unlocked, uninvestigated), podvine glyph-edge residual (14.6), sonnet
+(9.6), tunestr/podfriend (~9, radial-law refinement), knockout
+winding (tunein 70).
 
 ## Adding a platform or icon
 

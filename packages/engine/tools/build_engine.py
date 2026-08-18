@@ -482,10 +482,17 @@ export function createLiquidRenderer(recipe) {
           if (a2 <= 0) continue;
           let cr, cg, cb2;
           if (L2.fill.t === "solid") { cr = L2.fill.c[0]; cg = L2.fill.c[1]; cb2 = L2.fill.c[2]; }
-          else {   // linear gradient in canvas coords
-            const f = L2.fill;
-            const t = Math.min(Math.max(((px-f.x0)*(f.x1-f.x0) + (py-f.y0)*(f.y1-f.y0)) /
-                     Math.max((f.x1-f.x0)**2 + (f.y1-f.y0)**2, 1e-9), 0), 1);
+          else {   // gradient in canvas coords: linear, or radial via an
+            const f = L2.fill;   // inverse affine into unit-circle space
+            let t;
+            if (f.t === "rad") {
+              const gx = f.m[0]*px + f.m[1]*py + f.m[2];
+              const gy = f.m[3]*px + f.m[4]*py + f.m[5];
+              t = Math.min(Math.sqrt(gx*gx + gy*gy), 1);
+            } else {
+              t = Math.min(Math.max(((px-f.x0)*(f.x1-f.x0) + (py-f.y0)*(f.y1-f.y0)) /
+                  Math.max((f.x1-f.x0)**2 + (f.y1-f.y0)**2, 1e-9), 0), 1);
+            }
             if (f.cs) {   // multi-stop: st = offsets, cs = colors per stop
               const st = f.st; let k = 1;
               while (k < st.length - 1 && t > st[k]) k++;
