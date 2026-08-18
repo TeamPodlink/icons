@@ -1,7 +1,4 @@
-"use client";
-
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, useLocation } from "react-router";
 import { Braces, Cloud, House, Package, Server, Sparkles } from "lucide-react";
 import { categorySlug, getCategories, glassCards, visibleCards } from "@/lib/platforms";
 import { cn } from "@/lib/cn";
@@ -20,7 +17,7 @@ function Badge({ children }: { children: React.ReactNode }) {
 }
 
 export function Sidebar() {
-  const pathname = usePathname();
+  const { pathname } = useLocation();
   const categories = getCategories();
 
   const links = [
@@ -43,7 +40,7 @@ export function Sidebar() {
         {links.map(({ href, label, icon: Icon, badge }) => (
           <Link
             key={href}
-            href={href}
+            to={href}
             className={cn(itemBase, pathname === href && itemActive)}
           >
             <span className="flex items-center space-x-2">
@@ -61,7 +58,7 @@ export function Sidebar() {
           return (
             <Link
               key={c.name}
-              href={href}
+              to={href}
               className={cn(itemBase, pathname === href && itemActive)}
             >
               <span className="truncate">{c.name}</span>

@@ -113,8 +113,13 @@ export const visibleCards = cards.filter((c) => c.platform.active);
 
 export const glassCards = visibleCards.filter((c) => c.facet === "glass");
 
-/** Where liquid glass raster assets are served from. */
-export const ASSET_BASE = process.env.NEXT_PUBLIC_ASSET_BASE ?? "/library";
+/**
+ * Where liquid glass raster assets are served from. Production builds set
+ * VITE_ASSET_BASE to the immutable R2 release prefix
+ * (https://assets.icons.podlink.com/<version>); locally the pipeline syncs
+ * rendered assets into public/library.
+ */
+export const ASSET_BASE = import.meta.env.VITE_ASSET_BASE ?? "/library";
 
 export function getCategories(): { name: string; count: number }[] {
   const counts = new Map<string, number>();

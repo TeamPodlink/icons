@@ -1,8 +1,8 @@
 import { Code, DocsPage, P, Section } from "@/components/docs";
+import { useTitle } from "@/lib/use-title";
 
-export const metadata = { title: "Registry · refraction" };
-
-export default function RegistryDocs() {
+export function RegistryDocs() {
+  useTitle("Registry · refraction");
   return (
     <DocsPage
       title="shadcn registry"
@@ -14,7 +14,7 @@ export default function RegistryDocs() {
         </P>
         <Code>{`{
   "registries": {
-    "@refraction": "https://YOUR_SITE_DOMAIN/r/{name}.json"
+    "@refraction": "https://icons.podlink.com/r/{name}.json"
   }
 }`}</Code>
       </Section>
@@ -41,12 +41,12 @@ npx shadcn@latest add @refraction/all-icons   # everything`}</Code>
 
 <OvercastIcon size={32} />
 
-// class-based dark mode (next-themes / Tailwind "dark" class):
+// class-based dark mode (Tailwind "dark" class):
 <OvercastIcon size={32} theme="class" />`}</Code>
         <P>
           The component renders a <code className="font-mono">&lt;picture&gt;</code>{" "}
-          with a 1x/2x WebP srcset. Icons with a distinct dark rendition switch
-          automatically — via{" "}
+          with a 1x/2x srcset (AVIF-primary, WebP fallback). Icons with a
+          distinct dark rendition switch automatically — via{" "}
           <code className="font-mono">prefers-color-scheme</code> by default
           (zero JS), or via Tailwind&apos;s <code className="font-mono">dark</code>{" "}
           class with <code className="font-mono">theme=&quot;class&quot;</code> if
@@ -58,7 +58,7 @@ npx shadcn@latest add @refraction/all-icons   # everything`}</Code>
         <P>
           Flat vector icons and &quot;Listen on&quot; badges ship separately as{" "}
           <code className="font-mono">@podlink/icons</code> — SVG strings +
-          React components for all {`89`} platforms:
+          React components for every platform:
         </P>
         <Code>{`npm install @podlink/icons
 
@@ -70,11 +70,15 @@ import { PlatformIcon, PlatformBadge } from "@podlink/icons/react";
 
       <Section title="Where images come from">
         <P>
-          Installed Liquid Glass components point at the versioned{" "}
-          <code className="font-mono">@podlink/refraction</code> package on
-          jsDelivr, so they work with zero configuration. For production we
-          recommend self-hosting the images — see the self-hosting guide;
-          it&apos;s one dependency and a one-line change.
+          Installed Liquid Glass components point at{" "}
+          <code className="font-mono">
+            https://assets.icons.podlink.com/&#123;version&#125;/
+          </code>{" "}
+          — an immutable, versioned release prefix on Cloudflare R2 — so they
+          work with zero configuration, and upgrading is an explicit component
+          re-install, never a silent asset change. For production we recommend
+          self-hosting the images — see the self-hosting guide; it&apos;s one
+          zip download and a one-line change.
         </P>
       </Section>
     </DocsPage>

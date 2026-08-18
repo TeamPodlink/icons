@@ -1,7 +1,5 @@
-"use client";
-
 import { useEffect, useState } from "react";
-import Link from "next/link";
+import { Link } from "react-router";
 import { toast } from "sonner";
 import {
   Copy,
@@ -177,7 +175,7 @@ export function IconCard({ card }: { card: Card }) {
           {card.categories.slice(0, 2).map((c) => (
             <Link
               key={c}
-              href={`/directory/${categorySlug(c)}`}
+              to={`/directory/${categorySlug(c)}`}
               className="cursor-pointer rounded-full border border-neutral-200 px-2 py-0.5 font-mono text-xs font-medium text-neutral-600 hover:border-neutral-400 hover:text-black dark:border-neutral-800 dark:text-neutral-400 dark:hover:border-neutral-600 dark:hover:text-white"
             >
               {c}
