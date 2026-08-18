@@ -62,10 +62,15 @@ export default function IconFormatPage() {
           with start.y ∈ [0, 1] and stop.y ∈ [0.3, 1].{" "}
           <code>automatic-gradient</code> takes a single color and derives a
           gradient by rules Apple does not document; this project measures the
-          derived result from renders rather than guessing it. Note that
-          declared Display-P3 fills pass through a gamut mapping that is not
-          colorimetric clipping — the rendered sRGB pixel is not what naive
-          conversion predicts.
+          derived result from renders rather than guessing it. Color
+          resolution is not one pipeline but several, each measured
+          separately: canvas fills composite in sRGB (display-p3 values
+          gamut-clipped); solid layer-artwork colors and fill overrides
+          declared in sRGB leak through <em>unconverted</em> when the artwork
+          has an opaque full-bleed background darker than ~0.30 mean
+          luminance (a fast-path quirk), and composite in sRGB otherwise;
+          display-p3 layer colors always convert; gradient stops pass through
+          their own measured transform before a plain encoded-space ramp.
         </P>
       </Section>
 

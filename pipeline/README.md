@@ -261,17 +261,40 @@ transfer for display-p3 inputs (tunein's navy canvas rendered near
 black). netflix 27 → 12.4, tunein 70 → 18.2 — with the knockout
 lettering rendering correctly, refuting the assumed winding cause.
 
-Open lead from the same review: netflix's reds and tunein's teal
-render duller than GT — layer fill-overrides may resolve colors on
-yet another path than canvas fills (probe-gamut validated canvas
-fills only). One two-render instrument would settle it.
+**The layer-content color law (solved 2026-08-17, style-probe
+instruments).** The "duller reds" lead resolved into ictool's most
+cursed behavior yet, measured across ~20 instrument bundles:
+
+- **Canvas fills** composite in sRGB (probe-gamut; unchanged).
+- **Solid layer colors + fill overrides declared in sRGB** (hex,
+  `srgb:`) leak through **unconverted** — raw numbers relabeled as
+  P3 — when the artwork has an opaque *exact* full-bleed background
+  with mean encoded luminance < ~0.30 (threshold bracketed to
+  (0.282, 0.314); `<use>`-referenced and `<path>` covers trigger it,
+  1px-short coverage does not, light/white backgrounds do not).
+  Otherwise they composite in sRGB. Almost certainly the
+  dark-artwork classifier choosing an opaque blit fast-path that
+  skips color conversion.
+- **display-p3-declared layer colors** always convert (with a small
+  unexplained deviation from the canvas law on gamut-clipped
+  channels — noted, unfit).
+- **Gradient stops**: the stop law (unchanged).
+
+Forensic anchors: netflix's #b20710 stem renders as GT (178,7,15) —
+the raw hex bytes in P3 coordinates; deepcast's identical-syntax hex
+over a white background composites in sRGB; spotify's display-p3
+override regressed under raw-direct, pinning the per-colorspace
+split. netflix 12.4 → **1.86**, tunein 18.2 → **3.98** (the bundle
+recorded as "knockout winding, RMSE 45" since the first recipe sweep
+is now in band), deepcast/spotify/jam unchanged.
 
 Glass icons remain gated on the material-response sweep and the
 per-layer lighting model; raster-art bundles on a PNG-decode
 decision. The player's coverage today: flat + SVG, 38 bundles at
-median RMSE 3.93, 29/38 ≤ 5.5, worst 18.2 (was 183 at the first
-sweep); remaining: tunein 18.2 / podvine 14.6 / netflix 12.4, sonnet
-9.6, tunestr/podfriend/podhero ~8.5–9.
+median RMSE 3.4, **31/38 ≤ 5.5, worst 14.6** (the first sweep's
+worst was 183 with fifteen bundles above 40); remaining: podvine
+14.6 (glyph-edge), sonnet 9.6, tunestr 9.0, podfriend 8.5, podhero
+8.5, podcastindex 7.7, mixerbox 7.1.
 
 ## Adding a platform or icon
 

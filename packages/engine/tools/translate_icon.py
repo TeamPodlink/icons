@@ -299,9 +299,21 @@ def parse_svg_color(s):
     return "UNPARSED"
 
 
-def svg_color_to_render(spec):
+def svg_color_to_render(spec, fullbleed=False):
+    # SOLID layer-content color law (measured, forensics 2026-08-17):
+    # sRGB-DECLARED values (hex, rgb(), srgb:) leak through as raw numbers
+    # into the P3-coded composite — relabeled, never converted (netflix
+    # #b20710 stem -> GT (178,7,15) = the raw bytes; tunein srgb teal
+    # likewise). DISPLAY-P3-declared values are properly converted through
+    # the sRGB-clip composite (spotify/deepcast regressed under direct).
+    # Canvas fills: sRGB-composite path (probe-gamut, p3-declared);
+    # gradient stops: the stop law. Distinct paths, each measured.
     space, c = spec
-    return p3_to_render(c) if space == "p3" else srgb_to_render(c)
+    if space == "p3":
+        return p3_to_render(c)
+    if fullbleed:
+        return [round(float(min(max(v, 0), 1)) * 255, 1) for v in c]
+    return srgb_to_render(c)
 
 
 # CoreSVG gradient-stop law (measured 2026-08-17, probe-gradient-law.py):
@@ -416,6 +428,7 @@ def svg_elements(path):
     strokes = 0
     clipped = 0
     uses = 0
+    fullbleed = False
     hidden = 0  # depth inside non-rendered containers (defs/clipPath/mask/...)
     HIDE = ("defs", "clipPath", "mask", "symbol", "pattern")
     SHAPES = ("path", "rect", "circle", "ellipse", "polygon", "polyline")
@@ -440,7 +453,7 @@ def svg_elements(path):
         return c  # None = nothing painted
 
     def handle_shape(tag, attrs, extra_m):
-        nonlocal strokes, clipped
+        nonlocal strokes, clipped, fullbleed
         style = attr(attrs, "style", None)
         d = attr(attrs, "d", None) if tag == "path" else shape_to_path_d(tag, attrs)
         if not d:
@@ -474,6 +487,20 @@ def svg_elements(path):
                 fop *= float(v)
             rule = attr(attrs, "fill-rule", style) or "nonzero"
             els.append({"cubics": cubics, "rule": rule, "fill": fill, "op": fop})
+            # DARK full-bleed detection: an opaque solid element covering
+            # the exact viewBox with mean encoded luminance < 0.30 flips
+            # sRGB-declared artwork colors to the raw-direct path
+            # (measured: style-probes — white/light backgrounds composite
+            # in sRGB, dark ones blit raw; threshold brackets to
+            # (0.282, 0.314); <use>-referenced and <path> covers count,
+            # 1px-short coverage does not)
+            if (fop >= 0.999 and isinstance(fill, tuple) and fill[0] in ("srgb", "p3")
+                    and sum(fill[1]) / 3 < 0.30):
+                px = [c2 for cu in cubics for c2 in (cu[0][0], cu[3][0])]
+                py = [c2 for cu in cubics for c2 in (cu[0][1], cu[3][1])]
+                if (min(px) <= vb[0] + 1e-3 and min(py) <= vb[1] + 1e-3
+                        and max(px) >= vb[0] + vb[2] - 1e-3 and max(py) >= vb[1] + vb[3] - 1e-3):
+                    fullbleed = True
         stroke_s = attr(attrs, "stroke", style)
         if stroke_s not in (None, "none"):
             paint = resolve_paint(stroke_s)
@@ -543,7 +570,7 @@ def svg_elements(path):
             continue
         if tag in SHAPES:
             handle_shape(tag, attrs, np.eye(3))
-    return vb, els, grads, radial, strokes, clipped, uses
+    return vb, els, grads, radial, strokes, clipped, uses, fullbleed
 
 
 def stroke_annulus(cubics, width):
@@ -622,8 +649,16 @@ for cu in parse_path("M0,0 L1024,0 L1024,1024 L0,1024 Z"):
         CANVAS_SEG.extend([x, y])
 
 
-def fill_desc_from_icon(fill):
+def fill_desc_from_icon(fill, direct=False):
     if "solid" in fill:
+        if direct:  # layer overrides follow the layer-content color law
+            _k, vals = fill["solid"].split(":")
+            v = [float(x) for x in vals.split(",")][:3]
+            if _k == "gray":
+                v = [v[0]] * 3
+            if _k == "display-p3":
+                return {"t": "solid", "c": p3_to_render(v)}
+            return {"t": "solid", "c": [round(min(max(x, 0), 1) * 255, 1) for x in v]}
         return {"t": "solid", "c": parse_icon_color(fill["solid"])}
     if "linear-gradient" in fill:
         o = fill.get("orientation", {"start": {"x": 0.5, "y": 0}, "stop": {"x": 0.5, "y": 1}})
@@ -667,7 +702,7 @@ for g in reversed(doc.get("groups", [])):
         name = l["image-name"]
         if not name.lower().endswith(".svg"):
             raise SystemExit(f"NOT SVG: layer art {name}")
-        vb, els, grads, radial, strokes, clipped, uses = svg_elements(
+        vb, els, grads, radial, strokes, clipped, uses, fullbleed = svg_elements(
             os.path.join(a.bundle, "Assets", name))
         if strokes:
             warn(f"{name}: {strokes} stroked element(s) ignored")
@@ -699,7 +734,7 @@ for g in reversed(doc.get("groups", [])):
                     seg.append(round(cy, 2))
                     xs.append(cx); ys.append(cy)
             if override:
-                fdesc = fill_desc_from_icon(override)
+                fdesc = fill_desc_from_icon(override, direct=True)
                 if fdesc["t"] == "lin" and "x0" not in fdesc:
                     pass
             elif isinstance(el["fill"], tuple) and el["fill"][0] == "grad":
@@ -757,7 +792,7 @@ for g in reversed(doc.get("groups", [])):
                     warn(f"gradient #{gid} not found -> black")
                     fdesc = {"t": "solid", "c": [0, 0, 0]}
             else:
-                fdesc = {"t": "solid", "c": svg_color_to_render(el["fill"])}
+                fdesc = {"t": "solid", "c": svg_color_to_render(el["fill"], fullbleed)}
             lay = {"t": "path", "seg": seg, "rule": el["rule"], "fill": fdesc}
             eff_op = op * el["op"]
             if eff_op != 1:
