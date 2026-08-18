@@ -565,14 +565,20 @@ export function createLiquidRenderer(recipe) {
                   if (pmj <= 0) continue;
                   const aj = (GJ.AL[Math.min(GJ.AL.length-1, (ty/1024*GJ.AL.length)|0)]/255)*pmj;
                   const gcj = GJ.g.gc || [255, 255, 255];
-                  gb[0] += (gcj[0]-gb[0])*aj; gb[1] += (gcj[1]-gb[1])*aj; gb[2] += (gcj[2]-gb[2])*aj;
+                  // optional vertical material-color gradient (gc1 at
+                  // gcy[1]); absent gc1 keeps the constant-gc behavior
+                  const gj1 = GJ.g.gc1 || gcj;
+                  const tj = GJ.g.gc1 ? Math.min(Math.max((ty - GJ.g.gcy[0])/(GJ.g.gcy[1] - GJ.g.gcy[0]), 0), 1) : 0;
+                  gb[0] += (gcj[0] + (gj1[0]-gcj[0])*tj - gb[0])*aj; gb[1] += (gcj[1] + (gj1[1]-gcj[1])*tj - gb[1])*aj; gb[2] += (gcj[2] + (gj1[2]-gcj[2])*tj - gb[2])*aj;
                 }
                 dr += gb[0]; dg += gb[1]; db += gb[2];
               }
               dr /= 13; dg /= 13; db /= 13;
               const al = GL.AL[Math.min(GL.AL.length-1, (py/1024*GL.AL.length)|0)]/255;
               const gcc = GL.g.gc || [255, 255, 255];
-              const gr = dr*(1-al) + gcc[0]*al, gg = dg*(1-al) + gcc[1]*al, gbv = db*(1-al) + gcc[2]*al;
+              const gc1 = GL.g.gc1 || gcc;
+              const tg = GL.g.gc1 ? Math.min(Math.max((py - GL.g.gcy[0])/(GL.g.gcy[1] - GL.g.gcy[0]), 0), 1) : 0;
+              const gr = dr*(1-al) + (gcc[0] + (gc1[0]-gcc[0])*tg)*al, gg = dg*(1-al) + (gcc[1] + (gc1[1]-gcc[1])*tg)*al, gbv = db*(1-al) + (gcc[2] + (gc1[2]-gcc[2])*tg)*al;
               r += (gr-r)*pm; g += (gg-g)*pm; b += (gbv-b)*pm;
             }
             if (GL.SH) {
