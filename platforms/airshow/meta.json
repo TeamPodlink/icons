@@ -1,0 +1,21 @@
+{
+  "name": "Airshow",
+  "active": true,
+  "aliases": [
+    "airshowlightweightpodcasts"
+  ],
+  "url": "https://airshow.fm",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "airshow",
+        "title": "Airshow",
+        "variant": null,
+        "file": "Airshow.icon",
+        "source": "appstore-artwork-split",
+        "appStoreId": 1584582270,
+        "hasDark": true
+      }
+    ]
+  }
+}
