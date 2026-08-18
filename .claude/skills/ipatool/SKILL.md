@@ -48,7 +48,7 @@ assuming a platform is flat.
    `source: "decanted"`.
 4. **Flat app fallback.** No stack → mine the official 1024px
    marketing icon with `flat-icon-extract`; build the
-   single-raster-layer bundle (template: `platforms/wondery/`),
+   single-raster-layer bundle (template: `platforms/icatcher/`),
    `source: "appstore-artwork"`.
 5. **Dark art.** While in the catalog, look for genuine ≥1024px dark
    marketing icons (precedent: Deezer, Global Player, Hark, Pandora,
