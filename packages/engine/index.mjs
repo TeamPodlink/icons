@@ -6,8 +6,6 @@ export { createLiquidRenderer, encodePng } from "./engine.mjs";
 export const recipeSlugs = [
   "apple",
   "overcast",
-  "overcast-dark",
-  "overcast-premiumblue",
   "podcastrepublic",
   "spotify",
 ];
