@@ -29,6 +29,11 @@ export interface Platform {
    *  original TeamPodlink/badges repo or this repo, whichever is
    *  earlier. Drives the directory's "Sort by latest". */
   added: string | null;
+  /** OP3 top-apps download share (percent), from the committed
+   *  apps/web/lib/op3-popularity.json snapshot
+   *  (pipeline/fetch-popularity.mjs). null when OP3 has no data for
+   *  the platform. Drives the directory's "Sort by popular". */
+  popularity: number | null;
   guidelinesUrl: string | null;
   hasFlat: boolean;
   hasBadge: boolean;
@@ -125,6 +130,8 @@ export interface Card {
   categories: string[];
   /** Platform first-addition date (YYYY-MM-DD) — see Platform.added. */
   added: string | null;
+  /** OP3 download share (percent) — see Platform.popularity. */
+  popularity: number | null;
 }
 
 export const cards: Card[] = platforms.flatMap((p): Card[] => {
@@ -137,6 +144,7 @@ export const cards: Card[] = platforms.flatMap((p): Card[] => {
       bundle: b,
       categories: debugCategories(p, b),
       added: p.added,
+      popularity: p.popularity,
     }));
   if (p.hasFlat)
     return [
@@ -148,6 +156,7 @@ export const cards: Card[] = platforms.flatMap((p): Card[] => {
         bundle: null,
         categories: debugCategories(p, null),
         added: p.added,
+        popularity: p.popularity,
       },
     ];
   return [];

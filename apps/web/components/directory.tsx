@@ -2,7 +2,7 @@ import { useMemo, useRef } from "react";
 import { useState } from "react";
 import { useSearchParams } from "react-router";
 import Fuse from "fuse.js";
-import { ArrowDownUp, ArrowUpDown, Search } from "lucide-react";
+import { ArrowDownUp, ArrowUpDown, Search, TrendingUp } from "lucide-react";
 import { IconCard } from "@/components/icon-card";
 import { WarningBanner } from "@/components/warning-banner";
 import { PageCard } from "@/components/page-card";
@@ -29,6 +29,14 @@ function useUrlState(key: string, initial: string) {
 
 const FACETS: Facet[] = ["glass", "flat", "badge"];
 
+/** Sort cycle: Latest → A-Z → Popular → Latest. "latest" is the
+ *  default and stays out of the URL (?sort=alphabetical / ?sort=popular). */
+const SORTS = ["latest", "alphabetical", "popular"] as const;
+type Sort = (typeof SORTS)[number];
+
+const parseSort = (raw: string): Sort =>
+  raw === "alphabetical" || raw === "popular" ? raw : "latest";
+
 export function Directory({
   cards,
   heading,
@@ -39,7 +47,8 @@ export function Directory({
   facetSwitcher?: boolean;
 }) {
   const [query, setQuery] = useUrlState("search", "");
-  const [sort, setSort] = useUrlState("sort", "latest");
+  const [sortRaw, setSort] = useUrlState("sort", "latest");
+  const sort = parseSort(sortRaw);
   const [facetRaw, setFacet] = useUrlState("facet", "glass");
   const facet = facetSwitcher ? parseFacet(facetRaw) : "glass";
   const inputRef = useRef<HTMLInputElement>(null);
@@ -61,6 +70,14 @@ export function Directory({
     if (query) return list; // search results stay relevance-ordered
     if (sort === "alphabetical")
       list.sort((a, b) => byTitle(a.title, b.title));
+    else if (sort === "popular")
+      // "popular": OP3 download share (percent) descending; platforms
+      // without OP3 data sink to the bottom; ties A-Z.
+      list.sort(
+        (a, b) =>
+          (b.popularity ?? -1) - (a.popularity ?? -1) ||
+          byTitle(a.title, b.title)
+      );
     else
       // "latest": newest first-addition date first (meta.json "added",
       // mined from git history); undated sink to the bottom; ties A-Z.
@@ -126,17 +143,23 @@ export function Directory({
             <button
               type="button"
               onClick={() =>
-                setSort(sort === "alphabetical" ? "latest" : "alphabetical")
+                setSort(SORTS[(SORTS.indexOf(sort) + 1) % SORTS.length])
               }
               className="flex cursor-pointer items-center space-x-1.5 rounded-md px-2 py-1.5 text-sm text-neutral-600 hover:bg-neutral-200 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
             >
-              {sort === "alphabetical" ? (
-                <ArrowDownUp size={16} strokeWidth={1.8} />
-              ) : (
+              {sort === "latest" ? (
                 <ArrowUpDown size={16} strokeWidth={1.8} />
+              ) : sort === "alphabetical" ? (
+                <TrendingUp size={16} strokeWidth={1.8} />
+              ) : (
+                <ArrowDownUp size={16} strokeWidth={1.8} />
               )}
               <span>
-                {sort === "alphabetical" ? "Sort by latest" : "Sort A-Z"}
+                {sort === "latest"
+                  ? "Sort A-Z"
+                  : sort === "alphabetical"
+                    ? "Sort by popular"
+                    : "Sort by latest"}
               </span>
             </button>
           </div>

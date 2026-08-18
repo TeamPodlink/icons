@@ -1,9 +1,15 @@
 // Emit the merged platform dataset the website consumes:
 // apps/web/lib/platforms.gen.json (gitignored). Run before web dev/build.
 
-import { existsSync, mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { readPlatforms, root } from "./lib.mjs";
+
+// Committed OP3 download-share snapshot (pipeline/fetch-popularity.mjs).
+const popularityPath = join(root, "apps/web/lib/op3-popularity.json");
+const popularity = existsSync(popularityPath)
+  ? JSON.parse(readFileSync(popularityPath, "utf8")).shares
+  : {};
 
 const out = readPlatforms().map(({ id, dir, meta }) => ({
   id,
@@ -11,6 +17,7 @@ const out = readPlatforms().map(({ id, dir, meta }) => ({
   active: meta.active !== false,
   url: meta.url ?? null,
   added: meta.added ?? null,
+  popularity: popularity[id] ?? null,
   guidelinesUrl: meta.guidelinesUrl ?? null,
   hasFlat: existsSync(join(dir, "icon.svg")),
   hasBadge: existsSync(join(dir, "badge.svg")),
