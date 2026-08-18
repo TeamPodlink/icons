@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router";
 import { Toaster } from "sonner";
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
+import { WarningBanner } from "@/components/warning-banner";
 import { ApiDocs } from "@/src/pages/docs-api";
 import { IconFormatDocs } from "@/src/pages/docs-icon-format";
 import { CategoryPage } from "@/src/pages/directory-category";
@@ -14,6 +15,7 @@ export function App() {
     <>
       <Toaster position="bottom-right" />
       <Header />
+      <WarningBanner />
       <Sidebar />
       <main className="overflow-hidden px-2 md:mr-4 md:ml-56 md:px-0">
         <Routes>
