@@ -166,7 +166,59 @@ lightmap analysis over the adopted recipes.
    blob icons is partial (apple ↔ overcast r ≈ 0.6). Next iteration:
    per-layer fields instead of the silhouette union, with
    thin-feature (thickness-normalized) handling.
-5. **`automatic-gradient` fit** (33-color sweep): below ~0.775
+5. **Per-layer glass lighting: the ramp was the ring-killer, and the
+   LUT transfers** (measured 2026-08-17, `probe-layer-lightmap.py`;
+   supersedes item 4's parameterization). Method: fresh 1024 residual
+   fields `luma(GT − pass1)` (the lm-res-128 recipe lightmaps are 8px
+   texels — too coarse; item 4's numbers also flattened big arcs to
+   30px chords, which wrecked near-edge distance/normal estimates), an
+   authored instrument corpus rendered through ictool (disk, rings
+   w24/56/120, bars, wedge × artwork fills #333/#888/#fff on gray
+   canvas; thin features reuse the disk's measured material — the
+   two-gray erosion has no interior on them), and a model ladder fit
+   by shared-bin LSQ. Findings:
+   - **podcastrepublic's R² 0.19 was never edge conflation.** Authored
+     rings bin fine even under the UNION model (0.80–0.83). The killer
+     is the **material y-ramp**: the family's alpha(y) curve renders
+     vs pass-1's constant measured alpha as a residual ramp
+     `(a_fam(y)/mean(a_fam) − 1) · alpha0 · (gcLuma − base)` — family
+     curve at the layer's **declared translucency** (undeclared → t0,
+     ramp-free: overcast's undeclared glass shows none), amplitude
+     from the recipe's own alpha/gc and the flat composite beneath.
+     Fitted amplitudes on every single-layer bundle: 0.92–1.11 of the
+     law (sign flips confirmed: white ring +, #888-on-gray −, diskd —
+     all as predicted). All recipe-derivable: zero target measurement.
+   - **Model form** (per-contour additive (d×φ×thickness-class) LUT +
+     the ramp): per-bundle R² 0.84–0.99 on all 14 bundles — pcr 0.92,
+     ring56w 0.91 (union: 0.30 both), apple 0.99, overcast 0.84.
+   - **Zero-measurement transfer** (LUT fit on all other bundles' 
+     ramp-removed fields + derived ramp): R² 0.57–0.91 / r 0.75–0.97
+     for 12 of 14; apple 0.03.
+   - **End-to-end** (pass-1 recipe + PREDICTED lightmap, leave-target-
+     out, rendered and scored vs ictool at 1024/64): podcastrepublic
+     **5.36**/6.41, overcast-premiumblue **6.28**/6.14, overcast
+     **7.28**/8.26 (vs pass-1 9.8–10.7 and same-res measured bakes
+     3.05–4.73; measured band 2.2–7.6) — inside or at the edge of the
+     adopted band with no measurement of the target. **apple 28.1**
+     (pass1 28.6): its lavender bloom — half its residual energy lives
+     >48px from any edge — is an interior-lighting regime of highly
+     TRANSPARENT glass (its circles measure alpha 0.165–0; every other
+     bundle ≥0.72) that the corpus never sampled and edge kernels
+     cannot express.
+   - Verdict: **conditional GO.** Universal glass lighting = per-contour
+     edge LUT (shared) + family material ramp (translucency-declared,
+     recipe-amplitude) covers normal-alpha glass at predicted-lightmap
+     RMSE 5.4–7.3; the open cell is the low-alpha interior bloom
+     (needs a translucent-artwork instrument sweep, apple-class), and
+     ramp anchoring (canvas-y vs glass-bounds-y) stayed indistinguishable
+     on this corpus (all instruments span similar y; an off-center
+     high-contrast glass decides it). Prior-claim corrections: item 4's
+     R² 0.86–0.87 union numbers don't reproduce on fresh unquantized
+     fields (apple 0.80, overcast 0.50 — the baked lightmaps' deadzone
+     quantization zeroed noise), and item 3's material invariance
+     holds for edge lighting but NOT for the interior ramp, which is
+     material- (artwork-lightness-) and translucency-dependent.
+6. **`automatic-gradient` fit** (33-color sweep): below ~0.775
    lightness the gradient is [lightened(input), input]; above, it
    flips to [input, darkened(input)]. The lightening is
    hue-preserving (rides the dominant channels, small additive floor
@@ -408,8 +460,10 @@ closing instruments:
   radiopublic's flat fields match GT exactly at sampled pixels; its
   3.31 is the same edge class.
 
-Glass icons now await the per-layer lighting model (the material
-family is measured); raster-art bundles a PNG-decode decision. The player's coverage today: flat + SVG, 38 bundles at
+Glass lighting has a measured conditional GO (feasibility probe 5:
+per-contour edge LUT + the translucency-declared material ramp,
+predicted-lightmap RMSE 5.4–7.3 on normal-alpha glass; low-alpha
+interior bloom still open); raster-art bundles a PNG-decode decision. The player's coverage today: flat + SVG, 38 bundles at
 median RMSE 2.36, **38/38 ≤ 4.0, worst 3.98** (the first sweep's
 worst was 183 with fifteen bundles above 40; the milestone sweep's
 median was 4.16 with eleven above 5.5, worst 14.6). What remains is
