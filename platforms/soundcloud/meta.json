@@ -1,6 +1,7 @@
 {
   "name": "Soundcloud",
   "active": true,
+  "url": "https://soundcloud.com",
   "guidelinesUrl": "https://press.soundcloud.com/media_kits/228462/",
   "liquidGlass": {
     "bundles": [

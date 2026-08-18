@@ -1,6 +1,7 @@
 {
   "name": "Subscribe by Email",
   "active": true,
+  "url": "https://www.subscribebyemail.com",
   "guidelinesUrl": "https://www.subscribebyemail.com/podcasters/",
   "liquidGlass": {
     "bundles": [

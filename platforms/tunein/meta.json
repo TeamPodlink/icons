@@ -1,6 +1,7 @@
 {
   "name": "TuneIn",
   "active": true,
+  "url": "https://tunein.com",
   "liquidGlass": {
     "bundles": [
       {
