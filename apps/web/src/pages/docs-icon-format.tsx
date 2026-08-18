@@ -4,11 +4,11 @@ import survey from "@/lib/icon-spec-survey.json";
 import { useTitle } from "@/lib/use-title";
 
 export function IconFormatDocs() {
-  useTitle("The .icon format — refraction");
+  useTitle("Liquid Glass — refraction");
   const { firstParty, catalog } = survey.sources;
   return (
     <DocsPage
-      title="The .icon format"
+      title="Liquid Glass"
       intro={`Apple's Liquid Glass icon source format, documented empirically from ${firstParty} first-party icons extracted from Apple's own apps plus the ${catalog} bundles in this catalog. Apple publishes no spec; everything here is observed.`}
     >
       <Section title="Bundle anatomy">
