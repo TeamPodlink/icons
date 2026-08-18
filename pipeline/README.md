@@ -330,11 +330,33 @@ instrument pair-curves (10 sRGB + 8 p3, in- and out-of-gamut) fit at
 14.62 → 2.12, itunes 2.20 → 1.78, tunestr 9.00 → 8.78; resso
 2.40 → 2.45 (red-ceiling constant, see below).
 
+**The display-p3 solid soft-knee (solved 2026-08-17,
+`probe-p3-solid.py`).** The ledger's "small unexplained deviation on
+gamut-clipped channels" resolved: sonnet's navy (sRGB R = −0.015)
+renders at R 14/255 — between the clip hypothesis (30) and raw-p3
+(0). A 35-color solid grid (centered rect, direct pixel reads, no
+curve extraction) measured the law: the sRGB round trip for
+display-p3-declared SOLIDS (layer fills, fill overrides, canvas) is
+EXTENDED-RANGE — in-gamut channels return exactly, positive
+out-of-gamut channels pass through, and only NEGATIVE channels
+compress, by a soft knee in mirrored-encoded space:
+    y = −a·(1 − exp(−|x|/a)),  a = 0.238   (max err 2.3/255, n=27)
+Solids and gradient stops are now measurably DIFFERENT cells (teal's
+red: −0.0236 as a stop, −0.0388 as a solid) — the renderer's fifth
+measured color path. One sweep-wide fix in `p3_to_render`: sonnet
+9.63 → 2.99, podhero 8.47 → 2.28, podfriend 8.52 → 3.22,
+podcastindex 7.66 → 3.02, mixerbox 7.13 → 2.61, bullhorn
+5.47 → 1.84, breaker 5.29 → 2.86, spotify 4.64 → 2.47, rephonic
+4.49 → 1.49 — fourteen bundles improved by ≥ 0.5, none regressed.
+
 Glass icons now await the per-layer lighting model (the material
 family is measured); raster-art bundles a PNG-decode decision. The player's coverage today: flat + SVG, 38 bundles at
-median RMSE 3.4, **31/38 ≤ 5.5, worst 9.6**; remaining: sonnet 9.6,
-tunestr 8.8, podfriend 8.5, podhero 8.5, podcastindex 7.7, mixerbox
-7.1 — the display-p3 solid deviation is the shared suspect.
+median RMSE 2.41, **37/38 ≤ 5.5, worst 8.8** (the first sweep's
+worst was 183 with fifteen bundles above 40); remaining: tunestr
+8.8 (its SVG filter chain — inner-shadow highlight, drop shadow,
+fade-to-transparent glow — accounts for only 2.1 of it; the rest is
+under investigation), and resso carries a +0.08 shift from the
+measured red-ceiling constant.
 
 ## Adding a platform or icon
 

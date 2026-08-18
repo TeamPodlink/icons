@@ -76,9 +76,18 @@ def srgb_to_render(rgb01):
 
 
 def p3_to_render(rgb01):
-    # declared display-p3 -> composited-in-sRGB (clip) -> P3-coded
-    srgb = np.clip(_P3_TO_SRGB @ _lin(rgb01), 0, 1)
-    p3 = _enc(_SRGB_TO_P3 @ srgb)
+    # declared display-p3 SOLID -> P3-coded render value. Measured
+    # (probe-p3-solid.py, 35-color grid): the sRGB round trip is
+    # EXTENDED-RANGE — in-gamut values come back exactly; only negative
+    # sRGB channels are compressed, by a soft knee in mirrored-encoded
+    # space (y = -a(1-exp(-|x|/a)), a = 0.238, max err 2.3/255; hard
+    # clipping missed sonnet's navy by 16/255 in red). Values > 1 pass
+    # through (identity within 0.005 linear). Gradient STOPS compress
+    # harder — that is the separate stop law (gradient_stop_ext).
+    e = _enc_ext(_P3_TO_SRGB @ _lin(rgb01))
+    A = 0.238
+    e = np.where(e < 0, -A * (1 - np.exp(-np.abs(e) / A)), e)
+    p3 = np.clip(_enc_ext(_SRGB_TO_P3 @ _lin_ext(e)), 0, 1)
     return [round(float(v) * 255, 1) for v in p3]
 
 
