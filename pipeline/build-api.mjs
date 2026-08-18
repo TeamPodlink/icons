@@ -6,7 +6,7 @@
 // retired with the server: consumers fetch the full list and filter
 // client-side). Runs after build-data.mjs (it reads platforms.gen.json).
 //
-// URLs: SITE_URL sets the site origin for flat/badge/registry URLs
+// URLs: SITE_URL sets the site origin for flat/badge URLs
 // (default http://localhost:4173); Liquid Glass asset URLs come from
 // VITE_ASSET_BASE when set (production: the immutable R2 release prefix),
 // else <origin>/library.
@@ -92,8 +92,6 @@ function platformJson(p) {
       darkStatus: b.darkStatus,
       source: b.source,
       assets: glassAssets(b.slug, b.hasDark),
-      registryItem: `${SITE_URL}/r/${b.slug}.json`,
-      shadcn: `npx shadcn@latest add @refraction/${b.slug}`,
     })),
   };
 }

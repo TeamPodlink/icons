@@ -5,8 +5,8 @@ name: Deploy
 #   CLOUDFLARE_API_TOKEN    Workers deploy token
 #   CLOUDFLARE_ACCOUNT_ID   Cloudflare account id
 # The build points Liquid Glass images at the immutable R2 release prefix
-# for the version in packages/refraction/package.json; RELEASE_CHECK=1
-# fails the build if that release was never uploaded (pnpm release:assets).
+# for the version in packages/refraction/package.json (uploaded with
+# pnpm release:assets).
 
 on:
   push:
@@ -45,7 +45,6 @@ jobs:
         env:
           SITE_URL: https://icons.podlink.com
           VITE_ASSET_BASE: https://assets.icons.podlink.com/${{ steps.release.outputs.version }}
-          RELEASE_CHECK: "1"
 
       - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@v3

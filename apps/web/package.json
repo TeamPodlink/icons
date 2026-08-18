@@ -4,9 +4,9 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "predev": "node ../../pipeline/build-data.mjs && node ../../pipeline/sync-web-assets.mjs && node ../../pipeline/build-registry.mjs && node ../../pipeline/build-api.mjs",
+    "predev": "node ../../pipeline/build-data.mjs && node ../../pipeline/sync-web-assets.mjs && node ../../pipeline/build-api.mjs",
     "dev": "vite --port 4173 --strictPort",
-    "prebuild": "node ../../pipeline/build-data.mjs && node ../../pipeline/sync-web-assets.mjs && node ../../pipeline/build-registry.mjs && node ../../pipeline/build-api.mjs",
+    "prebuild": "node ../../pipeline/build-data.mjs && node ../../pipeline/sync-web-assets.mjs && node ../../pipeline/build-api.mjs",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview"
   },

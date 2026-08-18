@@ -43,7 +43,6 @@ packages/icons/src/data/platforms.json
 apps/web/public/library/
 apps/web/public/flat/
 apps/web/public/badges/
-apps/web/public/r/
 apps/web/public/api/
 apps/web/lib/platforms.gen.json
 
