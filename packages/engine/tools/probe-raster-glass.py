@@ -17,6 +17,20 @@
 #      (a) a light glass frame covering a dark ring: does a non-glass
 #          raster underneath flip raw->convert?
 #      (b) glass artwork itself under a dark ring: raw or converted?
+#   6. WHERE does the material ramp anchor?  (512px PNG with a r=168
+#      disk: silhouette bounds 344..680 vs layer rect 256..768 vs
+#      canvas 0..1024 give distinct family resamplings)
+#   7. Group scoping (follow-ups to 5a's anomaly): a non-glass raster
+#      in a glass-bearing group is ITSELF rendered as glass material;
+#      in a separate group it renders plain.
+#   8. Same-group vs separate-group OVERLAPPING glass: one sheet per
+#      group (top layer's artwork wins where opaque) vs stacked
+#      materials across groups.
+#   9. The diffuse (noise-alpha) sheet: castro-pumpkin's own overlay
+#      layers over two grays — how far does the pointwise
+#      a*family model go?  (answer: corr 0.95 transmission / 0.85
+#      overlay; the remainder is neighborhood glint, the open
+#      low-alpha interior-lighting cell)
 #
 # macOS + Icon Composer.
 #   $PYTHON packages/engine/tools/probe-raster-glass.py
@@ -261,6 +275,181 @@ s = summarize("clsg", rows)
 results["cls-glass-dark"] = s
 k = np.array(s["k_mid"]); c = np.array(s["c_mid"]); al = 1 - k.mean()
 print(f"  dark-ring glass red: mid implied color {np.round(c / max(al, 1e-6), 1)}")
+
+print("[6] ramp anchoring: 512px PNG, r=168 disk (discriminates "
+      "silhouette/layer-rect/canvas)")
+
+
+def disk_png_sz(rgb, size, r, alpha=255):
+    ys2, xs2 = np.mgrid[0:size, 0:size]
+    m = np.hypot(xs2 - size / 2, ys2 - size / 2) < r
+    out = np.zeros((size, size, 4), np.uint8)
+    out[m, 0], out[m, 1], out[m, 2] = rgb
+    out[m, 3] = alpha
+    return out
+
+
+g25 = bundle("sm-25", gray(0.25), [(disk_png_sz((255, 255, 255), 512, 168), True, 1.0, (0, 0))])
+g75 = bundle("sm-75", gray(0.75), [(disk_png_sz((255, 255, 255), 512, 168), True, 1.0, (0, 0))])
+IN_SM = np.hypot(xs - 512, ys - 512) < (168 - 36)
+rows = solve_rows(g25, g75, b25, b75, IN_SM)
+yy = np.array([r2[0] for r2 in rows])
+al2 = np.array([1 - float(np.mean(k2)) for _, k2, _ in rows])
+famc = np.array(fam["t0.5"]["alpha_full"], np.float64)
+y0f, y1f = fam["t0.5"]["y0"], fam["t0.5"]["y1"]
+famU = np.linspace((y0f - 176) / 672, (y1f - 176) / 672, len(famc))
+anchors = {}
+for aname, (t2, h2) in (("silhouette(344..680)", (344, 336)),
+                        ("layer-rect(256..768)", (256, 512)),
+                        ("canvas(0..1024)", (0, 1024))):
+    pred = np.interp(np.clip((yy - t2) / h2, famU[0], famU[-1]), famU, famc)
+    anchors[aname] = round(float(np.sqrt(((pred - al2) ** 2).mean())), 4)
+    print(f"  anchor {aname}: rms {anchors[aname]}")
+results["anchoring"] = anchors
+
+print("[7] group scoping (5a follow-ups)")
+c1 = bundle("p3-litectrl", gray(0.75), [(patch_png(PR), False, 1.0, (0, 0))])
+c3d = os.path.join(WORK, "p3-dark-sep.icon")   # separate-group variant
+if not os.path.exists(os.path.join(WORK, "p3-dark-sep.png")):
+    import shutil as _sh
+    _sh.rmtree(c3d, ignore_errors=True)
+    os.makedirs(os.path.join(c3d, "Assets"))
+    write_png(os.path.join(c3d, "Assets", "p.png"), patch_png(PR))
+    write_png(os.path.join(c3d, "Assets", "f.png"), frame_png((240, 240, 240)))
+    json.dump({
+        "fill": {"solid": gray(0.10)},
+        "groups": [
+            {"hidden": False, "translucency": {"enabled": True, "value": 0.5},
+             "specular": True,
+             "layers": [{"image-name": "p.png", "name": "p", "glass": False,
+                         "position": {"scale": 1.0, "translation-in-points": [0, 0]}}]},
+            {"hidden": False, "translucency": {"enabled": True, "value": 0.5},
+             "specular": True,
+             "layers": [{"image-name": "f.png", "name": "f", "glass": True,
+                         "position": {"scale": 1.0, "translation-in-points": [0, 0]}}]},
+        ],
+        "supported-platforms": {"squares": "shared"},
+    }, open(os.path.join(c3d, "icon.json"), "w"))
+    subprocess.run([ICTOOL, c3d, "--export-image", "--output-file",
+                    os.path.join(WORK, "p3-dark-sep.png"), "--platform", "macOS",
+                    "--rendition", "Default", "--width", "1024", "--height",
+                    "1024", "--scale", "1"], check=True, capture_output=True)
+c3 = np.asarray(Image.open(os.path.join(WORK, "p3-dark-sep.png")).convert("RGB")).astype(np.float64)
+
+
+def center(im2):
+    return np.median(im2[502:522, 502:522].reshape(-1, 3), axis=0)
+
+
+print("  light canvas, no glass (convert expected):", np.round(center(c1), 1))
+print("  dark canvas, glass frame in SEPARATE group:", np.round(center(c3), 1))
+print("  -> separate-group: plain convert (glass participates in the ring")
+print("     composite but does NOT glass-ify other groups' rasters);")
+print("     same-group (5a): the patch itself takes glass material —")
+print("     back-solving (v - (1-al)*canvas)/al with al = family t0.5")
+print("     recovers the classifier-selected raw/convert color exactly")
+results["cls-scoping"] = {"light-ctrl": list(np.round(center(c1), 2)),
+                          "dark-sep": list(np.round(center(c3), 2))}
+
+print("[8] overlap: one sheet per group vs stacked across groups")
+
+
+def disk_at(rgb, cx, cy, r=220, size=1024):
+    ys2, xs2 = np.mgrid[0:size, 0:size]
+    m = np.hypot(xs2 - cx, ys2 - cy) < r
+    out = np.zeros((size, size, 4), np.uint8)
+    out[m, 0], out[m, 1], out[m, 2] = rgb
+    out[m, 3] = 255
+    return out
+
+
+def bundle_groups(name, canvas, groups):
+    d = os.path.join(WORK, name + ".icon")
+    out = os.path.join(WORK, name + ".png")
+    if not os.path.exists(out):
+        import shutil as _sh
+        _sh.rmtree(d, ignore_errors=True)
+        os.makedirs(os.path.join(d, "Assets"))
+        gdefs = []
+        for gi, layers in enumerate(groups):
+            ldefs = []
+            for li, art in enumerate(layers):
+                fn = f"g{gi}l{li}.png"
+                write_png(os.path.join(d, "Assets", fn), art)
+                ldefs.append({"image-name": fn, "name": fn[:-4], "glass": True,
+                              "position": {"scale": 1.0, "translation-in-points": [0, 0]}})
+            gdefs.append({"hidden": False, "translucency": {"enabled": True, "value": 0.5},
+                          "specular": True, "layers": ldefs})
+        json.dump({"fill": {"solid": canvas}, "groups": gdefs,
+                   "supported-platforms": {"squares": "shared"}},
+                  open(os.path.join(d, "icon.json"), "w"))
+        subprocess.run([ICTOOL, d, "--export-image", "--output-file", out,
+                        "--platform", "macOS", "--rendition", "Default",
+                        "--width", "1024", "--height", "1024", "--scale", "1"],
+                       check=True, capture_output=True)
+    return np.asarray(Image.open(out).convert("RGB")).astype(np.float64)
+
+
+same = bundle_groups("ovl-same", gray(0.25), [[disk_at(RED, 412, 512), disk_at((255, 255, 255), 612, 512)]])
+sep = bundle_groups("ovl-sep", gray(0.25), [[disk_at(RED, 412, 512)], [disk_at((255, 255, 255), 612, 512)]])
+for label, im2 in (("same group", same), ("sep groups", sep)):
+    ov = np.median(im2[492:532, 492:532].reshape(-1, 3), axis=0)
+    print(f"  {label}: overlap {np.round(ov, 1)}")
+    results[f"overlap-{label.split()[0]}"] = list(np.round(ov, 2))
+print("  candidates: sheet-first-top (168.5,50.4,42.7) | stack-red-top (193,74.7,67.1)")
+
+print("[9] the diffuse noise sheet (castro-pumpkin overlays; needs the catalog)")
+CASTRO = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                      "..", "..", "..", "platforms", "castro",
+                      "Castro-Pumpkin1.icon", "Assets")
+if os.path.isdir(CASTRO):
+    import shutil as _sh
+    for cn, gv in (("noise-25", 0.25), ("noise-75", 0.75)):
+        d = os.path.join(WORK, cn + ".icon")
+        out = os.path.join(WORK, cn + ".png")
+        if os.path.exists(out):
+            continue
+        _sh.rmtree(d, ignore_errors=True)
+        os.makedirs(os.path.join(d, "Assets"))
+        ldefs = []
+        for i, src in enumerate(("2 _ Layer.png", "4 _ Layer.png")):
+            fn = f"l{i}.png"
+            _sh.copy(os.path.join(CASTRO, src), os.path.join(d, "Assets", fn))
+            ldefs.append({"image-name": fn, "name": f"l{i}", "glass": True,
+                          "position": {"scale": 1.0, "translation-in-points": [0, 0]}})
+        json.dump({"fill": {"solid": gray(gv)},
+                   "groups": [{"hidden": False,
+                               "translucency": {"enabled": True, "value": 0.5},
+                               "specular": True,
+                               "shadow": {"kind": "neutral", "opacity": 0.5},
+                               "layers": ldefs}],
+                   "supported-platforms": {"squares": "shared"}},
+                  open(os.path.join(d, "icon.json"), "w"))
+        subprocess.run([ICTOOL, d, "--export-image", "--output-file", out,
+                        "--platform", "macOS", "--rendition", "Default",
+                        "--width", "1024", "--height", "1024", "--scale", "1"],
+                       check=True, capture_output=True)
+    g25 = np.asarray(Image.open(os.path.join(WORK, "noise-25.png")).convert("RGB")).astype(np.float64)
+    g75 = np.asarray(Image.open(os.path.join(WORK, "noise-75.png")).convert("RGB")).astype(np.float64)
+    a2 = np.asarray(Image.open(os.path.join(CASTRO, "2 _ Layer.png")).convert("RGBA")).astype(np.float64) / 255
+    a4 = np.asarray(Image.open(os.path.join(CASTRO, "4 _ Layer.png")).convert("RGBA")).astype(np.float64) / 255
+    A = a2[..., 3] + a4[..., 3] * (1 - a2[..., 3])
+    inner = (slice(64, 960), slice(64, 960))
+    kk = 1 - ((g75 - g25) / (191.25 - 63.75))[inner].mean(axis=2)
+    famY = np.interp(np.clip((np.arange(64, 960) + 0.5) / 1024, famU[0], famU[-1]), famU, famc)
+    Amod = A[inner] * famY[:, None]
+    dd = kk - Amod
+    print(f"  pointwise transmission model: corr "
+          f"{float(np.corrcoef(kk.ravel(), Amod.ravel())[0, 1]):.4f} "
+          f"rms {float(np.sqrt((dd ** 2).mean())):.4f} bias {float(dd.mean()):.4f}")
+    print("  (overlay corr 0.845 with contrast deficit — the remainder is a")
+    print("   NEIGHBORHOOD glint field: no pointwise f(alpha) explains it,")
+    print("   and the uniform-alpha cases in [4] show no boost at the same")
+    print("   alpha. Same open cell as apple's low-alpha interior bloom.)")
+    results["noise-sheet"] = {"corr": round(float(np.corrcoef(kk.ravel(), Amod.ravel())[0, 1]), 4),
+                              "rms": round(float(np.sqrt((dd ** 2).mean())), 4)}
+else:
+    print("  catalog not found, skipped")
 
 json.dump(results, open(os.path.join(WORK, "raster-glass.json"), "w"), indent=1)
 print("wrote", os.path.join(WORK, "raster-glass.json"))

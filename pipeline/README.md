@@ -460,13 +460,14 @@ closing instruments:
   radiopublic's flat fields match GT exactly at sampled pixels; its
   3.31 is the same edge class.
 
-The player's coverage today: every flat catalog bundle, SVG or
-raster, plus all-SVG glass. Flat SVG: 38 bundles at median RMSE 2.36,
-**38/38 ≤ 4.0, worst 3.69** (the first sweep's worst was 183 with
-fifteen bundles above 40; the milestone sweep's median was 4.16 with
-eleven above 5.5, worst 14.6). Flat raster: **47/47 at median 1.39,
-all ≤ 2.99** (see "Raster layers" below). Glass: the five catalog
-bundles at 4.3–7.7 plus apple's bounded 17.3 (see "Glass synthesis"
+The player's coverage today: EVERY catalog bundle — flat or glass,
+SVG or raster artwork (92/92 scored, 0 skipped). Flat SVG: 38 bundles
+at median RMSE 2.36, **38/38 ≤ 4.0, worst 3.69** (the first sweep's
+worst was 183 with fifteen bundles above 40; the milestone sweep's
+median was 4.16 with eleven above 5.5, worst 14.6). Flat raster:
+**median 1.39, all ≤ 2.99** (see "Raster layers" below). Glass: eight
+bundles — six at 4.30–7.69, plus castro-pumpkin 16.2 and apple 17.3,
+both bounded (see "Glass synthesis" and "Raster-artwork glass"
 below). What remains in the flat tail is bounded: podlp 3.69,
 curiocaster 3.36, tunein 3.33 (colored auto-gradient, approximate),
 radiopublic 3.31 (rasterizer edge AA).
@@ -637,9 +638,80 @@ offsets (512/800×400/1200×500/scale-2/translate instruments).
 
 Remaining raster tail, all bounded: rss 2.99 / luminary 2.46 /
 playerfm 2.46 (glyph-edge AA + the alpha-lerp-space gap), goodpods
-2.06, downcast 2.24. Glass-bearing raster bundles (castamatic,
-castro-pumpkin, moonfm) still skip as NOT FLAT — they join via the
-glass-synthesis workstream.
+2.06, downcast 2.24.
+
+## Raster-artwork glass (solved 2026-08-18, `probe-raster-glass.py`)
+
+The three PNG-art glass bundles — the only place the raster and glass
+paths compose — scored 8.78/27.13/28.18 after the two workstreams
+merged, because the translator's `.png` branch ran before its glass
+check: glass PNGs rendered as plain raster layers (no material, no
+lighting, no shadow). The composition cell measured (14 authored
+probe bundles + region attribution on the targets):
+
+- **The material family applies to PNG-art glass — anchored to the
+  PLACED LAYER RECT**, not the silhouette bounds (SVG glass) and not
+  canvas-y: a 512px PNG with a r=168 disk discriminates all three
+  (rect rms 0.0042 vs 0.038/0.043). For multi-layer sheets the
+  translator uses the union of the group's layer rects (assumed, not
+  separately discriminated — the catalog's sheets have near-identical
+  member rects).
+- **Material color is PER-PIXEL artwork color** through the standard
+  sRGB→P3 composite conversion (half-red/half-white disk: crisp 5px
+  boundary; implied colors refute raw and the p3 soft-knee). Glass
+  artwork NEVER takes the raw dark path — a dark-ring red disk still
+  converts — but glass layers DO participate in the border-ring
+  composite that classifies OTHER raster layers (a light glass frame
+  flips a dark-ring patch raw→convert even from a separate group;
+  `raster_dark_verdict` already composited all PNG layers, confirmed
+  correct).
+- **Artwork alpha is straight and multiplies the family curve**
+  (uniform a128/a64 disks: rms 0.010–0.021 vs `a·family(u)`).
+- **Same-group glass layers form ONE SHEET; separate groups stack.**
+  Two overlapping opaque disks in one group measure exactly the top
+  layer's sheet value (167,48,41 vs sheet prediction 168.5,50.4,42.7);
+  in separate groups the overlap measures 191,69,64 vs the engine's
+  existing stack model 193,74.7,67.1. First layer/group = top. The
+  translator composites each group's glass PNGs source-over in encoded
+  space and emits one glass entry per group. (Same-group SVG glass is
+  still emitted as stacked entries — exact when non-overlapping, which
+  is the validated catalog case.)
+- **Side discovery:** a NON-glass raster in a glass-bearing group is
+  itself rendered as glass material (two-canvas joint solve: α 0.849 ≈
+  family t0.5 mid 0.846, color = the classifier-selected raw/convert
+  path). No Default-rendition catalog layer hits this cell (the
+  targets' non-glass siblings are opacity-0 in light mode); recorded,
+  not implemented.
+
+Engine: glass entries gained optional `mi` {w,h,x,y,s,z} — per-pixel
+material image (RGBA in render space; texel RGB = material color,
+texel alpha = coverage, nearest-sampled). The path mask still drives
+the height field/refraction/shadow; geometry comes from the sheet's
+opaque (α≥0.9) contours via marching-squares + RDP. Absent `mi`
+everything reduces op-for-op to the constant-gc form: regen
+byte-stable, six adopted recipes hash-identical at 256 `{exact:true}`.
+Shadow now honors `kind: "none"` (moonfm's template group; no other
+bundle declares it).
+
+Zero-measurement results vs fresh ictool GT, @1024 (@64):
+castamatic 8.78 → **4.71** (5.03), moonfm 28.18 → **5.46** (4.96),
+castro-pumpkin 27.13 → **16.22** (12.54, bounded). castro's residual
+is 74% the two full-canvas partial-alpha noise overlays (mean α
+0.18/0.35 — "diffuse" sheets, solidity < 0.3, material-only): the
+pointwise law explains corr 0.85 of that region's overlay and its
+solid-glass region scores 7.3, but the remainder is a NEIGHBORHOOD
+glint field — the isolated noise-sheet instrument (castro's own
+overlays over two grays) shows overlay variance ~19/255 beyond any
+pointwise f(α) model while the uniform-alpha instrument shows none at
+the same α. That is the same open cell as apple's low-alpha interior
+bloom (17.3): micro-relief lighting of highly transparent artwork,
+needing the translucent-artwork instrument sweep.
+
+Full-sweep confirmation (fresh GT, 92/92 scored): the flat cohort held
+bit-for-bit at its recorded band (84 bundles, combined median 1.75,
+worst podlp 3.69), and the SVG glass five reproduced exactly —
+podcastrepublic 4.30, overcast-premiumblue 5.86, overcast-dark 7.66,
+overcast 7.69, apple 17.27. Glass cohort (8): median 6.76.
 
 ## Adding a platform or icon
 
