@@ -9,7 +9,7 @@ function MaterialsIcon({ size = 16 }: { size?: number; strokeWidth?: number }) {
     </svg>
   );
 }
-import { categorySlug, getCategories, glassCards, visibleCards } from "@/lib/platforms";
+import { categorySlug, getCategories, visibleCards } from "@/lib/platforms";
 import { ScrollFade } from "@/components/scroll-fade";
 import { cn } from "@/lib/cn";
 
@@ -31,13 +31,7 @@ export function Sidebar() {
   const categories = getCategories();
 
   const links = [
-    { href: "/", label: "Home", icon: House, badge: visibleCards.length },
-    {
-      href: "/liquid-glass",
-      label: "Liquid Glass",
-      icon: MaterialsIcon,
-      badge: glassCards.length,
-    },
+    { href: "/", label: "Icons", icon: MaterialsIcon, badge: visibleCards.length },
     { href: "/docs/icon-format", label: ".icon Format", icon: Braces },
   ];
 

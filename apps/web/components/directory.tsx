@@ -31,7 +31,6 @@ export function Directory({
 }: {
   cards: Card[];
   heading: string;
-  /** Hidden on the glass-only page (/liquid-glass). */
   facetSwitcher?: boolean;
 }) {
   const [query, setQuery] = useUrlState("search", "");

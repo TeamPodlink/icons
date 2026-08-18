@@ -160,8 +160,6 @@ export const cards: Card[] = platforms.flatMap((p): Card[] => {
  */
 export const visibleCards = cards.filter((c) => c.platform.active);
 
-export const glassCards = visibleCards.filter((c) => c.facet === "glass");
-
 /**
  * Where liquid glass raster assets are served from. Production builds set
  * VITE_ASSET_BASE to the immutable R2 release prefix

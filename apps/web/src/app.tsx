@@ -5,7 +5,6 @@ import { Sidebar } from "@/components/sidebar";
 import { IconFormatDocs } from "@/src/pages/docs-icon-format";
 import { CategoryPage } from "@/src/pages/directory-category";
 import { Home } from "@/src/pages/home";
-import { LiquidGlassPage } from "@/src/pages/liquid-glass";
 import { NotFound } from "@/src/pages/not-found";
 
 export function App() {
@@ -17,7 +16,6 @@ export function App() {
       <main className="overflow-hidden px-2 md:mr-4 md:ml-56 md:px-0">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/liquid-glass" element={<LiquidGlassPage />} />
           <Route path="/directory/:category" element={<CategoryPage />} />
           <Route path="/docs/icon-format" element={<IconFormatDocs />} />
           <Route path="*" element={<NotFound />} />
