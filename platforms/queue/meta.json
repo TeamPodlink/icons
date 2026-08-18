@@ -1,0 +1,21 @@
+{
+  "name": "Queue",
+  "active": true,
+  "aliases": [
+    "queuesimplepodcasts"
+  ],
+  "url": "https://www.eikedrescher.com/queueapp",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "queue",
+        "title": "Queue",
+        "variant": null,
+        "file": "Queue.icon",
+        "source": "appstore-artwork",
+        "appStoreId": 6639586996,
+        "hasDark": true
+      }
+    ]
+  }
+}
