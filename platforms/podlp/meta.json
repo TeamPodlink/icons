@@ -9,7 +9,7 @@
         "variant": null,
         "file": "PodLP.icon",
         "source": "flat-svg-split",
-        "hasDark": false
+        "hasDark": true
       }
     ]
   }
