@@ -427,7 +427,15 @@ export function createLiquidRenderer(recipe) {
             const f = L2.fill;
             const t = Math.min(Math.max(((px-f.x0)*(f.x1-f.x0) + (py-f.y0)*(f.y1-f.y0)) /
                      Math.max((f.x1-f.x0)**2 + (f.y1-f.y0)**2, 1e-9), 0), 1);
-            cr = f.c0[0] + (f.c1[0]-f.c0[0])*t; cg = f.c0[1] + (f.c1[1]-f.c0[1])*t; cb2 = f.c0[2] + (f.c1[2]-f.c0[2])*t;
+            if (f.cs) {   // multi-stop: st = offsets, cs = colors per stop
+              const st = f.st; let k = 1;
+              while (k < st.length - 1 && t > st[k]) k++;
+              const u = Math.min(Math.max((t - st[k-1]) / Math.max(st[k] - st[k-1], 1e-9), 0), 1);
+              const a3 = f.cs[k-1], b3 = f.cs[k];
+              cr = a3[0] + (b3[0]-a3[0])*u; cg = a3[1] + (b3[1]-a3[1])*u; cb2 = a3[2] + (b3[2]-a3[2])*u;
+            } else {
+              cr = f.c0[0] + (f.c1[0]-f.c0[0])*t; cg = f.c0[1] + (f.c1[1]-f.c0[1])*t; cb2 = f.c0[2] + (f.c1[2]-f.c0[2])*t;
+            }
           }
           r += (cr-r)*a2; g += (cg-g)*a2; b += (cb2-b)*a2;
         } else if (L2.t === "vgrad") {

@@ -225,10 +225,23 @@ translate_icon.py (gradient stops only): jam 13.2 → 1.60, resso
 (14.6; its background field fits at ~6.9 under the law, axis
 verified — the remainder sits at glyph edges, unattributed).
 
+**Multi-stop gradients + stroked rings (2026-08-17).** The engine's
+path-gradient fill gained optional multi-stop support (`st` offsets +
+`cs` colors; old two-stop recipes verified bit-identical), and the
+translator emits every stop through the stop law instead of
+truncating to endpoints — iTunes' 16-stop rainbow was the forcing
+case. Strokes on closed smooth subpaths translate as normal-offset
+annulus outlines (24 samples/cubic; general open-path stroking still
+warned). itunes: 29.8 → **2.20** (its two failure causes were the
+muted endpoint-only gradients and the dropped stroked ring).
+Per-stop `stop-opacity` ≥ 0.9 is dropped silently, lower values warn.
+
 Glass icons remain gated on the material-response sweep and the
 per-layer lighting model; raster-art bundles on a PNG-decode
 decision. The player's coverage today: flat + SVG, 37 bundles at
-median RMSE 4.0, 27/37 ≤ 5.5.
+median RMSE 3.93, 28/37 ≤ 5.5; remaining tail: use-instantiation
+(deepcast 183, podfriend 43), radial gradients (tunestr 91), knockout
+winding (tunein 70), podvine glyph-edge residual (14.6), sonnet (9.6).
 
 ## Adding a platform or icon
 

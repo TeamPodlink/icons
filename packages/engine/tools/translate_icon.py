@@ -365,6 +365,7 @@ def shape_to_path_d(tag, attrs):
 
 def parse_gradients(s):
     grads = {}
+    sop_note = set()
     for m in re.finditer(r"<linearGradient([^>]*)>(.*?)</linearGradient>", s, re.S):
         attrs, body = m.group(1), m.group(2)
         gid = re.findall(r'id="([^"]*)"', attrs)
@@ -379,6 +380,11 @@ def parse_gradients(s):
             st = attr(sa, "style", None)
             col = attr(sa, "stop-color", st) or "#000"
             off = attr(sa, "offset", st) or "0"
+            sop = attr(sa, "stop-opacity", st)
+            if sop is not None and float(sop) < 0.9:
+                # engine gradients carry no per-stop alpha; near-1 values
+                # are dropped, low ones are worth a warning
+                sop_note.add(gid[0])
             c = parse_svg_color(col if not col.startswith("stop-color") else col)
             stops.append((float(off.rstrip("%")) / (100 if "%" in off else 1), c))
         grads[gid[0]] = {
@@ -391,6 +397,8 @@ def parse_gradients(s):
         }
     # radial gradients: record ids so fills can fall back with a warning
     radial = set(re.findall(r'<radialGradient[^>]*id="([^"]*)"', s))
+    for gid in sorted(sop_note):
+        warn(f"gradient #{gid}: stop-opacity < 0.9 ignored")
     return grads, radial
 
 
@@ -453,30 +461,23 @@ def svg_elements(path):
         parent = stack[-1]
         tr = attr(attrs, "transform", style)
         M = parent[0] @ (parse_transform(tr) if tr else np.eye(3))
-        if attr(attrs, "stroke", style) not in (None, "none"):
-            strokes += 1
         if attr(attrs, "clip-path", style):
             clipped += 1
-        fill_s = attr(attrs, "fill", style)
-        if fill_s is None:
-            fill_s = parent[1] if parent[1] is not None else "#000"
         op = parent[2]
-        for nm in ("opacity", "fill-opacity"):
-            v = attr(attrs, nm, style)
-            if v:
-                op *= float(v)
-        gm = re.match(r"url\(#([^)]+)\)", fill_s.strip()) if fill_s else None
-        if gm:
-            fill = ("grad", gm.group(1))
-        else:
-            c = parse_svg_color(fill_s)
+        v = attr(attrs, "opacity", style)
+        if v:
+            op *= float(v)
+
+        def resolve_paint(s):
+            gm = re.match(r"url\(#([^)]+)\)", s.strip()) if s else None
+            if gm:
+                return ("grad", gm.group(1))
+            c = parse_svg_color(s)
             if c == "UNPARSED":
-                warn(f"unparsed fill '{fill_s}' -> black")
-                c = ("srgb", (0, 0, 0))
-            if c is None:
-                continue  # fill:none, nothing painted (strokes unsupported)
-            fill = c
-        rule = attr(attrs, "fill-rule", style) or "nonzero"
+                warn(f"unparsed paint '{s}' -> black")
+                return ("srgb", (0, 0, 0))
+            return c  # None = nothing painted
+
         cubics = []
         for cu in parse_path(d):
             tc = []
@@ -484,9 +485,85 @@ def svg_elements(path):
                 p = M @ np.array([x, y, 1.0])
                 tc.append((float(p[0]), float(p[1])))
             cubics.append(tuple(tc))
-        if cubics:
-            els.append({"cubics": cubics, "rule": rule, "fill": fill, "op": op})
+        if not cubics:
+            continue
+
+        fill_s = attr(attrs, "fill", style)
+        if fill_s is None:
+            fill_s = parent[1] if parent[1] is not None else "#000"
+        fill = resolve_paint(fill_s)
+        if fill is not None:
+            fop = op
+            v = attr(attrs, "fill-opacity", style)
+            if v:
+                fop *= float(v)
+            rule = attr(attrs, "fill-rule", style) or "nonzero"
+            els.append({"cubics": cubics, "rule": rule, "fill": fill, "op": fop})
+
+        stroke_s = attr(attrs, "stroke", style)
+        if stroke_s not in (None, "none"):
+            paint = resolve_paint(stroke_s)
+            if paint is not None:
+                w = float(attr(attrs, "stroke-width", style) or 1)
+                # width scales by the element transform (uniform-scale assumption)
+                w *= float(np.sqrt(abs(np.linalg.det(M[:2, :2]))))
+                ring = stroke_annulus(cubics, w)
+                if ring is None:
+                    strokes += 1  # open/degenerate subpath: still unsupported
+                else:
+                    sop = op
+                    v = attr(attrs, "stroke-opacity", style)
+                    if v:
+                        sop *= float(v)
+                    els.append({"cubics": ring, "rule": "evenodd", "fill": paint, "op": sop})
     return vb, els, grads, radial, strokes, clipped, uses
+
+
+def stroke_annulus(cubics, width):
+    # closed smooth subpaths -> ring outline (outer + inner polylines,
+    # evenodd). Open subpaths return None (general stroking unsupported).
+    subs = []
+    cur = []
+    for cu in cubics:
+        if cur and np.hypot(cu[0][0] - cur[-1][3][0], cu[0][1] - cur[-1][3][1]) > 1e-6:
+            subs.append(cur)
+            cur = []
+        cur.append(cu)
+    if cur:
+        subs.append(cur)
+    out = []
+    for sub in subs:
+        pts = [sub[0][0]]
+        for (P0, P1, P2, P3) in sub:
+            for k in range(1, 25):
+                t = k / 24
+                mt = 1 - t
+                pts.append((mt**3*P0[0] + 3*mt*mt*t*P1[0] + 3*mt*t*t*P2[0] + t**3*P3[0],
+                            mt**3*P0[1] + 3*mt*mt*t*P1[1] + 3*mt*t*t*P2[1] + t**3*P3[1]))
+        P = np.array(pts)
+        if np.hypot(*(P[0] - P[-1])) > 1e-3 * max(np.ptp(P, 0).max(), 1e-9):
+            return None  # open subpath
+        P = P[:-1]
+        if len(P) < 3:
+            return None
+        nxt = np.roll(P, -1, 0)
+        prv = np.roll(P, 1, 0)
+        t1 = P - prv
+        t2 = nxt - P
+        t1 /= np.maximum(np.linalg.norm(t1, axis=1, keepdims=True), 1e-9)
+        t2 /= np.maximum(np.linalg.norm(t2, axis=1, keepdims=True), 1e-9)
+        m = t1 + t2
+        m /= np.maximum(np.linalg.norm(m, axis=1, keepdims=True), 1e-9)
+        n = np.stack([-m[:, 1], m[:, 0]], 1)
+        # miter compensation, clamped (smooth curves stay ~1)
+        cosj = np.clip(np.abs((n * np.stack([-t1[:, 1], t1[:, 0]], 1)).sum(1)), 0.33, 1)
+        offs = n * (width / 2 / cosj)[:, None]
+        for poly in (P + offs, P - offs):
+            q = np.vstack([poly, poly[:1]])
+            for i in range(len(q) - 1):
+                a2, b2 = tuple(q[i]), tuple(q[i + 1])
+                out.append((a2, a2, b2, b2))
+    return out or None
 
 
 # ---------------- icon.json walk ------------------------------------------
@@ -609,8 +686,6 @@ for g in reversed(doc.get("groups", [])):
                         c = stops[0][1] if stops else ("srgb", (0, 0, 0))
                         fdesc = {"t": "solid", "c": svg_color_to_render(c)}
                     else:
-                        if len(stops) > 2:
-                            warn(f"gradient #{gid}: {len(stops)} stops, using endpoints")
                         stops.sort(key=lambda s2: s2[0])
                         GM = parse_transform(gr["transform"])
                         def gpt(xs_, ys_):
@@ -625,10 +700,14 @@ for g in reversed(doc.get("groups", [])):
                         p0 = gpt(gr["x1"], gr["y1"])
                         p1 = gpt(gr["x2"], gr["y2"])
                         fdesc = {"t": "lin",
-                                 "c0": gradient_stop_to_render(stops[0][1]),
-                                 "c1": gradient_stop_to_render(stops[-1][1]),
                                  "x0": round(p0[0], 1), "y0": round(p0[1], 1),
                                  "x1": round(p1[0], 1), "y1": round(p1[1], 1)}
+                        if len(stops) == 2:
+                            fdesc["c0"] = gradient_stop_to_render(stops[0][1])
+                            fdesc["c1"] = gradient_stop_to_render(stops[-1][1])
+                        else:
+                            fdesc["st"] = [round(o, 4) for o, _ in stops]
+                            fdesc["cs"] = [gradient_stop_to_render(c) for _, c in stops]
                 else:
                     warn(f"gradient #{gid} not found -> black")
                     fdesc = {"t": "solid", "c": [0, 0, 0]}
