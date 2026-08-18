@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <defs>
+    <linearGradient id="sfg0" gradientUnits="userSpaceOnUse" x1="152.13" y1="453.09" x2="152.13" y2="113.42">
+      <stop offset="0" stop-color="#cc6e00"/>
+      <stop offset="0.73" stop-color="#ffc107"/>
+      <stop offset="1" stop-color="#f4c73f"/>
+    </linearGradient>
+    <radialGradient id="sfg1" gradientUnits="userSpaceOnUse" cx="185.73" cy="204.0" r="145.07">
+      <stop offset="0" stop-color="#ffc107" stop-opacity="0.24706"/>
+      <stop offset="1" stop-color="#ffc107" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <g transform="scale(16.616633) translate(-23.75,-23.1875)">
+    <g transform="scale(0.29110512,0.26470588)">
+      <g transform="translate(115.0,112.2) scale(0.4091912,0.45)">
+        <path fill="url(#sfg0)" d="M219.24,0.2L236.45,143.31L370.51,199.47L233.73,255.63L227.39,407.8L124.13,291.86L0.95,330.81L124.13,199.47L0.95,86.25L132.29,109.8L219.24,0.2Z"/>
+        <path fill="none" stroke="url(#sfg1)" stroke-width="8.53333" d="M216.23,10.86L232.21,143.82L232.51,146.29L234.8,147.25L359.37,199.43L232.11,251.68L229.58,252.72L229.47,255.45L223.57,397.09L127.32,289.02L125.48,286.96L122.85,287.79L15.23,321.82L127.25,202.39L130.19,199.24L127.02,196.33L14.64,93.04L131.53,114L134.04,114.45L135.63,112.45L216.23,10.86Z"/>
+      </g>
+    </g>
+  </g>
+</svg>

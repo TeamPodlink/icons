@@ -1,4 +1,33 @@
 {
+  "fill": {
+    "solid": "srgb:1.00000,1.00000,1.00000,1.00000",
+    "fill-specializations": [
+      {
+        "value": {
+          "solid": "srgb:1.00000,1.00000,1.00000,1.00000"
+        }
+      },
+      {
+        "appearance": "dark",
+        "value": {
+          "linear-gradient": [
+            "gray:0.19200,1.00000",
+            "gray:0.07800,1.00000"
+          ],
+          "orientation": {
+            "start": {
+              "x": 0.5,
+              "y": 0
+            },
+            "stop": {
+              "x": 0.5,
+              "y": 1
+            }
+          }
+        }
+      }
+    ]
+  },
   "groups": [
     {
       "hidden": false,
@@ -10,9 +39,23 @@
       },
       "layers": [
         {
-          "image-name": "light.png",
-          "name": "light",
+          "image-name": "star.svg",
+          "name": "star",
           "glass": false
+        },
+        {
+          "image-name": "background.svg",
+          "name": "background",
+          "glass": false,
+          "opacity-specializations": [
+            {
+              "value": 1
+            },
+            {
+              "appearance": "dark",
+              "value": 0
+            }
+          ]
         }
       ]
     }
