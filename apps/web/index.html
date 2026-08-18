@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>refraction · podcast app icons</title>
+    <meta
+      name="description"
+      content="Every podcast platform's icon — Liquid Glass renders calibrated against Apple's own renderer, flat vectors, and badges. By Podlink."
+    />
+    <script>
+      // Apply the theme before first paint (class strategy, same semantics
+      // as the old next-themes setup: stored choice wins, else system).
+      try {
+        var t = localStorage.getItem("theme");
+        if (
+          t === "dark" ||
+          (t !== "light" &&
+            window.matchMedia("(prefers-color-scheme: dark)").matches)
+        )
+          document.documentElement.classList.add("dark");
+      } catch (e) {}
+    </script>
+  </head>
+  <body
+    class="overscroll-none bg-neutral-100 font-sans text-black antialiased dark:bg-neutral-950 dark:text-white"
+  >
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
