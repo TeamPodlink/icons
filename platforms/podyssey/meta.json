@@ -1,6 +1,6 @@
 {
   "name": "Podyssey",
-  "active": true,
+  "active": false,
   "guidelinesUrl": "https://podyssey.fm/podcast-creators#:~:text=Podyssey%20badge",
   "liquidGlass": {
     "bundles": [

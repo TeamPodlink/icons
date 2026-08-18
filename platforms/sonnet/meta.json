@@ -1,6 +1,6 @@
 {
   "name": "Sonnet",
-  "active": true,
+  "active": false,
   "guidelinesUrl": "https://sonnet.fm/resources",
   "liquidGlass": {
     "bundles": [
