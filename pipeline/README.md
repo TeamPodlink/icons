@@ -247,13 +247,31 @@ attribute-parsing bug (`d=` matched inside `id=`; lookups now anchor
 on whitespace) that had hidden netflix from the sweep entirely.
 deepcast 183 → **2.17**, podfriend 43 → 8.5, tunestr 91 → 9.0.
 
+**Polyline, the placement law, and the auto-gradient transfer fix
+(2026-08-17).** Three fixes from gallery review: `<polyline>` joins
+the shape set (netflix's right stem — its N is two paths and a
+polyline); a viewBox instrument sweep through ictool (7 cases)
+measured the real default for position-less layers — **scale = 1,
+one SVG unit = one canvas unit, centered, canvas-clipped** (the
+1200×500 case proves clipping over fitting; the prior `1024/natural`
+guess in both the translator and `build_recipe.py` was benign only
+because every validated bundle had a 1024 viewBox — both now
+synced); and `automatic-gradient` no longer double-applies the
+transfer for display-p3 inputs (tunein's navy canvas rendered near
+black). netflix 27 → 12.4, tunein 70 → 18.2 — with the knockout
+lettering rendering correctly, refuting the assumed winding cause.
+
+Open lead from the same review: netflix's reds and tunein's teal
+render duller than GT — layer fill-overrides may resolve colors on
+yet another path than canvas fills (probe-gamut validated canvas
+fills only). One two-render instrument would settle it.
+
 Glass icons remain gated on the material-response sweep and the
 per-layer lighting model; raster-art bundles on a PNG-decode
 decision. The player's coverage today: flat + SVG, 38 bundles at
-median RMSE 3.98, 29/38 ≤ 5.5; remaining tail: netflix 27 (newly
-unlocked, uninvestigated), podvine glyph-edge residual (14.6), sonnet
-(9.6), tunestr/podfriend (~9, radial-law refinement), knockout
-winding (tunein 70).
+median RMSE 3.93, 29/38 ≤ 5.5, worst 18.2 (was 183 at the first
+sweep); remaining: tunein 18.2 / podvine 14.6 / netflix 12.4, sonnet
+9.6, tunestr/podfriend/podhero ~8.5–9.
 
 ## Adding a platform or icon
 

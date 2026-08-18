@@ -355,7 +355,7 @@ def shape_to_path_d(tag, attrs):
         ry = f("r") if tag == "circle" else f("ry")
         return (f"M{cx-rx},{cy} A{rx},{ry} 0 1 0 {cx+rx},{cy} "
                 f"A{rx},{ry} 0 1 0 {cx-rx},{cy} Z")
-    if tag == "polygon":
+    if tag in ("polygon", "polyline"):  # fill treats both as closed
         pts = re.findall(NUM, re.findall(r'points="([^"]*)"', attrs)[0])
         d = "M" + ",".join(pts[:2]) + " " + " ".join(
             "L" + pts[i] + "," + pts[i+1] for i in range(2, len(pts) - 1, 2))
@@ -418,13 +418,13 @@ def svg_elements(path):
     uses = 0
     hidden = 0  # depth inside non-rendered containers (defs/clipPath/mask/...)
     HIDE = ("defs", "clipPath", "mask", "symbol", "pattern")
-    SHAPES = ("path", "rect", "circle", "ellipse", "polygon")
+    SHAPES = ("path", "rect", "circle", "ellipse", "polygon", "polyline")
     stack = [(np.eye(3), root_fill[0] if root_fill else None, 1.0)]
 
     # id -> (tag, attrs) for every shape anywhere (defs included), so <use>
     # can instantiate them
     by_id = {}
-    for sm in re.finditer(r"<(path|rect|circle|ellipse|polygon)([^>]*?)/?>", s):
+    for sm in re.finditer(r"<(path|rect|circle|ellipse|polygon|polyline)([^>]*?)/?>", s):
         gid = re.findall(r'\bid="([^"]*)"', sm.group(2))
         if gid:
             by_id[gid[0]] = (sm.group(1), sm.group(2))
@@ -492,7 +492,7 @@ def svg_elements(path):
                     els.append({"cubics": ring, "rule": "evenodd", "fill": paint, "op": sop})
 
     for m in re.finditer(
-        r"<(g|path|rect|circle|ellipse|polygon|use|defs|clipPath|mask|symbol|pattern"
+        r"<(g|path|rect|circle|ellipse|polygon|polyline|use|defs|clipPath|mask|symbol|pattern"
         r"|/g|/defs|/clipPath|/mask|/symbol|/pattern)([^>]*?)(/?)>",
         s,
     ):
@@ -638,7 +638,7 @@ def fill_desc_from_icon(fill):
         if kind == "gray":
             v = [v[0]] * 3
         elif kind == "display-p3":
-            v = list(np.clip(_P3_TO_SRGB @ _lin(v), 0, 1))
+            v = list(_enc(np.clip(_P3_TO_SRGB @ _lin(v), 0, 1)))
         top, bottom = auto_gradient(v)
         warn("automatic-gradient translated from measured ladder (approx for colored inputs)")
         return {"t": "lin", "c0": top, "c1": bottom,
@@ -675,9 +675,11 @@ for g in reversed(doc.get("groups", [])):
             warn(f"{name}: {clipped} element(s) use clip-path (rendered unclipped)")
         if uses:
             warn(f"{name}: {uses} <use> element(s) not instantiated")
-        natural = max(vb[2], vb[3])
         pos = l.get("position", {})
-        sc = pos.get("scale", 1024.0 / natural)
+        # position-less layers render at scale 1 (1 svg unit = 1 canvas
+        # unit), centered, canvas-clipped — measured via a viewBox sweep
+        # through ictool (7 cases; the 1200x500 case proves clip over fit)
+        sc = pos.get("scale", 1.0)
         tr = pos.get("translation-in-points", [0.0, 0.0])
         ox = (1024.0 - vb[2] * sc) / 2 + tr[0]
         oy = (1024.0 - vb[3] * sc) / 2 + tr[1]

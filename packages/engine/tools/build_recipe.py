@@ -292,9 +292,11 @@ for g in reversed(groups):
         name = l["image-name"]
         assert name.lower().endswith(".svg"), f"non-SVG layer {name} not supported by v1"
         cubics, vb, rule = svg_to_cubics(os.path.join(a.bundle, "Assets", name))
-        natural = max(vb[2], vb[3])
         pos = l.get("position", {})
-        sc = pos.get("scale", 1024.0/natural)
+        # position-less layers render at scale 1, centered, canvas-clipped
+        # (measured: see translate_icon.py; prior 1024/natural default was
+        # benign only because all validated bundles have 1024 viewBoxes)
+        sc = pos.get("scale", 1.0)
         tr = pos.get("translation-in-points", [0.0, 0.0])
         # layer anchored centered on the canvas at natural*scale, plus offset
         ox = (1024.0 - vb[2]*sc)/2 + tr[0]
