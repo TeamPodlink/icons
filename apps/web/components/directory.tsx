@@ -4,6 +4,7 @@ import { useSearchParams } from "react-router";
 import Fuse from "fuse.js";
 import { ArrowDownUp, ArrowUpDown, Search } from "lucide-react";
 import { IconCard } from "@/components/icon-card";
+import { WarningBanner } from "@/components/warning-banner";
 import { PageCard } from "@/components/page-card";
 import { facetCards, parseFacet, type Card, type Facet } from "@/lib/platforms";
 import { cn } from "@/lib/cn";
@@ -127,6 +128,7 @@ export function Directory({
             </button>
           </div>
         </div>
+        <WarningBanner />
         <div className="container mx-auto my-6 px-6 lg:px-4">
           {shown.length === 0 ? (
             <div className="flex flex-col items-center justify-center space-y-2 py-24 text-center">
