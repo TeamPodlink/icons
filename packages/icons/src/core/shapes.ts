@@ -1,6 +1,11 @@
 import type { IconShape, ShapeDefinition } from './types.js'
 
-// iOS 26 superellipse (n=4 squircle) inset ratio:
+// Podlink house squircle: one cubic per quadrant with handles at 10/11 of
+// the half-size — a close approximation of an n≈3.9 superellipse (max
+// deviation from a true n=4 squircle: 3.1px at 1024). Deliberately NOT
+// Apple's Liquid Glass mask, which is flat edges + n≈2.45 superellipse
+// corners and sits 11px away at 1024 (measured 2026-08-18; the fitted
+// Apple path lives in the icon-to-flat-svg skill).
 // At size 32: inset = 1.455, half = 16  →  ratio = 1.455 / 16
 const SQUIRCLE_RATIO = 1.455 / 16
 
