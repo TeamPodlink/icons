@@ -14,26 +14,6 @@
         "rmse": 7.12,
         "hasDark": true,
         "source": "decanted"
-      },
-      {
-        "slug": "overcast-dark",
-        "title": "Overcast Dark",
-        "variant": "Dark",
-        "file": "Overcast-Dark.icon",
-        "recipe": true,
-        "rmse": 7.6,
-        "hasDark": true,
-        "source": "decanted"
-      },
-      {
-        "slug": "overcast-premiumblue",
-        "title": "Overcast Premium Blue",
-        "variant": "Premium Blue",
-        "file": "Overcast-PremiumBlue.icon",
-        "recipe": true,
-        "rmse": 6.52,
-        "hasDark": true,
-        "source": "decanted"
       }
     ]
   }

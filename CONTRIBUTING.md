@@ -13,8 +13,8 @@ platforms/overcast/
 ```
 
 Platform ids are flat lowercase (`pocketcasts`); Liquid Glass bundle
-slugs are the platform id, plus `-variant` for alternates
-(`overcast-dark`, `castro-pumpkin`).
+slugs are the platform id, plus `-variant` for any alternate icon
+(none shipped today).
 
 ## Adding a flat icon or badge
 

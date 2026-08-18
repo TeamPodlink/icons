@@ -30,9 +30,9 @@ npx shadcn@latest add @refraction/all-icons   # everything`}</Code>
           </code>{" "}
           into your project (and the shared{" "}
           <code className="font-mono">liquid-glass-icon.tsx</code> base the
-          first time). Icon slugs are platform ids; alternates append the
-          variant (<code className="font-mono">overcast-dark</code>,{" "}
-          <code className="font-mono">castro-pumpkin</code>).
+          first time). Icon slugs are platform ids; an alternate icon would
+          append its variant (<code className="font-mono">-dark</code>,{" "}
+          <code className="font-mono">-pride</code>).
         </P>
       </Section>
 

@@ -15,7 +15,7 @@ assets/<slug>-dark*.png/webp same set, Dark rendition — only present
 ```
 
 Default bundles are named by platform id (`overcast`, `pocketcasts`);
-alternates append the variant (`overcast-dark`, `castro-pumpkin`).
+an alternate icon would append its variant (`-dark`, `-pride`).
 
 ## Use from a CDN
 

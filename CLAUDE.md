@@ -44,7 +44,7 @@ pipeline/                  lib.mjs (readPlatforms/readBundles) + generators.
 ## Conventions
 
 - Platform ids: flat lowercase alphanumeric (`pocketcasts`). Bundle
-  slugs: platform id, `-variant` suffix for alternates (`overcast-dark`).
+  slugs: platform id, `-variant` suffix for alternates (none today).
 - Aliases for old/alternate spellings live in meta.json `aliases`.
 - Generated files are NEVER committed: web public/{library,flat,badges,r},
   lib/platforms.gen.json, packages/refraction/{assets,manifest.json},
