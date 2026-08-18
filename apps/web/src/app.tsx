@@ -4,8 +4,6 @@ import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
 import { ApiDocs } from "@/src/pages/docs-api";
 import { IconFormatDocs } from "@/src/pages/docs-icon-format";
-import { RegistryDocs } from "@/src/pages/docs-registry";
-import { SelfHostingDocs } from "@/src/pages/docs-self-hosting";
 import { CategoryPage } from "@/src/pages/directory-category";
 import { Home } from "@/src/pages/home";
 import { LiquidGlassPage } from "@/src/pages/liquid-glass";
@@ -22,8 +20,6 @@ export function App() {
           <Route path="/" element={<Home />} />
           <Route path="/liquid-glass" element={<LiquidGlassPage />} />
           <Route path="/directory/:category" element={<CategoryPage />} />
-          <Route path="/docs/registry" element={<RegistryDocs />} />
-          <Route path="/docs/self-hosting" element={<SelfHostingDocs />} />
           <Route path="/docs/api" element={<ApiDocs />} />
           <Route path="/docs/icon-format" element={<IconFormatDocs />} />
           <Route path="*" element={<NotFound />} />

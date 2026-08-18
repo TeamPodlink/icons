@@ -7,14 +7,12 @@ import {
   ImageIcon,
   Link as LinkIcon,
   Sparkles,
-  Terminal,
 } from "lucide-react";
 import { renderBundleDataUri } from "refraction-engine";
 import {
   assetPath,
   categorySlug,
   flatPath,
-  shadcnCommand,
   type Card,
 } from "@/lib/platforms";
 import { cn } from "@/lib/cn";
@@ -187,14 +185,6 @@ export function IconCard({ card }: { card: Card }) {
       <div className="flex items-center space-x-0.5">
         {card.facet === "glass" ? (
           <>
-            <button
-              type="button"
-              title={`Copy shadcn command — ${shadcnCommand(b!.slug)}`}
-              onClick={() => copyText(shadcnCommand(b!.slug), shadcnCommand(b!.slug))}
-              className={actionBtn}
-            >
-              <Terminal size={16} strokeWidth={1.8} />
-            </button>
             <button
               type="button"
               title="Copy 1024px PNG to clipboard"

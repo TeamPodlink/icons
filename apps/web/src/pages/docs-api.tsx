@@ -6,7 +6,7 @@ export function ApiDocs() {
   return (
     <DocsPage
       title="JSON API"
-      intro="Metadata and asset URLs for every platform and facet, for tooling and non-React consumers. Static JSON files generated at build time — no server. For React apps, prefer the shadcn registry (Liquid Glass) or @podlink/icons (flat + badges)."
+      intro="Metadata and asset URLs for every platform and facet, for tooling and programmatic consumers. Static JSON files generated at build time — no server. For React apps, @podlink/icons ships the flat icons and badges; Liquid Glass images are downloaded per icon from the directory or hot-linked from the versioned CDN URLs below."
     >
       <Section title="Endpoints">
         <Code>{`GET /api/platforms.json          all platforms
@@ -19,9 +19,8 @@ GET /api/platforms/{id}.json     one platform`}</Code>
         <P>
           Each entry includes the flat icon URL, badge URLs (light/dark), and
           every Liquid Glass bundle with light (and, where distinct, dark)
-          asset URLs at 32-512px AVIF+WebP + 1024px PNG, its registry item URL,
-          and the shadcn install command. Liquid Glass images are served from
-          the versioned CDN prefix{" "}
+          asset URLs at 32-512px AVIF+WebP + 1024px PNG. Liquid Glass images
+          are served from the versioned CDN prefix{" "}
           <code className="font-mono">
             https://assets.icons.podlink.com/&#123;version&#125;/
           </code>

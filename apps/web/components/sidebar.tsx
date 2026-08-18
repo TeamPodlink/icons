@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router";
-import { Braces, Cloud, House, Package, Server, Sparkles } from "lucide-react";
+import { Braces, Cloud, House, Sparkles } from "lucide-react";
 import { categorySlug, getCategories, glassCards, visibleCards } from "@/lib/platforms";
 import { cn } from "@/lib/cn";
 
@@ -28,8 +28,6 @@ export function Sidebar() {
       icon: Sparkles,
       badge: glassCards.length,
     },
-    { href: "/docs/registry", label: "Registry", icon: Package },
-    { href: "/docs/self-hosting", label: "Self-hosting", icon: Server },
     { href: "/docs/api", label: "API", icon: Cloud },
     { href: "/docs/icon-format", label: ".icon Format", icon: Braces },
   ];

@@ -172,7 +172,3 @@ export function assetPath(
 export function flatPath(id: string): string {
   return `/flat/${id}.svg`;
 }
-
-export function shadcnCommand(slug: string): string {
-  return `npx shadcn@latest add @refraction/${slug}`;
-}
