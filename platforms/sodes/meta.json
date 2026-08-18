@@ -1,0 +1,17 @@
+{
+  "name": "’sodes",
+  "active": true,
+  "url": "https://jaredsinclair.com/sodes/",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "sodes",
+        "title": "’sodes",
+        "variant": null,
+        "file": "Sodes.icon",
+        "source": "decanted",
+        "hasDark": true
+      }
+    ]
+  }
+}
