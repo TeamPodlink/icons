@@ -24,27 +24,26 @@ const platforms = JSON.parse(
 );
 
 // --- QA-lens categories: keep in sync with debugCategories() in
-// apps/web/lib/platforms.ts (the site computes the same lenses). ---
-const SOURCE_LABEL = {
-  decanted: "decanted",
-  "catalog-artwork": "catalog artwork",
-  "appstore-artwork": "app store artwork",
-  "appstore-artwork-split": "artwork split",
-  "catalog-artwork-split": "artwork split",
-  "flat-svg": "svg layer",
-  "flat-svg-split": "svg split",
-  "flat-svg-browser": "browser raster",
-  "flat-svg-raster": "browser raster",
-};
+// apps/web/lib/platforms.ts (the site computes the same lenses).
+// Problems-only: every category is an actionable worklist; informational
+// facts (provenance, recipe/dark coverage) stay as data fields below. ---
+const HAND_DRAWN_SOURCES = new Set([
+  "flat-svg",
+  "flat-svg-split",
+  "flat-svg-browser",
+  "flat-svg-raster",
+]);
 
 function debugCategories(p, b) {
   const cats = [];
   if (b) {
-    if (!b.recipe) cats.push("no recipe");
-    if (!b.hasDark)
-      cats.push(b.darkStatus === "native" ? "dark as-is" : "missing dark");
-    cats.push(b.source ? SOURCE_LABEL[b.source] ?? b.source : "unlabeled source");
+    if (!b.hasDark && b.darkStatus !== "native") cats.push("missing dark");
+    if (b.source && HAND_DRAWN_SOURCES.has(b.source))
+      cats.push("hand-drawn art");
   }
+  if (!p.hasFlat) cats.push("missing flat");
+  if (!p.hasBadge) cats.push("missing badge");
+  if (!p.url) cats.push("missing url");
   if (!p.active) cats.push("inactive");
   return cats;
 }
@@ -71,9 +70,13 @@ function platformJson(p) {
     name: p.name,
     url: p.url,
     active: p.active,
-    /** Computed QA lenses (union over bundles), not editorial taxonomy. */
+    /** Computed QA lenses (problems only): platform-level problems plus
+     *  the union over bundles. Not editorial taxonomy. */
     categories: [
-      ...new Set(p.bundles.flatMap((b) => debugCategories(p, b))),
+      ...new Set([
+        ...debugCategories(p, null),
+        ...p.bundles.flatMap((b) => debugCategories(p, b)),
+      ]),
     ],
     flatIcon: p.hasFlat ? `${SITE_URL}/flat/${p.id}.svg` : null,
     badges: p.hasBadge
