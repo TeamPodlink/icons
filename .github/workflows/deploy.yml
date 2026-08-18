@@ -4,6 +4,8 @@ name: Deploy
 # Secrets (maintainer, GitHub repo settings):
 #   CLOUDFLARE_API_TOKEN    Workers deploy token
 #   CLOUDFLARE_ACCOUNT_ID   Cloudflare account id
+#   OP3_TOKEN               optional OP3 API token for the popularity
+#                           snapshot (unset -> OP3's public preview token)
 # The build points Liquid Glass images at the immutable R2 release prefix
 # for the version in packages/refraction/package.json (uploaded with
 # pnpm release:assets).
@@ -31,6 +33,17 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+
+      # Refresh the OP3 popularity snapshot at deploy time only (never at
+      # request time). An OP3 outage must not fail the deploy: on error the
+      # script leaves apps/web/lib/op3-popularity.json untouched and the
+      # site ships the committed baseline. OP3_TOKEN falls back to OP3's
+      # public preview token when the secret is unset.
+      - name: Fetch OP3 popularity
+        run: node pipeline/fetch-popularity.mjs
+        continue-on-error: true
+        env:
+          OP3_TOKEN: ${{ secrets.OP3_TOKEN }}
 
       - run: node pipeline/validate.mjs
 
