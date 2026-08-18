@@ -1,6 +1,6 @@
 ---
 name: ipatool
-description: Source a platform's icon artwork from the real iOS app — download the IPA with ipatool, check its asset catalog for a genuine Liquid Glass .icon (IconImageStack), and extract it with decant; fall back to the catalog's official 1024px marketing artwork for flat apps. Use whenever adding a platform, sourcing or updating icon artwork, or wondering what an app's icon "really" ships — NEVER hand-author or recreate artwork by eye.
+description: Source a platform's icon artwork from the real shipped app — iOS via ipatool (IPA asset catalog, decant for genuine Liquid Glass .icon stacks, marketing artwork for flat apps) or Android via the official APK's adaptive-icon layers (apktool decode, developer foreground/background separation). Use whenever adding a platform, sourcing or updating icon artwork, building a bundle for an Android-only app, or wondering what an app's icon "really" ships — NEVER hand-author or recreate artwork by eye.
 ---
 
 # Sourcing icon artwork from the shipped app
@@ -60,6 +60,95 @@ assuming a platform is flat.
    Apple-convention dark twins via `pipeline/split-raster-icons.mjs`;
    then `node pipeline/build-assets.mjs` (commits `hasDark` flips) and
    `node pipeline/validate.mjs`.
+
+## Android apps (no iOS build)
+
+Android-only apps get bundles built from the **official APK's
+adaptive-icon layers** — the developer's own foreground/background
+separation — never from our hand-drawn flat SVGs. Pilot + worked
+example: antennapod (commit `d64ded5`).
+
+### Official APK sources, in order
+
+1. **Developer GitHub releases** — a release APK signed/published by
+   the developer themselves.
+2. **F-Droid official** — `https://f-droid.org/api/v1/packages/<pkg>`
+   for versions, then `https://f-droid.org/repo/<pkg>_<code>.apk`.
+   (AntennaPod's GitHub releases carry no APK assets; F-Droid was the
+   pilot's source.)
+3. **apkeep as last resort** — NOT installed on this Mac; installing
+   it is a maintainer decision, ask first.
+
+Paid apps, auth-walled downloads, or anything requiring a Play
+account: STOP and ask the maintainer — mirror the iOS "never
+purchase" rule.
+
+### Extraction (apktool, installed via brew)
+
+1. `apktool d -f -o decoded <apk>` in scratch.
+2. `AndroidManifest.xml` → `android:icon="@mipmap/ic_launcher"` →
+   `res/mipmap-anydpi*/ic_launcher.xml` (`<adaptive-icon>`) → its
+   `<foreground>`/`<background>` drawable references. Ignore splash /
+   animation drawables (`launcher_animate*` etc.) — only the
+   adaptive-icon layers are the icon.
+3. **Vector layers** (VectorDrawable XML): `pathData` is SVG path
+   syntax — convert faithfully, no redrawing:
+   `viewportWidth/Height` → `viewBox`; `fillColor` → `fill`;
+   `fillType="evenOdd"` → `fill-rule`; `strokeColor/Width` map 1:1;
+   gradients in `<aapt:attr>` → SVG gradients with the same stops.
+4. **Raster layers**: use the highest-density mipmap (usually
+   `mipmap-xxxhdpi`, 432×432 for a 108dp layer).
+5. **Plain color background** (`@color`/`#RRGGBB`): that IS the
+   canvas fill. A gradient raster that measures as an exact linear
+   gradient (check per-row uniformity + linearity) becomes a canvas
+   `fill` gradient with stops sampled at the measured crop window.
+
+### Scaling convention (measured, antennapod pilot)
+
+Android composes a 108dp layer canvas and launchers crop the center
+~66–72dp. **Measure the app's own framing instead of assuming**: the
+official Play Store 512px icon (served from the store page /
+play-lh.googleusercontent.com, `=w512-h512`) is typically the
+developer's own crop of the same layers.
+
+- Find the crop: RMSE-scan center-crop sizes of the composited
+  432px layers resized to 512 against the Play icon (pilot: sharp
+  minimum at 273.3px = 68.33dp, centered, RMSE 4.28/255).
+- Map to the 1024 canvas: layer scale = `1024 / crop_px`; the layer
+  is drawn at `432 × 1024/crop_px` px, centered (crop offsets if the
+  scan says non-centered). Fill-gradient stops = layer gradient
+  sampled at the crop edges (pilot: fractions 0.183/0.817).
+- Verify render-vs-render: put the Play art through ictool as a
+  single-raster probe bundle and diff against the new bundle's
+  Default render — canvas material lighting cancels out. Pilot
+  agreement: RMSE 6.87/255, glyph bbox within 1px, fill within
+  1/255. A raw diff against the flat Play PNG measures the Liquid
+  Glass sheen, not fidelity — don't use it.
+
+### Bundle + dark
+
+Background → canvas `fill` (+ standard `gray:0.192→0.078` dark pin);
+foreground → glyph layer. Dark follows the measured tint law
+(pipeline/README.md ledger): SVG glyphs that pass the near-white gate
+ship as a single bare SVG layer (auto-tint); raster glyphs NEVER
+auto-tint, so monochrome-paint art gets a baked `glyph-dark.png` —
+white-coverage (alpha × whiteness projection over the per-row
+background) recolored to the default fill per row, background-matching
+pixels knocked out — via the standard opacity-specializations twin.
+Colorful art or untintable backgrounds: light-only. Note: layers baked
+against the layer gradient (translucent-white arcs etc.) recompose
+correctly over the cropped canvas fill — the crop mapping is the bake.
+`source: "adaptive-icon"` (or `"adaptive-icon-split"` with a dark
+twin). Android's `<monochrome>` themed-icon layer is a different,
+differently-scaled artwork — don't substitute it for the tint-law twin.
+
+### Android boundaries
+
+- APKs and decoded resources stay OUT of the repo — scratch only;
+  only the assembled `.icon` bundle is committed.
+- Every path/color in the bundle must trace to the APK's own
+  resources (interpolating the APK's own gradient, or projecting its
+  own pixels, is fine; drawing is not).
 
 ## Boundaries
 
