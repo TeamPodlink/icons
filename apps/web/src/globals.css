@@ -2,9 +2,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
-@theme inline {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+@theme {
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, monospace;
 }
 
 ::selection {

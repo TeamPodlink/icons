@@ -1,46 +1,56 @@
-name: Deploy to GitHub Pages
+name: Deploy
+
+# Deploys the directory site to Cloudflare (icons.podlink.com).
+# Secrets (maintainer, GitHub repo settings):
+#   CLOUDFLARE_API_TOKEN    Workers deploy token
+#   CLOUDFLARE_ACCOUNT_ID   Cloudflare account id
+# The build points Liquid Glass images at the immutable R2 release prefix
+# for the version in packages/refraction/package.json; RELEASE_CHECK=1
+# fails the build if that release was never uploaded (pnpm release:assets).
 
 on:
   push:
-    branches: [main]
+    branches: [refraction]
   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
-
 concurrency:
-  group: pages
+  group: deploy
   cancel-in-progress: false
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
     steps:
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
 
-      - run: pnpm build
+      - run: node pipeline/validate.mjs
 
-      - uses: actions/configure-pages@v5
+      - run: pnpm --filter @podlink/icons build
 
-      - uses: actions/upload-pages-artifact@v3
+      - name: Read release version
+        id: release
+        run: echo "version=$(node -p "require('./packages/refraction/package.json').version")" >> "$GITHUB_OUTPUT"
+
+      - name: Build site
+        run: pnpm --filter web build
+        env:
+          SITE_URL: https://icons.podlink.com
+          VITE_ASSET_BASE: https://assets.icons.podlink.com/${{ steps.release.outputs.version }}
+          RELEASE_CHECK: "1"
+
+      - name: Deploy to Cloudflare
+        uses: cloudflare/wrangler-action@v3
         with:
-          path: ./static
-
-      - id: deployment
-        uses: actions/deploy-pages@v4
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          workingDirectory: apps/web
+          command: deploy

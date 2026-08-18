@@ -10,6 +10,7 @@
     "build": "pnpm -r build",
     "test": "pnpm -r test",
     "assets": "node pipeline/build-assets.mjs",
+    "release:assets": "node pipeline/upload-assets.mjs",
     "registry": "node pipeline/build-registry.mjs",
     "validate": "node pipeline/validate.mjs"
   },
@@ -17,6 +18,7 @@
     "node": ">=18"
   },
   "devDependencies": {
+    "@aws-sdk/client-s3": "^3.658.0",
     "sharp": "^0.34.3"
   },
   "pnpm": {

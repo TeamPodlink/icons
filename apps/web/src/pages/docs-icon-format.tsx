@@ -1,15 +1,10 @@
-import type { Metadata } from "next";
 import { Code, DocsPage, P, Section } from "@/components/docs";
 import { SpecFieldTable } from "@/components/spec-field-table";
 import survey from "@/lib/icon-spec-survey.json";
+import { useTitle } from "@/lib/use-title";
 
-export const metadata: Metadata = {
-  title: "The .icon format — refraction",
-  description:
-    "Empirical documentation of Apple's Liquid Glass .icon bundle format, surveyed from first-party and catalog icons.",
-};
-
-export default function IconFormatPage() {
+export function IconFormatDocs() {
+  useTitle("The .icon format — refraction");
   const { firstParty, catalog } = survey.sources;
   return (
     <DocsPage

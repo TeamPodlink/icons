@@ -1,8 +1,6 @@
-"use client";
-
 import { useMemo, useRef } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { useSearchParams } from "react-router";
 import Fuse from "fuse.js";
 import { ArrowDownUp, ArrowUpDown, Search } from "lucide-react";
 import { IconCard } from "@/components/icon-card";
@@ -10,18 +8,14 @@ import { PageCard } from "@/components/page-card";
 import type { Card } from "@/lib/platforms";
 
 function useUrlState(key: string, initial: string) {
-  const router = useRouter();
-  const params = useSearchParams();
+  const [params, setParams] = useSearchParams();
   const [value, setValue] = useState(params.get(key) ?? initial);
   const set = (v: string) => {
     setValue(v);
     const next = new URLSearchParams(window.location.search);
     if (v && v !== initial) next.set(key, v);
     else next.delete(key);
-    const qs = next.toString();
-    router.replace(qs ? `?${qs}` : window.location.pathname, {
-      scroll: false,
-    });
+    setParams(next, { replace: true, preventScrollReset: true });
   };
   return [value, set] as const;
 }

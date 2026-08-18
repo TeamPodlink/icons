@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "react-router";
 import { Github } from "lucide-react";
 import { Logo } from "@/components/logo";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -9,7 +9,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-50 w-full bg-neutral-100 px-2 py-3 md:px-4 md:py-4 dark:bg-neutral-950">
       <nav className="flex w-full items-center justify-between">
-        <Link href="/" className="flex items-center space-x-2">
+        <Link to="/" className="flex items-center space-x-2">
           <Logo size={28} />
           <h2 className="text-xl font-medium tracking-tight">refraction</h2>
           <span className="mt-0.5 hidden text-sm text-neutral-500 sm:block dark:text-neutral-400">
