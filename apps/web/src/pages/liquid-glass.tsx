@@ -4,5 +4,8 @@ import { useTitle } from "@/lib/use-title";
 
 export function LiquidGlassPage() {
   useTitle("Liquid Glass · refraction");
-  return <Directory cards={glassCards} heading="Liquid Glass" />;
+  // Glass-only page by definition: no facet switcher here.
+  return (
+    <Directory cards={glassCards} heading="Liquid Glass" facetSwitcher={false} />
+  );
 }

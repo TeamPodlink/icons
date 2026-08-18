@@ -5,7 +5,8 @@ import Fuse from "fuse.js";
 import { ArrowDownUp, ArrowUpDown, Search } from "lucide-react";
 import { IconCard } from "@/components/icon-card";
 import { PageCard } from "@/components/page-card";
-import type { Card } from "@/lib/platforms";
+import { facetCards, parseFacet, type Card, type Facet } from "@/lib/platforms";
+import { cn } from "@/lib/cn";
 
 function useUrlState(key: string, initial: string) {
   const [params, setParams] = useSearchParams();
@@ -20,33 +21,44 @@ function useUrlState(key: string, initial: string) {
   return [value, set] as const;
 }
 
+const FACETS: Facet[] = ["glass", "flat", "badge"];
+
 export function Directory({
   cards,
   heading,
+  facetSwitcher = true,
 }: {
   cards: Card[];
   heading: string;
+  /** Hidden on the glass-only page (/liquid-glass). */
+  facetSwitcher?: boolean;
 }) {
   const [query, setQuery] = useUrlState("search", "");
   const [sort, setSort] = useUrlState("sort", "latest");
+  const [facetRaw, setFacet] = useUrlState("facet", "glass");
+  const facet = facetSwitcher ? parseFacet(facetRaw) : "glass";
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const base = useMemo(() => facetCards(cards, facet), [cards, facet]);
 
   const fuse = useMemo(
     () =>
-      new Fuse(cards, {
+      new Fuse(base, {
         keys: ["title", "platform.name", "platform.id"],
         threshold: 0.35,
         ignoreLocation: true,
       }),
-    [cards]
+    [base]
   );
 
   const shown = useMemo(() => {
-    const list = query ? fuse.search(query).map((r) => r.item) : [...cards];
+    const list = query ? fuse.search(query).map((r) => r.item) : [...base];
     if (!query && sort === "alphabetical")
       list.sort((a, b) => a.title.localeCompare(b.title));
     return list;
-  }, [cards, fuse, query, sort]);
+  }, [base, fuse, query, sort]);
+
+  const noun = facet === "badge" ? "badges" : "icons";
 
   return (
     <>
@@ -58,7 +70,7 @@ export function Directory({
         <input
           ref={inputRef}
           type="search"
-          placeholder={`Search ${cards.length} icons...`}
+          placeholder={`Search ${base.length} ${noun}...`}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => e.key === "Escape" && setQuery("")}
@@ -69,38 +81,64 @@ export function Directory({
         <div className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-neutral-200 bg-white/80 px-4 py-1.5 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/40">
           <p className="font-mono text-sm text-neutral-600 dark:text-neutral-400">
             {heading === "Home"
-              ? `${shown.length} icons`
-              : `${heading} — ${shown.length} icons`}
+              ? `${shown.length} ${noun}`
+              : `${heading} — ${shown.length} ${noun}`}
           </p>
-          <button
-            type="button"
-            onClick={() =>
-              setSort(sort === "alphabetical" ? "latest" : "alphabetical")
-            }
-            className="flex cursor-pointer items-center space-x-1.5 rounded-md px-2 py-1.5 text-sm text-neutral-600 hover:bg-neutral-200 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
-          >
-            {sort === "alphabetical" ? (
-              <ArrowDownUp size={16} strokeWidth={1.8} />
-            ) : (
-              <ArrowUpDown size={16} strokeWidth={1.8} />
+          <div className="flex items-center space-x-2">
+            {facetSwitcher && (
+              <div
+                role="group"
+                aria-label="Facet"
+                className="flex items-center rounded-md border border-neutral-200 p-0.5 dark:border-neutral-800"
+              >
+                {FACETS.map((f) => (
+                  <button
+                    key={f}
+                    type="button"
+                    aria-pressed={facet === f}
+                    onClick={() => setFacet(f)}
+                    className={cn(
+                      "cursor-pointer rounded px-2 py-1 font-mono text-xs capitalize",
+                      facet === f
+                        ? "bg-neutral-200 font-medium text-black dark:bg-neutral-800 dark:text-white"
+                        : "text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white"
+                    )}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
             )}
-            <span>
-              {sort === "alphabetical" ? "Sort by latest" : "Sort A-Z"}
-            </span>
-          </button>
+            <button
+              type="button"
+              onClick={() =>
+                setSort(sort === "alphabetical" ? "latest" : "alphabetical")
+              }
+              className="flex cursor-pointer items-center space-x-1.5 rounded-md px-2 py-1.5 text-sm text-neutral-600 hover:bg-neutral-200 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
+            >
+              {sort === "alphabetical" ? (
+                <ArrowDownUp size={16} strokeWidth={1.8} />
+              ) : (
+                <ArrowUpDown size={16} strokeWidth={1.8} />
+              )}
+              <span>
+                {sort === "alphabetical" ? "Sort by latest" : "Sort A-Z"}
+              </span>
+            </button>
+          </div>
         </div>
         <div className="container mx-auto my-6 px-6 lg:px-4">
           {shown.length === 0 ? (
             <div className="flex flex-col items-center justify-center space-y-2 py-24 text-center">
               <p className="text-lg font-medium">Icon not found</p>
               <p className="text-sm text-neutral-500 dark:text-neutral-400">
-                “{query}” didn’t match any icons.
+                “{query}” didn’t match any {noun}.
               </p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
               {shown.map((card) => (
-                <IconCard key={card.key} card={card} />
+                <IconCard key={card.key} card={card} facet={facet} />
               ))}
             </div>
           )}
