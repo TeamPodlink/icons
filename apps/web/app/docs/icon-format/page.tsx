@@ -232,11 +232,16 @@ kR = 0.0185   kB = 0.0320   span = 0.9540      (linear light)`}</Code>
           ≈ 255·alpha), with alpha varying smoothly in both vertical
           position and translucency — one interpolable 2D family covers
           every material setting. <code>specular</code> has zero measured
-          effect on the interior: it is edge lighting only. A conforming
-          player therefore renders a glass interior as a white overlay whose
-          alpha it looks up from the (y, translucency) family, and treats
-          specular purely as an edge-lighting pass; edge lighting itself
-          remains unmodeled here.
+          effect on the interior: it is edge lighting only. The vertical
+          axis anchors to the <em>glass layer&apos;s bounds</em>, not the
+          canvas: alpha is a function of (y − boundsTop) / boundsHeight,
+          and the normalized ramp is size-invariant (144px and 336px
+          circles fit the same curve; bounds-y fits at the ~1/255 noise
+          floor while canvas-y misses by 37–40×). A conforming player
+          therefore renders a glass interior as a white overlay whose
+          alpha it looks up from the (bounds-normalized y, translucency)
+          family, and treats specular purely as an edge-lighting pass;
+          edge lighting itself remains unmodeled here.
         </P>
       </Section>
 
