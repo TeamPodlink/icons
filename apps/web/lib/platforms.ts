@@ -25,6 +25,10 @@ export interface Platform {
   name: string;
   active: boolean;
   url: string | null;
+  /** First-addition date (YYYY-MM-DD), mined from git history — the
+   *  original TeamPodlink/badges repo or this repo, whichever is
+   *  earlier. Drives the directory's "Sort by latest". */
+  added: string | null;
   guidelinesUrl: string | null;
   hasFlat: boolean;
   hasBadge: boolean;
@@ -119,6 +123,8 @@ export interface Card {
   facet: "glass" | "flat";
   bundle: GlassBundle | null;
   categories: string[];
+  /** Platform first-addition date (YYYY-MM-DD) — see Platform.added. */
+  added: string | null;
 }
 
 export const cards: Card[] = platforms.flatMap((p): Card[] => {
@@ -130,6 +136,7 @@ export const cards: Card[] = platforms.flatMap((p): Card[] => {
       facet: "glass",
       bundle: b,
       categories: debugCategories(p, b),
+      added: p.added,
     }));
   if (p.hasFlat)
     return [
@@ -140,6 +147,7 @@ export const cards: Card[] = platforms.flatMap((p): Card[] => {
         facet: "flat",
         bundle: null,
         categories: debugCategories(p, null),
+        added: p.added,
       },
     ];
   return [];

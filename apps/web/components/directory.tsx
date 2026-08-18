@@ -54,8 +54,17 @@ export function Directory({
 
   const shown = useMemo(() => {
     const list = query ? fuse.search(query).map((r) => r.item) : [...base];
-    if (!query && sort === "alphabetical")
+    if (query) return list; // search results stay relevance-ordered
+    if (sort === "alphabetical")
       list.sort((a, b) => a.title.localeCompare(b.title));
+    else
+      // "latest": newest first-addition date first (meta.json "added",
+      // mined from git history); undated sink to the bottom; ties A-Z.
+      list.sort(
+        (a, b) =>
+          (b.added ?? "").localeCompare(a.added ?? "") ||
+          a.title.localeCompare(b.title)
+      );
     return list;
   }, [base, fuse, query, sort]);
 

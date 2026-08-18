@@ -10,6 +10,7 @@ const out = readPlatforms().map(({ id, dir, meta }) => ({
   name: meta.name,
   active: meta.active !== false,
   url: meta.url ?? null,
+  added: meta.added ?? null,
   guidelinesUrl: meta.guidelinesUrl ?? null,
   hasFlat: existsSync(join(dir, "icon.svg")),
   hasBadge: existsSync(join(dir, "badge.svg")),
