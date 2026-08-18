@@ -1,0 +1,21 @@
+{
+  "name": "JioSaavn",
+  "active": true,
+  "aliases": [
+    "saavn"
+  ],
+  "url": "https://www.jiosaavn.com",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "jiosaavn",
+        "title": "JioSaavn",
+        "variant": null,
+        "file": "JioSaavn.icon",
+        "source": "appstore-artwork-split",
+        "appStoreId": 441813332,
+        "hasDark": true
+      }
+    ]
+  }
+}
