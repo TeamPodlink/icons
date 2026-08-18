@@ -713,6 +713,57 @@ worst podlp 3.69), and the SVG glass five reproduced exactly —
 podcastrepublic 4.30, overcast-premiumblue 5.86, overcast-dark 7.66,
 overcast 7.69, apple 17.27. Glass cohort (8): median 6.76.
 
+## Dark-rendition tint law (measured 2026-08-18, `probe-dark-tint*.py`)
+
+Apple's dark-icon convention: a colored background with a white glyph
+becomes a dark canvas with the glyph TINTED in the former background
+color. Every `*-split` bundle with a white glyph shipped the untinted
+look instead (white glyph on the gray canvas) — the prior belief that
+ictool "ALWAYS auto-darkens the canvas and tints white glyphs … even
+against fill-specializations" was wrong on the gating side. Measured
+matrix (Icon Composer 2.0 ictool, ~50 authored probe bundles):
+
+- **Canvas darkening is unconditional.** Dark always renders the
+  standard gray canvas (== the explicit `gray:0.192→0.078` pin the
+  splits emit; export-P3-coded ≈ 31→15 8-bit). Fill-specializations
+  neither enable nor disable anything else.
+- **The glyph tint is per-LAYER and applies iff ALL of:**
+  1. the layer is an **SVG** — raster (PNG) layers are NEVER tinted,
+     nor adjusted at all;
+  2. the layer has **no opacity-specializations** — even
+     `[{value:1},{dark,value:1}]` disables it (so every twin/pin layer
+     the splits emitted killed the tint it relied on);
+  3. **every visible pixel is near-white**: luminance ≥ ~0.85 (gray
+     216 no / 217 yes; #ffd070 (luma .83) no; pastels ≥ .88 yes). A
+     0.2%-area black speck kills the whole layer; separate layers
+     gate independently;
+  4. the canvas DEFAULT fill has **max channel > ~0.2** (0.20 no /
+     0.21 yes, any syntax — srgb/gray/display-p3): black and dim
+     canvases keep the glyph white.
+- **The tint color is the canvas DEFAULT fill** — not the light
+  fill-specialization — sampled **per-pixel along its gradient**
+  (a white bar over the amazonmusic gradient reproduces both stops
+  row-for-row), replacing the glyph color outright (90%-gray tints to
+  the same full fill color as white).
+- Non-tinted SVG layers get a small vibrancy shift in Dark
+  (235,196,66 → 243,193,1); raster layers are byte-stable.
+
+Fixes: `build-svg-icons.mjs` white glyphs are a single bare SVG layer
+(the "pin on dim backgrounds" twin was the bug); monochrome-dark SVG
+glyphs get twins recolored to the background color (white only when
+the background is untintable). `split-raster-icons.mjs` bakes the tint
+(rasters never auto-tint): `glyph-dark.png` models the art as
+monochrome paint P over background B, projects each pixel onto B→P —
+paint → per-row background color, B-matching pixels → knockout holes
+(playapod's reel, yoto's face), blends interpolate; colorful art
+(youtube, goodpods, breez) and untintable backgrounds (podhome) get no
+twin, matching ictool's own gates. `--refresh-dark` re-bakes existing
+splits in place. Verified: all 50 split bundles' Default renditions
+pixel-identical; the 14 changed dark renditions now measure glyph hue
+== background hue; the rest byte-stable. anytimeplayer joined the split
+class (border sampling now insets 3px past baked edge artifacts) and
+gained its first dark rendition.
+
 ## Adding a platform or icon
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md).
