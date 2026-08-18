@@ -1,6 +1,11 @@
 {
   "name": "RSSRadio",
   "active": true,
+  "aliases": [
+    "rss",
+    "rsspodcasts"
+  ],
+  "url": "https://apps.apple.com/us/app/podcast-player-rssradio-app/id386600664",
   "liquidGlass": {
     "bundles": [
       {
@@ -8,8 +13,8 @@
         "title": "RSSRadio",
         "variant": null,
         "file": "RSSRadio.icon",
-        "source": "flat-svg-split",
-        "hasDark": true
+        "hasDark": true,
+        "source": "appstore-artwork-split"
       }
     ]
   }
