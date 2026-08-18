@@ -222,6 +222,24 @@ kR = 0.0185   kB = 0.0320   span = 0.9540      (linear light)`}</Code>
         </P>
       </Section>
 
+      <Section title="The glass material (measured)">
+        <P>
+          The interior of a glass layer is one universal material family,
+          not a per-icon effect. Per-row affine solves over two-gray
+          canvases, across translucency {"{0, .25, .5, .75, 1}"} crossed
+          with the specular modes, measure it as: a neutral response (chroma
+          of the gain term ≤ 0.017), a <em>white</em> overlay (constant term
+          ≈ 255·alpha), with alpha varying smoothly in both vertical
+          position and translucency — one interpolable 2D family covers
+          every material setting. <code>specular</code> has zero measured
+          effect on the interior: it is edge lighting only. A conforming
+          player therefore renders a glass interior as a white overlay whose
+          alpha it looks up from the (y, translucency) family, and treats
+          specular purely as an edge-lighting pass; edge lighting itself
+          remains unmodeled here.
+        </P>
+      </Section>
+
       <Section title="Platforms and features">
         <P>
           <code>supported-platforms</code> declares target shapes:{" "}
@@ -276,7 +294,11 @@ kR = 0.0185   kB = 0.0320   span = 0.9540      (linear light)`}</Code>
           </a>{" "}
           (host-CoreUI extraction; refraction and specular-location details
           may be incomplete on this path), then surveyed as aggregate facts —
-          key paths, counts, value spaces. Apple&apos;s artwork is not
+          key paths, counts, value spaces. The rendering laws — color
+          resolution, the gradient derivations, placement, the glass
+          material — were measured by rendering purpose-built instrument
+          bundles through Apple&apos;s own renderer (<code>ictool</code>)
+          and fitting the pixels. Apple&apos;s artwork is not
           redistributed here: the corpus informs the documentation, and the
           format itself is documented for interoperability. Everything on this
           page is observation, not specification — Apple can change any of it.
