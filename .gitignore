@@ -6,7 +6,7 @@ dist/
 static/
 
 # Generated code (rebuilt from source-icons/)
-src/generated/
+packages/icons/src/generated/
 
 # Environment variables
 .env
