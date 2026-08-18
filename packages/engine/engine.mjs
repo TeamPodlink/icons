@@ -419,7 +419,7 @@ export function createLiquidRenderer(recipe) {
       for (let li = 0; li < bgL.length; li++) {
         const L2 = bgL[li];
         if (L2.t === "path") {
-          const a2 = bil(F.covs[li], px/S, py/S)*(L2.op === undefined ? 1 : L2.op);
+          let a2 = bil(F.covs[li], px/S, py/S)*(L2.op === undefined ? 1 : L2.op);
           if (a2 <= 0) continue;
           let cr, cg, cb2;
           if (L2.fill.t === "solid") { cr = L2.fill.c[0]; cg = L2.fill.c[1]; cb2 = L2.fill.c[2]; }
@@ -440,8 +440,10 @@ export function createLiquidRenderer(recipe) {
               const u = Math.min(Math.max((t - st[k-1]) / Math.max(st[k] - st[k-1], 1e-9), 0), 1);
               const a3 = f.cs[k-1], b3 = f.cs[k];
               cr = a3[0] + (b3[0]-a3[0])*u; cg = a3[1] + (b3[1]-a3[1])*u; cb2 = a3[2] + (b3[2]-a3[2])*u;
+              if (f.as) a2 *= f.as[k-1] + (f.as[k]-f.as[k-1])*u;  // per-stop alpha
             } else {
               cr = f.c0[0] + (f.c1[0]-f.c0[0])*t; cg = f.c0[1] + (f.c1[1]-f.c0[1])*t; cb2 = f.c0[2] + (f.c1[2]-f.c0[2])*t;
+              if (f.a0 !== undefined) a2 *= f.a0 + (f.a1-f.a0)*t;  // stop alpha
             }
           }
           r += (cr-r)*a2; g += (cg-g)*a2; b += (cb2-b)*a2;

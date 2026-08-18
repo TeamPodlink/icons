@@ -349,14 +349,39 @@ podcastindex 7.66 → 3.02, mixerbox 7.13 → 2.61, bullhorn
 5.47 → 1.84, breaker 5.29 → 2.86, spotify 4.64 → 2.47, rephonic
 4.49 → 1.49 — fourteen bundles improved by ≥ 0.5, none regressed.
 
+**Fade-to-transparent gradients (solved 2026-08-17, glow-probe +
+attribution renders).** tunestr's 8.8 attributed by two variant
+ictool renders: stripping its SVG filter chain moved GT only 2.06 —
+but removing the ONE glow element from the engine recipe moved the
+engine 8.78 → 3.10. The cause was the fade-to-transparent radial
+(Figma's `stop-color="none" stop-opacity="0"` idiom) painted as an
+opaque disc under the old "<2 usable stops → solid" fallback. A
+one-render glow probe (pink→transparent radial over a navy field)
+measured the law: implied alpha is exactly 1−t per channel when
+compositing in ENCODED space, and the color stays the opaque stop's
+throughout — so transparent colorless stops are alpha knots that
+inherit the nearest colored stop. The engine gained optional per-stop
+alpha (`as`, or `a0`/`a1`; absent fields keep old behavior — regen
+byte-stable, all six adopted recipes hash-identical under
+`{ exact: true }`), and the translator emits resampled alpha ramps.
+Side fix: 2-stop gradients whose offsets aren't [0,1] now keep their
+`st` offsets instead of being forced into the c0/c1 form (resso
+2.45 → 2.31, now below its pre-law 2.40 — the "+0.08 red-ceiling
+shift" recorded above was actually this). Bounded limitation: the
+engine composites alpha in P3-coded space, not encoded sRGB — the
+synthetic glow probe keeps 4.2 RMSE mid-fade while every real bundle
+is in band. tunestr 8.78 → **2.36** (the remaining SVG-filter
+effects — inner-shadow highlight, drop shadow — are inside that).
+
 Glass icons now await the per-layer lighting model (the material
 family is measured); raster-art bundles a PNG-decode decision. The player's coverage today: flat + SVG, 38 bundles at
-median RMSE 2.41, **37/38 ≤ 5.5, worst 8.8** (the first sweep's
-worst was 183 with fifteen bundles above 40); remaining: tunestr
-8.8 (its SVG filter chain — inner-shadow highlight, drop shadow,
-fade-to-transparent glow — accounts for only 2.1 of it; the rest is
-under investigation), and resso carries a +0.08 shift from the
-measured red-ceiling constant.
+median RMSE 2.36, **38/38 ≤ 4.0, worst 3.98** (the first sweep's
+worst was 183 with fifteen bundles above 40; the milestone sweep's
+median was 4.16 with eleven above 5.5). The remaining top of the
+tail is enumerable small physics: tunein 3.98 (the automatic-gradient
+ladder is measured on grays only — colored inputs approximate),
+podlp 3.69, curiocaster 3.36, radiopublic 3.31 (unattributed,
+glyph-edge-scale residuals).
 
 ## Adding a platform or icon
 

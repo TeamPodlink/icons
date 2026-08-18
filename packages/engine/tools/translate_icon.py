@@ -377,19 +377,21 @@ def _ramp_to_render(e):
 
 
 def resample_law_stops(stops):
-    # [(offset, spec)] -> (st, cs) sampling the law curve densely enough
-    # that the engine's piecewise-linear P3-coded lerp stays within tol.
-    # The engine lerps stored P3-coded colors; the law curve lives in
-    # extended encoded sRGB, so intermediate stops are inserted wherever
-    # the two disagree.
-    knots = [(float(o), gradient_stop_ext(spec)) for o, spec in stops]
+    # [(offset, spec, alpha)] -> (st, cs, als) sampling the law curve
+    # densely enough that the engine's piecewise-linear P3-coded lerp
+    # stays within tol. The engine lerps stored P3-coded colors; the law
+    # curve lives in extended encoded sRGB, so intermediate stops are
+    # inserted wherever the two disagree. Stop alpha lerps linearly in t
+    # composited in encoded space (measured: the glow-probe fade's
+    # implied alpha is exactly 1-t per channel in encoded sRGB).
+    knots = [(float(o), gradient_stop_ext(spec), float(al)) for o, spec, al in stops]
     TOL = 0.4  # 0..255 units
 
     def law_at(e0, e1, u):
         return _ramp_to_render(e0 + (e1 - e0) * u)
 
-    out = [(knots[0][0], law_at(knots[0][1], knots[0][1], 0.0))]
-    for (o0, e0), (o1, e1) in zip(knots, knots[1:]):
+    out = [(knots[0][0], law_at(knots[0][1], knots[0][1], 0.0), knots[0][2])]
+    for (o0, e0, al0), (o1, e1, al1) in zip(knots, knots[1:]):
         seg = [(0.0, np.array(law_at(e0, e1, 0.0))), (1.0, np.array(law_at(e0, e1, 1.0)))]
         for _ in range(5 if o1 - o0 > 1e-6 else 0):  # up to 33 samples/segment
             refined = [seg[0]]
@@ -405,8 +407,10 @@ def resample_law_stops(stops):
             if not split:
                 break
         for u, c in seg[1:]:
-            out.append((o0 + (o1 - o0) * u, [round(float(v), 1) for v in c]))
-    return ([round(o, 4) for o, _ in out], [c for _, c in out])
+            out.append((o0 + (o1 - o0) * u, [round(float(v), 1) for v in c],
+                        al0 + (al1 - al0) * u))
+    return ([round(o, 4) for o, _, _ in out], [c for _, c, _ in out],
+            [round(al, 3) for _, _, al in out])
 
 
 def attr(attrs, name, style):
@@ -447,7 +451,6 @@ def shape_to_path_d(tag, attrs):
 
 def parse_gradients(s):
     grads = {}
-    sop_note = set()
     for m in re.finditer(
         r"<(linearGradient|radialGradient)([^>]*)>(.*?)</\1>", s, re.S
     ):
@@ -465,12 +468,9 @@ def parse_gradients(s):
             col = attr(sa, "stop-color", st) or "#000"
             off = attr(sa, "offset", st) or "0"
             sop = attr(sa, "stop-opacity", st)
-            if sop is not None and float(sop) < 0.9:
-                # engine gradients carry no per-stop alpha; near-1 values
-                # are dropped, low ones are worth a warning
-                sop_note.add(gid[0])
+            alpha = float(sop) if sop is not None else 1.0
             c = parse_svg_color(col if not col.startswith("stop-color") else col)
-            stops.append((float(off.rstrip("%")) / (100 if "%" in off else 1), c))
+            stops.append((float(off.rstrip("%")) / (100 if "%" in off else 1), c, alpha))
         grads[gid[0]] = {
             "kind": "radial" if kind == "radialGradient" else "linear",
             "x1": f("x1", "0"), "y1": f("y1", "0"),
@@ -482,8 +482,6 @@ def parse_gradients(s):
             "transform": f("gradientTransform", ""),
             "stops": stops,
         }
-    for gid in sorted(sop_note):
-        warn(f"gradient #{gid}: stop-opacity < 0.9 ignored")
     return grads, set()
 
 
@@ -811,13 +809,24 @@ for g in reversed(doc.get("groups", [])):
                 gid = el["fill"][1]
                 if gid in grads:
                     gr = grads[gid]
-                    stops = [s2 for s2 in gr["stops"] if s2[1] is not None]
+                    # colorless fully-transparent stops (Figma's
+                    # fade-to-'none' idiom) inherit the nearest colored
+                    # stop's color and act as pure alpha knots
+                    raw = sorted(gr["stops"], key=lambda s2: s2[0])
+                    colored = [s2 for s2 in raw if s2[1] is not None]
+                    stops = []
+                    for o, c, al in raw:
+                        if c is None:
+                            if al <= 0.01 and colored:
+                                near = min(colored, key=lambda s2: abs(s2[0] - o))
+                                stops.append((o, near[1], al))
+                        else:
+                            stops.append((o, c, al))
                     if len(stops) < 2:
                         warn(f"gradient #{gid}: <2 usable stops -> solid")
                         c = stops[0][1] if stops else ("srgb", (0, 0, 0))
                         fdesc = {"t": "solid", "c": svg_color_to_render(c)}
                     else:
-                        stops.sort(key=lambda s2: s2[0])
                         GM = parse_transform(gr["transform"])
                         A_tc = np.array([[sc, 0, ox - vb[0] * sc],
                                          [0, sc, oy - vb[1] * sc],
@@ -852,11 +861,16 @@ for g in reversed(doc.get("groups", [])):
                                      "x0": round(p0[0], 1), "y0": round(p0[1], 1),
                                      "x1": round(p1[0], 1), "y1": round(p1[1], 1)}
                         if fdesc["t"] in ("lin", "rad"):
-                            st, cs = resample_law_stops(stops)
-                            if len(st) == 2:
+                            st, cs, als = resample_law_stops(stops)
+                            has_alpha = any(al < 0.999 for al in als)
+                            if len(st) == 2 and abs(st[0]) < 1e-4 and abs(st[1] - 1) < 1e-4:
                                 fdesc["c0"], fdesc["c1"] = cs
+                                if has_alpha:
+                                    fdesc["a0"], fdesc["a1"] = als
                             else:
                                 fdesc["st"], fdesc["cs"] = st, cs
+                                if has_alpha:
+                                    fdesc["as"] = als
                 else:
                     warn(f"gradient #{gid} not found -> black")
                     fdesc = {"t": "solid", "c": [0, 0, 0]}
