@@ -8,7 +8,7 @@
         "title": "Downcast",
         "variant": null,
         "file": "Downcast.icon",
-        "source": "appstore-artwork",
+        "source": "appstore-artwork-split",
         "appStoreId": 393858566,
         "hasDark": false,
         "darkStatus": "missing"
