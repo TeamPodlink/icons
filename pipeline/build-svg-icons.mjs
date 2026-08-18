@@ -13,14 +13,25 @@
 //                     layer alone (+ white-recolored dark glyph for
 //                     monochrome-dark marks via opacity-specializations)
 //
-// Split rules (learned the hard way — keep in sync with reality):
-//   - ictool's Dark rendition ALWAYS auto-darkens the canvas and tints
-//     white glyphs with the former background color (Apple's automatic
-//     derivation), even against fill-specializations. Bright/colorful
-//     glyphs therefore need no recoloring.
-//   - Whitening is only safe for effectively-monochrome dark glyphs
-//     (low luminance AND low saturation). Illustrated dark art must not
-//     be recolored.
+// Split rules (MEASURED by packages/engine/tools/probe-dark-tint*.py,
+// Icon Composer 2.0 — see the pipeline/README.md ledger):
+//   - ictool's Dark rendition always darkens the canvas (matching the
+//     explicit gray:0.192->0.078 pin), but auto-tints a glyph with the
+//     former background color ONLY when the layer is an SVG, has NO
+//     opacity-specializations (even {value:1, dark:1} disables it),
+//     every visible pixel is near-white (luminance >= ~0.85), and the
+//     canvas DEFAULT fill has a channel above ~0.2. The tint samples
+//     the default fill per-pixel along its gradient;
+//     fill-specializations never gate it.
+//   - So white glyphs must ship as a single bare SVG layer. Any twin
+//     layer carrying opacity-specializations kills the tint — the old
+//     "pin the glyph on dim backgrounds" twin was exactly the
+//     white-on-gray dark-rendition bug.
+//   - Monochrome-dark glyphs never auto-tint (they fail the near-white
+//     gate); they get an explicit dark twin recolored to the background
+//     color — the same convention iOS shows (dark canvas, glyph tinted
+//     in the former background). Untintable backgrounds (max channel
+//     <= 0.2) fall back to a white twin.
 //   - Knockout designs (glyph punched out of an overlay above a white
 //     base) are unsplittable: near-full glyph coverage detects them.
 //
@@ -32,8 +43,9 @@
 //   --browser         skip the SVG layer for these ids, go straight to
 //                     a Chrome raster
 //   --no-split        build single-layer bundles only
-//   --split-existing  also re-attempt the split on bundles already built
-//                     as flat-svg (not just ones built this run)
+//   --split-existing  also (re-)attempt the split on bundles already
+//                     built as flat-svg or flat-svg-split (not just
+//                     ones built this run)
 //
 // Review sheets for visual QA:
 //   /tmp/svg-icons-review.png      light renders of built bundles
@@ -245,12 +257,26 @@ async function glyphStats(png) {
   };
 }
 
-/** Recolor dark fills to white for the dark-appearance glyph. */
-function whiten(svg) {
+/**
+ * Recolor dark fills for the dark-appearance glyph twin. `css` is the
+ * former background color (Apple's dark-icon tint convention), or
+ * white when the background is untintable.
+ */
+function retintDark(svg, css) {
   return svg
-    .replace(/fill="#([0-4][0-9a-f]{2}|[0-4][0-9a-f]{5})"/gi, 'fill="#ffffff"')
-    .replace(/fill="(black|#000|#000000)"/gi, 'fill="#ffffff"')
-    .replace(/stroke="(black|#000|#000000)"/gi, 'stroke="#ffffff"');
+    .replace(/fill="#([0-4][0-9a-f]{2}|[0-4][0-9a-f]{5})"/gi, `fill="${css}"`)
+    .replace(/fill="(black|#000|#000000)"/gi, `fill="${css}"`)
+    .replace(/stroke="(black|#000|#000000)"/gi, `stroke="${css}"`);
+}
+
+/** ic color ("srgb:r,g,b,a" / "display-p3:...") -> CSS color. */
+function cssColor(icColor) {
+  const m = icColor.match(/^([a-z0-9-]+):([\d.]+),([\d.]+),([\d.]+)/);
+  if (!m) return null;
+  const [r, g, b] = [+m[2], +m[3], +m[4]];
+  if (m[1] === "display-p3") return `color(display-p3 ${r} ${g} ${b})`;
+  const h = (v) => Math.round(v * 255).toString(16).padStart(2, "0");
+  return `#${h(r)}${h(g)}${h(b)}`;
 }
 
 /**
@@ -273,28 +299,23 @@ async function trySplit(id, dir, meta) {
   rmSync(bdir, { recursive: true, force: true });
   mkdirSync(join(bdir, "Assets"), { recursive: true });
   writeFileSync(join(bdir, "Assets/icon.svg"), split.glyphSvg);
-  // Dim backgrounds tint white glyphs into near-invisibility under
-  // Apple's dark derivation (Apollo's navy castle). Pin the glyph with
-  // a dark-only twin layer — explicit dark layers escape the tinting.
+  // White glyphs MUST stay a single bare SVG layer: ictool's dark
+  // derivation tints them with the canvas default fill, and any twin
+  // layer / opacity-specialization disables that tint (measured law —
+  // see header). Dark monochrome glyphs never auto-tint, so they get
+  // an explicit dark twin recolored to the former background color
+  // (white if the background is untintable: max channel <= 0.2).
   const cm = split.color.match(/^[a-z0-9-]+:([\d.]+),([\d.]+),([\d.]+)/);
-  const bgLuma = cm
-    ? (0.2126 * +cm[1] + 0.7152 * +cm[2] + 0.0722 * +cm[3]) * 255
-    : 255;
-  const pinGlyph = !needsWhiteGlyph && bgLuma < 80;
+  const bgMax = cm ? Math.max(+cm[1], +cm[2], +cm[3]) : 1;
   const layers = [];
   if (needsWhiteGlyph) {
-    writeFileSync(join(bdir, "Assets/icon-dark.svg"), whiten(split.glyphSvg));
+    const twinColor = bgMax > 0.2 ? cssColor(split.color) : "#ffffff";
+    writeFileSync(
+      join(bdir, "Assets/icon-dark.svg"),
+      retintDark(split.glyphSvg, twinColor)
+    );
     layers.push({
       "image-name": "icon-dark.svg", name: "icon-dark", glass: false,
-      position: { scale: 32, "translation-in-points": [0, 0] },
-      "opacity-specializations": [
-        { value: 0 }, { appearance: "dark", value: 1 },
-      ],
-    });
-  }
-  if (pinGlyph) {
-    layers.push({
-      "image-name": "icon.svg", name: "icon-dark", glass: false,
       position: { scale: 32, "translation-in-points": [0, 0] },
       "opacity-specializations": [
         { value: 0 }, { appearance: "dark", value: 1 },
@@ -304,7 +325,7 @@ async function trySplit(id, dir, meta) {
   layers.push({
     "image-name": "icon.svg", name: "icon", glass: false,
     position: { scale: 32, "translation-in-points": [0, 0] },
-    ...(needsWhiteGlyph || pinGlyph
+    ...(needsWhiteGlyph
       ? {
           "opacity-specializations": [
             { value: 1 }, { appearance: "dark", value: 0 },
@@ -414,10 +435,15 @@ if (doSplit) {
   const builtIds = new Set(
     results.filter((r) => r.source === "flat-svg").map((r) => r.id)
   );
+  // --split-existing also re-runs the split on bundles already split
+  // (flat-svg-split), regenerating their icon.json from icon.svg.
+  const splittable = splitExisting
+    ? ["flat-svg", "flat-svg-split"]
+    : ["flat-svg"];
   for (const { id, dir, meta } of readPlatforms()) {
     if (only && id !== only) continue;
     const b = meta.liquidGlass?.bundles?.[0];
-    if (!b || b.source !== "flat-svg" || meta.liquidGlass.bundles.length > 1)
+    if (!b || !splittable.includes(b.source) || meta.liquidGlass.bundles.length > 1)
       continue;
     if (!splitExisting && !builtIds.has(id)) continue;
     try {
