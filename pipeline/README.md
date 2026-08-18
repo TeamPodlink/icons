@@ -373,15 +373,36 @@ synthetic glow probe keeps 4.2 RMSE mid-fade while every real bundle
 is in band. tunestr 8.78 → **2.36** (the remaining SVG-filter
 effects — inner-shadow highlight, drop shadow — are inside that).
 
+**The remaining tail, attributed and bounded (2026-08-17).** Two
+closing instruments:
+
+- *Colored automatic-gradient*
+  (`probe-autogradient-colored.py`, 12 canvases): the bottom stop
+  equals the SOLID soft-knee conversion of the input (spotify-green
+  gains +45/255 red on both stops — the p3 solid law, not a gradient
+  effect), and the top lift rides the dominant channels — but the
+  lift's span depends on saturation and interacts with the gray
+  ladder's sawtooth (gray 0.25 → 8.9/255 vs saturated colors at the
+  same lightness → 24–28/255; two colors at identical
+  lightness+saturation but different dominant channels differ by
+  3.4/255). The best 2-parameter closed form fits at only ~5/255 rms
+  — left UNFIT; the dataset is recorded in the probe. tunein (3.98)
+  is the only in-scope bundle on this path.
+- *Glyph-edge AA*: curiocaster's residual is 99.5% inside the ±3px
+  edge band, and the shift instrument shows alignment is already
+  optimal (all eight 1px shifts and both half-pixel blends score
+  WORSE than the base render) — a genuine CoreSVG-vs-engine
+  rasterizer AA difference, recorded as a bounded limitation.
+  radiopublic's flat fields match GT exactly at sampled pixels; its
+  3.31 is the same edge class.
+
 Glass icons now await the per-layer lighting model (the material
 family is measured); raster-art bundles a PNG-decode decision. The player's coverage today: flat + SVG, 38 bundles at
 median RMSE 2.36, **38/38 ≤ 4.0, worst 3.98** (the first sweep's
 worst was 183 with fifteen bundles above 40; the milestone sweep's
-median was 4.16 with eleven above 5.5). The remaining top of the
-tail is enumerable small physics: tunein 3.98 (the automatic-gradient
-ladder is measured on grays only — colored inputs approximate),
-podlp 3.69, curiocaster 3.36, radiopublic 3.31 (unattributed,
-glyph-edge-scale residuals).
+median was 4.16 with eleven above 5.5, worst 14.6). What remains is
+bounded: tunein 3.98 (colored auto-gradient, unfit), podlp 3.69,
+curiocaster 3.36, radiopublic 3.31 (rasterizer edge AA).
 
 ## Adding a platform or icon
 
