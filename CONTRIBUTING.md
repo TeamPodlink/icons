@@ -8,8 +8,8 @@ platforms/overcast/
                        liquidGlass bundle list
   icon.svg             flat 32×32 vector icon
   badge.svg            badge artwork (badge-dark.svg if it differs)
-  Overcast.icon/       Liquid Glass bundle (Icon Composer format)
-  Overcast-Dark.icon/  alternates live beside the default
+  Overcast.icon/       Liquid Glass bundle (Icon Composer format);
+                       any alternate would live beside the default
 ```
 
 Platform ids are flat lowercase (`pocketcasts`); Liquid Glass bundle
