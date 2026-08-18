@@ -39,6 +39,8 @@ const SOURCE_LABEL: Record<string, string> = {
   "appstore-artwork": "app store artwork",
   "appstore-artwork-split": "artwork split",
   "catalog-artwork-split": "artwork split",
+  "adaptive-icon": "adaptive icon",
+  "adaptive-icon-split": "adaptive icon split",
   "flat-svg": "svg layer",
   "flat-svg-split": "svg split",
   "flat-svg-browser": "browser raster",
@@ -46,26 +48,62 @@ const SOURCE_LABEL: Record<string, string> = {
 };
 
 /**
- * Debug categories: computed QA lenses over the collection, replacing
- * editorial taxonomy. Each is a worklist — "no recipe" is the recipe
- * backlog and "live render" its complement (bundles whose adopted recipe
- * renders procedurally in-browser), "missing dark" the icons whose
- * Apple-darkened rendition we
- * don't have yet (the dark-variant backlog), "dark as-is" the icons
- * whose artwork is already dark so identical light/dark is correct
- * (measured split: pipeline/audit-dark-status.mjs), "unlabeled source"
- * the provenance backfill, and the source rungs show how far up the
- * upgrade ladder each icon sits.
+ * Human label for a bundle's provenance rung. Informational only —
+ * provenance is shown on cards as a muted label, never as a lens.
+ */
+export function sourceLabel(b: GlassBundle): string | null {
+  return b.source ? SOURCE_LABEL[b.source] ?? b.source : null;
+}
+
+/** Sources hand-drawn by a maintainer rather than lifted from the app's
+ *  own shipped artwork (decanted / store artwork / adaptive-icon rungs). */
+const HAND_DRAWN_SOURCES = new Set([
+  "flat-svg",
+  "flat-svg-split",
+  "flat-svg-browser",
+  "flat-svg-raster",
+]);
+
+/**
+ * Lenses that describe the platform rather than a single bundle. They
+ * chip on every one of the platform's cards (all facets) and are counted
+ * by platform in getCategories(); bundle-level lenses count cards.
+ */
+const PLATFORM_LENSES = new Set([
+  "missing flat",
+  "missing badge",
+  "missing url",
+  "inactive",
+]);
+
+export function isPlatformLens(cat: string): boolean {
+  return PLATFORM_LENSES.has(cat);
+}
+
+/**
+ * QA lenses: every category is an actionable worklist of identifiable
+ * problems — informational facts (provenance, feature coverage) are data
+ * on the card, not lenses. Bundle-level: "missing dark" is the
+ * dark-variant backlog (light artwork whose Apple-darkened rendition we
+ * don't have yet; artwork measured as natively dark is correct as-is and
+ * not flagged — split: pipeline/audit-dark-status.mjs); "hand-drawn art"
+ * is the re-sourcing backlog (bundles built from maintainer-drawn SVG
+ * before the official-artwork-only doctrine). Platform-level (see
+ * PLATFORM_LENSES for count semantics): "missing flat" / "missing badge"
+ * are the artwork queues for platforms without a flat icon or badge,
+ * "missing url" the meta.json website-link backfill, and "inactive"
+ * retired platforms (0 today; kept for future retirements).
  */
 export function debugCategories(p: Platform, b: GlassBundle | null): string[] {
   const cats: string[] = [];
   if (b) {
-    if (b.recipe) cats.push("live render");
-    else cats.push("no recipe");
-    if (!b.hasDark)
-      cats.push(b.darkStatus === "native" ? "dark as-is" : "missing dark");
-    cats.push(b.source ? SOURCE_LABEL[b.source] ?? b.source : "unlabeled source");
+    if (!b.hasDark && b.darkStatus !== "native") cats.push("missing dark");
+    if (b.source && HAND_DRAWN_SOURCES.has(b.source))
+      cats.push("hand-drawn art");
   }
+  if (!p.hasFlat) cats.push("missing flat");
+  if (!p.hasBadge) cats.push("missing badge");
+  if (!p.url) cats.push("missing url");
   if (!p.active) cats.push("inactive");
   return cats;
 }
@@ -124,15 +162,24 @@ export const glassCards = visibleCards.filter((c) => c.facet === "glass");
  */
 export const ASSET_BASE = import.meta.env.VITE_ASSET_BASE ?? "/library";
 
+/**
+ * Nonzero lenses with truthful counts: platform-level lenses count
+ * platforms (a multi-variant platform is one problem, not several);
+ * bundle-level lenses count cards. Lens pages still list every card of a
+ * member platform.
+ */
 export function getCategories(): { name: string; count: number }[] {
-  const counts = new Map<string, number>();
+  const members = new Map<string, Set<string>>();
   for (const c of cards)
     for (const cat of c.categories) {
       if (!c.platform.active && cat !== "inactive") continue;
-      counts.set(cat, (counts.get(cat) ?? 0) + 1);
+      const key = isPlatformLens(cat) ? c.platform.id : c.key;
+      let set = members.get(cat);
+      if (!set) members.set(cat, (set = new Set()));
+      set.add(key);
     }
-  return [...counts.entries()]
-    .map(([name, count]) => ({ name, count }))
+  return [...members.entries()]
+    .map(([name, set]) => ({ name, count: set.size }))
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 

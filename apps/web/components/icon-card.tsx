@@ -14,6 +14,8 @@ import {
   badgePath,
   categorySlug,
   flatPath,
+  isPlatformLens,
+  sourceLabel,
   type Card,
   type Facet,
 } from "@/lib/platforms";
@@ -253,7 +255,9 @@ export function IconCard({
       </div>
 
       {missing ? (
-        <MissingPreview label={shown === "flat" ? "no flat icon" : "no badge"} />
+        <MissingPreview
+          label={shown === "flat" ? "missing flat" : "missing badge"}
+        />
       ) : shown === "glass" ? (
         <GlassPreview
           card={card}
@@ -269,16 +273,29 @@ export function IconCard({
         <p className="select-all truncate text-balance text-center text-[15px] font-medium">
           {title}
         </p>
-        <div className="flex h-6 items-center justify-center space-x-1">
-          {card.categories.slice(0, 2).map((c) => (
-            <Link
-              key={c}
-              to={`/directory/${categorySlug(c)}`}
-              className="cursor-pointer rounded-full border border-neutral-200 px-2 py-0.5 font-mono text-xs font-medium text-neutral-600 hover:border-neutral-400 hover:text-black dark:border-neutral-800 dark:text-neutral-400 dark:hover:border-neutral-600 dark:hover:text-white"
+        <div className="flex min-h-6 flex-wrap items-center justify-center gap-1">
+          {/* Problem chips: bundle-level problems only make sense on the
+              glass facet; platform-level problems chip on every facet. */}
+          {card.categories
+            .filter((c) => shown === "glass" || isPlatformLens(c))
+            .map((c) => (
+              <Link
+                key={c}
+                to={`/directory/${categorySlug(c)}`}
+                className="cursor-pointer rounded-full border border-neutral-200 px-2 py-0.5 font-mono text-xs font-medium text-neutral-600 hover:border-neutral-400 hover:text-black dark:border-neutral-800 dark:text-neutral-400 dark:hover:border-neutral-600 dark:hover:text-white"
+              >
+                {c}
+              </Link>
+            ))}
+          {/* Provenance: informational, not a lens — muted, non-linked. */}
+          {shown === "glass" && b && sourceLabel(b) && (
+            <span
+              title="Artwork source"
+              className="px-1 font-mono text-[11px] text-neutral-400 dark:text-neutral-600"
             >
-              {c}
-            </Link>
-          ))}
+              {sourceLabel(b)}
+            </span>
+          )}
         </div>
       </div>
 
