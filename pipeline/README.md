@@ -13,6 +13,7 @@ scripts.
 | `build-assets.mjs` | **macOS + Icon Composer** | Renders every Liquid Glass bundle via ictool (Default + Dark), dedupes identical dark renditions by pixel compare, emits 32-512 AVIF+WebP + 1024 PNG into `packages/refraction/assets`, writes `hasDark` back into meta.json |
 | `build-svg-icons.mjs` | **macOS + Icon Composer + Chrome** | Builds `.icon` bundles from platforms' flat `icon.svg` (glassless platforms only), then attempts the dark-variant SPLIT on each by default. Emits review sheets for visual QA. See the header comment for modes, flags, and the split rules (Apple's automatic dark derivation, monochrome-only whitening, knockout detection) |
 | `build-recipes.mjs` | **macOS + Icon Composer** | Runs the two-phase procedural-recipe pipeline (`packages/engine/tools`) over all-SVG bundles and reports RMSE vs ictool; `--adopt <maxRmse>` copies winners into `packages/engine/recipes`, sets recipe/rmse in meta.json, and regenerates `recipeSlugs`. Set `PYTHON` to a venv with numpy+Pillow |
+| `audit-dark-status.mjs` | any | Classifies every `hasDark:false` bundle as `darkStatus: "native"` (artwork already dark — identical light/dark is correct) or `"missing"` (dark-variant backlog), measured from the bundle's own 1024 layer composite via the border-ring dark classifier + mean-luminance law; `--write` records it into meta.json. See "The dark-status split" below |
 | `survey-icon-spec.mjs` | any (corpus: maintainer Mac) | Surveys every icon.json's field space (key paths, types, observed values/ranges) into the COMMITTED `apps/web/lib/icon-spec-survey.json` that powers the site's `.icon` format docs. `--corpus <dir>` adds a local first-party corpus (extract with [decant](https://github.com/kylebshr/decant); Apple bundles stay out of the repo) |
 
 The web app's `predev`/`prebuild` run data + sync + registry
@@ -763,6 +764,53 @@ pixel-identical; the 14 changed dark renditions now measure glyph hue
 == background hue; the rest byte-stable. anytimeplayer joined the split
 class (border sampling now insets 3px past baked edge artifacts) and
 gained its first dark rendition.
+
+## The dark-status split (measured 2026-08-18, `audit-dark-status.mjs`)
+
+The site's single "no dark variant" QA lens conflated two different
+states of a `hasDark:false` bundle (light and dark renditions pixel-
+identical, per build-assets' compare): artwork that is ALREADY dark —
+where identical renditions are the correct final state — and light
+artwork whose Apple-darkened rendition simply doesn't exist yet. The
+split is recorded per bundle as meta.json `darkStatus`
+(`"native" | "missing"`, set only when `hasDark` is false; validate.mjs
+enforces the enum and flags stale fields on `hasDark:true` bundles) and
+surfaces on the site as two lenses, "dark as-is" and "missing dark"
+(`debugCategories` in `apps/web/lib/platforms.ts`).
+
+The verdict is measured from the bundle's own 1024 layer composite
+(canvas fill + placed artwork — the composite ictool's raster
+classifier sees; buildable anywhere, no ictool):
+
+    native ⇔ ringRaw OR meanLuma < 0.30
+    ringRaw  = 1-px border ring fully opaque AND max encoded channel
+               < 0.308 (the measured composite border-ring dark
+               classifier — ictool's own dark-artwork gate)
+    meanLuma = mean encoded Rec. 709 luminance of the composite
+               (white-backed where transparent), the SVG-era
+               whole-background dark law's statistic (bracket
+               (0.282, 0.314))
+
+The second disjunct catches measurably-dark artwork that converts only
+because a few ring pixels break the bracket (wondery's textured teal,
+ring max 0.63, meanLuma 0.242; snipd 0.404/0.195; tunestr
+0.376/0.159; truefans ring 1.0 from bright glyph pixels on the ring,
+meanLuma 0.270). Rendered-master luminance (opaque-area + 48px border
+band) is reported as corroboration when assets exist but never enters
+the verdict; on the 2026-08-18 audit composite meanLuma tracked master
+luminance within ~0.02 everywhere except jam (0.300 vs 0.434,
+librsvg gradient rendering — still "missing" either way).
+
+First audit (25 hasDark:false bundles, all verdicts visually
+confirmed): 9 native — greatpods (ring 0.298, BORDERLINE: 0.010 under
+the bracket), lnbeats, netflix, neuecast, podbean, snipd, truefans,
+tunestr, wondery; 16 missing — audible, castbox, deepcast, downcast
+(meanLuma 0.307, BORDERLINE: vivid red), gpodder, icatcher,
+iheartradio, instacast, jam, listennotes, podcastaddict, podurama,
+podvine, podyssey, samsungfree, spreaker. Re-derive with
+`node pipeline/audit-dark-status.mjs --write` after adding platforms
+or reworking artwork (build-assets does NOT maintain darkStatus; it
+only measures hasDark).
 
 ## Adding a platform or icon
 
