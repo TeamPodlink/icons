@@ -18,7 +18,30 @@ const assetsPkg = JSON.parse(
 );
 
 const SITE_URL = process.env.SITE_URL ?? "http://localhost:4173";
-const CDN = `https://cdn.jsdelivr.net/npm/@podlink/refraction@${assetsPkg.version}/assets`;
+// Images live on R2 under an immutable release prefix (see
+// pipeline/upload-assets.mjs); the version in
+// packages/refraction/package.json names the release.
+const CDN = `https://assets.icons.podlink.com/${assetsPkg.version}`;
+
+// Production guard: refuse to generate a registry that points at a release
+// prefix that was never uploaded (browsers don't fall back on 404s).
+if (process.env.RELEASE_CHECK === "1") {
+  const probe = `${CDN}/manifest.json`;
+  const res = await fetch(probe, { method: "HEAD" }).catch((e) => ({
+    ok: false,
+    status: String(e),
+  }));
+  if (!res.ok) {
+    console.error(
+      `RELEASE_CHECK failed: HEAD ${probe} -> ${res.status}\n` +
+        `Release ${assetsPkg.version} is not on R2 — run ` +
+        `\`pnpm release:assets\` (maintainer Mac) before deploying, or ` +
+        `fix the version in packages/refraction/package.json.`
+    );
+    process.exit(1);
+  }
+  console.log(`release check ok: ${probe}`);
+}
 
 // Sizes/formats come from the rendered manifest so the generated component
 // always matches the published asset set. Fallback = the last published
@@ -52,10 +75,10 @@ const BASE_COMPONENT = `/*
  * loading="eager" (e.g. an above-fold LCP icon), both variants will
  * fetch.
  *
- * Self-hosting (recommended):
- *   npm i @podlink/refraction
- *   cp -R node_modules/@podlink/refraction/assets public/refraction
- * then change ASSET_BASE to "/refraction".
+ * Self-hosting (recommended for production): download assets-<version>.zip
+ * from the repo's GitHub Release, extract it into public/refraction, then
+ * change ASSET_BASE to "/refraction". The default ASSET_BASE below points
+ * at the immutable, versioned release prefix on assets.icons.podlink.com.
  */
 import * as React from "react";
 
