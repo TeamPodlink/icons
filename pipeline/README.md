@@ -923,6 +923,62 @@ spreaker ship `adaptive-icon` with canvas-pin darks (spreaker's first
 dark). hasDark 53→57 of 70; the "missing dark" lens falls 10→6
 (castbox, downcast, gpodder, icatcher, iheartradio, listennotes).
 
+## The missing-dark round (2026-08-18)
+
+The six light-only bundles worked through, in the order genuine
+shipped dark art > derived split > official vector rebuild > bounded
+verdict. Fresh IPA mining first (ipatool): Castbox 10.31.0 and iHeart
+10.66.0 both ship no IconImageStack and no UIAppearanceDark rendition
+— their 1024 marketing icons are pixel-identical (maxdiff 0) to the
+committed appstore artwork, and "tinted" renditions are byte-identical
+CoreUI fallbacks. (The stock `flat-icon-extract` sweeps idioms 0–5 and
+returns only 180px; the 1024 marketing rendition lives at idiom 6 —
+extract with the sweep widened.) Downcast is paid ($2.99), unlicensed
+on the account — never purchased, so its committed artwork stays the
+source. No Listen Notes iOS app exists (ipatool search).
+
+**Layered-background split mode** (split-raster-icons.mjs): the
+vertical-fill split can't represent castbox's diagonal orange gradient
+(left/right border disagreement 58) or downcast's eased red ramp
+(per-row profile deviates 15/255 from the top->bottom lerp — the
+measured cause of its earlier RMSE-5.48 revert). Fallback
+`keyBackgroundField` models the background as a 2D field, linear in x
+between the measured left/right border columns, and ships it as a
+background.png layer with opacity 0 in dark over the plain vertical
+fill (fill-orientation law; audible/spreaker precedent); the dark
+twin tints from the field's per-row mean, and the vertical path now
+prechecks lerp deviation (> 2.5 routes to field mode). --refresh-dark
+preserves background.png. Unchanged RMSE <= 3 guard passed at 0.68
+(castbox) and 0.14 (downcast); iheartradio needed only --tol 17 (its
+radial shading sits at 24.5 vs the default 18 border-agreement
+threshold), light RMSE 2.41. All three ship tinted glyph-dark twins.
+
+**Official-vector rebuilds** (no app anywhere to mine): gpodder now
+ships the project's own scalable SVG verbatim
+(share/icons/hicolor/scalable/apps/gpodder.svg @ 2f91e98) as a bare
+layer over white + dark pin — CoreSVG renders it faithfully (vs-Chrome
+central RMSE 3.95, diff is pure edge AA), and the colorful glyph keeps
+its own colors on the gray canvas (source `official-svg`). listennotes
+ships the brand's own assets from brand-assets.listennotes.com: "Logo
+only with Transparent Background" in light, "White Logo" — the brand's
+explicit dark-background treatment — as the dark layer (source
+`official-artwork`), framing matched to the prior bundle (glyph 0.723
+of canvas vs 0.719).
+
+**Bounded verdict — icatcher:** the platform was added from store
+artwork after the maintainer declined the $4.99 purchase, and the
+artwork itself is unsplittable skeuomorphism: border columns 12x over
+the field mode's smoothness gate (36.9/26.2 vs 3), top-row profile
+swings 0,88,179 -> 163,210,247 — the glossy rounded-rect frame IS the
+artwork, and the glassy interior fails every tint gate. No dark is
+achievable without the unpurchasable IPA; darkStatus stays "missing".
+
+Round outcome: hasDark 57 -> 62 of 70 (audit now counts 7 native); the
+"missing dark" lens falls 6 -> 1 (icatcher). The six metas also gained
+their official homepage `url`s (castbox/icatcher already had theirs;
+downcastapp.com, gpodder.net, www.iheart.com, www.listennotes.com
+verified live and same-entity).
+
 ## Adding a platform or icon
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md).
