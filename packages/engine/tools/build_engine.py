@@ -12,7 +12,11 @@
 #              pre-transformed to render space by the translator; placed at
 #              canvas (x,y), 1 texel = s canvas units, nearest-sampled) ],
 #     dluts: [ {z,rows,cols,klo,khi,clo,chi} ],
-#     glass: [ {path,law:{A0,R0,pw,sr,sn},alpha,gc?,shadow:{dy,r,n,amp},lm|null} ],
+#     glass: [ {path,law:{A0,R0,pw,sr,sn},alpha,gc?,mi?,shadow:{dy,r,n,amp},
+#              lm|null} ]  (mi = optional per-pixel material image for
+#              raster-artwork glass, same {w,h,x,y,s,z} shape as bg img:
+#              texel RGB is the material color, texel alpha the coverage;
+#              absent mi keeps the constant-gc material),
 #     bodyLight: true, lm: null | {y,q,b,x0,y0,ds,w,h} }
 #
 # Run from the repo root:  python3 tools/build_engine.py --outdir out
@@ -428,7 +432,8 @@ export function createLiquidRenderer(recipe) {
           for (let i = 0; i < sr2.length; i++) CAPS[i] = (sr2[i] - 128)*2.5;
         }
       }
-      glass.push({ g, pmask, H, SH, AL: b64(g.alpha), LMY, CAPP, CAPS });
+      const MI = g.mi ? await inflate(b64(g.mi.z)) : null;
+      glass.push({ g, pmask, H, SH, AL: b64(g.alpha), LMY, CAPP, CAPS, MI });
     }
     let RLM = null;
     if (recipe.lm) {
@@ -556,7 +561,21 @@ export function createLiquidRenderer(recipe) {
           for (let gi = 0; gi < F.glass.length; gi++) {
             const GL = F.glass[gi];
             const pm = bil(GL.pmask, px/S, py/S);
-            if (pm > 0) {
+            // optional per-pixel material image (raster-artwork glass,
+            // measured probe-raster-glass.py): coverage = the artwork's
+            // straight alpha, material color = the artwork texel, both
+            // nearest-sampled; the path mask keeps driving the height
+            // field. Absent mi, cov === pm and nothing changes.
+            let cov = pm, mo = -1;
+            const MG = GL.g.mi;
+            if (MG) {
+              const mx = Math.floor((px - MG.x)/MG.s), my = Math.floor((py - MG.y)/MG.s);
+              if (mx >= 0 && my >= 0 && mx < MG.w && my < MG.h) {
+                mo = (my*MG.w + mx)*4;
+                cov = GL.MI[mo+3]/255;
+              } else cov = 0;
+            }
+            if (cov > 0) {
               const e = 0.75;
               const hc = bil(GL.H, px/S, py/S);
               const hx = (bil(GL.H, (px+e)/S, py/S) - bil(GL.H, (px-e)/S, py/S))/(2*e);
@@ -576,15 +595,26 @@ export function createLiquidRenderer(recipe) {
                 // own refraction ignored — it is sub-tap-scale)
                 for (let gj = 0; gj < gi; gj++) {
                   const GJ = F.glass[gj];
-                  const pmj = bil(GJ.pmask, tx/S, ty/S);
-                  if (pmj <= 0) continue;
-                  const aj = (GJ.AL[Math.min(GJ.AL.length-1, (ty/1024*GJ.AL.length)|0)]/255)*pmj*(GJ.g.op === undefined ? 1 : GJ.g.op);
+                  let covj = bil(GJ.pmask, tx/S, ty/S), moj = -1;
+                  const MJ = GJ.g.mi;
+                  if (MJ) {
+                    const jx = Math.floor((tx - MJ.x)/MJ.s), jy = Math.floor((ty - MJ.y)/MJ.s);
+                    if (jx >= 0 && jy >= 0 && jx < MJ.w && jy < MJ.h) {
+                      moj = (jy*MJ.w + jx)*4;
+                      covj = GJ.MI[moj+3]/255;
+                    } else covj = 0;
+                  }
+                  if (covj <= 0) continue;
+                  const aj = (GJ.AL[Math.min(GJ.AL.length-1, (ty/1024*GJ.AL.length)|0)]/255)*covj*(GJ.g.op === undefined ? 1 : GJ.g.op);
                   const gcj = GJ.g.gc || [255, 255, 255];
                   // optional vertical material-color gradient (gc1 at
                   // gcy[1]); absent gc1 keeps the constant-gc behavior
                   const gj1 = GJ.g.gc1 || gcj;
                   const tj = GJ.g.gc1 ? Math.min(Math.max((ty - GJ.g.gcy[0])/(GJ.g.gcy[1] - GJ.g.gcy[0]), 0), 1) : 0;
-                  gb[0] += (gcj[0] + (gj1[0]-gcj[0])*tj - gb[0])*aj; gb[1] += (gcj[1] + (gj1[1]-gcj[1])*tj - gb[1])*aj; gb[2] += (gcj[2] + (gj1[2]-gcj[2])*tj - gb[2])*aj;
+                  const cjr = moj >= 0 ? GJ.MI[moj] : gcj[0] + (gj1[0]-gcj[0])*tj;
+                  const cjg = moj >= 0 ? GJ.MI[moj+1] : gcj[1] + (gj1[1]-gcj[1])*tj;
+                  const cjb = moj >= 0 ? GJ.MI[moj+2] : gcj[2] + (gj1[2]-gcj[2])*tj;
+                  gb[0] += (cjr - gb[0])*aj; gb[1] += (cjg - gb[1])*aj; gb[2] += (cjb - gb[2])*aj;
                 }
                 dr += gb[0]; dg += gb[1]; db += gb[2];
               }
@@ -593,16 +623,19 @@ export function createLiquidRenderer(recipe) {
               const gcc = GL.g.gc || [255, 255, 255];
               const gc1 = GL.g.gc1 || gcc;
               const tg = GL.g.gc1 ? Math.min(Math.max((py - GL.g.gcy[0])/(GL.g.gcy[1] - GL.g.gcy[0]), 0), 1) : 0;
-              const gr = dr*(1-al) + (gcc[0] + (gc1[0]-gcc[0])*tg)*al, gg = dg*(1-al) + (gcc[1] + (gc1[1]-gcc[1])*tg)*al, gbv = db*(1-al) + (gcc[2] + (gc1[2]-gcc[2])*tg)*al;
+              const mcr = mo >= 0 ? GL.MI[mo] : gcc[0] + (gc1[0]-gcc[0])*tg;
+              const mcg = mo >= 0 ? GL.MI[mo+1] : gcc[1] + (gc1[1]-gcc[1])*tg;
+              const mcb = mo >= 0 ? GL.MI[mo+2] : gcc[2] + (gc1[2]-gcc[2])*tg;
+              const gr = dr*(1-al) + mcr*al, gg = dg*(1-al) + mcg*al, gbv = db*(1-al) + mcb*al;
               // optional glass opacity: POST-COMPOSITE blend with the clean
               // base (measured: overcast's op-0.9 tower group passes 10% of
               // the UNREFRACTED canvas — opacity is compositor semantics,
               // not a material-alpha factor)
-              const opf = pm*(GL.g.op === undefined ? 1 : GL.g.op);
+              const opf = cov*(GL.g.op === undefined ? 1 : GL.g.op);
               r += (gr-r)*opf; g += (gg-g)*opf; b += (gbv-b)*opf;
             }
             if (GL.SH) {
-              const shv = bil(GL.SH, px/S, py/S)*(1-pm);
+              const shv = bil(GL.SH, px/S, py/S)*(1-cov);
               const amp = GL.g.shadow.amp;
               r = Math.max(r - amp*shv, 0); g = Math.max(g - amp*shv, 0); b = Math.max(b - amp*shv, 0);
             }
