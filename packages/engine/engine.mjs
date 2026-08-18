@@ -311,8 +311,10 @@ export function createLiquidRenderer(recipe) {
     if (_fieldsByN.has(N)) return _fieldsByN.get(N);
     const S = 1024/N;
     const covs = [];
+    const imgs = [];
     for (const L2 of recipe.bg) {
       covs.push(L2.t === "path" ? rasterizeMask(L2.seg, N, L2.rule || "evenodd") : null);
+      imgs.push(L2.t === "img" ? await inflate(b64(L2.z)) : null);
     }
     const dluts = [];
     for (const dl of recipe.dluts) {
@@ -373,7 +375,7 @@ export function createLiquidRenderer(recipe) {
       for (let i = 0; i < yr.length; i++) RLM[i] = (yr[i] - 128)*recipe.lm.q;
     }
     const BLd = recipe.bodyLight === false ? null : await bodyLightLut();
-    const F = { dluts, glass, BLd, covs, RLM };
+    const F = { dluts, glass, BLd, covs, imgs, RLM };
     _fieldsByN.set(N, F);
     return F;
   }
@@ -447,6 +449,16 @@ export function createLiquidRenderer(recipe) {
             }
           }
           r += (cr-r)*a2; g += (cg-g)*a2; b += (cb2-b)*a2;
+        } else if (L2.t === "img") {
+          // nearest-texel sampling: exact 1:1 at N=1024/s=1 (matching
+          // ictool's blit), and the 2x2 supersample turns it into a box
+          // filter at smaller N. Colors are already render-space.
+          const ix = Math.floor((px - L2.x)/L2.s), iy = Math.floor((py - L2.y)/L2.s);
+          if (ix < 0 || iy < 0 || ix >= L2.w || iy >= L2.h) continue;
+          const A = F.imgs[li], o3 = (iy*L2.w + ix)*4;
+          const a2 = A[o3+3]/255*(L2.op === undefined ? 1 : L2.op);
+          if (a2 <= 0) continue;
+          r += (A[o3]-r)*a2; g += (A[o3+1]-g)*a2; b += (A[o3+2]-b)*a2;
         } else if (L2.t === "vgrad") {
           const t = py/1024;
           r = L2.c0[0] + (L2.c1[0]-L2.c0[0])*t;

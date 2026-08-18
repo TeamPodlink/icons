@@ -460,11 +460,12 @@ closing instruments:
   radiopublic's flat fields match GT exactly at sampled pixels; its
   3.31 is the same edge class.
 
-Raster-art bundles remain a PNG-decode decision. The player's coverage
-today: every all-SVG bundle, flat or glass. Flat: 38 bundles at median
-RMSE 2.36, **38/38 ≤ 4.0, worst 3.69** (the first sweep's worst was
-183 with fifteen bundles above 40; the milestone sweep's median was
-4.16 with eleven above 5.5, worst 14.6). Glass: the five catalog
+The player's coverage today: every flat catalog bundle, SVG or
+raster, plus all-SVG glass. Flat SVG: 38 bundles at median RMSE 2.36,
+**38/38 ≤ 4.0, worst 3.69** (the first sweep's worst was 183 with
+fifteen bundles above 40; the milestone sweep's median was 4.16 with
+eleven above 5.5, worst 14.6). Flat raster: **47/47 at median 1.39,
+all ≤ 2.99** (see "Raster layers" below). Glass: the five catalog
 bundles at 4.3–7.7 plus apple's bounded 17.3 (see "Glass synthesis"
 below). What remains in the flat tail is bounded: podlp 3.69,
 curiocaster 3.36, tunein 3.33 (colored auto-gradient, approximate),
@@ -565,6 +566,80 @@ display-p3 per-channel-k deviation (≤0.05), and overcast's last
 +0.3 over the WS1 band (tower-region residual after the op/gc1 fixes —
 the remaining B-channel floor at the ring bottom is refraction-tap
 bleed the scalar-alpha composite keeps).
+
+## Raster layers (solved 2026-08-17, `probe-raster.py`)
+
+PNG-art bundles — 47 flat catalog bundles, previously excluded — now
+translate through a measured raster color law and a new engine
+primitive. Sweep: **47/47 scored, median RMSE 1.39, all ≤ 2.99**
+(fountain 10.56 → 1.49, luminary 28.48 → 2.46, wondery 14.75 → 1.41 en
+route); the flat-SVG sweep is bit-identical to its baseline, and the
+six adopted glass recipes hash-identical under the new engine.
+
+**Design: rasters travel in the recipe.** New bg layer
+`{t:'img',w,h,x,y,s,z,op?}` — zlib+base64 RGBA at native size, colors
+pre-transformed to render space by the translator (the engine stays
+measurement-free and decode-free beyond its existing inflate),
+nearest-texel sampled: exact 1:1 blit at 1024/scale-1, and the 2×2
+supersample turns nearest into a box filter at smaller N. Raster
+recipes are median 69 KB (17 KB–850 KB) vs 3.3 KB for SVG recipes —
+fine for the player/validation role; rasters remain the delivery path
+per the distillation verdict.
+
+**The raster color paths** (patch-grid instruments vs ictool):
+
+- **Untagged and sRGB-tagged PNGs** composite in sRGB (max err
+  0.7/255) — except under the dark classifier (below), when raw bytes
+  leak as P3 coordinates (err 0.0). Untagged ≡ sRGB-tagged in every
+  case.
+- **Display-P3-tagged PNGs** follow the p3-solid soft-knee law
+  (worst 1.1/255 over the 10-color grid), classifier-independent —
+  the same law as declared display-p3 solids.
+- **Gray-gamma-2.2-tagged L/LA PNGs** (the catalog's `ICC(4508B)`
+  images) behave as sRGB-encoded neutrals; the profile's 2.2 decode is
+  refuted at 6/255.
+- **Alpha composites in encoded sRGB** (d ≤ 1.0/255 at α ∈ {64, 128,
+  191}); the engine lerps in P3-coded space — a bounded AA-edge-only
+  difference (~5/255 at half-alpha), same class as the gradient-alpha
+  limitation.
+
+**The dark classifier is a composite border-ring law, not a
+whole-image statistic.** The SVG-era "opaque exact full-bleed
+background with mean luminance < 0.30" survives only as a special
+case. Refutation chain: wondery (textured dark, whole-image pixmax
+mean 0.296) renders CONVERT while a uniform 0.302 gray renders RAW —
+mean dead; linear-space mean, dark-pixel fraction, and border-mean
+each die on wondery/podbean/deezer/snipd pairs; strict border
+uniformity dies on the toprow-darkcanvas instrument (two dark colors
+on the ring, still RAW). The law that fits all 14 instruments and
+every catalog bundle:
+
+    raw ⇔ every pixel of the composite's 1-px border ring is opaque
+          AND has max encoded channel < ~0.308   (bracket (0.302, 0.314))
+
+- *Composite* means canvas fill showing through transparent artwork
+  edges counts: fountain/luminary (glyphs over declared dark
+  canvases) render RAW — proven causally by darkcanvas/whitecanvas/
+  gradcanvas instruments. An undeclared canvas contributes nothing.
+- *Per-pixel max channel*: saturated green, blue, and half-red/half-
+  blue full-bleeds all CONVERT despite low mean/luma.
+- *Opacity*: a 1-px transparent top row kills it (CONVERT); a 60-px
+  interior transparent hole does not (RAW).
+- Catalog raw set: fountain, luminary, metacast, podverse, disctopia,
+  podbean, deezer (+ podhome, neuecast, pocketcasts-dark, whose
+  neutral art renders identically either way). The nearest catalog
+  ring values sit at 0.212 (RAW) and 0.404 (CONVERT) — comfortably
+  outside the bracket.
+
+**Placement**: rasters obey the SVG scale-1 law — 1 texel = 1 canvas
+unit, centered, canvas-clipped; `scale` multiplies, translation
+offsets (512/800×400/1200×500/scale-2/translate instruments).
+
+Remaining raster tail, all bounded: rss 2.99 / luminary 2.46 /
+playerfm 2.46 (glyph-edge AA + the alpha-lerp-space gap), goodpods
+2.06, downcast 2.24. Glass-bearing raster bundles (castamatic,
+castro-pumpkin, moonfm) still skip as NOT FLAT — they join via the
+glass-synthesis workstream.
 
 ## Adding a platform or icon
 
