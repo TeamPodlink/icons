@@ -273,3 +273,35 @@ if want("classify"):
         lm = float((arr[..., :3] @ np.array([0.2126, 0.7152, 0.0722])).mean())
         print(f"[classify] {name:8s} meas {np.round(meas,1)}  {verdict}  "
               f"(chan-mean {cm:.3f}  luma {lm:.3f})")
+
+# ---------------- classifier x canvas-fill interplay ----------------------
+# fountain/luminary forensics: NON-full-bleed glyphs over declared dark
+# canvas fills render RAW — the classifier evaluates the COMPOSITE
+# (canvas + artwork), not the artwork alone. These instruments pin it.
+if want("classify2"):
+    RED = (178, 7, 15)
+
+    def glyph_png(toprow=False):
+        arr = np.zeros((1024, 1024, 4), np.uint8)
+        x, y = POS[0]
+        arr[y:y + 120, x:x + 120] = (*RED, 255)
+        if toprow:  # full-bleed dark artwork with 1px transparent top row
+            arr[:, :] = (20, 20, 30, 255)
+            arr[y:y + 120, x:x + 120] = (*RED, 255)
+            arr[0:1, :] = 0
+        return Image.fromarray(arr, "RGBA")
+
+    cases = [
+        ("darkcanvas", glyph_png(), {"solid": "srgb:0.04,0.04,0.08,1"}),
+        ("whitecanvas", glyph_png(), {"solid": "srgb:1,1,1,1"}),
+        ("toprow-darkcanvas", glyph_png(True), {"solid": "srgb:0.04,0.04,0.08,1"}),
+        ("gradcanvas", glyph_png(), {"linear-gradient": ["srgb:0,0,0,1", "srgb:0,0,0,1"],
+                                     "orientation": {"start": {"x": 0.5, "y": 0},
+                                                     "stop": {"x": 0.5, "y": 1}}}),
+    ]
+    for name, img, fill in cases:
+        im = author(f"classify2-{name}", img, canvas_fill=fill)
+        meas = read_patch(im, 0)
+        h_conv = srgb_to_p3coded(np.array(RED, np.float64))
+        verdict = "RAW" if abs(meas[1] - 7) < 6 else ("CONVERT" if abs(meas[1] - h_conv[1]) < 6 else "??")
+        print(f"[classify2] {name:18s} meas {np.round(meas,1)}  {verdict}")

@@ -13,6 +13,10 @@
 #   - per-subpath SVG fills parsed from the artwork itself (the gap that
 #     rejected 35/36 bundles in the recipe sweep: build_recipe.py only
 #     accepts icon.json fill overrides)
+#   - PNG raster layers via the measured raster color law (probe-raster:
+#     sRGB-composite unless the dark classifier leaks raw bytes;
+#     P3-tagged = the p3-solid soft-knee), baked into the recipe as an
+#     engine img primitive in render space
 #
 # Shares its path/transform/placement machinery with build_recipe.py
 # (copied; keep in sync). Supported SVG subset: path/rect/circle/ellipse/
@@ -73,6 +77,32 @@ def srgb_to_render(rgb01):
     # sRGB color -> P3-coded engine values (0..255)
     p3 = _enc(_SRGB_TO_P3 @ _lin(np.clip(rgb01, 0, 1)))
     return [round(float(v) * 255, 1) for v in p3]
+
+
+def _enc_arr(u):  # like _enc but preserves array shape for image data
+    u = np.clip(np.asarray(u, np.float64), 0, 1)
+    return np.where(u <= 0.0031308, 12.92 * u, 1.055 * u ** (1 / 2.4) - 0.055)
+
+
+def srgb_to_render_img(rgb):
+    # vectorized srgb_to_render for HxWx3 arrays (0..1) -> 0..255 floats
+    return _enc_arr(np.einsum("ij,hwj->hwi", _SRGB_TO_P3, _lin(rgb))) * 255
+
+
+def p3_to_render_img(rgb):
+    # vectorized p3_to_render (the display-p3 solid soft-knee law) for
+    # HxWx3 arrays — measured to govern Display-P3-TAGGED raster pixels
+    # too (probe-raster.py: worst 1.1/255 over the 10-color grid)
+    lin = np.sign(rgb) * np.where(np.abs(rgb) <= 0.04045, np.abs(rgb) / 12.92,
+                                  ((np.abs(rgb) + 0.055) / 1.055) ** 2.4)
+    e = np.einsum("ij,hwj->hwi", _P3_TO_SRGB, lin)
+    e = np.sign(e) * np.where(np.abs(e) <= 0.0031308, 12.92 * np.abs(e),
+                              1.055 * np.abs(e) ** (1 / 2.4) - 0.055)
+    A = 0.238
+    e = np.where(e < 0, -A * (1 - np.exp(-np.abs(e) / A)), e)
+    el = np.sign(e) * np.where(np.abs(e) <= 0.04045, np.abs(e) / 12.92,
+                               ((np.abs(e) + 0.055) / 1.055) ** 2.4)
+    return _enc_arr(np.einsum("ij,hwj->hwi", _SRGB_TO_P3, el)) * 255
 
 
 def p3_to_render(rgb01):
@@ -749,6 +779,152 @@ def fill_desc_from_icon(fill, direct=False):
     raise ValueError(f"unsupported canvas fill {fill}")
 
 
+# ---- the raster dark classifier (composite border-ring law) --------------
+# Measured (probe-raster.py classify/classify2 + per-bundle GT forensics):
+# a raster layer's untagged/sRGB pixels leak RAW (bytes relabeled as P3
+# coordinates) iff the COMPOSITE border ring of the icon — canvas fill
+# showing through transparent artwork edges included — is fully opaque
+# with every ring pixel's MAX encoded channel < ~0.308 (instrument
+# bracket (0.302, 0.314); per-pixel max pinned by the green/blue/twotone
+# cases; opacity by the toprow case; canvas participation by fountain/
+# luminary forensics + the darkcanvas/gradcanvas instruments; per-pixel —
+# not mean, not uniform-color — by wondery-vs-podbean and the
+# toprow-darkcanvas instrument). Otherwise pixels convert through the
+# sRGB composite. Whole-image statistics (mean/fraction/border-mean)
+# were each refuted by at least one measured case.
+RING_THR = 0.308
+
+
+def _ring_points():
+    e = np.arange(1024) + 0.5
+    xs = np.concatenate([e, e, np.full(1022, 0.5), np.full(1022, 1023.5)])
+    ys = np.concatenate([np.full(1024, 0.5), np.full(1024, 1023.5),
+                         e[1:-1], e[1:-1]])
+    return xs, ys
+
+
+def _canvas_ring(fill, xs, ys):
+    # -> (color[N,3] encoded declared 0..1, alpha[N]) for the canvas fill
+    n = len(xs)
+    if fill is None:
+        return np.zeros((n, 3)), np.zeros(n)
+
+    def comp(cstr):
+        kind, vals = cstr.split(":")
+        v = [float(x) for x in vals.split(",")]
+        if kind == "gray":
+            return [v[0]] * 3, (v[1] if len(v) > 1 else 1.0)
+        return v[:3], (v[3] if len(v) > 3 else 1.0)
+
+    if "solid" in fill:
+        c, al = comp(fill["solid"])
+        return np.tile(c, (n, 1)), np.full(n, al)
+    if "linear-gradient" in fill:
+        cs = [comp(s) for s in fill["linear-gradient"]]
+        o = fill.get("orientation", {"start": {"x": 0.5, "y": 0},
+                                     "stop": {"x": 0.5, "y": 1}})
+        p0 = np.array([o["start"]["x"], o["start"]["y"]]) * 1024
+        p1 = np.array([o["stop"]["x"], o["stop"]["y"]]) * 1024
+        d = p1 - p0
+        t = np.clip(((xs - p0[0]) * d[0] + (ys - p0[1]) * d[1])
+                    / max(d @ d, 1e-9), 0, 1)
+        offs = np.linspace(0, 1, len(cs))
+        col = np.stack([np.interp(t, offs, [c[0][i] for c in cs])
+                        for i in range(3)], 1)
+        al = np.interp(t, offs, [c[1] for c in cs])
+        return col, al
+    if "automatic-gradient" in fill:
+        c, al = comp(fill["automatic-gradient"])
+        return np.tile(c, (n, 1)), np.full(n, al)
+    return np.zeros((n, 3)), np.zeros(n)
+
+
+def raster_dark_verdict(doc, bundle_dir):
+    # composite the border ring in declared encoded space: canvas fill,
+    # then visible raster layers bottom-to-top (nearest-texel sampling
+    # under the scale-1 placement law); SVG layers are skipped (no
+    # catalog bundle mixes SVG art with raster layers)
+    from PIL import Image
+    xs, ys = _ring_points()
+    col, al = _canvas_ring(light_value(doc, "fill"), xs, ys)
+    for g2 in reversed(doc.get("groups", [])):
+        if g2.get("hidden"):
+            continue
+        g_op2 = light_value(g2, "opacity")
+        g_op2 = 1.0 if g_op2 is None else g_op2
+        for l2 in reversed(g2.get("layers", [])):
+            op2 = light_value(l2, "opacity")
+            if op2 == 0:
+                continue
+            op2 = (1.0 if op2 is None else op2) * g_op2
+            nm = l2.get("image-name", "")
+            if not nm.lower().endswith(".png"):
+                continue
+            im2 = Image.open(os.path.join(bundle_dir, "Assets", nm))
+            arr = np.asarray(im2.convert("RGBA")).astype(np.float64) / 255
+            h2, w2 = arr.shape[:2]
+            pos2 = l2.get("position", {})
+            sc2 = pos2.get("scale", 1.0)
+            tr2 = pos2.get("translation-in-points", [0.0, 0.0])
+            ox2 = (1024.0 - w2 * sc2) / 2 + tr2[0]
+            oy2 = (1024.0 - h2 * sc2) / 2 + tr2[1]
+            ix = np.floor((xs - ox2) / sc2).astype(int)
+            iy = np.floor((ys - oy2) / sc2).astype(int)
+            inside = (ix >= 0) & (iy >= 0) & (ix < w2) & (iy < h2)
+            ixc, iyc = np.clip(ix, 0, w2 - 1), np.clip(iy, 0, h2 - 1)
+            px = arr[iyc, ixc]
+            a2 = px[:, 3] * op2 * inside
+            col = col + (px[:, :3] - col) * a2[:, None]
+            al = al + (1 - al) * a2
+    return bool(al.min() >= 0.999 and col.max(axis=1).max() < RING_THR)
+
+
+def raster_img_layer(path, layer, op, raw):
+    # PNG layer -> engine img primitive. Measured (probe-raster.py):
+    #   - untagged/sRGB-tagged pixels take the sRGB-composite path (max
+    #     err 0.7/255), UNLESS the composite border-ring classifier
+    #     (raster_dark_verdict above) fires — then raw bytes leak as P3
+    #     coordinates (err 0.0), exactly as SVG artwork colors do
+    #   - Display-P3-tagged pixels follow the p3-solid soft-knee law
+    #     (worst 1.1/255, classifier-independent); gray-gamma-2.2 L/LA
+    #     are sRGB neutrals (gamma-2.2 decode refuted at 6/255)
+    #   - placement follows the scale-1 law (1 texel = 1 canvas unit,
+    #     centered, canvas-clipped; scale multiplies, translation offsets)
+    # Colors are baked into the recipe ALREADY in render space; alpha
+    # stays straight (ictool composites in encoded sRGB, the engine lerps
+    # in P3-coded space — bounded AA-edge-only difference, ~5/255 at
+    # half-alpha, same class as the gradient-alpha limitation).
+    from PIL import Image
+    im = Image.open(path)
+    icc = im.info.get("icc_profile") or b""
+    is_p3 = (b"Display P3" in icc
+             or "Display P3".encode("utf-16-be") in icc)
+    rgba = np.asarray(im.convert("RGBA")).astype(np.float64)
+    h, w = rgba.shape[:2]
+    pos = layer.get("position", {})
+    sc = pos.get("scale", 1.0)
+    tr = pos.get("translation-in-points", [0.0, 0.0])
+    ox = (1024.0 - w * sc) / 2 + tr[0]
+    oy = (1024.0 - h * sc) / 2 + tr[1]
+    a8 = rgba[..., 3].astype(np.uint8)
+    if is_p3:
+        out = p3_to_render_img(rgba[..., :3] / 255)
+    elif raw:
+        out = rgba[..., :3]
+    else:
+        out = srgb_to_render_img(rgba[..., :3] / 255)
+    q = np.clip(np.round(out), 0, 255).astype(np.uint8)
+    q[a8 == 0] = 0  # transparent texels: drop stray RGB (compression + hygiene)
+    payload = np.dstack([q, a8[..., None]]).tobytes()
+    lay = {"t": "img", "w": w, "h": h, "x": round(ox, 2), "y": round(oy, 2),
+           "s": sc, "z": base64.b64encode(zlib.compress(payload, 9)).decode()}
+    if op != 1:
+        lay["op"] = round(op, 3)
+    return lay
+
+
+_raster_raw = None  # computed lazily on first raster layer
+
 canvas_fill = light_value(doc, "fill")
 if canvas_fill:
     bg.append({"t": "path", "seg": [round(v, 1) for v in CANVAS_SEG],
@@ -768,6 +944,16 @@ for g in reversed(doc.get("groups", [])):
             continue
         op = (1.0 if op is None else op) * g_op
         name = l["image-name"]
+        if name.lower().endswith(".png"):
+            if light_value(l, "fill"):
+                warn(f"{name}: fill override on a raster layer ignored")
+            if _raster_raw is None:
+                _raster_raw = raster_dark_verdict(doc, a.bundle)
+                if _raster_raw:
+                    warn("dark composite border ring: raster pixels on the raw path")
+            bg.append(raster_img_layer(os.path.join(a.bundle, "Assets", name),
+                                       l, op, _raster_raw))
+            continue
         if not name.lower().endswith(".svg"):
             raise SystemExit(f"NOT SVG: layer art {name}")
         vb, els, grads, radial, strokes, clipped, uses, fullbleed = svg_elements(
