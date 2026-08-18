@@ -1,6 +1,7 @@
 {
   "name": "Podfriend",
   "active": true,
+  "url": "https://podfriend.com",
   "liquidGlass": {
     "bundles": [
       {

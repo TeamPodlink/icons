@@ -1,6 +1,7 @@
 {
   "name": "Pandora",
   "active": true,
+  "url": "https://www.pandora.com",
   "guidelinesUrl": "https://developer.pandora.com/docs/developer-resources/brand-assets/",
   "liquidGlass": {
     "bundles": [

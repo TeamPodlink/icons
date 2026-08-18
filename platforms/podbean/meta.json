@@ -1,6 +1,7 @@
 {
   "name": "Podbean",
   "active": true,
+  "url": "https://www.podbean.com",
   "guidelinesUrl": "https://www.podbean.com/site/default/badges",
   "liquidGlass": {
     "bundles": [

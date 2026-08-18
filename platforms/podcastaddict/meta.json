@@ -1,6 +1,7 @@
 {
   "name": "Podcast Addict",
   "active": true,
+  "url": "https://podcastaddict.com",
   "liquidGlass": {
     "bundles": [
       {
