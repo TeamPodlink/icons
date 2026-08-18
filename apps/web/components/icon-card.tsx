@@ -113,6 +113,29 @@ export function IconCard({ card }: { card: Card }) {
     await copyText(svg, `${card.title} — flat SVG`);
   };
 
+  /**
+   * Download via fetch + blob object URL: the `download` attribute is
+   * ignored on cross-origin hrefs (production serves assets from R2),
+   * where a plain anchor would navigate instead of saving. Same-origin
+   * (dev /library) goes through the identical path.
+   */
+  const downloadAsset = async (url: string, filename: string) => {
+    try {
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(`${res.status}`);
+      const objectUrl = URL.createObjectURL(await res.blob());
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+    } catch {
+      toast.error("Download failed");
+    }
+  };
+
   return (
     <div className="flex flex-col items-center justify-center rounded-md border border-neutral-200 px-3.5 py-3 hover:bg-neutral-100/80 dark:border-neutral-800 dark:hover:bg-neutral-800/20">
       <div className="flex h-6 w-full items-center justify-end space-x-2 pb-0.5">
@@ -193,14 +216,14 @@ export function IconCard({ card }: { card: Card }) {
             >
               <ImageIcon size={16} strokeWidth={1.8} />
             </button>
-            <a
-              href={assetPath(b!.slug)}
-              download={`${b!.slug}.png`}
+            <button
+              type="button"
               title="Download 1024px PNG"
+              onClick={() => downloadAsset(assetPath(b!.slug), `${b!.slug}.png`)}
               className={actionBtn}
             >
               <Download size={16} strokeWidth={1.8} />
-            </a>
+            </button>
           </>
         ) : (
           <>
