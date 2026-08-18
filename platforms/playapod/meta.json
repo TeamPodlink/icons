@@ -2,6 +2,7 @@
   "name": "Playapod",
   "active": true,
   "url": "https://playapod.com",
+  "added": "2024-08-12",
   "liquidGlass": {
     "bundles": [
       {

@@ -2,6 +2,7 @@
   "name": "YouTube",
   "active": true,
   "url": "https://www.youtube.com",
+  "added": "2023-02-06",
   "guidelinesUrl": "https://support.google.com/youtube/answer/13379217?hl=en",
   "liquidGlass": {
     "bundles": [

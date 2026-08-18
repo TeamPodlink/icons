@@ -2,6 +2,7 @@
   "name": "iHeartRadio",
   "active": true,
   "url": "https://www.iheart.com",
+  "added": "2023-02-06",
   "guidelinesUrl": "https://brand.iheart.com/podcastlogo",
   "liquidGlass": {
     "bundles": [

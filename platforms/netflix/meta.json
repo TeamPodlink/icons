@@ -2,6 +2,7 @@
   "name": "Netflix",
   "active": true,
   "url": "https://www.netflix.com",
+  "added": "2026-05-17",
   "liquidGlass": {
     "bundles": [
       {

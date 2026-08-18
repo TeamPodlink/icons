@@ -2,6 +2,7 @@
   "name": "Soundcloud",
   "active": true,
   "url": "https://soundcloud.com",
+  "added": "2023-02-06",
   "guidelinesUrl": "https://press.soundcloud.com/media_kits/228462/",
   "liquidGlass": {
     "bundles": [

@@ -2,6 +2,7 @@
   "name": "Podverse",
   "active": true,
   "url": "https://podverse.fm",
+  "added": "2023-02-06",
   "liquidGlass": {
     "bundles": [
       {

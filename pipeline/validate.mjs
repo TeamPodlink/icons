@@ -28,6 +28,12 @@ for (const { id, dir, meta } of platforms) {
   if (!/^[a-z0-9]+$/.test(id)) err(`${id}: folder name must be flat lowercase alphanumeric`);
   if (!meta.name) err(`${id}: meta.json missing "name"`);
   if (meta.url && !/^https:\/\//.test(meta.url)) err(`${id}: url must be https`);
+  // added: the platform's first-addition date (mined from git history —
+  // the original TeamPodlink/badges repo or this repo). Drives the
+  // site's "Sort by latest".
+  if (!meta.added) err(`${id}: meta.json missing "added" (YYYY-MM-DD first-addition date)`);
+  else if (!/^\d{4}-\d{2}-\d{2}$/.test(meta.added))
+    err(`${id}: added must be a YYYY-MM-DD date, got ${JSON.stringify(meta.added)}`);
   if (meta.categories && !Array.isArray(meta.categories))
     err(`${id}: categories must be an array`);
 

@@ -2,6 +2,7 @@
   "name": "Podnews",
   "active": true,
   "url": "https://podnews.net",
+  "added": "2023-02-06",
   "liquidGlass": {
     "bundles": [
       {

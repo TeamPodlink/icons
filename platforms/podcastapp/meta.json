@@ -2,6 +2,7 @@
   "name": "Podcast App",
   "active": true,
   "url": "https://podcast.app",
+  "added": "2023-02-06",
   "liquidGlass": {
     "bundles": [
       {

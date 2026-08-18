@@ -2,6 +2,7 @@
   "name": "Podcast Index",
   "active": true,
   "url": "https://podcastindex.org",
+  "added": "2023-02-06",
   "liquidGlass": {
     "bundles": [
       {

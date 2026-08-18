@@ -2,6 +2,7 @@
   "name": "Player FM",
   "active": true,
   "url": "https://player.fm",
+  "added": "2023-02-06",
   "liquidGlass": {
     "bundles": [
       {

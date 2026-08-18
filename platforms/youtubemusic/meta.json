@@ -2,6 +2,7 @@
   "name": "YouTube Music",
   "active": true,
   "url": "https://music.youtube.com",
+  "added": "2024-01-08",
   "guidelinesUrl": "https://support.google.com/youtube/answer/13379217?hl=en",
   "liquidGlass": {
     "bundles": [

@@ -2,6 +2,7 @@
   "name": "podStation",
   "active": true,
   "url": "https://podstation.org",
+  "added": "2023-02-06",
   "liquidGlass": {
     "bundles": [
       {
