@@ -1,6 +1,7 @@
 {
   "name": "CurioCaster",
   "active": true,
+  "url": "https://curiocaster.com",
   "liquidGlass": {
     "bundles": [
       {

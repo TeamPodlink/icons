@@ -1,6 +1,7 @@
 {
   "name": "Pod Engine",
   "active": true,
+  "url": "https://www.podengine.ai",
   "liquidGlass": {
     "bundles": [
       {

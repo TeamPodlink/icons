@@ -1,6 +1,7 @@
 {
   "name": "PodLP",
   "active": true,
+  "url": "https://podlp.com",
   "liquidGlass": {
     "bundles": [
       {

@@ -1,6 +1,7 @@
 {
   "name": "iVoox",
   "active": true,
+  "url": "https://www.ivoox.com",
   "liquidGlass": {
     "bundles": [
       {

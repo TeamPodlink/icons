@@ -1,6 +1,7 @@
 {
   "name": "podStation",
   "active": true,
+  "url": "https://podstation.org",
   "liquidGlass": {
     "bundles": [
       {

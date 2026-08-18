@@ -1,6 +1,7 @@
 {
   "name": "Audacy",
   "active": true,
+  "url": "https://www.audacy.com",
   "liquidGlass": {
     "bundles": [
       {

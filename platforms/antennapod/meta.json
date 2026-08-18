@@ -1,6 +1,7 @@
 {
   "name": "Antennapod",
   "active": true,
+  "url": "https://antennapod.org",
   "guidelinesUrl": "https://github.com/AntennaPod/Branding",
   "liquidGlass": {
     "bundles": [

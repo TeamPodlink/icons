@@ -1,6 +1,7 @@
 {
   "name": "SiriusXM",
   "active": true,
+  "url": "https://www.siriusxm.com",
   "liquidGlass": {
     "bundles": [
       {

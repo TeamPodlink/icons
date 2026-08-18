@@ -1,6 +1,7 @@
 {
   "name": "Podchaser",
   "active": true,
+  "url": "https://www.podchaser.com",
   "guidelinesUrl": "https://support.podchaser.com/en/articles/5253592-generating-a-podchaser-badge-for-your-podcast",
   "liquidGlass": {
     "bundles": [

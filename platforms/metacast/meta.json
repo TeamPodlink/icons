@@ -1,6 +1,7 @@
 {
   "name": "Metacast",
   "active": true,
+  "url": "https://metacast.app",
   "liquidGlass": {
     "bundles": [
       {

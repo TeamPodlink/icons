@@ -1,6 +1,7 @@
 {
   "name": "Podcast Index",
   "active": true,
+  "url": "https://podcastindex.org",
   "liquidGlass": {
     "bundles": [
       {

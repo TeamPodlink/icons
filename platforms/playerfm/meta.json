@@ -1,6 +1,7 @@
 {
   "name": "Player FM",
   "active": true,
+  "url": "https://player.fm",
   "liquidGlass": {
     "bundles": [
       {

@@ -1,6 +1,7 @@
 {
   "name": "Gaana",
   "active": true,
+  "url": "https://gaana.com",
   "liquidGlass": {
     "bundles": [
       {

@@ -1,6 +1,7 @@
 {
   "name": "Steno.fm",
   "active": true,
+  "url": "https://www.steno.fm",
   "liquidGlass": {
     "bundles": [
       {

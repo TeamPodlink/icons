@@ -1,6 +1,7 @@
 {
   "name": "Podverse",
   "active": true,
+  "url": "https://podverse.fm",
   "liquidGlass": {
     "bundles": [
       {

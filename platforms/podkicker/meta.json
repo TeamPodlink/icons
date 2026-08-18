@@ -1,6 +1,7 @@
 {
   "name": "Podkicker",
   "active": true,
+  "url": "https://play.google.com/store/apps/details?id=ait.podka",
   "liquidGlass": {
     "bundles": [
       {

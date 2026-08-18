@@ -1,6 +1,7 @@
 {
   "name": "TrueFans",
   "active": true,
+  "url": "https://truefans.fm",
   "liquidGlass": {
     "bundles": [
       {
