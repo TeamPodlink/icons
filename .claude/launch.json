@@ -4,20 +4,12 @@
     {
       "name": "web",
       "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["--filter", "web", "dev"],
-      "port": 4173
-    },
-    {
-      "name": "flat-player-gallery",
-      "runtimeExecutable": "python3",
       "runtimeArgs": [
-        "-m",
-        "http.server",
-        "4201",
-        "-d",
-        "/private/tmp/claude-501/-Users-nathan-Developer-podlink-icons/15fa4de3-1ac6-4cb5-ab7e-3b6febad6214/scratchpad/flat-player"
+        "--filter",
+        "web",
+        "dev"
       ],
-      "port": 4201
+      "port": 4173
     }
   ]
 }
