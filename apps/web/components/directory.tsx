@@ -2,7 +2,8 @@ import { useMemo, useRef } from "react";
 import { useState } from "react";
 import { useSearchParams } from "react-router";
 import Fuse from "fuse.js";
-import { ArrowDownUp, ArrowUpDown, Search, TrendingUp } from "lucide-react";
+import { ArrowDownUp, ArrowUpDown, Check, Search, TrendingUp } from "lucide-react";
+import { useEffect } from "react";
 import { IconCard } from "@/components/icon-card";
 import { WarningBanner } from "@/components/warning-banner";
 import { PageCard } from "@/components/page-card";
@@ -36,6 +37,79 @@ type Sort = (typeof SORTS)[number];
 
 const parseSort = (raw: string): Sort =>
   raw === "alphabetical" || raw === "popular" ? raw : "latest";
+
+const SORT_META: Record<Sort, { label: string; Icon: typeof ArrowUpDown }> = {
+  latest: { label: "Latest", Icon: ArrowUpDown },
+  alphabetical: { label: "A-Z", Icon: ArrowDownUp },
+  popular: { label: "Popular", Icon: TrendingUp },
+};
+
+/** Shows the CURRENT sort; tapping reveals the options with the current
+ *  one checked. */
+function SortMenu({ sort, onChange }: { sort: Sort; onChange: (s: Sort) => void }) {
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const { label, Icon } = SORT_META[sort];
+
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: MouseEvent) => {
+      if (!menuRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("keydown", onKey);
+    };
+  }, [open]);
+
+  return (
+    <div ref={menuRef} className="relative">
+      <button
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+        className="flex cursor-pointer items-center space-x-1.5 rounded-md px-2 py-1.5 text-sm text-neutral-600 hover:bg-neutral-200 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
+      >
+        <Icon size={16} strokeWidth={1.8} />
+        <span>{label}</span>
+      </button>
+      {open && (
+        <div
+          role="listbox"
+          aria-label="Sort order"
+          className="absolute right-0 top-full z-50 mt-1 w-36 rounded-md border border-neutral-200 bg-white p-1 shadow-md dark:border-neutral-800 dark:bg-neutral-900"
+        >
+          {SORTS.map((s) => {
+            const { label: l, Icon: I } = SORT_META[s];
+            return (
+              <button
+                key={s}
+                type="button"
+                role="option"
+                aria-selected={s === sort}
+                onClick={() => {
+                  onChange(s);
+                  setOpen(false);
+                }}
+                className="flex w-full cursor-pointer items-center justify-between rounded px-2 py-1.5 text-sm text-neutral-700 hover:bg-neutral-100 dark:text-neutral-300 dark:hover:bg-neutral-800"
+              >
+                <span className="flex items-center space-x-1.5">
+                  <I size={15} strokeWidth={1.8} />
+                  <span>{l}</span>
+                </span>
+                {s === sort && <Check size={15} strokeWidth={2} />}
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function Directory({
   cards,
@@ -140,28 +214,7 @@ export function Directory({
                 ))}
               </div>
             )}
-            <button
-              type="button"
-              onClick={() =>
-                setSort(SORTS[(SORTS.indexOf(sort) + 1) % SORTS.length])
-              }
-              className="flex cursor-pointer items-center space-x-1.5 rounded-md px-2 py-1.5 text-sm text-neutral-600 hover:bg-neutral-200 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
-            >
-              {sort === "latest" ? (
-                <ArrowUpDown size={16} strokeWidth={1.8} />
-              ) : sort === "alphabetical" ? (
-                <TrendingUp size={16} strokeWidth={1.8} />
-              ) : (
-                <ArrowDownUp size={16} strokeWidth={1.8} />
-              )}
-              <span>
-                {sort === "latest"
-                  ? "Sort A-Z"
-                  : sort === "alphabetical"
-                    ? "Sort by popular"
-                    : "Sort by latest"}
-              </span>
-            </button>
+            <SortMenu sort={sort} onChange={setSort} />
           </div>
         </div>
         <WarningBanner />
