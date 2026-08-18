@@ -199,7 +199,12 @@ kR = 0.0185   kB = 0.0320   span = 0.9540      (linear light)`}</Code>
           artwork&apos;s natural size (the SVG viewBox, or pixel size — not
           the 1024 canvas) multiplied by <code>position.scale</code>, centered
           on the canvas, then offset by{" "}
-          <code>position.translation-in-points</code>.
+          <code>position.translation-in-points</code>. When{" "}
+          <code>position</code> is omitted entirely, the default is{" "}
+          <em>not</em> fit-to-canvas: the layer renders at scale 1 — one SVG
+          unit per canvas unit — centered, and clipped to the canvas
+          (measured with a seven-case viewBox sweep; a 1200×500 viewBox
+          spills and clips rather than shrinking to fit).
         </P>
         <Code>{`{ "name": "glyph",
   "image-name": "glyph.svg",
