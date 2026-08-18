@@ -1,6 +1,6 @@
 {
   "name": "Netflix",
-  "active": false,
+  "active": true,
   "liquidGlass": {
     "bundles": [
       {

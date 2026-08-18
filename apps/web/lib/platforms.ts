@@ -104,7 +104,14 @@ export const cards: Card[] = platforms.flatMap((p): Card[] => {
   return [];
 });
 
-export const glassCards = cards.filter((c) => c.facet === "glass");
+/**
+ * Cards shown in the main directory and non-inactive lenses: inactive
+ * platforms are hidden from the site and reachable only through the
+ * "inactive" QA lens.
+ */
+export const visibleCards = cards.filter((c) => c.platform.active);
+
+export const glassCards = visibleCards.filter((c) => c.facet === "glass");
 
 /** Where liquid glass raster assets are served from. */
 export const ASSET_BASE = process.env.NEXT_PUBLIC_ASSET_BASE ?? "/library";
@@ -112,7 +119,10 @@ export const ASSET_BASE = process.env.NEXT_PUBLIC_ASSET_BASE ?? "/library";
 export function getCategories(): { name: string; count: number }[] {
   const counts = new Map<string, number>();
   for (const c of cards)
-    for (const cat of c.categories) counts.set(cat, (counts.get(cat) ?? 0) + 1);
+    for (const cat of c.categories) {
+      if (!c.platform.active && cat !== "inactive") continue;
+      counts.set(cat, (counts.get(cat) ?? 0) + 1);
+    }
   return [...counts.entries()]
     .map(([name, count]) => ({ name, count }))
     .sort((a, b) => a.name.localeCompare(b.name));
@@ -127,8 +137,10 @@ export function categorySlug(name: string): string {
 }
 
 export function getCardsByCategory(slug: string): Card[] {
-  return cards.filter((c) =>
-    c.categories.some((cat) => categorySlug(cat) === slug)
+  return cards.filter(
+    (c) =>
+      c.categories.some((cat) => categorySlug(cat) === slug) &&
+      (slug === "inactive" || c.platform.active)
   );
 }
 

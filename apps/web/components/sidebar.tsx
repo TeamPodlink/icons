@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Braces, Cloud, House, Package, Server, Sparkles } from "lucide-react";
-import { cards, categorySlug, getCategories, glassCards } from "@/lib/platforms";
+import { categorySlug, getCategories, glassCards, visibleCards } from "@/lib/platforms";
 import { cn } from "@/lib/cn";
 
 const itemBase =
@@ -24,7 +24,7 @@ export function Sidebar() {
   const categories = getCategories();
 
   const links = [
-    { href: "/", label: "Home", icon: House, badge: cards.length },
+    { href: "/", label: "Home", icon: House, badge: visibleCards.length },
     {
       href: "/liquid-glass",
       label: "Liquid Glass",
