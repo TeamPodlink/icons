@@ -504,7 +504,7 @@ export function createLiquidRenderer(recipe) {
                   const GJ = F.glass[gj];
                   const pmj = bil(GJ.pmask, tx/S, ty/S);
                   if (pmj <= 0) continue;
-                  const aj = (GJ.AL[Math.min(GJ.AL.length-1, (ty/1024*GJ.AL.length)|0)]/255)*pmj;
+                  const aj = (GJ.AL[Math.min(GJ.AL.length-1, (ty/1024*GJ.AL.length)|0)]/255)*pmj*(GJ.g.op === undefined ? 1 : GJ.g.op);
                   const gcj = GJ.g.gc || [255, 255, 255];
                   // optional vertical material-color gradient (gc1 at
                   // gcy[1]); absent gc1 keeps the constant-gc behavior
@@ -520,7 +520,12 @@ export function createLiquidRenderer(recipe) {
               const gc1 = GL.g.gc1 || gcc;
               const tg = GL.g.gc1 ? Math.min(Math.max((py - GL.g.gcy[0])/(GL.g.gcy[1] - GL.g.gcy[0]), 0), 1) : 0;
               const gr = dr*(1-al) + (gcc[0] + (gc1[0]-gcc[0])*tg)*al, gg = dg*(1-al) + (gcc[1] + (gc1[1]-gcc[1])*tg)*al, gbv = db*(1-al) + (gcc[2] + (gc1[2]-gcc[2])*tg)*al;
-              r += (gr-r)*pm; g += (gg-g)*pm; b += (gbv-b)*pm;
+              // optional glass opacity: POST-COMPOSITE blend with the clean
+              // base (measured: overcast's op-0.9 tower group passes 10% of
+              // the UNREFRACTED canvas — opacity is compositor semantics,
+              // not a material-alpha factor)
+              const opf = pm*(GL.g.op === undefined ? 1 : GL.g.op);
+              r += (gr-r)*opf; g += (gg-g)*opf; b += (gbv-b)*opf;
             }
             if (GL.SH) {
               const shv = bil(GL.SH, px/S, py/S)*(1-pm);
