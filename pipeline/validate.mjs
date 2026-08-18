@@ -43,6 +43,16 @@ for (const { id, dir, meta } of platforms) {
     if (slugs.has(b.slug)) err(`${bid}: duplicate bundle slug`);
     slugs.add(b.slug);
 
+    // darkStatus: measured classification of hasDark:false bundles
+    // (pipeline/audit-dark-status.mjs) — "native" (artwork already
+    // dark; identical light/dark is correct) or "missing" (dark
+    // rendition backlog). Inapplicable when a real dark rendition
+    // exists.
+    if (b.darkStatus != null && !["native", "missing"].includes(b.darkStatus))
+      err(`${bid}: darkStatus must be "native" or "missing"`);
+    if (b.darkStatus != null && b.hasDark)
+      err(`${bid}: darkStatus is set but hasDark is true (stale audit — rerun audit-dark-status.mjs --write)`);
+
     const bundle = join(dir, b.file ?? "");
     if (!existsSync(bundle)) {
       err(`${bid}: bundle dir not found: ${b.file}`);
