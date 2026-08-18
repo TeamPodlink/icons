@@ -1,0 +1,15 @@
+// Cloudflare Workers static-assets deploy for the directory site.
+// Pure static: no server code — the SPA fallback serves index.html for
+// deep links (/directory/<lens>, /docs/*). Deployed by
+// .github/workflows/deploy.yml (wrangler deploy from this directory).
+{
+  "name": "refraction-web",
+  "compatibility_date": "2026-08-18",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "single-page-application"
+  },
+  "routes": [
+    { "pattern": "icons.podlink.com", "custom_domain": true }
+  ]
+}
