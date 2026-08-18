@@ -1,6 +1,7 @@
 {
   "name": "gPodder",
   "active": true,
+  "url": "https://gpodder.net",
   "guidelinesUrl": "https://gpodder.net/publisher/link/",
   "liquidGlass": {
     "bundles": [

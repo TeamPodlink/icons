@@ -1,6 +1,7 @@
 {
   "name": "iHeartRadio",
   "active": true,
+  "url": "https://www.iheart.com",
   "guidelinesUrl": "https://brand.iheart.com/podcastlogo",
   "liquidGlass": {
     "bundles": [

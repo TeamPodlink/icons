@@ -1,6 +1,7 @@
 {
   "name": "Downcast",
   "active": true,
+  "url": "https://downcastapp.com",
   "liquidGlass": {
     "bundles": [
       {
