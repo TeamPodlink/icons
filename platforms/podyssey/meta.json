@@ -11,7 +11,8 @@
         "file": "Podyssey.icon",
         "source": "appstore-artwork",
         "appStoreId": 6499520102,
-        "hasDark": false
+        "hasDark": false,
+        "darkStatus": "missing"
       }
     ]
   }

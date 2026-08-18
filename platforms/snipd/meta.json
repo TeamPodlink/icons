@@ -10,7 +10,8 @@
         "file": "Snipd.icon",
         "source": "appstore-artwork",
         "appStoreId": 1557206126,
-        "hasDark": false
+        "hasDark": false,
+        "darkStatus": "native"
       }
     ]
   }

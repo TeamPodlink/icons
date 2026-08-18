@@ -9,7 +9,8 @@
         "variant": null,
         "file": "GreatPods.icon",
         "source": "flat-svg",
-        "hasDark": false
+        "hasDark": false,
+        "darkStatus": "native"
       }
     ]
   }

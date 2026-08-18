@@ -10,7 +10,8 @@
         "variant": null,
         "file": "ListenNotes.icon",
         "source": "flat-svg-browser",
-        "hasDark": false
+        "hasDark": false,
+        "darkStatus": "missing"
       }
     ]
   }
