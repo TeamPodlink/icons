@@ -9,6 +9,11 @@ import { PageCard } from "@/components/page-card";
 import { facetCards, parseFacet, type Card, type Facet } from "@/lib/platforms";
 import { cn } from "@/lib/cn";
 
+/** Alphabetical compare that ignores punctuation, so "’sodes" sorts
+ *  under S instead of leading the list on its apostrophe. */
+const byTitle = (a: string, b: string) =>
+  a.localeCompare(b, undefined, { ignorePunctuation: true });
+
 function useUrlState(key: string, initial: string) {
   const [params, setParams] = useSearchParams();
   const [value, setValue] = useState(params.get(key) ?? initial);
@@ -55,14 +60,14 @@ export function Directory({
     const list = query ? fuse.search(query).map((r) => r.item) : [...base];
     if (query) return list; // search results stay relevance-ordered
     if (sort === "alphabetical")
-      list.sort((a, b) => a.title.localeCompare(b.title));
+      list.sort((a, b) => byTitle(a.title, b.title));
     else
       // "latest": newest first-addition date first (meta.json "added",
       // mined from git history); undated sink to the bottom; ties A-Z.
       list.sort(
         (a, b) =>
           (b.added ?? "").localeCompare(a.added ?? "") ||
-          a.title.localeCompare(b.title)
+          byTitle(a.title, b.title)
       );
     return list;
   }, [base, fuse, query, sort]);
