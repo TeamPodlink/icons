@@ -1,0 +1,21 @@
+{
+  "name": "iCatcher!",
+  "active": true,
+  "aliases": [
+    "icatcherpodcastplayer"
+  ],
+  "url": "https://www.joeisanerd.com",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "icatcher",
+        "title": "iCatcher!",
+        "variant": null,
+        "file": "iCatcher.icon",
+        "source": "appstore-artwork",
+        "appStoreId": 414419105,
+        "hasDark": false
+      }
+    ]
+  }
+}
