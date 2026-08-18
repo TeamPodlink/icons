@@ -10,9 +10,8 @@
         "title": "Audible",
         "variant": null,
         "file": "Audible.icon",
-        "hasDark": false,
-        "source": "adaptive-icon-split",
-        "darkStatus": "missing"
+        "hasDark": true,
+        "source": "adaptive-icon-split"
       }
     ]
   }

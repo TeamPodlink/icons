@@ -76,12 +76,42 @@ example: antennapod (commit `d64ded5`).
    for versions, then `https://f-droid.org/repo/<pkg>_<code>.apk`.
    (AntennaPod's GitHub releases carry no APK assets; F-Droid was the
    pilot's source.)
-3. **apkeep as last resort** — NOT installed on this Mac; installing
-   it is a maintainer decision, ask first.
+3. **apkeep** (`/opt/homebrew/bin/apkeep`, installed 2026-08-18 with
+   maintainer approval). What actually works (2026-08-18 round):
+   - `-d google-play` with an Aurora-dispenser anonymous token is THE
+     working path, and it serves first-party Play APKs:
+     `curl -H "User-Agent: com.aurora.store-4.6.3-63"
+     https://auroraoss.com/api/auth` → `{email, auth}` →
+     `apkeep -a <pkg> -d google-play -e <email> --auth-token <auth>
+     --accept-tos out/` (the ToS acceptance is for the dispenser's own
+     throwaway account). Failures are SILENT ("Downloading…" then no
+     file) — always `ls` the output. Geo/device-gated apps
+     (iheartradio) and delisted apps (listennotes) fail this way.
+   - `-d apk-pure` (the default) is DEAD: "Invalid app response" for
+     every package (and APKPure was reportedly compromised —
+     EFForg/apkeep#237 — avoid it regardless).
+   - `-d huawei-app-gallery` works anonymously but carries few
+     Western apps and stale versions (podcastaddict 2022.2.2h vs Play
+     2026.9.1); useful only as a cross-check of signing certs.
+   - Mirror websites (Uptodown, APKPure web, APKMirror download pages)
+     gate behind Cloudflare Turnstile / bot checks — do not automate
+     around them; APKMirror's *browse* pages are curl-able and publish
+     cert fingerprints, useful for cross-checking.
 
-Paid apps, auth-walled downloads, or anything requiring a Play
-account: STOP and ask the maintainer — mirror the iOS "never
-purchase" rule.
+**Provenance discipline (mandatory):** for every APK record source,
+package id, versionName/versionCode (`apktool.yml`), and the signing
+cert SHA-256 in the adoption commit. Modern APKs are v2/v3-signed
+(`keytool -printcert -jarfile` prints NOTHING — that is not an
+error); use androguard in a scratch venv:
+`APK(f).get_certificates_der_v3() or …_v2()` → sha256. Cross-check
+against a second source when one exists (APKMirror publishes
+fingerprints; AppGallery copies should carry the same key — Podcast
+Guru's AppGallery copy did NOT, a different signing key, so prefer
+Play).
+
+Paid apps, auth-walled downloads, or anything requiring the
+maintainer's own Play account: STOP and ask the maintainer — mirror
+the iOS "never purchase" rule.
 
 ### Extraction (apktool, installed via brew)
 
@@ -102,6 +132,21 @@ purchase" rule.
    canvas fill. A gradient raster that measures as an exact linear
    gradient (check per-row uniformity + linearity) becomes a canvas
    `fill` gradient with stops sampled at the measured crop window.
+   **Fill-orientation law (measured 2026-08-18, ledger):** ictool
+   IGNORES fill `orientation` start/stop — canvas gradients always
+   paint vertically over the full canvas height. Only vertical
+   full-height gradients may become canvas fills; diagonal, kinked,
+   or radial backgrounds ship as a layer instead (raster baked from
+   the exact gradient, or the converted SVG, full-canvas) over a
+   plain fill, with opacity-specializations 0 in dark so the gray
+   pin shows through (worked examples: audible, spreaker).
+6. **Malformation patterns to skip** (inspect before adopting):
+   `<foreground>@null` (playerfm — the "adaptive icon" is a bare
+   color); layers that encode a DIFFERENT rendition than the official
+   store icon (castbox's hexagon-less waveform, podcastguru's
+   dark-style vectors — crop-scan RMSE stays huge at every crop size);
+   Android Studio template backgrounds (green grid). A delisted app
+   (Play page 404) has no official Android distribution to mine.
 
 ### Scaling convention (measured, antennapod pilot)
 
@@ -124,6 +169,16 @@ developer's own crop of the same layers.
   agreement: RMSE 6.87/255, glyph bbox within 1px, fill within
   1/255. A raw diff against the flat Play PNG measures the Liquid
   Glass sheen, not fidelity — don't use it.
+- ALSO run a **self-probe** (2026-08-18 round): the measured crop of
+  your own 432 composite, upscaled to 1024, through ictool as the
+  same single-raster probe. Self-probe RMSE isolates recomposition
+  fidelity (round: 0.4–2.8/255); the Play-probe RMSE additionally
+  contains store-export divergence — some developers' Play 512s
+  measurably differ from their shipped layers (spreaker's export has
+  a weaker glow, audible's a different gradient), and a large
+  Play-RMSE with a small self-RMSE means the ART differs, which is a
+  skip signal only when the Play/App-Store rendition is the one the
+  entry should keep (castbox's hexagon, podcastguru's pastel light).
 
 ### Bundle + dark
 

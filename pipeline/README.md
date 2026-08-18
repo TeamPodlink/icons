@@ -846,6 +846,79 @@ podvine, podyssey, samsungfree, spreaker. Re-derive with
 or reworking artwork (build-assets does NOT maintain darkStatus; it
 only measures hasDark).
 
+## Android adaptive-icon upgrade round (2026-08-18)
+
+Second Android round after the antennapod pilot: the survey's ten
+ranked candidates inspected from their official APKs (Google Play via
+apkeep 1.0.0 `-d google-play` with an Aurora-dispenser anonymous
+token — the working acquisition path now that apkeep's APKPure backend
+returns invalid responses for every package tried, AppGallery carries
+only 3 of 10 candidates at stale versions, and Uptodown gates
+downloads behind Cloudflare Turnstile; all mirrors' CDNs also reject
+this Mac's WARP egress IP). Every APK's signing cert SHA-256 recorded
+in the adoption commits; Player FM's Play cert matches APKMirror's
+published fingerprint, and Podcast Addict / Castbox AppGallery copies
+carry the same keys as their Play copies (Podcast Guru's AppGallery
+copy is signed with a different key — Play copy used).
+
+**Adopted 5** (each verified render-vs-render through ictool: a
+"self-probe" = the measured crop of the 432 layer composite through
+ictool as a single-raster bundle isolates recomposition fidelity; the
+Play-art probe additionally measures store-export divergence):
+
+| slug | crop (dp of 108) | self RMSE / non-edge | vs-Play RMSE / bbox | dark |
+|---|---|---|---|---|
+| podcastaddict | 78.75, off (+.50,+.50) | 1.85 / 0.46 | 4.67 / ≤2px | baked twin |
+| podurama | 69.75, off (+.25,+.25) | 0.42 / 0.08 | 3.16 / ≤1px | baked twin |
+| podkicker | 72.13, off (+.50,+.50) | 1.48 / 0.45 | 4.04 / ≤1px | canvas pin |
+| spreaker | 61.63, off (+2.25,0) | 2.84 / 0.82 | 10.09 / ≤5px | canvas pin |
+| audible | 70.88, off (−2.0,−1.5) | 1.45 / 0.51 | 6.06 / ≤3px | baked twin |
+
+spreaker is the first all-vector Android adoption (both layers
+VectorDrawables, converted path-for-path; pathData verified
+byte-identical). Its and audible's elevated vs-Play numbers are
+store-export divergence, not recomposition error: both developers'
+Play 512s differ measurably from their shipped layers (spreaker's
+export has a weaker glow; audible's a slightly different gradient).
+
+**The fill-orientation law (measured this round, diag-fill + fill-only
+instruments).** ictool IGNORES canvas-fill `orientation` start/stop
+entirely — linear-gradient fills always paint vertically over the
+full canvas height, first color at y=0 (a diagonal red→blue
+orientation renders as the plain vertical gradient; a kinked
+start-y=0.62 gradient renders full-height). This is why every
+decanted bundle says `(0.5,0)→(0.5,1)`: Icon Composer never writes
+anything else, and ictool honors nothing else. Non-vertical or
+non-full-height backgrounds must ship as layers: audible's diagonal
+gradient bakes to an exact-gradient 1024 raster layer, spreaker's
+kinked-gradient-plus-glow background ships as a full-canvas SVG layer
+— each over a plain fill, with `opacity-specializations` 0 in dark so
+the gray canvas pin shows through.
+
+**Skipped 6, measured:** castbox — genuine 432 layers but a
+hexagon-less rendition ≠ its official Play/App-Store hexagon art
+(crop-scan bottoms at an implausible 94.6dp, RMSE 46/255; replacing
+1024 store art with 432 different-art raster fails the fidelity
+rule). podcastguru — genuine full-vector layers, but they encode the
+developer's DARK rendition (matches the existing bundle's dark.png),
+not the pastel light icon (scan RMSE 160/255); the existing 1024
+catalog bundle already carries both renditions. playerfm — degenerate
+adaptive icon: `<foreground>@null` over solid #c8122a (the themed
+launcher aliases are 192px full-bleed legacy rasters, all disabled);
+nothing beats the existing 1024+dark store art. podchaser — no
+Android app exists (Play 404, absent from Play search and mirrors).
+listennotes — delisted from Play (page 404, anonymous-token download
+refused); no official Android distribution left to mine. iheartradio
+— Play refuses the anonymous-token download (geo/device gating),
+absent from AppGallery, mirror paths bot-gated; uninspectable this
+round.
+
+Round outcome: podcastaddict, podurama, audible flip
+`adaptive-icon-split` with first dark renditions; podkicker and
+spreaker ship `adaptive-icon` with canvas-pin darks (spreaker's first
+dark). hasDark 53→57 of 70; the "missing dark" lens falls 10→6
+(castbox, downcast, gpodder, icatcher, iheartradio, listennotes).
+
 ## Adding a platform or icon
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md).

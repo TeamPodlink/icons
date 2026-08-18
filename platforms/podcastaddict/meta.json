@@ -9,8 +9,7 @@
         "variant": null,
         "file": "PodcastAddict.icon",
         "source": "adaptive-icon-split",
-        "hasDark": false,
-        "darkStatus": "missing"
+        "hasDark": true
       }
     ]
   }

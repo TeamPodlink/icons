@@ -9,9 +9,8 @@
         "title": "Spreaker",
         "variant": null,
         "file": "Spreaker.icon",
-        "hasDark": false,
-        "source": "adaptive-icon",
-        "darkStatus": "missing"
+        "hasDark": true,
+        "source": "adaptive-icon"
       }
     ]
   }
