@@ -11,10 +11,13 @@ import {
 import { renderBundleDataUri } from "refraction-engine";
 import {
   assetPath,
+  badgePath,
   categorySlug,
   flatPath,
   type Card,
+  type Facet,
 } from "@/lib/platforms";
+import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/cn";
 
 const actionBtn =
@@ -38,8 +41,6 @@ function useLiquidRender(slug: string, size: number, enabled: boolean) {
 
 const previewCls = "pointer-events-none mb-4 mt-1.5 h-24 w-24 select-none";
 const previewCommon = {
-  width: 96,
-  height: 96,
   loading: "lazy" as const,
   decoding: "async" as const,
 };
@@ -52,42 +53,111 @@ function GlassPreview({ card, src }: { card: Card; src?: string }) {
     src: assetPath(b.slug, { size: 128, dark }),
     srcSet: `${assetPath(b.slug, { size: 128, dark })} 1x, ${assetPath(b.slug, { size: 256, dark })} 2x`,
   });
-  if (src) return <img src={src} alt={alt} {...previewCommon} className={previewCls} />;
+  const common = { ...previewCommon, width: 96, height: 96 };
+  if (src) return <img src={src} alt={alt} {...common} className={previewCls} />;
   if (!b.hasDark)
     return (
-      <img
-        {...sized(false)}
-        alt={alt}
-        {...previewCommon}
-        className={previewCls}
-      />
+      <img {...sized(false)} alt={alt} {...common} className={previewCls} />
     );
   return (
     <>
       <img
         {...sized(false)}
         alt={alt}
-        {...previewCommon}
+        {...common}
         className={cn(previewCls, "dark:hidden")}
       />
       <img
         {...sized(true)}
         alt={alt}
-        {...previewCommon}
+        {...common}
         className={cn(previewCls, "hidden dark:block")}
       />
     </>
   );
 }
 
-export function IconCard({ card }: { card: Card }) {
+function FlatPreview({ card }: { card: Card }) {
+  return (
+    <img
+      src={flatPath(card.platform.id)}
+      alt={`${card.platform.name} icon`}
+      {...previewCommon}
+      width={96}
+      height={96}
+      className={previewCls}
+    />
+  );
+}
+
+/** Badge artwork is wide (~40px tall, variable width): a light/dark pair
+ *  swapped by theme class, letterboxed in the same box glass icons use. */
+function BadgePreview({ card }: { card: Card }) {
+  const id = card.platform.id;
+  const alt = `Listen on ${card.platform.name} badge`;
+  const cls = "h-12 w-auto max-w-full";
+  return (
+    <div className="pointer-events-none mb-4 mt-1.5 flex h-24 w-full select-none items-center justify-center px-2">
+      <img
+        src={badgePath(id, false)}
+        alt={alt}
+        {...previewCommon}
+        className={cn(cls, "dark:hidden")}
+      />
+      <img
+        src={badgePath(id, true)}
+        alt={alt}
+        {...previewCommon}
+        className={cn(cls, "hidden dark:block")}
+      />
+    </div>
+  );
+}
+
+/** A platform missing this facet: keep the card (catalog gaps stay
+ *  visible, per the QA-lens ethos) with an explicit empty treatment. */
+function MissingPreview({ label }: { label: string }) {
+  return (
+    <div
+      className={cn(
+        previewCls,
+        "flex items-center justify-center rounded-xl border border-dashed border-neutral-300 dark:border-neutral-700"
+      )}
+    >
+      <span className="px-2 text-center font-mono text-[11px] leading-tight text-neutral-400 dark:text-neutral-600">
+        {label}
+      </span>
+    </div>
+  );
+}
+
+export function IconCard({
+  card,
+  facet = "glass",
+}: {
+  card: Card;
+  /** The directory-level facet view; the card adapts artwork + actions. */
+  facet?: Facet;
+}) {
   const [live, setLive] = useState(false);
+  const { resolvedTheme } = useTheme();
   const b = card.bundle;
+  const p = card.platform;
+
+  // What this card actually shows: the glass view falls back to the flat
+  // vector for platforms that have no glass bundle yet (card.facet).
+  const shown: Facet =
+    facet === "glass" ? (card.facet === "glass" ? "glass" : "flat") : facet;
+  const missing =
+    (shown === "flat" && !p.hasFlat) || (shown === "badge" && !p.hasBadge);
+
   const liveUri = useLiquidRender(
     b?.slug ?? "",
     192,
-    live && Boolean(b?.recipe)
+    shown === "glass" && live && Boolean(b?.recipe)
   );
+
+  const title = facet === "glass" ? card.title : p.name;
 
   const copyText = async (text: string, description: string) => {
     await navigator.clipboard.writeText(text);
@@ -108,16 +178,16 @@ export function IconCard({ card }: { card: Card }) {
     }
   };
 
-  const copySvg = async () => {
-    const svg = await fetch(flatPath(card.platform.id)).then((r) => r.text());
-    await copyText(svg, `${card.title} — flat SVG`);
+  const copySvg = async (url: string, description: string) => {
+    const svg = await fetch(url).then((r) => r.text());
+    await copyText(svg, description);
   };
 
   /**
    * Download via fetch + blob object URL: the `download` attribute is
    * ignored on cross-origin hrefs (production serves assets from R2),
    * where a plain anchor would navigate instead of saving. Same-origin
-   * (dev /library) goes through the identical path.
+   * (dev /library, /flat, /badges) goes through the identical path.
    */
   const downloadAsset = async (url: string, filename: string) => {
     try {
@@ -136,10 +206,15 @@ export function IconCard({ card }: { card: Card }) {
     }
   };
 
+  // Badge downloads/copies target the variant currently on screen.
+  const badgeDark = resolvedTheme === "dark";
+  const badgeUrl = badgePath(p.id, badgeDark);
+  const badgeName = `${p.id}-${badgeDark ? "dark" : "light"}.svg`;
+
   return (
     <div className="flex flex-col items-center justify-center rounded-md border border-neutral-200 px-3.5 py-3 hover:bg-neutral-100/80 dark:border-neutral-800 dark:hover:bg-neutral-800/20">
       <div className="flex h-6 w-full items-center justify-end space-x-2 pb-0.5">
-        {card.facet === "flat" && (
+        {shown === "flat" && facet === "glass" && (
           <span
             title="No Liquid Glass icon yet — flat vector shown. Contributions welcome!"
             className="rounded-full border border-neutral-300 px-2 py-0.5 font-mono text-[11px] text-neutral-400 dark:border-neutral-800 dark:text-neutral-500"
@@ -147,7 +222,7 @@ export function IconCard({ card }: { card: Card }) {
             flat
           </span>
         )}
-        {b?.hasDark && (
+        {shown === "glass" && b?.hasDark && (
           <span
             title="Has a distinct dark rendition"
             className="rounded-full border border-neutral-300 px-2 py-0.5 font-mono text-[11px] text-neutral-500 dark:border-neutral-700 dark:text-neutral-400"
@@ -155,42 +230,44 @@ export function IconCard({ card }: { card: Card }) {
             dark
           </span>
         )}
-        {b?.recipe && (
+        {shown === "glass" && b?.recipe && (
           <button
             type="button"
             title={
               live
-                ? "Showing live in-browser procedural render"
-                : `Render procedurally in your browser (RMSE ${b.rmse} vs Apple's renderer)`
+                ? "Live: rendered procedurally in your browser just now — click for the prerendered raster"
+                : `Render this icon live in your browser — the adopted recipe, RMSE ${b.rmse} vs Apple's renderer`
             }
             onClick={() => setLive((v) => !v)}
             className={cn(
-              "flex cursor-pointer items-center space-x-1 rounded-full border px-2 py-0.5 font-mono text-[11px]",
+              "flex cursor-pointer items-center space-x-1 rounded-full border px-2 py-0.5 font-mono text-[11px] font-medium",
               live
-                ? "border-emerald-500/40 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                : "border-neutral-300 text-neutral-500 hover:border-neutral-400 dark:border-neutral-700 dark:text-neutral-400 dark:hover:border-neutral-500"
+                ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
+                : "border-neutral-400 text-neutral-600 hover:border-emerald-500/60 hover:bg-emerald-500/10 hover:text-emerald-600 dark:border-neutral-600 dark:text-neutral-300 dark:hover:border-emerald-500/50 dark:hover:text-emerald-400"
             )}
           >
             <Sparkles size={11} strokeWidth={1.8} />
-            <span>{live ? "live" : "recipe"}</span>
+            <span>live</span>
           </button>
         )}
       </div>
 
-      {card.facet === "glass" ? (
-        <GlassPreview card={card} src={live && b?.recipe ? liveUri ?? undefined : undefined} />
-      ) : (
-        <img
-          src={flatPath(card.platform.id)}
-          alt={`${card.title} icon`}
-          {...previewCommon}
-          className={previewCls}
+      {missing ? (
+        <MissingPreview label={shown === "flat" ? "no flat icon" : "no badge"} />
+      ) : shown === "glass" ? (
+        <GlassPreview
+          card={card}
+          src={live && b?.recipe ? liveUri ?? undefined : undefined}
         />
+      ) : shown === "badge" ? (
+        <BadgePreview card={card} />
+      ) : (
+        <FlatPreview card={card} />
       )}
 
       <div className="mb-3 flex flex-col items-center justify-center space-y-1">
         <p className="select-all truncate text-balance text-center text-[15px] font-medium">
-          {card.title}
+          {title}
         </p>
         <div className="flex h-6 items-center justify-center space-x-1">
           {card.categories.slice(0, 2).map((c) => (
@@ -206,7 +283,7 @@ export function IconCard({ card }: { card: Card }) {
       </div>
 
       <div className="flex items-center space-x-0.5">
-        {card.facet === "glass" ? (
+        {missing ? null : shown === "glass" ? (
           <>
             <button
               type="button"
@@ -225,32 +302,58 @@ export function IconCard({ card }: { card: Card }) {
               <Download size={16} strokeWidth={1.8} />
             </button>
           </>
+        ) : shown === "badge" ? (
+          <>
+            <button
+              type="button"
+              title={`Copy badge SVG (${badgeDark ? "dark" : "light"})`}
+              onClick={() =>
+                copySvg(
+                  badgeUrl,
+                  `${p.name} — ${badgeDark ? "dark" : "light"} badge SVG`
+                )
+              }
+              className={actionBtn}
+            >
+              <Copy size={16} strokeWidth={1.8} />
+            </button>
+            <button
+              type="button"
+              title={`Download badge SVG (${badgeDark ? "dark" : "light"})`}
+              onClick={() => downloadAsset(badgeUrl, badgeName)}
+              className={actionBtn}
+            >
+              <Download size={16} strokeWidth={1.8} />
+            </button>
+          </>
         ) : (
           <>
             <button
               type="button"
               title="Copy flat SVG"
-              onClick={copySvg}
+              onClick={() =>
+                copySvg(flatPath(p.id), `${card.title} — flat SVG`)
+              }
               className={actionBtn}
             >
               <Copy size={16} strokeWidth={1.8} />
             </button>
-            <a
-              href={flatPath(card.platform.id)}
-              download={`${card.platform.id}.svg`}
+            <button
+              type="button"
               title="Download flat SVG"
+              onClick={() => downloadAsset(flatPath(p.id), `${p.id}.svg`)}
               className={actionBtn}
             >
               <Download size={16} strokeWidth={1.8} />
-            </a>
+            </button>
           </>
         )}
-        {card.platform.url && (
+        {p.url && (
           <a
-            href={card.platform.url}
+            href={p.url}
             target="_blank"
             rel="noreferrer"
-            title={`${card.platform.name} website`}
+            title={`${p.name} website`}
             className={actionBtn}
           >
             <LinkIcon size={16} strokeWidth={1.8} />
