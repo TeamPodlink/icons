@@ -8,7 +8,7 @@
         "title": "Podurama",
         "variant": null,
         "file": "Podurama.icon",
-        "source": "appstore-artwork",
+        "source": "adaptive-icon-split",
         "appStoreId": 1497491520,
         "hasDark": false,
         "darkStatus": "missing"
