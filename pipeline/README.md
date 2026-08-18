@@ -194,26 +194,41 @@ the gamut probe's ±3/255 tolerance plus edge AA). The remaining tail
 is enumerated SVG-feature work, not model error: `<use>`
 instantiation (deepcast 183, podfriend 43), radial + multi-stop
 gradients (tunestr 91, itunes 30), the pre-existing knockout-winding
-limitation (tunein 70), and a now-identified gradient-interpolation
-mismatch (podvine 15.6, likely jam 13.2): CoreSVG interpolates SVG
-gradients by a law that is none of the obvious candidates — measured
-against nine models (encoded/linear sRGB, encoded/linear P3, Oklab,
-OkLCH, HSL, CSS-4 gamut-mapped stops, native-P3 lerp; best miss 11.7
-RMSE on podvine's field) — and is syntax-independent (hex sRGB stops
-show the identical curve as color(display-p3) stops; instrument:
-2-stop gradient bundles through ictool). Saturated violet stops shift
-visibly toward blue mid-ramp. The law is directly solvable with a
-stop-grid instrument sweep (black→white ramps expose the transfer,
-hue pairs the mixing space) — the same measure-don't-theorize
-playbook as the refraction law. sonnet (9.6, gradient-free) remains
-unattributed. Iteration history: the first sweep's entire
+limitation (tunein 70), and sonnet (9.6, gradient-free,
+unattributed). Iteration history: the first sweep's entire
 40–149 tail was two causes — unrendered-subtree handling
 (defs/clipPath) and the CSS Color 4 `color(display-p3 …)` fill
 syntax.
 
+**The CoreSVG gradient-stop law (solved 2026-08-17,
+`probe-gradient-law.py`).** SVG gradient midtones initially missed by
+up to 45/255 in the green channel while solid fills of the same
+colors were exact. Nine candidate interpolation spaces all failed
+(best 11.7 RMSE); the decisive instruments: hex sRGB and
+color(display-p3) stops produce the identical curve (it's the
+gradient machinery, not color parsing), and a blue→black ramp — both
+stops zero-green — shows the added green is perfectly LINEAR in t, so
+the ramp is a plain encoded-sRGB lerp of TRANSFORMED stops. A 4×4×4
+constant-stop sweep (64 ictool renders of C→white gradients) measured
+the transform directly: only green changes, clamped in linear sRGB to
+a range set by the other channels —
+
+    G' = clamp(G, kR·R + kB·B, span + kR·R + kB·B)
+    kR = 0.0185, kB = 0.0320, span = 0.9540   (linear light)
+
+— fit RMSE 0.18/255 over the grid; all ten instrument pair-curves
+reproduce at ≤ 1.2 RMSE (violet→teal was 9.9 under the best guess).
+The signature of stops being round-tripped through a working space
+with a different green primary and clipped there. Applying the law in
+translate_icon.py (gradient stops only): jam 13.2 → 1.60, resso
+2.84 → 2.40. podvine improved but keeps an unrelated residual
+(14.6; its background field fits at ~6.9 under the law, axis
+verified — the remainder sits at glyph edges, unattributed).
+
 Glass icons remain gated on the material-response sweep and the
 per-layer lighting model; raster-art bundles on a PNG-decode
-decision. The player's coverage today: flat + SVG.
+decision. The player's coverage today: flat + SVG, 37 bundles at
+median RMSE 4.0, 27/37 ≤ 5.5.
 
 ## Adding a platform or icon
 

@@ -304,6 +304,29 @@ def svg_color_to_render(spec):
     return p3_to_render(c) if space == "p3" else srgb_to_render(c)
 
 
+# CoreSVG gradient-stop law (measured 2026-08-17, probe-gradient-law.py):
+# stops — and only stops; solid fills are exact — pass through a working
+# space that clamps linear green to a range set by the other channels
+# (G' = clamp(G, kR*R + kB*B, span + kR*R + kB*B)), then the ramp is a
+# plain lerp of the clamped stops in encoded sRGB. Fit RMSE 0.18/255
+# over a 4x4x4 stop grid; all ten instrument pair-curves <= 1.2 RMSE.
+_STOP_KR, _STOP_KB, _STOP_SPAN = 0.0185, 0.0320, 0.9540
+
+
+def gradient_stop_srgb(spec):
+    # resolved stop color -> composite-space sRGB 0..1 with the stop law
+    space, c = spec
+    srgb = np.clip(_P3_TO_SRGB @ _lin(c), 0, 1) if space == "p3" else _lin(np.clip(c, 0, 1))
+    lo = _STOP_KR * srgb[0] + _STOP_KB * srgb[2]
+    g = np.clip(srgb[1], lo, lo + _STOP_SPAN)
+    return np.array([srgb[0], g, srgb[2]])
+
+
+def gradient_stop_to_render(spec):
+    p3 = _enc(_SRGB_TO_P3 @ gradient_stop_srgb(spec))
+    return [round(float(v) * 255, 1) for v in p3]
+
+
 def attr(attrs, name, style):
     v = re.findall(rf'{name}="([^"]*)"', attrs)
     if v:
@@ -602,8 +625,8 @@ for g in reversed(doc.get("groups", [])):
                         p0 = gpt(gr["x1"], gr["y1"])
                         p1 = gpt(gr["x2"], gr["y2"])
                         fdesc = {"t": "lin",
-                                 "c0": svg_color_to_render(stops[0][1]),
-                                 "c1": svg_color_to_render(stops[-1][1]),
+                                 "c0": gradient_stop_to_render(stops[0][1]),
+                                 "c1": gradient_stop_to_render(stops[-1][1]),
                                  "x0": round(p0[0], 1), "y0": round(p0[1], 1),
                                  "x1": round(p1[0], 1), "y1": round(p1[1], 1)}
                 else:
