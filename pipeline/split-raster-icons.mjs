@@ -17,6 +17,17 @@
 // Interior regions matching the background color (YouTube's white play
 // triangle) are NOT border-connected and are preserved.
 //
+// Layered-background mode (fallback): when the background is smooth but
+// NOT a vertical 2-stop linear gradient — diagonal linear gradients
+// (castbox) or nonlinear vertical ramps (downcast's eased red) — the
+// background is modeled as a 2D field, linear in x between the measured
+// left/right border columns, and ships as a baked background.png layer
+// with opacity 0 in dark over a plain vertical fill (the fill-
+// orientation law, pipeline/README.md: canvas fills only ever paint
+// vertical full-height linear gradients; audible/spreaker precedent).
+// The dark twin's tint is sampled from the field's per-row mean,
+// matching how ictool's SVG tint samples the (vertical) default fill.
+//
 // Safety guard: the rebuilt bundle's Default rendition must match the
 // original bundle's render (central RMSE <= 3) or the change is
 // reverted. Dark pairs land in /tmp/raster-split-review.png.
@@ -126,13 +137,34 @@ function keyBackground(data, w, h, tol) {
       if (d > tol * 1.5) return null;
     }
 
+  const out = keyGlyphByField(data, w, h, tol, (x, y) => rowBg[y]);
+  return {
+    bgTop: round3(rowBg[0]),
+    bgBottom: round3(rowBg[h - 1]),
+    bgMid: round3(rowBg[Math.floor(h / 2)]),
+    rowBg,
+    glyph: out,
+  };
+}
+
+const round3 = (c) => c.map((v) => Math.round(v));
+
+/**
+ * Flood-fill glyph keying against an arbitrary background field
+ * fieldAt(x,y) -> [r,g,b]: border-connected near-background pixels go
+ * transparent; a 1px shell around the mask gets alpha scaled by color
+ * distance to soften the boundary. Returns the keyed RGBA buffer.
+ */
+function keyGlyphByField(data, w, h, tol, fieldAt) {
   const dist = (i) => {
-    const y = Math.floor(i / 4 / w);
-    const bg = rowBg[y];
+    const p = i / 4;
+    const y = Math.floor(p / w), x = p % w;
+    const bg = fieldAt(x, y);
     return Math.sqrt(
       (data[i] - bg[0]) ** 2 + (data[i + 1] - bg[1]) ** 2 + (data[i + 2] - bg[2]) ** 2
     );
   };
+  const px = (x, y) => (y * w + x) * 4;
   const mask = new Uint8Array(w * h); // 1 = background
   const stack = [];
   const border = [];
@@ -155,8 +187,6 @@ function keyBackground(data, w, h, tol) {
       }
     }
   }
-  // glyph = original with background transparent; soften the boundary
-  // by scaling alpha with color distance in a 1px shell around the mask
   const out = Buffer.from(data);
   for (let i = 0; i < w * h; i++) {
     if (mask[i]) out[i * 4 + 3] = 0;
@@ -173,12 +203,85 @@ function keyBackground(data, w, h, tol) {
         out[i * 4 + 3] = Math.round(out[i * 4 + 3] * a);
       }
     }
-  const round3 = (c) => c.map((v) => Math.round(v));
+  return out;
+}
+
+/**
+ * Layered-background fallback (see header): background = 2D field,
+ * linear in x between the measured left/right border columns. Exact
+ * for diagonal LINEAR gradients and for vertical ramps of any profile
+ * (each row's color is measured, not interpolated). Structural gates:
+ * both border columns vary smoothly in y (gradient, not texture) and
+ * the border rows match the linear-in-x model; overall fidelity is
+ * still arbitrated by the light-rendition RMSE guard downstream.
+ * Returns { bgTop, bgBottom, rowBgFn, glyph, bg } or null.
+ */
+function keyBackgroundField(data, w, h, tol) {
+  const px = (x, y) => (y * w + x) * 4;
+  const IN = 3;
+  const colMean = (xs, y) => {
+    let r = 0, g = 0, b = 0;
+    for (const x of xs) {
+      const i = px(x, y);
+      r += data[i]; g += data[i + 1]; b += data[i + 2];
+    }
+    return [r / xs.length, g / xs.length, b / xs.length];
+  };
+  const left = new Array(h), right = new Array(h);
+  for (let y = 0; y < h; y++) {
+    const yy = Math.min(Math.max(y, IN), h - 1 - IN);
+    left[y] = colMean([IN, IN + 1, IN + 2], yy);
+    right[y] = colMean([w - 3 - IN, w - 2 - IN, w - 1 - IN], yy);
+  }
+  // each border column must vary gently in y (gradient, not texture)
+  for (const col of [left, right])
+    for (let y = IN + 1; y < h - IN; y++) {
+      const d = Math.hypot(
+        col[y][0] - col[y - 1][0],
+        col[y][1] - col[y - 1][1],
+        col[y][2] - col[y - 1][2]
+      );
+      if (d > 3) return null;
+    }
+  const fieldAt = (x, y) => {
+    const t = x / (w - 1);
+    const L = left[y], R = right[y];
+    return [
+      L[0] + (R[0] - L[0]) * t,
+      L[1] + (R[1] - L[1]) * t,
+      L[2] + (R[2] - L[2]) * t,
+    ];
+  };
+  // border rows must match the linear-in-x model
+  for (const y of [IN, h - 1 - IN])
+    for (let x = IN + 1; x < w - IN; x += 5) {
+      const i = px(x, y), f = fieldAt(x, y);
+      const d = Math.hypot(
+        data[i] - f[0], data[i + 1] - f[1], data[i + 2] - f[2]
+      );
+      if (d > tol * 1.5) return null;
+    }
+  const glyph = keyGlyphByField(data, w, h, tol, fieldAt);
+  const bg = Buffer.alloc(data.length);
+  for (let y = 0; y < h; y++)
+    for (let x = 0; x < w; x++) {
+      const i = px(x, y), f = fieldAt(x, y);
+      bg[i] = Math.round(f[0]);
+      bg[i + 1] = Math.round(f[1]);
+      bg[i + 2] = Math.round(f[2]);
+      bg[i + 3] = 255;
+    }
+  const mid = (y) => [
+    (left[y][0] + right[y][0]) / 2,
+    (left[y][1] + right[y][1]) / 2,
+    (left[y][2] + right[y][2]) / 2,
+  ];
   return {
-    bgTop: round3(rowBg[0]),
-    bgBottom: round3(rowBg[h - 1]),
-    bgMid: round3(rowBg[Math.floor(h / 2)]),
-    glyph: out,
+    bgTop: round3(mid(0)),
+    bgBottom: round3(mid(h - 1)),
+    rowBgFn: mid,
+    glyph,
+    bg,
   };
 }
 
@@ -196,16 +299,16 @@ function keyBackground(data, w, h, tol) {
  *   - the artwork has colors off the B->P line (colorful glyphs keep
  *     their own colors in dark, as iOS does) — unless `force`.
  */
-function bakeDarkGlyph(data, w, h, bgTop, bgBottom, force = false) {
+function bakeDarkGlyph(data, w, h, bgTop, bgBottom, force = false, rowBgFn = null) {
   if (Math.max(...bgTop, ...bgBottom) <= 51) return null;
-  const rowBg = (y) => {
+  const rowBg = rowBgFn ?? ((y) => {
     const t = h <= 1 ? 0 : y / (h - 1);
     return [
       bgTop[0] + (bgBottom[0] - bgTop[0]) * t,
       bgTop[1] + (bgBottom[1] - bgTop[1]) * t,
       bgTop[2] + (bgBottom[2] - bgTop[2]) * t,
     ];
-  };
+  });
   // Pole vote among clearly-non-background pixels: is the paint white
   // or achromatic-dark? Chromatic paint (YouTube's red button) and
   // mid-tones vote "other" — enough of those means the artwork isn't a
@@ -341,13 +444,34 @@ for (const b of targets) {
       const stops = icon.fill["linear-gradient"];
       const bgTop = parseStop(stops[0]);
       const bgBottom = parseStop(stops[1]);
+      // Layered-background bundles: the field's per-row mean (not the
+      // vertical fill lerp) is the tint reference, and the layer must
+      // survive the groups rebuild.
+      let rowBgFn = null;
+      const bgPath = join(assets, "background.png");
+      if (_exists(bgPath)) {
+        const { data: bgd, info: bgi } = await sharp(bgPath)
+          .ensureAlpha()
+          .raw()
+          .toBuffer({ resolveWithObject: true });
+        const rows = new Array(bgi.height);
+        for (let y = 0; y < bgi.height; y++) {
+          let r = 0, g = 0, bch = 0;
+          for (let x = 0; x < bgi.width; x++) {
+            const i = (y * bgi.width + x) * 4;
+            r += bgd[i]; g += bgd[i + 1]; bch += bgd[i + 2];
+          }
+          rows[y] = [r / bgi.width, g / bgi.width, bch / bgi.width];
+        }
+        rowBgFn = (y) => rows[Math.min(y, rows.length - 1)];
+      }
       const beforeR = join(work, `${b.slug}-before.png`);
       ictoolRender(bdir, beforeR, 256);
       rmSync(backup, { recursive: true, force: true });
       cpSync(bdir, backup, { recursive: true });
       const baked = bakeDarkGlyph(
         data, info.width, info.height, bgTop, bgBottom,
-        allowDarkGlyph.has(b.slug)
+        allowDarkGlyph.has(b.slug), rowBgFn
       );
       if (baked)
         await sharp(baked, {
@@ -361,11 +485,22 @@ for (const b of targets) {
         "image-name": "glyph.png", name: "glyph", glass: false,
         ...(scale ? { position: { scale, "translation-in-points": [0, 0] } } : {}),
       };
+      const rebuilt = twinLayers(baseLayer, !!baked);
+      if (rowBgFn)
+        rebuilt.push({
+          "image-name": "background.png", name: "background", glass: false,
+          ...(scale
+            ? { position: { scale, "translation-in-points": [0, 0] } }
+            : {}),
+          "opacity-specializations": [
+            { value: 1 }, { appearance: "dark", value: 0 },
+          ],
+        });
       icon.groups = [
         {
           hidden: false, "blend-mode": "normal", specular: false,
           translucency: { enabled: false, value: 0 },
-          layers: twinLayers(baseLayer, !!baked),
+          layers: rebuilt,
         },
       ];
       writeFileSync(
@@ -394,17 +529,38 @@ for (const b of targets) {
       .ensureAlpha()
       .raw()
       .toBuffer({ resolveWithObject: true });
-    const keyed = keyBackground(data, info.width, info.height, TOL);
+    let keyed = keyBackground(data, info.width, info.height, TOL);
+    if (keyed) {
+      // The vertical fill is a 2-stop LINEAR gradient; a measured
+      // per-row profile that deviates from the top->bottom lerp
+      // (downcast's eased red ramp) can't be reproduced by it — route
+      // to the layered-background mode instead of drifting past the
+      // render guard.
+      let dev = 0;
+      const { rowBg } = keyed;
+      const n = rowBg.length;
+      for (let y = 0; y < n; y++) {
+        const t = n <= 1 ? 0 : y / (n - 1);
+        for (let c = 0; c < 3; c++)
+          dev = Math.max(
+            dev,
+            Math.abs(rowBg[y][c] - (rowBg[0][c] + (rowBg[n - 1][c] - rowBg[0][c]) * t))
+          );
+      }
+      if (dev > 2.5) keyed = null;
+    }
+    if (!keyed) keyed = keyBackgroundField(data, info.width, info.height, TOL);
     if (!keyed) {
       console.log(`skip ${b.slug}: non-uniform background`);
       continue;
     }
+    const bgImage = keyed.bg ?? null; // layered-background mode
     // Bake the dark twin (raster layers never auto-tint — see header).
     // A dark glyph that gets no tintable twin would ride the dark
     // canvas near-invisibly (Podyssey's illustrated boat): skip whole.
     const baked = bakeDarkGlyph(
       keyed.glyph, info.width, info.height, keyed.bgTop, keyed.bgBottom,
-      allowDarkGlyph.has(b.slug)
+      allowDarkGlyph.has(b.slug), keyed.rowBgFn ?? null
     );
     if (!baked && glyphLuma(keyed.glyph) < 90) {
       console.log(`skip ${b.slug}: dark glyph with no tintable twin`);
@@ -426,6 +582,12 @@ for (const b of targets) {
       })
         .png()
         .toFile(join(assets, "glyph-dark.png"));
+    if (bgImage)
+      await sharp(bgImage, {
+        raw: { width: info.width, height: info.height, channels: 4 },
+      })
+        .png()
+        .toFile(join(assets, "background.png"));
     rmSync(lightPng);
     const col = (c) => `srgb:${c.map((v) => (v / 255).toFixed(5)).join(",")},1.00000`;
     const fillValue = {
@@ -438,6 +600,14 @@ for (const b of targets) {
       ...(scale ? { position: { scale, "translation-in-points": [0, 0] } } : {}),
     };
     const layers = twinLayers(baseLayer, !!baked);
+    if (bgImage)
+      layers.push({
+        "image-name": "background.png", name: "background", glass: false,
+        ...(scale ? { position: { scale, "translation-in-points": [0, 0] } } : {}),
+        "opacity-specializations": [
+          { value: 1 }, { appearance: "dark", value: 0 },
+        ],
+      });
     writeFileSync(
       join(bdir, "icon.json"),
       JSON.stringify(
