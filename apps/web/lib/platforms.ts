@@ -48,7 +48,9 @@ const SOURCE_LABEL: Record<string, string> = {
 /**
  * Debug categories: computed QA lenses over the collection, replacing
  * editorial taxonomy. Each is a worklist — "no recipe" is the recipe
- * backlog, "missing dark" the icons whose Apple-darkened rendition we
+ * backlog and "live render" its complement (bundles whose adopted recipe
+ * renders procedurally in-browser), "missing dark" the icons whose
+ * Apple-darkened rendition we
  * don't have yet (the dark-variant backlog), "dark as-is" the icons
  * whose artwork is already dark so identical light/dark is correct
  * (measured split: pipeline/audit-dark-status.mjs), "unlabeled source"
@@ -58,7 +60,8 @@ const SOURCE_LABEL: Record<string, string> = {
 export function debugCategories(p: Platform, b: GlassBundle | null): string[] {
   const cats: string[] = [];
   if (b) {
-    if (!b.recipe) cats.push("no recipe");
+    if (b.recipe) cats.push("live render");
+    else cats.push("no recipe");
     if (!b.hasDark)
       cats.push(b.darkStatus === "native" ? "dark as-is" : "missing dark");
     cats.push(b.source ? SOURCE_LABEL[b.source] ?? b.source : "unlabeled source");
@@ -171,4 +174,36 @@ export function assetPath(
 /** Flat squircle SVG path for a platform id. */
 export function flatPath(id: string): string {
   return `/flat/${id}.svg`;
+}
+
+/** "Listen on" badge SVG path for a platform id (light + dark pair). */
+export function badgePath(id: string, dark = false): string {
+  return `/badges/${id}-${dark ? "dark" : "light"}.svg`;
+}
+
+/**
+ * Which artwork the directory grid shows. "glass" is the default (one
+ * card per bundle); "flat" and "badge" show the platform-level facets.
+ */
+export type Facet = "glass" | "flat" | "badge";
+
+export function parseFacet(raw: string | null): Facet {
+  return raw === "flat" || raw === "badge" ? raw : "glass";
+}
+
+/**
+ * Card list for a facet view. Glass keeps one card per bundle; flat and
+ * badge dedupe to one card per platform (those assets are per-platform,
+ * so a platform with several bundle variants gets a single card).
+ * Platforms missing the facet stay listed — the card renders an explicit
+ * gap so catalog holes remain visible.
+ */
+export function facetCards(list: Card[], facet: Facet): Card[] {
+  if (facet === "glass") return list;
+  const seen = new Set<string>();
+  return list.filter((c) => {
+    if (seen.has(c.platform.id)) return false;
+    seen.add(c.platform.id);
+    return true;
+  });
 }
