@@ -1,6 +1,7 @@
 {
   "name": "Global Player",
   "active": true,
+  "url": "https://www.globalplayer.com",
   "liquidGlass": {
     "bundles": [
       {

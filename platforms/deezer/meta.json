@@ -1,6 +1,7 @@
 {
   "name": "Deezer",
   "active": true,
+  "url": "https://www.deezer.com",
   "guidelinesUrl": "https://deezerbrand.com/",
   "liquidGlass": {
     "bundles": [

@@ -1,6 +1,7 @@
 {
   "name": "Hark",
   "active": true,
+  "url": "https://harkaudio.com",
   "liquidGlass": {
     "bundles": [
       {
