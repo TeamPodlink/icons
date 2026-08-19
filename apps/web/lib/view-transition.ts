@@ -48,7 +48,10 @@ export function useTransitionNavigate() {
       else
         void router.navigate(to, {
           ...opts,
-          viewTransition: !prefersReducedMotion(),
+          // Skip the morph for reduced-motion users, and in hidden
+          // documents, where startViewTransition aborts with an
+          // InvalidStateError react-router leaves unhandled.
+          viewTransition: !prefersReducedMotion() && !document.hidden,
         });
     },
     [router, fallback]
