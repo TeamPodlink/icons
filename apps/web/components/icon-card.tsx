@@ -26,6 +26,7 @@ import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/cn";
 import {
   CARD_VT_ATTR,
+  CELL_VT_ATTR,
   nameCardForTransition,
   useTransitionNavigate,
 } from "@/lib/view-transition";
@@ -235,6 +236,7 @@ export function IconCard({
 
   return (
     <div
+      {...{ [CELL_VT_ATTR]: card.key }}
       onContextMenu={(e) => {
         e.preventDefault();
         setMenu({ x: e.clientX, y: e.clientY });

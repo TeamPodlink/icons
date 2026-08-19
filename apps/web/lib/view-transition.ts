@@ -4,8 +4,9 @@
 // lifted into the ::view-transition pseudo-layer, which paints over the
 // root snapshot. So NO grid card carries a name at rest: the one
 // transitioning card is named imperatively for exactly the transition
-// window (see nameCardForTransition / useIconTransitionHandoff), and the
-// detail preview is the only element named in React.
+// window (see nameCardForTransition / useIconTransitionHandoff) — its
+// artwork box as `icon-<key>` and its root cell as `card-<key>` — and
+// only the detail side (preview + dialog panel) is named in React.
 //
 // react-router only honors `viewTransition` through the data router
 // (`router.navigate`) — the declarative navigator that `useNavigate()`
@@ -14,7 +15,12 @@
 // `document.startViewTransition` (Firefox) just get the plain instant
 // navigation: the router feature-detects and skips the transition.
 
-import { useCallback, useContext, useLayoutEffect } from "react";
+import {
+  useCallback,
+  useContext,
+  useLayoutEffect,
+  type CSSProperties,
+} from "react";
 import {
   UNSAFE_DataRouterContext,
   useNavigate,
@@ -68,14 +74,39 @@ export function iconTransitionName(key: string): string {
   return `icon-${key}`;
 }
 
-/** data attribute that lets the transition machinery find a card's
- *  artwork box without the card carrying a live name. */
-export const CARD_VT_ATTR = "data-vt-icon";
+/** `view-transition-name` for a card's root cell / the dialog panel it
+ *  expands into (the container pair riding alongside the icon pair). */
+export function cardTransitionName(key: string): string {
+  return `card-${key}`;
+}
 
-function findCardArtwork(key: string): HTMLElement | null {
-  return document.querySelector<HTMLElement>(
-    `[${CARD_VT_ATTR}="${CSS.escape(key)}"]`
-  );
+/** `view-transition-class` shared by the cell and the dialog panel, so
+ *  globals.css can style the container morph without per-key selectors. */
+export const CARD_VT_CLASS = "vt-card";
+
+/** data attributes that let the transition machinery find a card's
+ *  artwork box / root cell without the card carrying live names. */
+export const CARD_VT_ATTR = "data-vt-icon";
+export const CELL_VT_ATTR = "data-vt-card";
+
+/** Inline style for the detail side of the container pair (dialog panel
+ *  or full-page detail card). */
+export function cardTransitionStyle(key: string): CSSProperties {
+  return {
+    viewTransitionName: cardTransitionName(key),
+    viewTransitionClass: CARD_VT_CLASS,
+  } as CSSProperties;
+}
+
+function findCardParts(key: string): {
+  artwork: HTMLElement | null;
+  cell: HTMLElement | null;
+} {
+  const esc = CSS.escape(key);
+  return {
+    artwork: document.querySelector<HTMLElement>(`[${CARD_VT_ATTR}="${esc}"]`),
+    cell: document.querySelector<HTMLElement>(`[${CELL_VT_ATTR}="${esc}"]`),
+  };
 }
 
 /** Failsafe timers: whoever names a card schedules its return to rest in
@@ -88,22 +119,32 @@ export function clearCardTransitionName(key: string) {
     clearTimeout(timer);
     pendingClears.delete(key);
   }
-  const el = findCardArtwork(key);
-  if (el) el.style.viewTransitionName = "";
+  const { artwork, cell } = findCardParts(key);
+  if (artwork) artwork.style.viewTransitionName = "";
+  if (cell) {
+    cell.style.viewTransitionName = "";
+    cell.style.setProperty("view-transition-class", "");
+  }
 }
 
 /**
- * Name a grid card's artwork for one transition window. Call right
- * before the navigation so the element is named in the captured state;
- * the detail's handoff effect (or the failsafe timeout) returns the grid
- * to its zero-named rest state. Returns false when no such card is on
- * the page (filtered grid, other route) — callers can then skip the
- * morph and let the navigation be a plain fade.
+ * Name a grid card for one transition window — the artwork box
+ * (`icon-<key>`, pairing with the detail preview) and the root cell
+ * (`card-<key>`, pairing with the dialog panel) together. Call right
+ * before the navigation so both are in the captured state; the detail's
+ * handoff effect (or the failsafe timeout) returns the grid to its
+ * zero-named rest state. Returns false when no such card is on the page
+ * (filtered grid, other route) — the navigation then degrades to the
+ * plain cross-fade.
  */
 export function nameCardForTransition(key: string): boolean {
-  const el = findCardArtwork(key);
-  if (!el) return false;
-  el.style.viewTransitionName = iconTransitionName(key);
+  const { artwork, cell } = findCardParts(key);
+  if (!artwork) return false;
+  artwork.style.viewTransitionName = iconTransitionName(key);
+  if (cell) {
+    cell.style.viewTransitionName = cardTransitionName(key);
+    cell.style.setProperty("view-transition-class", CARD_VT_CLASS);
+  }
   const timer = pendingClears.get(key);
   if (timer !== undefined) clearTimeout(timer);
   pendingClears.set(

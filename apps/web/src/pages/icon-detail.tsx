@@ -4,10 +4,20 @@ import { X } from "lucide-react";
 import { IconDetail } from "@/components/icon-detail";
 import { PageCard } from "@/components/page-card";
 import { TransitionLink } from "@/components/transition-link";
-import { resolvePlatform } from "@/lib/platforms";
+import { resolvePlatform, type Platform } from "@/lib/platforms";
 import { useTitle } from "@/lib/use-title";
-import { useTransitionNavigate } from "@/lib/view-transition";
+import {
+  cardTransitionStyle,
+  useTransitionNavigate,
+} from "@/lib/view-transition";
 import { NotFound } from "@/src/pages/not-found";
+
+/** The grid-card key this platform's detail pairs with: its first
+ *  bundle's slug, or the platform id for glass-less platforms — exactly
+ *  how lib/platforms.ts keys the card. */
+function panelKey(platform: Platform): string {
+  return platform.bundles[0]?.slug ?? platform.id;
+}
 
 const closeBtn =
   "flex h-9 w-9 cursor-pointer items-center justify-center rounded-md text-neutral-600 outline-none hover:bg-neutral-200 hover:text-black focus-visible:ring-2 focus-visible:ring-neutral-400 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white dark:focus-visible:ring-neutral-600";
@@ -26,7 +36,9 @@ export function IconDetailPage() {
     return <Navigate to={`/icon/${platform.id}`} replace />;
   return (
     <PageCard>
-      <div className="mx-auto max-w-2xl py-4">
+      {/* Carries the container-pair name so navigating back morphs this
+          card into the grid cell (and a card click morphed it out). */}
+      <div style={cardTransitionStyle(panelKey(platform))} className="mx-auto max-w-2xl py-4">
         <div className="px-6 pt-4 sm:px-8">
           <TransitionLink
             to="/"
@@ -93,7 +105,13 @@ export function IconDetailModal() {
         onClick={() => navigate(-1)}
         className="absolute inset-0 bg-black/40 backdrop-blur-sm"
       />
-      <div className="relative flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-900">
+      {/* The panel is the cell's morph target: it carries `card-<key>`
+          while the grid cell gets the same name just-in-time, so the
+          cell visibly expands into this dialog (and back on close). */}
+      <div
+        style={platform ? cardTransitionStyle(panelKey(platform)) : undefined}
+        className="relative flex max-h-[85vh] w-full max-w-2xl flex-col overflow-hidden rounded-lg border border-neutral-200 bg-white shadow-xl dark:border-neutral-800 dark:bg-neutral-900"
+      >
         <button
           type="button"
           aria-label="Close"

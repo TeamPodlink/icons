@@ -30,6 +30,15 @@ import {
   useIconTransitionHandoff,
 } from "@/lib/view-transition";
 
+/**
+ * Morph-lock milestone: the detail is stripped to the card's own
+ * composition — artwork + title — while the cell → dialog-panel
+ * container morph gets locked in against real-browser motion. The full
+ * header/actions/sections below are parked, not deleted: flip this flag
+ * to reintroduce them (they render exactly as before).
+ */
+const DETAIL_SECTIONS = false;
+
 /** Labeled action button (the detail view has room for words; cards
  *  keep their icon-only 9×9 buttons). */
 const labeledBtn =
@@ -67,13 +76,15 @@ function formatAdded(added: string): string {
       });
 }
 
-/** One Liquid Glass bundle: large preview (light/dark renditions, live
- *  render for recipe bundles), PNG actions, and the <picture> embed copy. */
-function GlassSection({ bundle }: { bundle: GlassBundle }) {
+/** The large glass artwork box: light/dark renditions (or the live
+ *  procedural render), the shared-element name + grid-card handoff, and
+ *  the pointer parallax. Used by both the minimal morph-lock detail and
+ *  the parked full GlassSection. */
+function GlassArtwork({ bundle }: { bundle: GlassBundle }) {
   const [live, setLive] = useState(false);
   const liveUri = useLiquidRender(bundle.slug, 512, live && bundle.recipe);
   const parallax = useParallax<HTMLDivElement>();
-  // Take the transition name over from the grid card on open; hand it
+  // Take the transition names over from the grid card on open; hand them
   // back on close so the reverse morph has a destination.
   useIconTransitionHandoff(bundle.slug);
   const alt = `${bundle.title} app icon`;
@@ -86,53 +97,81 @@ function GlassSection({ bundle }: { bundle: GlassBundle }) {
   const common = { decoding: "async" as const, width: 256, height: 256 };
 
   return (
-    <Section title={bundle.variant ? `Liquid Glass — ${bundle.title}` : "Liquid Glass"}>
-      <div className="relative flex justify-center py-2">
-        {bundle.recipe && (
-          <div className="absolute right-0 top-0">
-            <LiveChip
-              live={live}
-              rmse={bundle.rmse}
-              onToggle={() => setLive((v) => !v)}
-            />
-          </div>
-        )}
-        {/* Named for the card → detail shared-element morph; tilts and
-            shines under the pointer (both prerendered and live modes). */}
-        <div
-          ref={parallax.ref}
-          style={{ viewTransitionName: iconTransitionName(bundle.slug) }}
-          className="relative h-64 w-64"
-        >
-          {live && bundle.recipe && liveUri ? (
-            <img src={liveUri} alt={alt} {...common} className={imgCls} />
-          ) : !bundle.hasDark ? (
-            <img {...sized(false)} alt={alt} {...common} className={imgCls} />
-          ) : (
-            <>
-              <img
-                {...sized(false)}
-                alt={alt}
-                {...common}
-                className={cn(imgCls, "dark:hidden")}
-              />
-              <img
-                {...sized(true)}
-                alt={alt}
-                {...common}
-                className={cn(imgCls, "hidden dark:block")}
-              />
-            </>
-          )}
-          {/* Specular highlight tracking the pointer; radius matches the
-              icon squircle so the shine stays on the artwork. */}
-          <div
-            ref={parallax.shineRef}
-            aria-hidden="true"
-            className="pointer-events-none absolute inset-0 rounded-[22.5%] opacity-0 transition-opacity duration-300"
+    <div className="relative flex justify-center py-2">
+      {DETAIL_SECTIONS && bundle.recipe && (
+        <div className="absolute right-0 top-0">
+          <LiveChip
+            live={live}
+            rmse={bundle.rmse}
+            onToggle={() => setLive((v) => !v)}
           />
         </div>
+      )}
+      {/* Named for the card → detail shared-element morph; tilts and
+          shines under the pointer (both prerendered and live modes). */}
+      <div
+        ref={parallax.ref}
+        style={{ viewTransitionName: iconTransitionName(bundle.slug) }}
+        className="relative h-64 w-64"
+      >
+        {live && bundle.recipe && liveUri ? (
+          <img src={liveUri} alt={alt} {...common} className={imgCls} />
+        ) : !bundle.hasDark ? (
+          <img {...sized(false)} alt={alt} {...common} className={imgCls} />
+        ) : (
+          <>
+            <img
+              {...sized(false)}
+              alt={alt}
+              {...common}
+              className={cn(imgCls, "dark:hidden")}
+            />
+            <img
+              {...sized(true)}
+              alt={alt}
+              {...common}
+              className={cn(imgCls, "hidden dark:block")}
+            />
+          </>
+        )}
+        {/* Specular highlight tracking the pointer; radius matches the
+            icon squircle so the shine stays on the artwork. */}
+        <div
+          ref={parallax.shineRef}
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-[22.5%] opacity-0 transition-opacity duration-300"
+        />
       </div>
+    </div>
+  );
+}
+
+/** Minimal hero for glass-less platforms: the flat vector, scaled up,
+ *  carrying the card's transition name (the platform id is its key). */
+function FlatArtwork({ platform }: { platform: Platform }) {
+  useIconTransitionHandoff(platform.id);
+  return (
+    <div className="flex justify-center py-2">
+      <img
+        src={flatPath(platform.id)}
+        alt={`${platform.name} icon`}
+        decoding="async"
+        width={160}
+        height={160}
+        style={{ viewTransitionName: iconTransitionName(platform.id) }}
+        className="h-40 w-40 select-none"
+      />
+    </div>
+  );
+}
+
+/** One Liquid Glass bundle: large preview (light/dark renditions, live
+ *  render for recipe bundles), PNG actions, and the <picture> embed copy.
+ *  Parked behind DETAIL_SECTIONS during the morph-lock milestone. */
+function GlassSection({ bundle }: { bundle: GlassBundle }) {
+  return (
+    <Section title={bundle.variant ? `Liquid Glass — ${bundle.title}` : "Liquid Glass"}>
+      <GlassArtwork bundle={bundle} />
 
       <div className="flex flex-wrap items-center gap-2">
         <button
@@ -308,6 +347,22 @@ export function IconDetail({ platform }: { platform: Platform }) {
   const host = p.url
     ? new URL(p.url).hostname.replace(/^www\./, "")
     : null;
+
+  // Morph-lock milestone: a scaled-up card — artwork + title, centered —
+  // so the cell → panel container morph can be judged on matching
+  // composition. The full detail below returns with DETAIL_SECTIONS.
+  if (!DETAIL_SECTIONS) {
+    return (
+      <div className="flex flex-col items-center justify-center space-y-4 p-8 sm:p-10">
+        {p.bundles[0] ? (
+          <GlassArtwork bundle={p.bundles[0]} />
+        ) : p.hasFlat ? (
+          <FlatArtwork platform={p} />
+        ) : null}
+        <h1 className="text-center text-2xl font-semibold">{p.name}</h1>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8 p-6 sm:p-8">
