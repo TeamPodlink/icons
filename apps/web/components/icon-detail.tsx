@@ -74,24 +74,24 @@ function formatAdded(added: string): string {
 }
 
 /** The large glass artwork box: light/dark renditions (or the live
- *  procedural render), the shared-element name + grid-card handoff, and
- *  the pointer parallax. Used by the minimal modal card, the full-page
- *  detail's Liquid Glass hero, and the parked full GlassSection. */
+ *  procedural render), the shared-element name, and the pointer
+ *  parallax. Fills its container's width as a square — the detail page
+ *  sizes the container to fit the available space — so it serves the
+ *  512px rendition (1024px PNG covers 2x displays). */
 export function GlassArtwork({ bundle }: { bundle: GlassBundle }) {
   const [live, setLive] = useState(false);
   const liveUri = useLiquidRender(bundle.slug, 512, live && bundle.recipe);
   const parallax = useParallax<HTMLDivElement>();
   const alt = `${bundle.title} app icon`;
-  // 256px box: 256 rendition on 1x displays, 512 on 2x.
   const sized = (dark: boolean) => ({
-    src: assetPath(bundle.slug, { size: 256, dark }),
-    srcSet: `${assetPath(bundle.slug, { size: 256, dark })} 1x, ${assetPath(bundle.slug, { size: 512, dark })} 2x`,
+    src: assetPath(bundle.slug, { size: 512, dark }),
+    srcSet: `${assetPath(bundle.slug, { size: 512, dark })} 1x, ${assetPath(bundle.slug, { dark })} 2x`,
   });
-  const imgCls = "h-64 w-64 select-none";
-  const common = { decoding: "async" as const, width: 256, height: 256 };
+  const imgCls = "h-full w-full select-none";
+  const common = { decoding: "async" as const, width: 512, height: 512 };
 
   return (
-    <div className="relative flex justify-center py-2">
+    <div className="relative w-full py-2">
       {DETAIL_SECTIONS && bundle.recipe && (
         <div className="absolute right-0 top-0">
           <LiveChip
@@ -106,7 +106,7 @@ export function GlassArtwork({ bundle }: { bundle: GlassBundle }) {
       <div
         ref={parallax.ref}
         style={{ viewTransitionName: iconTransitionName(bundle.slug) }}
-        className="relative h-64 w-64"
+        className="relative aspect-square w-full"
       >
         {live && bundle.recipe && liveUri ? (
           <img src={liveUri} alt={alt} {...common} className={imgCls} />
@@ -140,11 +140,12 @@ export function GlassArtwork({ bundle }: { bundle: GlassBundle }) {
   );
 }
 
-/** The flat vector, scaled up. `named` (glass-less platforms, where the
- *  flat artwork IS the card's morph hero — the platform id is its key)
- *  carries the transition name + grid handoff; the full-page Vector
- *  segment of a glass platform renders it unnamed, so the morph names
- *  stay on the glass hero only. */
+/** The flat vector, scaled up to fill its container's width as a square
+ *  (like the glass hero), with the same pointer parallax. `named`
+ *  (glass-less platforms, where the flat artwork IS the card's morph
+ *  hero — the platform id is its key) carries the transition name; the
+ *  Vector segment of a glass platform renders it unnamed, so the morph
+ *  names stay on the glass hero only. */
 export function FlatArtwork({
   platform,
   named = true,
@@ -152,20 +153,61 @@ export function FlatArtwork({
   platform: Platform;
   named?: boolean;
 }) {
+  const parallax = useParallax<HTMLDivElement>();
   return (
-    <div className="flex justify-center py-2">
-      <img
-        src={flatPath(platform.id)}
-        alt={`${platform.name} icon`}
-        decoding="async"
-        width={160}
-        height={160}
+    <div className="w-full py-2">
+      <div
+        ref={parallax.ref}
         style={
           named
             ? { viewTransitionName: iconTransitionName(platform.id) }
             : undefined
         }
-        className="h-40 w-40 select-none"
+        className="relative aspect-square w-full"
+      >
+        <img
+          src={flatPath(platform.id)}
+          alt={`${platform.name} icon`}
+          decoding="async"
+          width={512}
+          height={512}
+          className="h-full w-full select-none"
+        />
+        <div
+          ref={parallax.shineRef}
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 rounded-[22.5%] opacity-0 transition-opacity duration-300"
+        />
+      </div>
+    </div>
+  );
+}
+
+/** The "Listen on" badge as the hero: only the rendition matching the
+ *  current theme (swapped by the dark class like the glass hero),
+ *  natural wide aspect, same pointer parallax. */
+export function BadgeArtwork({ platform }: { platform: Platform }) {
+  const parallax = useParallax<HTMLDivElement>();
+  const alt = `Listen on ${platform.name} badge`;
+  const imgCls = "h-auto w-full select-none";
+  return (
+    <div ref={parallax.ref} className="relative w-full py-2">
+      <img
+        src={badgePath(platform.id, false)}
+        alt={alt}
+        decoding="async"
+        className={cn(imgCls, "dark:hidden")}
+      />
+      <img
+        src={badgePath(platform.id, true)}
+        alt={alt}
+        decoding="async"
+        className={cn(imgCls, "hidden dark:block")}
+      />
+      <div
+        ref={parallax.shineRef}
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300"
       />
     </div>
   );
