@@ -78,9 +78,9 @@ function formatAdded(added: string): string {
 
 /** The large glass artwork box: light/dark renditions (or the live
  *  procedural render), the shared-element name + grid-card handoff, and
- *  the pointer parallax. Used by both the minimal morph-lock detail and
- *  the parked full GlassSection. */
-function GlassArtwork({ bundle }: { bundle: GlassBundle }) {
+ *  the pointer parallax. Used by the minimal modal card, the full-page
+ *  detail's Liquid Glass hero, and the parked full GlassSection. */
+export function GlassArtwork({ bundle }: { bundle: GlassBundle }) {
   const [live, setLive] = useState(false);
   const liveUri = useLiquidRender(bundle.slug, 512, live && bundle.recipe);
   const parallax = useParallax<HTMLDivElement>();
@@ -146,10 +146,19 @@ function GlassArtwork({ bundle }: { bundle: GlassBundle }) {
   );
 }
 
-/** Minimal hero for glass-less platforms: the flat vector, scaled up,
- *  carrying the card's transition name (the platform id is its key). */
-function FlatArtwork({ platform }: { platform: Platform }) {
-  useIconTransitionHandoff(platform.id);
+/** The flat vector, scaled up. `named` (glass-less platforms, where the
+ *  flat artwork IS the card's morph hero — the platform id is its key)
+ *  carries the transition name + grid handoff; the full-page Vector
+ *  segment of a glass platform renders it unnamed, so the morph names
+ *  stay on the glass hero only. */
+export function FlatArtwork({
+  platform,
+  named = true,
+}: {
+  platform: Platform;
+  named?: boolean;
+}) {
+  useIconTransitionHandoff(named ? platform.id : null);
   return (
     <div className="flex justify-center py-2">
       <img
@@ -158,7 +167,11 @@ function FlatArtwork({ platform }: { platform: Platform }) {
         decoding="async"
         width={160}
         height={160}
-        style={{ viewTransitionName: iconTransitionName(platform.id) }}
+        style={
+          named
+            ? { viewTransitionName: iconTransitionName(platform.id) }
+            : undefined
+        }
         className="h-40 w-40 select-none"
       />
     </div>
@@ -286,7 +299,13 @@ function VectorSection({
 
 /** One badge variant on its own truthful surface (light on white, dark
  *  on near-black) so both are visible whatever the site theme is. */
-function BadgeTile({ platform, dark }: { platform: Platform; dark: boolean }) {
+export function BadgeTile({
+  platform,
+  dark,
+}: {
+  platform: Platform;
+  dark: boolean;
+}) {
   const url = badgePath(platform.id, dark);
   const label = dark ? "dark" : "light";
   return (

@@ -1,15 +1,26 @@
 import { useEffect } from "react";
-import { Navigate, useLocation, useParams } from "react-router";
-import { X } from "lucide-react";
-import { IconDetail } from "@/components/icon-detail";
+import {
+  Navigate,
+  useLocation,
+  useParams,
+  useSearchParams,
+} from "react-router";
+import { ArrowLeft, PenTool, Ticket, X } from "lucide-react";
+import {
+  BadgeTile,
+  FlatArtwork,
+  GlassArtwork,
+  IconDetail,
+} from "@/components/icon-detail";
+import { MaterialsIcon } from "@/components/materials-icon";
 import { PageCard } from "@/components/page-card";
-import { TransitionLink } from "@/components/transition-link";
-import { resolvePlatform, type Platform } from "@/lib/platforms";
+import { resolvePlatform, type Facet, type Platform } from "@/lib/platforms";
 import { useTitle } from "@/lib/use-title";
 import {
   cardTransitionStyle,
   useTransitionNavigate,
 } from "@/lib/view-transition";
+import { cn } from "@/lib/cn";
 import { NotFound } from "@/src/pages/not-found";
 
 /** The grid-card key this platform's detail pairs with: its first
@@ -19,35 +30,147 @@ function panelKey(platform: Platform): string {
   return platform.bundles[0]?.slug ?? platform.id;
 }
 
+/** ?facet= on /icon/:id, matching the site's param conventions: "vector"
+ *  or "badge" select an alternate hero; absent/unknown means glass
+ *  ("flat" accepted as the legacy spelling of vector). */
+function parseDetailFacet(raw: string | null): Facet {
+  if (raw === "vector" || raw === "flat") return "flat";
+  if (raw === "badge") return "badge";
+  return "glass";
+}
+
 const closeBtn =
   "flex h-9 w-9 cursor-pointer items-center justify-center rounded-md text-neutral-600 outline-none hover:bg-neutral-200 hover:text-black focus-visible:ring-2 focus-visible:ring-neutral-400 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white dark:focus-visible:ring-neutral-600";
 
 /**
- * Direct-load presentation of /icon/:id: a full page (no grid modal).
- * Alias ids canonicalize with a replace-navigation; unknown ids get the
- * site 404.
+ * Direct-load presentation of /icon/:id: the grid's PageCard chrome with
+ * the sticky toolbar persisting into the detail state (svgl-style). The
+ * toolbar hosts the back affordance (← platform name) on the left and a
+ * segmented control of the platform's available variants on the right;
+ * the body is the selected variant's hero. Variant selection is ?facet=
+ * URL state, so variant views are shareable. Alias ids canonicalize with
+ * a replace-navigation (keeping the query); unknown ids get the site 404.
+ * The modal presentation below is untouched — minimal card, no toolbar.
  */
 export function IconDetailPage() {
   const { id = "" } = useParams();
+  const location = useLocation();
+  const navigate = useTransitionNavigate();
+  const [params, setParams] = useSearchParams();
   const platform = resolvePlatform(id);
   useTitle(platform ? `${platform.name} · refraction` : "Not found · refraction");
   if (!platform) return <NotFound />;
   if (platform.id !== id)
-    return <Navigate to={`/icon/${platform.id}`} replace />;
+    return (
+      <Navigate
+        to={{ pathname: `/icon/${platform.id}`, search: location.search }}
+        replace
+      />
+    );
+
+  const p = platform;
+  // Only the variants this platform actually ships become segments.
+  const segments: {
+    facet: Facet;
+    label: string;
+    icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
+  }[] = [
+    ...(p.bundles.length > 0
+      ? [{ facet: "glass" as const, label: "Liquid Glass", icon: MaterialsIcon }]
+      : []),
+    ...(p.hasFlat
+      ? [{ facet: "flat" as const, label: "Vector", icon: PenTool }]
+      : []),
+    ...(p.hasBadge
+      ? [{ facet: "badge" as const, label: "Badge", icon: Ticket }]
+      : []),
+  ];
+  const requested = parseDetailFacet(params.get("facet"));
+  // A ?facet the platform doesn't ship falls back to its first variant.
+  const facet = segments.some((s) => s.facet === requested)
+    ? requested
+    : segments[0]?.facet ?? "glass";
+
+  const setFacet = (f: Facet) => {
+    const next = new URLSearchParams(params);
+    if (f === "glass") next.delete("facet");
+    else next.set("facet", f === "flat" ? "vector" : "badge");
+    setParams(next, { replace: true, preventScrollReset: true });
+  };
+
+  // The back affordance: pop when there's in-app history to return to
+  // (replaying any recorded morph); on a direct load go to the directory
+  // instead. The router's history index is the truthful signal — a
+  // segment switch replaces (new location.key, same entry), so idx stays
+  // 0 on a direct-loaded page.
+  const back = () => {
+    const idx = (window.history.state as { idx?: number } | null)?.idx ?? 0;
+    if (idx > 0) navigate(-1);
+    else navigate("/");
+  };
+
   return (
     <PageCard>
-      {/* Carries the container-pair name so navigating back morphs this
-          card into the grid cell (and a card click morphed it out). */}
-      <div style={cardTransitionStyle(panelKey(platform))} className="mx-auto max-w-2xl py-4">
-        <div className="px-6 pt-4 sm:px-8">
-          <TransitionLink
-            to="/"
-            className="text-sm text-neutral-600 underline decoration-neutral-400 underline-offset-2 hover:text-black dark:text-neutral-400 dark:hover:text-white"
+      <div className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-neutral-200 bg-white/80 px-4 py-1.5 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/40">
+        <button
+          type="button"
+          onClick={back}
+          title="Back to the directory"
+          className="flex cursor-pointer items-center space-x-1.5 rounded-md px-2 py-1.5 text-sm font-medium text-neutral-600 hover:bg-neutral-200 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
+        >
+          <ArrowLeft size={16} strokeWidth={1.8} />
+          <span>{p.name}</span>
+        </button>
+        {segments.length > 0 && (
+          <div
+            role="group"
+            aria-label="Variant"
+            className="flex items-center rounded-md border border-neutral-200 p-0.5 dark:border-neutral-800"
           >
-            ← Back to the directory
-          </TransitionLink>
-        </div>
-        <IconDetail platform={platform} />
+            {segments.map(({ facet: f, label, icon: Icon }) => (
+              <button
+                key={f}
+                type="button"
+                aria-pressed={facet === f}
+                onClick={() => setFacet(f)}
+                className={cn(
+                  "flex cursor-pointer items-center space-x-1.5 rounded px-2 py-1 font-mono text-xs",
+                  facet === f
+                    ? "bg-neutral-200 font-medium text-black dark:bg-neutral-800 dark:text-white"
+                    : "text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white"
+                )}
+              >
+                <Icon size={13} strokeWidth={1.8} />
+                <span>{label}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* The selected variant's hero. The glass hero (and the flat hero
+          standing in for glass-less platforms) carries the container-pair
+          name so the grid cell ↔ detail morph stays wired; other
+          variants render unnamed. */}
+      <div className="flex min-h-[calc(100vh-12rem)] flex-col items-center justify-center px-6 py-16">
+        {facet === "glass" && p.bundles[0] ? (
+          <div style={cardTransitionStyle(panelKey(p))}>
+            <GlassArtwork bundle={p.bundles[0]} />
+          </div>
+        ) : facet === "flat" && p.hasFlat ? (
+          p.bundles.length === 0 ? (
+            <div style={cardTransitionStyle(p.id)}>
+              <FlatArtwork platform={p} named />
+            </div>
+          ) : (
+            <FlatArtwork platform={p} named={false} />
+          )
+        ) : facet === "badge" && p.hasBadge ? (
+          <div className="grid w-full max-w-xl grid-cols-1 gap-3 sm:grid-cols-2">
+            <BadgeTile platform={p} dark={false} />
+            <BadgeTile platform={p} dark={true} />
+          </div>
+        ) : null}
       </div>
     </PageCard>
   );
