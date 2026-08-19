@@ -2,7 +2,8 @@ import { Sparkles } from "lucide-react";
 import { cn } from "@/lib/cn";
 
 /** The "live" toggle chip: swaps a recipe-backed bundle's prerendered
- *  raster for an in-browser procedural render (icon cards + detail). */
+ *  raster for an in-browser procedural render (detail view only — the
+ *  grid always shows the prerendered artwork). */
 export function LiveChip({
   live,
   rmse,

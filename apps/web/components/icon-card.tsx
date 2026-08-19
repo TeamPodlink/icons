@@ -22,10 +22,8 @@ import {
   type Card,
   type Facet,
 } from "@/lib/platforms";
-import { useLiquidRender } from "@/lib/use-liquid-render";
 import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/cn";
-import { LiveChip } from "@/components/live-chip";
 import {
   iconTransitionName,
   useOpenDetailPlatformId,
@@ -38,7 +36,7 @@ const previewCommon = {
   decoding: "async" as const,
 };
 
-function GlassPreview({ card, src }: { card: Card; src?: string }) {
+function GlassPreview({ card }: { card: Card }) {
   const b = card.bundle!;
   const alt = `${card.title} app icon`;
   // 96px box: 128 rendition on 1x displays, 256 on 2x.
@@ -47,7 +45,6 @@ function GlassPreview({ card, src }: { card: Card; src?: string }) {
     srcSet: `${assetPath(b.slug, { size: 128, dark })} 1x, ${assetPath(b.slug, { size: 256, dark })} 2x`,
   });
   const common = { ...previewCommon, width: 96, height: 96 };
-  if (src) return <img src={src} alt={alt} {...common} className={previewCls} />;
   if (!b.hasDark)
     return (
       <img {...sized(false)} alt={alt} {...common} className={previewCls} />
@@ -132,7 +129,6 @@ export function IconCard({
   /** The directory-level facet view; the card adapts artwork + actions. */
   facet?: Facet;
 }) {
-  const [live, setLive] = useState(false);
   const { resolvedTheme } = useTheme();
   const location = useLocation();
   const navigate = useTransitionNavigate();
@@ -156,12 +152,6 @@ export function IconCard({
     facet === "glass" ? (card.facet === "glass" ? "glass" : "flat") : facet;
   const missing =
     (shown === "flat" && !p.hasFlat) || (shown === "badge" && !p.hasBadge);
-
-  const liveUri = useLiquidRender(
-    b?.slug ?? "",
-    192,
-    shown === "glass" && live && Boolean(b?.recipe)
-  );
 
   const title = facet === "glass" ? card.title : p.name;
 
@@ -261,13 +251,6 @@ export function IconCard({
             flat
           </span>
         )}
-        {shown === "glass" && b?.recipe && (
-          <LiveChip
-            live={live}
-            rmse={b.rmse}
-            onToggle={() => setLive((v) => !v)}
-          />
-        )}
       </div>
 
       {/* Artwork + title open the platform detail — a real link, so
@@ -286,10 +269,7 @@ export function IconCard({
                 label={shown === "flat" ? "missing flat" : "missing badge"}
               />
             ) : shown === "glass" ? (
-              <GlassPreview
-                card={card}
-                src={live && b?.recipe ? liveUri ?? undefined : undefined}
-              />
+              <GlassPreview card={card} />
             ) : shown === "badge" ? (
               <BadgePreview card={card} />
             ) : (

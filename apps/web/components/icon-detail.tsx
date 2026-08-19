@@ -22,6 +22,7 @@ import {
 } from "@/lib/asset-actions";
 import { embedHtml } from "@/lib/embed-html";
 import { useLiquidRender } from "@/lib/use-liquid-render";
+import { useParallax } from "@/lib/use-parallax";
 import { cn } from "@/lib/cn";
 import { LiveChip } from "@/components/live-chip";
 import { iconTransitionName } from "@/lib/view-transition";
@@ -68,6 +69,7 @@ function formatAdded(added: string): string {
 function GlassSection({ bundle }: { bundle: GlassBundle }) {
   const [live, setLive] = useState(false);
   const liveUri = useLiquidRender(bundle.slug, 512, live && bundle.recipe);
+  const parallax = useParallax<HTMLDivElement>();
   const alt = `${bundle.title} app icon`;
   // 256px box: 256 rendition on 1x displays, 512 on 2x.
   const sized = (dark: boolean) => ({
@@ -89,10 +91,12 @@ function GlassSection({ bundle }: { bundle: GlassBundle }) {
             />
           </div>
         )}
-        {/* Named for the card → detail shared-element morph. */}
+        {/* Named for the card → detail shared-element morph; tilts and
+            shines under the pointer (both prerendered and live modes). */}
         <div
+          ref={parallax.ref}
           style={{ viewTransitionName: iconTransitionName(bundle.slug) }}
-          className="h-64 w-64"
+          className="relative h-64 w-64"
         >
           {live && bundle.recipe && liveUri ? (
             <img src={liveUri} alt={alt} {...common} className={imgCls} />
@@ -114,6 +118,13 @@ function GlassSection({ bundle }: { bundle: GlassBundle }) {
               />
             </>
           )}
+          {/* Specular highlight tracking the pointer; radius matches the
+              icon squircle so the shine stays on the artwork. */}
+          <div
+            ref={parallax.shineRef}
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-0 rounded-[22.5%] opacity-0 transition-opacity duration-300"
+          />
         </div>
       </div>
 
