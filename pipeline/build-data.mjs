@@ -28,6 +28,7 @@ const out = readPlatforms().map(({ id, dir, meta }) => ({
   id,
   name: meta.name,
   active: meta.active !== false,
+  aliases: meta.aliases ?? [],
   url: meta.url ?? null,
   added: meta.added ?? null,
   popularity: popularity[id] ?? null,

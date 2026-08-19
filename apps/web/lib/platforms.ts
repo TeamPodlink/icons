@@ -24,6 +24,9 @@ export interface Platform {
   id: string;
   name: string;
   active: boolean;
+  /** Old/alternate spellings from meta.json — resolvePlatform() accepts
+   *  them so /icon/<alias> deep links keep working. */
+  aliases: string[];
   url: string | null;
   /** First-addition date (YYYY-MM-DD), mined from git history — the
    *  original TeamPodlink/badges repo or this repo, whichever is
@@ -43,6 +46,29 @@ export interface Platform {
 }
 
 export const platforms: Platform[] = raw as Platform[];
+
+/** Same flat-lowercase normalization @podlink/icons uses for
+ *  resolvePlatformId: trim, lowercase, strip everything non-alphanumeric
+ *  ("Amazon Music" / "amazon-music" → "amazonmusic"). */
+function normalizePlatformInput(input: string): string {
+  return input
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]/g, "");
+}
+
+const platformIdMap = new Map<string, Platform>();
+for (const p of platforms) {
+  platformIdMap.set(normalizePlatformInput(p.id), p);
+  for (const alias of p.aliases)
+    platformIdMap.set(normalizePlatformInput(alias), p);
+}
+
+/** Resolve a /icon/:id route param — canonical id or meta.json alias,
+ *  any casing/punctuation — to its platform. */
+export function resolvePlatform(input: string): Platform | undefined {
+  return platformIdMap.get(normalizePlatformInput(input));
+}
 
 const SOURCE_LABEL: Record<string, string> = {
   decanted: "decanted",
