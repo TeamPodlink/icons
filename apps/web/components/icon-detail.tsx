@@ -25,7 +25,10 @@ import { useLiquidRender } from "@/lib/use-liquid-render";
 import { useParallax } from "@/lib/use-parallax";
 import { cn } from "@/lib/cn";
 import { LiveChip } from "@/components/live-chip";
-import { iconTransitionName } from "@/lib/view-transition";
+import {
+  iconTransitionName,
+  useIconTransitionHandoff,
+} from "@/lib/view-transition";
 
 /** Labeled action button (the detail view has room for words; cards
  *  keep their icon-only 9×9 buttons). */
@@ -70,6 +73,9 @@ function GlassSection({ bundle }: { bundle: GlassBundle }) {
   const [live, setLive] = useState(false);
   const liveUri = useLiquidRender(bundle.slug, 512, live && bundle.recipe);
   const parallax = useParallax<HTMLDivElement>();
+  // Take the transition name over from the grid card on open; hand it
+  // back on close so the reverse morph has a destination.
+  useIconTransitionHandoff(bundle.slug);
   const alt = `${bundle.title} app icon`;
   // 256px box: 256 rendition on 1x displays, 512 on 2x.
   const sized = (dark: boolean) => ({
@@ -193,6 +199,7 @@ function VectorSection({
   platform: Platform;
   named: boolean;
 }) {
+  useIconTransitionHandoff(named ? platform.id : null);
   return (
     <Section title="Vector">
       <div className="flex items-center space-x-4">

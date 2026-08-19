@@ -25,8 +25,8 @@ import {
 import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/cn";
 import {
-  iconTransitionName,
-  useOpenDetailPlatformId,
+  CARD_VT_ATTR,
+  nameCardForTransition,
   useTransitionNavigate,
 } from "@/lib/view-transition";
 
@@ -136,15 +136,15 @@ export function IconCard({
   const b = card.bundle;
   const p = card.platform;
 
-  // Shared-element morph: the artwork carries `icon-<key>` and the detail
-  // preview reuses it. While this platform's modal is open the name moves
-  // to the modal — the card must shed it (duplicate names in a captured
-  // frame make the browser skip the transition).
-  const openPlatformId = useOpenDetailPlatformId();
-  const vtStyle =
-    openPlatformId === p.id
-      ? undefined
-      : { viewTransitionName: iconTransitionName(card.key) };
+  // Shared-element morph: the artwork carries no view-transition-name at
+  // rest (a named element is lifted above the root snapshot in every
+  // transition — 70 lifted cards would paint over the incoming dialog).
+  // Navigations to the detail name this one card imperatively for just
+  // the transition window; the data attribute is the lookup handle.
+  const openDetails = () => {
+    nameCardForTransition(card.key);
+    navigate(`/icon/${p.id}`, { state: { background: location } });
+  };
 
   // What this card actually shows: the glass view falls back to the flat
   // vector for platforms that have no glass bundle yet (card.facet).
@@ -166,8 +166,7 @@ export function IconCard({
       label: "Open details",
       icon: Maximize2,
       // Same navigation as a card click: background location + morph.
-      onSelect: () =>
-        navigate(`/icon/${p.id}`, { state: { background: location } }),
+      onSelect: openDetails,
     },
   ];
   if (!missing) {
@@ -260,10 +259,25 @@ export function IconCard({
         to={`/icon/${p.id}`}
         state={{ background: location }}
         title={`${p.name} details`}
+        onClick={(e) => {
+          // Name the artwork only for the navigation the link will run
+          // itself — modified clicks (new tab) morph nothing.
+          if (
+            e.button === 0 &&
+            !e.metaKey &&
+            !e.altKey &&
+            !e.ctrlKey &&
+            !e.shiftKey
+          )
+            nameCardForTransition(card.key);
+        }}
         className="group flex w-full flex-col items-center rounded-md outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 dark:focus-visible:ring-neutral-600"
       >
         <div className="flex w-full justify-center transition-transform duration-150 ease-out group-hover:scale-[1.03]">
-          <div style={vtStyle} className={shown === "badge" ? "w-full" : undefined}>
+          <div
+            {...{ [CARD_VT_ATTR]: card.key }}
+            className={shown === "badge" ? "w-full" : undefined}
+          >
             {missing ? (
               <MissingPreview
                 label={shown === "flat" ? "missing flat" : "missing badge"}
