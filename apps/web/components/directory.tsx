@@ -1,6 +1,6 @@
-import { useMemo, useRef } from "react";
+import { useLayoutEffect, useMemo, useRef } from "react";
 import { useState } from "react";
-import { useSearchParams } from "react-router";
+import { useLocation, useSearchParams } from "react-router";
 import Fuse from "fuse.js";
 import { ArrowDownUp, ArrowUpDown, Check, Search, TrendingUp } from "lucide-react";
 import { useEffect } from "react";
@@ -25,6 +25,34 @@ function useUrlState(key: string, initial: string) {
     setParams(next, { replace: true, preventScrollReset: true });
   };
   return [value, set] as const;
+}
+
+/**
+ * Scroll memory for the grid, keyed by history entry (location.key). The
+ * grid unmounts when a card opens its detail takeover, and the scroller
+ * is the PageCard viewport — not the window — so the router's own scroll
+ * restoration can't cover it. Positions are recorded as the user scrolls
+ * and restored in a layout effect on mount: that effect runs inside the
+ * router's view-transition commit, so a back navigation captures the
+ * grid already scrolled to place and the return morph lands on the
+ * correct visible cell.
+ */
+const scrollMemory = new Map<string, number>();
+
+function useScrollMemory(anchorRef: React.RefObject<HTMLElement | null>) {
+  const { key } = useLocation();
+  useLayoutEffect(() => {
+    const viewport = anchorRef.current?.closest(".overflow-y-auto");
+    if (!(viewport instanceof HTMLElement)) return;
+    const saved = scrollMemory.get(key);
+    if (saved !== undefined) viewport.scrollTop = saved;
+    const onScroll = () => scrollMemory.set(key, viewport.scrollTop);
+    viewport.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      viewport.removeEventListener("scroll", onScroll);
+      scrollMemory.set(key, viewport.scrollTop);
+    };
+  }, [key, anchorRef]);
 }
 
 /** Sort cycle: Latest → A-Z → Popular → Latest. "latest" is the
@@ -122,6 +150,9 @@ export function Directory({
   const [sortRaw, setSort] = useUrlState("sort", "latest");
   const sort = parseSort(sortRaw);
   const inputRef = useRef<HTMLInputElement>(null);
+  // Anchor inside the PageCard viewport, for scroll save/restore.
+  const toolbarRef = useRef<HTMLDivElement>(null);
+  useScrollMemory(toolbarRef);
 
   const base = useMemo(() => facetCards(cards, facet), [cards, facet]);
 
@@ -180,7 +211,10 @@ export function Directory({
         />
       </div>
       <PageCard withSearch>
-        <div className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-neutral-200 bg-white/80 px-4 py-1.5 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/40">
+        <div
+          ref={toolbarRef}
+          className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-neutral-200 bg-white/80 px-4 py-1.5 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/40"
+        >
           <p className="font-mono text-sm text-neutral-600 dark:text-neutral-400">
             {heading === "Home"
               ? `${shown.length} ${noun}`
