@@ -43,7 +43,10 @@ export function Home({ facet = "glass" }: { facet?: Facet }) {
   }
 
   return (
+    // Keyed by facet: switching facet routes remounts the directory so
+    // ?search/?sort state stays truthful to the (fresh) URL.
     <Directory
+      key={facet}
       cards={visibleCards}
       heading={FACET_HEADINGS[facet]}
       facet={facet}
