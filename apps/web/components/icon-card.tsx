@@ -1,5 +1,10 @@
 import { useLayoutEffect, useState } from "react";
-import { Copy, Download, Maximize2 } from "lucide-react";
+import {
+  Copy,
+  Download,
+  Maximize2,
+  SquareArrowOutUpRight,
+} from "lucide-react";
 import {
   ContextMenu,
   type ContextMenuItem,
@@ -221,10 +226,26 @@ export function IconCard({
         </div>
       </div>
 
-      <div className="mb-3 flex flex-col items-center justify-center space-y-1">
+      <div className="mb-3 flex items-center justify-center space-x-1.5">
         <p className="truncate text-balance text-center text-[15px] font-medium">
           {title}
         </p>
+        {/* Website link: above the stretched card link (z-10) and out of
+            the morphing artwork wrapper; clicking it opens the site, not
+            the detail. */}
+        {p.url && (
+          <a
+            href={p.url}
+            target="_blank"
+            rel="noreferrer noopener"
+            title={`${p.name} website`}
+            aria-label={`${p.name} website`}
+            onClick={(e) => e.stopPropagation()}
+            className="relative z-10 shrink-0 text-neutral-400 hover:text-black dark:text-neutral-500 dark:hover:text-white"
+          >
+            <SquareArrowOutUpRight size={13} strokeWidth={1.8} />
+          </a>
+        )}
       </div>
 
       {/* Stretched link: the whole cell is the click target, and it's a
