@@ -6,7 +6,7 @@ import {
   Package,
   PenTool,
   Scale,
-  Ticket,
+  StretchHorizontal,
 } from "lucide-react";
 
 import { MaterialsIcon } from "@/components/materials-icon";
@@ -33,13 +33,11 @@ export function Sidebar() {
   const carry = (href: string) => href + search;
   const categories = getCategories();
 
-  // The three facets are the navigation. Icon note: Ticket is the
-  // current wide-pill read for the badge facet — swap the `icon` field
-  // here if the maintainer settles on another glyph.
+  // The three facets are the navigation.
   const links = [
     { href: "/", label: "Liquid Glass", icon: MaterialsIcon, badge: facetCounts.glass },
     { href: "/vector", label: "Vector", icon: PenTool, badge: facetCounts.flat },
-    { href: "/badges", label: "Badge", icon: Ticket, badge: facetCounts.badge },
+    { href: "/badges", label: "Badge", icon: StretchHorizontal, badge: facetCounts.badge },
   ];
 
   const docs = [

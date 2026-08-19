@@ -11,7 +11,7 @@ import {
   Copy,
   Download,
   PenTool,
-  Ticket,
+  StretchHorizontal,
 } from "lucide-react";
 import {
   ContextMenu,
@@ -150,7 +150,7 @@ export function IconDetailPage() {
       ? [{ facet: "flat" as const, label: "Vector", icon: PenTool }]
       : []),
     ...(p.hasBadge
-      ? [{ facet: "badge" as const, label: "Badge", icon: Ticket }]
+      ? [{ facet: "badge" as const, label: "Badge", icon: StretchHorizontal }]
       : []),
   ];
   const requested = parseDetailFacet(params.get("facet"));
