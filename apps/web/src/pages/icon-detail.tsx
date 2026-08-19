@@ -18,7 +18,7 @@ import {
   type ContextMenuItem,
 } from "@/components/context-menu";
 import {
-  BadgeTile,
+  BadgeArtwork,
   FlatArtwork,
   GlassArtwork,
 } from "@/components/icon-detail";
@@ -43,6 +43,12 @@ function panelKey(platform: Platform): string {
   return platform.bundles[0]?.slug ?? platform.id;
 }
 
+/** Square-hero sizing rule: fill the body column up to whichever bites
+ *  first — the column width, the viewport height minus ~20rem of chrome
+ *  and breathing room (header + toolbar + padding), or 512px, the
+ *  largest sized rendition (the 1024px PNG serves 2x displays). */
+const SQUARE_HERO_WIDTH = "min(100%, calc(100vh - 20rem), 32rem)";
+
 /** ?facet= on /icon/:id, matching the site's param conventions: "vector"
  *  or "badge" select an alternate hero; absent/unknown means glass
  *  ("flat" accepted as the legacy spelling of vector). */
@@ -52,16 +58,15 @@ function parseDetailFacet(raw: string | null): Facet {
   return "glass";
 }
 
-/** Toolbar dropdown: a labeled button (Copy / Download + chevron) whose
+/** Toolbar dropdown: a labeled button (Copy / Download + chevron, no
+ *  leading icon — the centered segmented control needs the room) whose
  *  menu opens anchored to the button's bottom-right edge, reusing the
  *  ContextMenu in its anchored (alignRight) mode. */
 function ToolbarMenu({
   label,
-  icon: Icon,
   items,
 }: {
   label: string;
-  icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
   items: ContextMenuItem[];
 }) {
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -90,7 +95,6 @@ function ToolbarMenu({
         }}
         className="flex cursor-pointer items-center space-x-1.5 rounded-md px-2 py-1.5 text-sm text-neutral-600 hover:bg-neutral-200 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
       >
-        <Icon size={16} strokeWidth={1.8} />
         <span>{label}</span>
         <ChevronDown size={14} strokeWidth={1.8} />
       </button>
@@ -125,6 +129,9 @@ export function IconDetailPage() {
   const [params, setParams] = useSearchParams();
   // Menu actions resolve to the rendition on screen (theme-scoped).
   const darkTheme = useTheme().resolvedTheme === "dark";
+  const [heroMenu, setHeroMenu] = useState<{ x: number; y: number } | null>(
+    null
+  );
   const platform = resolvePlatform(id);
   useTitle(platform ? `${platform.name} · refraction` : "Not found · refraction");
   if (!platform) return <NotFound />;
@@ -188,6 +195,13 @@ export function IconDetailPage() {
     darkTheme
   );
 
+  // Right-click on the hero: the grid card's Copy ▸ / Download ▸ tree
+  // (no "Open details" — we're already here).
+  const heroMenuItems: ContextMenuItem[] = [
+    { label: "Copy", icon: Copy, children: copyItems },
+    { label: "Download", icon: Download, children: downloadItems },
+  ];
+
   return (
     <PageCard>
       <div className="sticky top-0 z-40 grid h-12 grid-cols-[1fr_auto_1fr] items-center border-b border-neutral-200 bg-white/80 px-4 py-1.5 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/40">
@@ -234,38 +248,58 @@ export function IconDetailPage() {
         )}
         <div className="flex items-center justify-end space-x-0.5">
           {copyItems.length > 0 && (
-            <ToolbarMenu label="Copy" icon={Copy} items={copyItems} />
+            <ToolbarMenu label="Copy" items={copyItems} />
           )}
           {downloadItems.length > 0 && (
-            <ToolbarMenu label="Download" icon={Download} items={downloadItems} />
+            <ToolbarMenu label="Download" items={downloadItems} />
           )}
         </div>
       </div>
 
-      {/* The selected variant's hero. The glass hero (and the flat hero
-          standing in for glass-less platforms) carries the container-pair
-          name so the grid cell ↔ detail morph stays wired; other
-          variants render unnamed. */}
-      <div className="flex min-h-[calc(100vh-12rem)] flex-col items-center justify-center px-6 py-16">
+      {/* The selected variant's hero, scaled to fit the available space:
+          square heroes take min(column width, viewport height minus the
+          chrome, 512px — the largest sized rendition); the badge keeps
+          its natural wide aspect at up to 36rem. The glass hero (and the
+          flat hero standing in for glass-less platforms) carries the
+          container-pair name so the grid cell ↔ detail morph stays
+          wired; other variants render unnamed. Right-click anywhere on
+          the hero for the grid's Copy ▸ / Download ▸ tree. */}
+      <div
+        onContextMenu={(e) => {
+          e.preventDefault();
+          setHeroMenu({ x: e.clientX, y: e.clientY });
+        }}
+        className="flex min-h-[calc(100vh-12rem)] flex-col items-center justify-center px-6 py-12"
+      >
         {facet === "glass" && p.bundles[0] ? (
-          <div style={cardTransitionStyle(panelKey(p))}>
+          <div style={{ ...cardTransitionStyle(panelKey(p)), width: SQUARE_HERO_WIDTH }}>
             <GlassArtwork bundle={p.bundles[0]} />
           </div>
         ) : facet === "flat" && p.hasFlat ? (
-          p.bundles.length === 0 ? (
-            <div style={cardTransitionStyle(p.id)}>
-              <FlatArtwork platform={p} named />
-            </div>
-          ) : (
-            <FlatArtwork platform={p} named={false} />
-          )
+          <div
+            style={{
+              ...(p.bundles.length === 0 ? cardTransitionStyle(p.id) : null),
+              width: SQUARE_HERO_WIDTH,
+            }}
+          >
+            <FlatArtwork platform={p} named={p.bundles.length === 0} />
+          </div>
         ) : facet === "badge" && p.hasBadge ? (
-          <div className="grid w-full max-w-xl grid-cols-1 gap-3 sm:grid-cols-2">
-            <BadgeTile platform={p} dark={false} />
-            <BadgeTile platform={p} dark={true} />
+          <div style={{ width: "min(100%, 36rem)" }}>
+            <BadgeArtwork platform={p} />
           </div>
         ) : null}
       </div>
+
+      {heroMenu && (
+        <ContextMenu
+          x={heroMenu.x}
+          y={heroMenu.y}
+          items={heroMenuItems}
+          label={`${p.name} actions`}
+          onClose={() => setHeroMenu(null)}
+        />
+      )}
     </PageCard>
   );
 }
