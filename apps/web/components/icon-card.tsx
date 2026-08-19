@@ -1,13 +1,10 @@
-import { useEffect, useState } from "react";
-import { toast } from "sonner";
+import { useState } from "react";
+import { Copy, Download, ImageIcon, Link as LinkIcon } from "lucide-react";
 import {
-  Copy,
-  Download,
-  ImageIcon,
-  Link as LinkIcon,
-  Sparkles,
-} from "lucide-react";
-import { renderBundleDataUri } from "refraction-engine";
+  copyImage,
+  copySvg,
+  downloadAsset,
+} from "@/lib/asset-actions";
 import {
   assetPath,
   badgePath,
@@ -15,27 +12,13 @@ import {
   type Card,
   type Facet,
 } from "@/lib/platforms";
+import { useLiquidRender } from "@/lib/use-liquid-render";
 import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/cn";
+import { LiveChip } from "@/components/live-chip";
 
 const actionBtn =
   "flex h-9 w-9 cursor-pointer items-center justify-center rounded-md text-neutral-600 hover:bg-neutral-200 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white";
-
-/** In-browser procedural render of a recipe-backed bundle (site demo). */
-function useLiquidRender(slug: string, size: number, enabled: boolean) {
-  const [uri, setUri] = useState<string | null>(null);
-  useEffect(() => {
-    if (!enabled) return;
-    let alive = true;
-    renderBundleDataUri(slug, { size })
-      .then((u: string) => alive && setUri(u))
-      .catch(() => alive && setUri(null));
-    return () => {
-      alive = false;
-    };
-  }, [slug, size, enabled]);
-  return enabled ? uri : null;
-}
 
 const previewCls = "pointer-events-none mb-4 mt-1.5 h-24 w-24 select-none";
 const previewCommon = {
@@ -157,53 +140,6 @@ export function IconCard({
 
   const title = facet === "glass" ? card.title : p.name;
 
-  const copyText = async (text: string, description: string) => {
-    await navigator.clipboard.writeText(text);
-    toast.success("Copied to clipboard", { description });
-  };
-
-  const copyImage = async () => {
-    try {
-      const blob = await fetch(assetPath(b!.slug)).then((r) => r.blob());
-      await navigator.clipboard.write([
-        new ClipboardItem({ "image/png": blob }),
-      ]);
-      toast.success("Copied to clipboard", {
-        description: `${card.title} — 1024px PNG`,
-      });
-    } catch {
-      toast.error("Clipboard image copy not supported in this browser");
-    }
-  };
-
-  const copySvg = async (url: string, description: string) => {
-    const svg = await fetch(url).then((r) => r.text());
-    await copyText(svg, description);
-  };
-
-  /**
-   * Download via fetch + blob object URL: the `download` attribute is
-   * ignored on cross-origin hrefs (production serves assets from R2),
-   * where a plain anchor would navigate instead of saving. Same-origin
-   * (dev /library, /flat, /badges) goes through the identical path.
-   */
-  const downloadAsset = async (url: string, filename: string) => {
-    try {
-      const res = await fetch(url);
-      if (!res.ok) throw new Error(`${res.status}`);
-      const objectUrl = URL.createObjectURL(await res.blob());
-      const a = document.createElement("a");
-      a.href = objectUrl;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
-    } catch {
-      toast.error("Download failed");
-    }
-  };
-
   // Badge downloads/copies target the variant currently on screen.
   const badgeDark = resolvedTheme === "dark";
   const badgeUrl = badgePath(p.id, badgeDark);
@@ -221,24 +157,11 @@ export function IconCard({
           </span>
         )}
         {shown === "glass" && b?.recipe && (
-          <button
-            type="button"
-            title={
-              live
-                ? "Live: rendered procedurally in your browser just now — click for the prerendered raster"
-                : `Render this icon live in your browser — the adopted recipe, RMSE ${b.rmse} vs Apple's renderer`
-            }
-            onClick={() => setLive((v) => !v)}
-            className={cn(
-              "flex cursor-pointer items-center space-x-1 rounded-full border px-2 py-0.5 font-mono text-[11px] font-medium",
-              live
-                ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400"
-                : "border-neutral-400 text-neutral-600 hover:border-emerald-500/60 hover:bg-emerald-500/10 hover:text-emerald-600 dark:border-neutral-600 dark:text-neutral-300 dark:hover:border-emerald-500/50 dark:hover:text-emerald-400"
-            )}
-          >
-            <Sparkles size={11} strokeWidth={1.8} />
-            <span>live</span>
-          </button>
+          <LiveChip
+            live={live}
+            rmse={b.rmse}
+            onToggle={() => setLive((v) => !v)}
+          />
         )}
       </div>
 
@@ -269,7 +192,9 @@ export function IconCard({
             <button
               type="button"
               title="Copy 1024px PNG to clipboard"
-              onClick={copyImage}
+              onClick={() =>
+                copyImage(assetPath(b!.slug), `${card.title} — 1024px PNG`)
+              }
               className={actionBtn}
             >
               <ImageIcon size={16} strokeWidth={1.8} />
