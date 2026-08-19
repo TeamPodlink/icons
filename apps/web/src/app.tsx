@@ -15,7 +15,9 @@ export function App() {
       <Sidebar />
       <main className="overflow-hidden px-2 md:mr-4 md:ml-56 md:px-0">
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home facet="glass" />} />
+          <Route path="/vector" element={<Home facet="flat" />} />
+          <Route path="/badges" element={<Home facet="badge" />} />
           <Route path="/directory/:category" element={<CategoryPage />} />
           <Route path="/docs/icon-format" element={<IconFormatDocs />} />
           <Route path="*" element={<NotFound />} />

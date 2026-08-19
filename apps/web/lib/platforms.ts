@@ -260,6 +260,17 @@ export function parseFacet(raw: string | null): Facet {
 }
 
 /**
+ * Facet coverage counts for the sidebar: glass counts directory cards
+ * (one per bundle, flat fallbacks included); flat and badge count the
+ * active platforms that actually ship that facet.
+ */
+export const facetCounts: Record<Facet, number> = {
+  glass: visibleCards.length,
+  flat: platforms.filter((p) => p.active && p.hasFlat).length,
+  badge: platforms.filter((p) => p.active && p.hasBadge).length,
+};
+
+/**
  * Card list for a facet view. Glass keeps one card per bundle; flat and
  * badge dedupe to one card per platform (those assets are per-platform,
  * so a platform with several bundle variants gets a single card).

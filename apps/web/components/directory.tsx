@@ -7,8 +7,7 @@ import { useEffect } from "react";
 import { IconCard } from "@/components/icon-card";
 import { WarningBanner } from "@/components/warning-banner";
 import { PageCard } from "@/components/page-card";
-import { facetCards, parseFacet, type Card, type Facet } from "@/lib/platforms";
-import { cn } from "@/lib/cn";
+import { facetCards, type Card, type Facet } from "@/lib/platforms";
 
 /** Alphabetical compare that ignores punctuation, so "’sodes" sorts
  *  under S instead of leading the list on its apostrophe. */
@@ -27,8 +26,6 @@ function useUrlState(key: string, initial: string) {
   };
   return [value, set] as const;
 }
-
-const FACETS: Facet[] = ["glass", "flat", "badge"];
 
 /** Sort cycle: Latest → A-Z → Popular → Latest. "latest" is the
  *  default and stays out of the URL (?sort=alphabetical / ?sort=popular). */
@@ -114,17 +111,16 @@ function SortMenu({ sort, onChange }: { sort: Sort; onChange: (s: Sort) => void 
 export function Directory({
   cards,
   heading,
-  facetSwitcher = true,
+  facet = "glass",
 }: {
   cards: Card[];
   heading: string;
-  facetSwitcher?: boolean;
+  /** Which facet view to render — routed via the sidebar, not a toolbar control. */
+  facet?: Facet;
 }) {
   const [query, setQuery] = useUrlState("search", "");
   const [sortRaw, setSort] = useUrlState("sort", "latest");
   const sort = parseSort(sortRaw);
-  const [facetRaw, setFacet] = useUrlState("facet", "glass");
-  const facet = facetSwitcher ? parseFacet(facetRaw) : "glass";
   const inputRef = useRef<HTMLInputElement>(null);
 
   const base = useMemo(() => facetCards(cards, facet), [cards, facet]);
@@ -190,33 +186,7 @@ export function Directory({
               ? `${shown.length} ${noun}`
               : `${heading} — ${shown.length} ${noun}`}
           </p>
-          <div className="flex items-center space-x-2">
-            {facetSwitcher && (
-              <div
-                role="group"
-                aria-label="Facet"
-                className="flex items-center rounded-md border border-neutral-200 p-0.5 dark:border-neutral-800"
-              >
-                {FACETS.map((f) => (
-                  <button
-                    key={f}
-                    type="button"
-                    aria-pressed={facet === f}
-                    onClick={() => setFacet(f)}
-                    className={cn(
-                      "cursor-pointer rounded px-2 py-1 font-mono text-xs capitalize",
-                      facet === f
-                        ? "bg-neutral-200 font-medium text-black dark:bg-neutral-800 dark:text-white"
-                        : "text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white"
-                    )}
-                  >
-                    {f}
-                  </button>
-                ))}
-              </div>
-            )}
-            <SortMenu sort={sort} onChange={setSort} />
-          </div>
+          <SortMenu sort={sort} onChange={setSort} />
         </div>
         <WarningBanner />
         <div className="container mx-auto my-6 px-6 lg:px-4">

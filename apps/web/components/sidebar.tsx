@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router";
-import { House } from "lucide-react";
+import { PenTool, Ticket } from "lucide-react";
 
 /** Apple HIG "materials" glyph (developer.apple.com/tutorials/images/com.apple.HIG/materials.svg), recolored to currentColor. */
 function MaterialsIcon({ size = 16 }: { size?: number; strokeWidth?: number }) {
@@ -9,7 +9,7 @@ function MaterialsIcon({ size = 16 }: { size?: number; strokeWidth?: number }) {
     </svg>
   );
 }
-import { categorySlug, getCategories, visibleCards } from "@/lib/platforms";
+import { categorySlug, facetCounts, getCategories } from "@/lib/platforms";
 import { ScrollFade } from "@/components/scroll-fade";
 import { cn } from "@/lib/cn";
 
@@ -30,9 +30,13 @@ export function Sidebar() {
   const { pathname } = useLocation();
   const categories = getCategories();
 
+  // The three facets are the navigation. Icon note: Ticket is the
+  // current wide-pill read for the badge facet — swap the `icon` field
+  // here if the maintainer settles on another glyph.
   const links = [
-    { href: "/", label: "Home", icon: House, badge: visibleCards.length },
-    { href: "/docs/icon-format", label: "Liquid Glass", icon: MaterialsIcon },
+    { href: "/", label: "Liquid Glass", icon: MaterialsIcon, badge: facetCounts.glass },
+    { href: "/vector", label: "Vector", icon: PenTool, badge: facetCounts.flat },
+    { href: "/badges", label: "Badge", icon: Ticket, badge: facetCounts.badge },
   ];
 
   return (
