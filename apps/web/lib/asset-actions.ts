@@ -2,8 +2,12 @@ import { toast } from "sonner";
 
 /** Copy plain text with the house success toast. */
 export async function copyText(text: string, description: string) {
-  await navigator.clipboard.writeText(text);
-  toast.success("Copied to clipboard", { description });
+  try {
+    await navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard", { description });
+  } catch {
+    toast.error("Clipboard copy not available");
+  }
 }
 
 /** Copy a PNG asset to the clipboard as an image (blob-fetch, so it
