@@ -182,7 +182,7 @@ export function IconCard({
         e.preventDefault();
         setMenu({ x: e.clientX, y: e.clientY });
       }}
-      className="flex flex-col items-center justify-center rounded-md border border-neutral-200 px-3.5 py-3 hover:bg-neutral-100/80 dark:border-neutral-800 dark:hover:bg-neutral-800/20"
+      className="group relative flex flex-col items-center justify-center rounded-md border border-neutral-200 px-3.5 py-3 hover:bg-neutral-100/80 dark:border-neutral-800 dark:hover:bg-neutral-800/20"
     >
       <div className="flex h-6 w-full items-center justify-end space-x-2 pb-0.5">
         {shown === "flat" && facet === "glass" && (
@@ -195,12 +195,38 @@ export function IconCard({
         )}
       </div>
 
-      {/* Artwork + title open the platform detail — a real link, so
-          cmd-click / middle-click / copy-link semantics work; a plain
-          click carries the grid location for the modal presentation. */}
+      <div className="flex w-full justify-center transition-transform duration-150 ease-out group-hover:scale-[1.03]">
+        <div
+          {...{ [CARD_VT_ATTR]: card.key }}
+          className={shown === "badge" ? "w-full" : undefined}
+        >
+          {missing ? (
+            <MissingPreview
+              label={shown === "flat" ? "missing flat" : "missing badge"}
+            />
+          ) : shown === "glass" ? (
+            <GlassPreview card={card} />
+          ) : shown === "badge" ? (
+            <BadgePreview card={card} />
+          ) : (
+            <FlatPreview card={card} />
+          )}
+        </div>
+      </div>
+
+      <div className="mb-3 flex flex-col items-center justify-center space-y-1">
+        <p className="truncate text-balance text-center text-[15px] font-medium">
+          {title}
+        </p>
+      </div>
+
+      {/* Stretched link: the whole cell is the click target, and it's a
+          real anchor so cmd/middle-click and copy-link semantics keep
+          working (right-click bubbles to the cell's context menu). */}
       <TransitionLink
         to={`/icon/${p.id}`}
         state={{ background: location }}
+        aria-label={`${p.name} details`}
         title={`${p.name} details`}
         onClick={(e) => {
           // Name the artwork only for the navigation the link will run
@@ -214,33 +240,8 @@ export function IconCard({
           )
             nameCardForTransition(card.key);
         }}
-        className="group flex w-full flex-col items-center rounded-md outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 dark:focus-visible:ring-neutral-600"
-      >
-        <div className="flex w-full justify-center transition-transform duration-150 ease-out group-hover:scale-[1.03]">
-          <div
-            {...{ [CARD_VT_ATTR]: card.key }}
-            className={shown === "badge" ? "w-full" : undefined}
-          >
-            {missing ? (
-              <MissingPreview
-                label={shown === "flat" ? "missing flat" : "missing badge"}
-              />
-            ) : shown === "glass" ? (
-              <GlassPreview card={card} />
-            ) : shown === "badge" ? (
-              <BadgePreview card={card} />
-            ) : (
-              <FlatPreview card={card} />
-            )}
-          </div>
-        </div>
-
-        <div className="mb-3 flex flex-col items-center justify-center space-y-1">
-          <p className="truncate text-balance text-center text-[15px] font-medium decoration-neutral-400 underline-offset-2 group-hover:underline">
-            {title}
-          </p>
-        </div>
-      </TransitionLink>
+        className="absolute inset-0 rounded-md outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 dark:focus-visible:ring-neutral-600"
+      />
 
       {menu && (
         <ContextMenu
