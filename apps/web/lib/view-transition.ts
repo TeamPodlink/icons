@@ -138,6 +138,13 @@ export function clearCardTransitionName(key: string) {
  * plain cross-fade.
  */
 export function nameCardForTransition(key: string): boolean {
+  // A new transition begins: sweep any stale participant first. The close
+  // path clears its destination card only via the failsafe timer, so a
+  // quick follow-up open inside that window would otherwise lift the
+  // previous card into the new transition's top layer (sharp, above the
+  // backdrop) until the morph ends.
+  for (const staleKey of [...pendingClears.keys()])
+    if (staleKey !== key) clearCardTransitionName(staleKey);
   const { artwork, cell } = findCardParts(key);
   if (!artwork) return false;
   artwork.style.viewTransitionName = iconTransitionName(key);
@@ -149,7 +156,7 @@ export function nameCardForTransition(key: string): boolean {
   if (timer !== undefined) clearTimeout(timer);
   pendingClears.set(
     key,
-    window.setTimeout(() => clearCardTransitionName(key), 1000)
+    window.setTimeout(() => clearCardTransitionName(key), 400)
   );
   return true;
 }
