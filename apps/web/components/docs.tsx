@@ -6,11 +6,7 @@ import { copyText } from "@/lib/asset-actions";
 import { domToMarkdown } from "@/lib/dom-markdown";
 
 export function Code({ children }: { children: React.ReactNode }) {
-  return (
-    <pre className="overflow-x-auto rounded-md border border-neutral-200 bg-neutral-50 p-4 font-mono text-[13px] leading-relaxed dark:border-neutral-800 dark:bg-neutral-950/60">
-      {children}
-    </pre>
-  );
+  return <pre className="font-mono">{children}</pre>;
 }
 
 /** Section titles double as anchor ids, so the TOC needs no registration
@@ -239,13 +235,11 @@ export function DocsPage({
       <div className="flex gap-8 lg:gap-12">
         <article
           ref={articleRef}
-          className="mx-auto mb-6 mt-8 w-full max-w-3xl flex-1 space-y-8 px-6 lg:px-4"
+          className="docs-prose mx-auto mb-6 mt-8 w-full max-w-3xl flex-1 px-6 lg:px-4"
         >
           <div>
-            <h1 className="scroll-mt-16 text-2xl font-semibold tracking-tight">
-              {title}
-            </h1>
-            <p className="mt-2 text-neutral-600 dark:text-neutral-400">
+            <h1>{title}</h1>
+            <p className="text-center text-neutral-600 dark:text-neutral-400">
               {intro}
             </p>
           </div>
@@ -271,11 +265,8 @@ export function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section className="space-y-3">
-      {/* scroll-mt clears the sticky docs header on an anchor jump. */}
-      <h2 id={slugify(title)} className="scroll-mt-16 text-lg font-medium">
-        {title}
-      </h2>
+    <section className="mt-10">
+      <h2 id={slugify(title)}>{title}</h2>
       {children}
     </section>
   );
@@ -292,7 +283,6 @@ export function A({
   const external = href.startsWith("http");
   return (
     <a
-      className="underline decoration-neutral-400 underline-offset-2"
       href={href}
       target={external ? "_blank" : undefined}
       rel={external ? "noreferrer" : undefined}
@@ -303,9 +293,5 @@ export function A({
 }
 
 export function P({ children }: { children: React.ReactNode }) {
-  return (
-    <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
-      {children}
-    </p>
-  );
+  return <p>{children}</p>;
 }

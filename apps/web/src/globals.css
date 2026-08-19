@@ -53,3 +53,46 @@
 }
 
 /* Scroll fade mask for the page card (svgl-style). */
+
+/* Docs typography, mirroring svgl's markdown.css: the classic
+   documentation scale — ruled h2s, full-contrast body at leading-7,
+   tinted inline code — scoped to .docs-prose. Elements inside
+   .not-prose keep their own styling (the same escape hatch their
+   stylesheet spells .not-markdown). */
+.docs-prose {
+  @apply max-w-full text-neutral-950 dark:text-neutral-50;
+}
+
+.docs-prose h1:not(.not-prose h1) {
+  @apply scroll-mt-20 text-balance text-center text-3xl font-semibold;
+}
+
+.docs-prose h2:not(.not-prose h2) {
+  @apply mb-3 scroll-mt-20 border-b border-neutral-200 pb-1.5 text-2xl font-semibold dark:border-neutral-800;
+}
+
+.docs-prose h3:not(.not-prose h3) {
+  @apply scroll-mt-20 text-xl font-semibold;
+}
+
+.docs-prose p:not(.not-prose p) {
+  @apply mb-1.5 leading-7 [&:not(:first-child)]:mt-4;
+}
+
+.docs-prose a:not(.not-prose a) {
+  @apply font-medium underline underline-offset-4 transition-opacity hover:opacity-80;
+}
+
+.docs-prose ul:not(.not-prose ul) {
+  @apply my-6 ml-6 list-disc [&>li]:mt-2;
+}
+
+.docs-prose code:not(pre > code):not(.not-prose code) {
+  @apply relative rounded bg-neutral-200/50 px-[0.3rem] py-[0.2rem] font-mono text-sm dark:bg-neutral-800/50;
+}
+
+/* overflow-x (not their overflow-y): our code blocks are wide ASCII
+   tables, so horizontal scroll is the correct axis. */
+.docs-prose pre:not(.not-prose pre) {
+  @apply mt-2 overflow-x-auto rounded-md border border-neutral-200 bg-white p-2 text-sm drop-shadow-xs dark:border-neutral-800 dark:bg-neutral-950;
+}

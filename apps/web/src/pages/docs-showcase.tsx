@@ -26,7 +26,8 @@ export function ShowcaseDocs() {
       title="Showcase"
       intro="Sites and apps using the collection in production."
     >
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      {/* Custom cards: opt out of the prose link styling. */}
+      <div className="not-prose grid grid-cols-1 gap-4 pt-6 sm:grid-cols-2">
         {SHOWCASE.map((s) => (
           <a
             key={s.url}
