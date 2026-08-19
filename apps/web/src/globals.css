@@ -59,8 +59,12 @@
    tinted inline code — scoped to .docs-prose. Elements inside
    .not-prose keep their own styling (the same escape hatch their
    stylesheet spells .not-markdown). */
+/* No max-w-full here: svgl can afford it because their constraint sits
+   on a parent Container, but our article carries max-w-3xl itself and a
+   later class rule of equal specificity would silently defeat it —
+   stretching the measure from ~68 to ~81 characters. */
 .docs-prose {
-  @apply max-w-full text-neutral-950 dark:text-neutral-50;
+  @apply text-neutral-950 dark:text-neutral-50;
 }
 
 .docs-prose h1:not(.not-prose h1) {
