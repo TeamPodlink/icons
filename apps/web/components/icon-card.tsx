@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link, useLocation } from "react-router";
 import { Copy, Download, ImageIcon, Link as LinkIcon } from "lucide-react";
 import {
   copyImage,
@@ -122,6 +123,7 @@ export function IconCard({
 }) {
   const [live, setLive] = useState(false);
   const { resolvedTheme } = useTheme();
+  const location = useLocation();
   const b = card.bundle;
   const p = card.platform;
 
@@ -165,26 +167,38 @@ export function IconCard({
         )}
       </div>
 
-      {missing ? (
-        <MissingPreview
-          label={shown === "flat" ? "missing flat" : "missing badge"}
-        />
-      ) : shown === "glass" ? (
-        <GlassPreview
-          card={card}
-          src={live && b?.recipe ? liveUri ?? undefined : undefined}
-        />
-      ) : shown === "badge" ? (
-        <BadgePreview card={card} />
-      ) : (
-        <FlatPreview card={card} />
-      )}
+      {/* Artwork + title open the platform detail — a real link, so
+          cmd-click / middle-click / copy-link semantics work; a plain
+          click carries the grid location for the modal presentation. */}
+      <Link
+        to={`/icon/${p.id}`}
+        state={{ background: location }}
+        title={`${p.name} details`}
+        className="group flex w-full flex-col items-center rounded-md outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 dark:focus-visible:ring-neutral-600"
+      >
+        <div className="flex w-full justify-center transition-transform duration-150 ease-out group-hover:scale-[1.03]">
+          {missing ? (
+            <MissingPreview
+              label={shown === "flat" ? "missing flat" : "missing badge"}
+            />
+          ) : shown === "glass" ? (
+            <GlassPreview
+              card={card}
+              src={live && b?.recipe ? liveUri ?? undefined : undefined}
+            />
+          ) : shown === "badge" ? (
+            <BadgePreview card={card} />
+          ) : (
+            <FlatPreview card={card} />
+          )}
+        </div>
 
-      <div className="mb-3 flex flex-col items-center justify-center space-y-1">
-        <p className="select-all truncate text-balance text-center text-[15px] font-medium">
-          {title}
-        </p>
-      </div>
+        <div className="mb-3 flex flex-col items-center justify-center space-y-1">
+          <p className="truncate text-balance text-center text-[15px] font-medium decoration-neutral-400 underline-offset-2 group-hover:underline">
+            {title}
+          </p>
+        </div>
+      </Link>
 
       <div className="flex items-center space-x-0.5">
         {missing ? null : shown === "glass" ? (
