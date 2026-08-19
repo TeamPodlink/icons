@@ -1,5 +1,13 @@
 import { Link, useLocation } from "react-router";
-import { PenTool, Ticket } from "lucide-react";
+import {
+  BookOpen,
+  GitPullRequest,
+  Megaphone,
+  Package,
+  PenTool,
+  Scale,
+  Ticket,
+} from "lucide-react";
 
 /** Apple HIG "materials" glyph (developer.apple.com/tutorials/images/com.apple.HIG/materials.svg), recolored to currentColor. */
 function MaterialsIcon({ size = 16 }: { size?: number; strokeWidth?: number }) {
@@ -39,6 +47,14 @@ export function Sidebar() {
     { href: "/badges", label: "Badge", icon: Ticket, badge: facetCounts.badge },
   ];
 
+  const docs = [
+    { href: "/docs/guide", label: "Guide", icon: BookOpen },
+    { href: "/docs/packages", label: "Packages", icon: Package },
+    { href: "/docs/legal", label: "Legal", icon: Scale },
+    { href: "/docs/contributing", label: "Contributing", icon: GitPullRequest },
+    { href: "/docs/showcase", label: "Showcase", icon: Megaphone },
+  ];
+
   return (
     <aside className="w-54 hidden h-[calc(100vh-4.5rem)] flex-col space-y-3 overflow-x-hidden bg-neutral-100 px-2 md:fixed md:left-1 md:flex dark:bg-neutral-950">
       <nav className="flex flex-col space-y-0.5">
@@ -53,6 +69,21 @@ export function Sidebar() {
               <span>{label}</span>
             </span>
             {badge !== undefined && <Badge>{badge}</Badge>}
+          </Link>
+        ))}
+      </nav>
+      <div className="h-px w-full bg-neutral-200 dark:bg-neutral-800" />
+      <nav className="flex flex-col space-y-0.5">
+        {docs.map(({ href, label, icon: Icon }) => (
+          <Link
+            key={href}
+            to={href}
+            className={cn(itemBase, pathname === href && itemActive)}
+          >
+            <span className="flex items-center space-x-2">
+              <Icon size={16} strokeWidth={1.8} />
+              <span>{label}</span>
+            </span>
           </Link>
         ))}
       </nav>

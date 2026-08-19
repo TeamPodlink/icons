@@ -45,6 +45,27 @@ export function Section({
   );
 }
 
+/** Inline link for docs prose; external URLs open in a new tab. */
+export function A({
+  href,
+  children,
+}: {
+  href: string;
+  children: React.ReactNode;
+}) {
+  const external = href.startsWith("http");
+  return (
+    <a
+      className="underline decoration-neutral-400 underline-offset-2"
+      href={href}
+      target={external ? "_blank" : undefined}
+      rel={external ? "noreferrer" : undefined}
+    >
+      {children}
+    </a>
+  );
+}
+
 export function P({ children }: { children: React.ReactNode }) {
   return (
     <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
