@@ -1,6 +1,11 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router";
+import { useLocation } from "react-router";
 import { Copy, Download, ImageIcon, Link as LinkIcon } from "lucide-react";
+import { TransitionLink } from "@/components/transition-link";
+import {
+  iconTransitionName,
+  useOpenDetailPlatformId,
+} from "@/lib/view-transition";
 import {
   copyImage,
   copySvg,
@@ -127,6 +132,16 @@ export function IconCard({
   const b = card.bundle;
   const p = card.platform;
 
+  // Shared-element morph: the artwork carries `icon-<key>` and the detail
+  // preview reuses it. While this platform's modal is open the name moves
+  // to the modal — the card must shed it (duplicate names in a captured
+  // frame make the browser skip the transition).
+  const openPlatformId = useOpenDetailPlatformId();
+  const vtStyle =
+    openPlatformId === p.id
+      ? undefined
+      : { viewTransitionName: iconTransitionName(card.key) };
+
   // What this card actually shows: the glass view falls back to the flat
   // vector for platforms that have no glass bundle yet (card.facet).
   const shown: Facet =
@@ -170,27 +185,29 @@ export function IconCard({
       {/* Artwork + title open the platform detail — a real link, so
           cmd-click / middle-click / copy-link semantics work; a plain
           click carries the grid location for the modal presentation. */}
-      <Link
+      <TransitionLink
         to={`/icon/${p.id}`}
         state={{ background: location }}
         title={`${p.name} details`}
         className="group flex w-full flex-col items-center rounded-md outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 dark:focus-visible:ring-neutral-600"
       >
         <div className="flex w-full justify-center transition-transform duration-150 ease-out group-hover:scale-[1.03]">
-          {missing ? (
-            <MissingPreview
-              label={shown === "flat" ? "missing flat" : "missing badge"}
-            />
-          ) : shown === "glass" ? (
-            <GlassPreview
-              card={card}
-              src={live && b?.recipe ? liveUri ?? undefined : undefined}
-            />
-          ) : shown === "badge" ? (
-            <BadgePreview card={card} />
-          ) : (
-            <FlatPreview card={card} />
-          )}
+          <div style={vtStyle} className={shown === "badge" ? "w-full" : undefined}>
+            {missing ? (
+              <MissingPreview
+                label={shown === "flat" ? "missing flat" : "missing badge"}
+              />
+            ) : shown === "glass" ? (
+              <GlassPreview
+                card={card}
+                src={live && b?.recipe ? liveUri ?? undefined : undefined}
+              />
+            ) : shown === "badge" ? (
+              <BadgePreview card={card} />
+            ) : (
+              <FlatPreview card={card} />
+            )}
+          </div>
         </div>
 
         <div className="mb-3 flex flex-col items-center justify-center space-y-1">
@@ -198,7 +215,7 @@ export function IconCard({
             {title}
           </p>
         </div>
-      </Link>
+      </TransitionLink>
 
       <div className="flex items-center space-x-0.5">
         {missing ? null : shown === "glass" ? (

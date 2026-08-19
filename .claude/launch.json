@@ -12,6 +12,20 @@
       "port": 4173
     },
     {
+      "name": "web-dev-4199",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": [
+        "--filter",
+        "web",
+        "exec",
+        "vite",
+        "--port",
+        "4199",
+        "--strictPort"
+      ],
+      "port": 4199
+    },
+    {
       "name": "web-preview",
       "runtimeExecutable": "pnpm",
       "runtimeArgs": [

@@ -1,16 +1,12 @@
 import { useEffect } from "react";
-import {
-  Link,
-  Navigate,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router";
+import { Navigate, useLocation, useParams } from "react-router";
 import { X } from "lucide-react";
 import { IconDetail } from "@/components/icon-detail";
 import { PageCard } from "@/components/page-card";
+import { TransitionLink } from "@/components/transition-link";
 import { resolvePlatform } from "@/lib/platforms";
 import { useTitle } from "@/lib/use-title";
+import { useTransitionNavigate } from "@/lib/view-transition";
 import { NotFound } from "@/src/pages/not-found";
 
 const closeBtn =
@@ -32,12 +28,12 @@ export function IconDetailPage() {
     <PageCard>
       <div className="mx-auto max-w-2xl py-4">
         <div className="px-6 pt-4 sm:px-8">
-          <Link
+          <TransitionLink
             to="/"
             className="text-sm text-neutral-600 underline decoration-neutral-400 underline-offset-2 hover:text-black dark:text-neutral-400 dark:hover:text-white"
           >
             ← Back to the directory
-          </Link>
+          </TransitionLink>
         </div>
         <IconDetail platform={platform} />
       </div>
@@ -54,7 +50,9 @@ export function IconDetailPage() {
 export function IconDetailModal() {
   const { id = "" } = useParams();
   const location = useLocation();
-  const navigate = useNavigate();
+  // Closing pops through the data router so the recorded open transition
+  // replays in reverse (preview morphs back into its grid card).
+  const navigate = useTransitionNavigate();
   const platform = resolvePlatform(id);
   useTitle(
     platform ? `${platform.name} · refraction` : "Not found · refraction",

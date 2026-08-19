@@ -11,4 +11,23 @@
   @apply bg-neutral-300 dark:bg-neutral-700;
 }
 
+/* Shared-element morph (card artwork ↔ detail preview): quick, ease-out.
+   Applies to every transition group, including the root cross-fade. */
+::view-transition-group(*) {
+  animation-duration: 280ms;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Reduced motion: keep the (instant) navigation, drop the morph. The
+   navigation code also skips startViewTransition entirely — this guard
+   covers replayed pop transitions. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-image-pair(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
+  }
+}
+
 /* Scroll fade mask for the page card (svgl-style). */

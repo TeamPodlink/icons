@@ -23,6 +23,7 @@ import {
 import { useLiquidRender } from "@/lib/use-liquid-render";
 import { cn } from "@/lib/cn";
 import { LiveChip } from "@/components/live-chip";
+import { iconTransitionName } from "@/lib/view-transition";
 
 /** Labeled action button (the detail view has room for words; cards
  *  keep their icon-only 9×9 buttons). */
@@ -103,26 +104,32 @@ function GlassSection({
             />
           </div>
         )}
-        {live && bundle.recipe && liveUri ? (
-          <img src={liveUri} alt={alt} {...common} className={imgCls} />
-        ) : !bundle.hasDark ? (
-          <img {...sized(false)} alt={alt} {...common} className={imgCls} />
-        ) : (
-          <>
-            <img
-              {...sized(false)}
-              alt={alt}
-              {...common}
-              className={cn(imgCls, "dark:hidden")}
-            />
-            <img
-              {...sized(true)}
-              alt={alt}
-              {...common}
-              className={cn(imgCls, "hidden dark:block")}
-            />
-          </>
-        )}
+        {/* Named for the card → detail shared-element morph. */}
+        <div
+          style={{ viewTransitionName: iconTransitionName(bundle.slug) }}
+          className="h-64 w-64"
+        >
+          {live && bundle.recipe && liveUri ? (
+            <img src={liveUri} alt={alt} {...common} className={imgCls} />
+          ) : !bundle.hasDark ? (
+            <img {...sized(false)} alt={alt} {...common} className={imgCls} />
+          ) : (
+            <>
+              <img
+                {...sized(false)}
+                alt={alt}
+                {...common}
+                className={cn(imgCls, "dark:hidden")}
+              />
+              <img
+                {...sized(true)}
+                alt={alt}
+                {...common}
+                className={cn(imgCls, "hidden dark:block")}
+              />
+            </>
+          )}
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
@@ -203,7 +210,16 @@ function GlassSection({
   );
 }
 
-function VectorSection({ platform }: { platform: Platform }) {
+/** `named`: glass-less platforms morph their card artwork into this
+ *  preview instead (the platform id doubles as the card key there); with
+ *  bundles present the GlassSection already owns the name. */
+function VectorSection({
+  platform,
+  named,
+}: {
+  platform: Platform;
+  named: boolean;
+}) {
   return (
     <Section title="Vector">
       <div className="flex items-center space-x-4">
@@ -213,6 +229,11 @@ function VectorSection({ platform }: { platform: Platform }) {
           decoding="async"
           width={80}
           height={80}
+          style={
+            named
+              ? { viewTransitionName: iconTransitionName(platform.id) }
+              : undefined
+          }
           className="h-20 w-20 select-none"
         />
         <div className="flex flex-wrap gap-2">
@@ -344,7 +365,9 @@ export function IconDetail({ platform }: { platform: Platform }) {
       {p.bundles.map((b) => (
         <GlassSection key={b.slug} bundle={b} platformName={p.name} />
       ))}
-      {p.hasFlat && <VectorSection platform={p} />}
+      {p.hasFlat && (
+        <VectorSection platform={p} named={p.bundles.length === 0} />
+      )}
       {p.hasBadge && (
         <Section title="Badge">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">

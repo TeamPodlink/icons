@@ -2,6 +2,8 @@ import { Route, Routes, useLocation, type Location } from "react-router";
 import { Toaster } from "sonner";
 import { Header } from "@/components/header";
 import { Sidebar } from "@/components/sidebar";
+import { resolvePlatform } from "@/lib/platforms";
+import { OpenDetailContext } from "@/lib/view-transition";
 import { CategoryPage } from "@/src/pages/directory-category";
 import { ContributingDocs } from "@/src/pages/docs-contributing";
 import { GuideDocs } from "@/src/pages/docs-guide";
@@ -21,8 +23,18 @@ export function App() {
   const background = (location.state as { background?: Location } | null)
     ?.background;
 
+  // Cards render under the background location, so they can't see the
+  // real one — tell them which platform's modal is open so the card drops
+  // its view-transition-name while the detail preview owns it.
+  const iconMatch = background
+    ? /^\/icon\/([^/]+)$/.exec(location.pathname)
+    : null;
+  const openPlatformId = iconMatch
+    ? resolvePlatform(decodeURIComponent(iconMatch[1]))?.id ?? null
+    : null;
+
   return (
-    <>
+    <OpenDetailContext.Provider value={openPlatformId}>
       <Toaster position="bottom-right" />
       <Header />
       <Sidebar />
@@ -47,6 +59,6 @@ export function App() {
           <Route path="*" element={null} />
         </Routes>
       )}
-    </>
+    </OpenDetailContext.Provider>
   );
 }
