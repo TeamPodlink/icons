@@ -1,12 +1,15 @@
 import { toast } from "sonner";
 
-/** Copy plain text with the house success toast. */
+/** Copy plain text with the house success toast. Resolves true when the
+ *  write actually landed, for callers that show a copied state. */
 export async function copyText(text: string, description: string) {
   try {
     await navigator.clipboard.writeText(text);
     toast.success("Copied to clipboard", { description });
+    return true;
   } catch {
     toast.error("Clipboard copy not available");
+    return false;
   }
 }
 
