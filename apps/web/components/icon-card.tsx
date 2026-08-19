@@ -1,20 +1,12 @@
 import { useState } from "react";
 import { useLocation } from "react-router";
-import {
-  CodeXml,
-  Copy,
-  Download,
-  ImageIcon,
-  Maximize2,
-  Moon,
-} from "lucide-react";
+import { Copy, Download, Maximize2 } from "lucide-react";
 import {
   ContextMenu,
   type ContextMenuItem,
 } from "@/components/context-menu";
 import { TransitionLink } from "@/components/transition-link";
-import { copyImage, copySvg, copyText, downloadAsset } from "@/lib/asset-actions";
-import { embedHtml } from "@/lib/embed-html";
+import { copyItemsFor, downloadItemsFor } from "@/lib/asset-menus";
 import {
   assetPath,
   badgePath,
@@ -130,9 +122,10 @@ export function IconCard({
   /** The directory-level facet view; the card adapts artwork + actions. */
   facet?: Facet;
 }) {
-  const { resolvedTheme } = useTheme();
   const location = useLocation();
   const navigate = useTransitionNavigate();
+  // Menu actions resolve to the rendition on screen (theme-scoped).
+  const darkTheme = useTheme().resolvedTheme === "dark";
   const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
   const b = card.bundle;
   const p = card.platform;
@@ -156,12 +149,9 @@ export function IconCard({
 
   const title = facet === "glass" ? card.title : p.name;
 
-  // Badge downloads/copies target the variant currently on screen.
-  const badgeDark = resolvedTheme === "dark";
-  const badgeUrl = badgePath(p.id, badgeDark);
-  const badgeName = `${p.id}-${badgeDark ? "dark" : "light"}.svg`;
-
-  /** Right-click menu rows for the facet on screen. */
+  /** Right-click menu: Open details, then the shared per-variant Copy /
+   *  Download trees (lib/asset-menus.ts — same options as the detail
+   *  toolbar's dropdowns). */
   const menuItems: ContextMenuItem[] = [
     {
       label: "Open details",
@@ -171,67 +161,18 @@ export function IconCard({
     },
   ];
   if (!missing) {
-    if (shown === "glass" && b) {
-      menuItems.push(
-        {
-          label: "Copy PNG",
-          icon: ImageIcon,
-          onSelect: () =>
-            copyImage(assetPath(b.slug), `${card.title} — 1024px PNG`),
-        },
-        {
-          label: "Download PNG 1024",
-          icon: Download,
-          onSelect: () => downloadAsset(assetPath(b.slug), `${b.slug}.png`),
-        }
-      );
-      if (b.hasDark)
-        menuItems.push({
-          label: "Download PNG 1024 (dark)",
-          icon: Moon,
-          onSelect: () =>
-            downloadAsset(
-              assetPath(b.slug, { dark: true }),
-              `${b.slug}-dark.png`
-            ),
-        });
-      menuItems.push({
-        label: "Copy embed HTML",
-        icon: CodeXml,
-        onSelect: () =>
-          copyText(embedHtml(b), `${card.title} — <picture> embed`),
-      });
-    } else if (shown === "badge") {
-      menuItems.push(
-        {
-          label: `Copy SVG (${badgeDark ? "dark" : "light"})`,
-          icon: Copy,
-          onSelect: () =>
-            copySvg(
-              badgeUrl,
-              `${p.name} — ${badgeDark ? "dark" : "light"} badge SVG`
-            ),
-        },
-        {
-          label: `Download SVG (${badgeDark ? "dark" : "light"})`,
-          icon: Download,
-          onSelect: () => downloadAsset(badgeUrl, badgeName),
-        }
-      );
-    } else {
-      menuItems.push(
-        {
-          label: "Copy SVG",
-          icon: Copy,
-          onSelect: () => copySvg(flatPath(p.id), `${card.title} — flat SVG`),
-        },
-        {
-          label: "Download SVG",
-          icon: Download,
-          onSelect: () => downloadAsset(flatPath(p.id), `${p.id}.svg`),
-        }
-      );
-    }
+    menuItems.push(
+      {
+        label: "Copy",
+        icon: Copy,
+        children: copyItemsFor(shown, p, b, darkTheme),
+      },
+      {
+        label: "Download",
+        icon: Download,
+        children: downloadItemsFor(shown, p, b, darkTheme),
+      }
+    );
   }
 
   return (
