@@ -1,16 +1,20 @@
 import { useState } from "react";
 import { useLocation } from "react-router";
-import { Copy, Download, ImageIcon, Link as LinkIcon } from "lucide-react";
+import {
+  CodeXml,
+  Copy,
+  Download,
+  ImageIcon,
+  Maximize2,
+  Moon,
+} from "lucide-react";
+import {
+  ContextMenu,
+  type ContextMenuItem,
+} from "@/components/context-menu";
 import { TransitionLink } from "@/components/transition-link";
-import {
-  iconTransitionName,
-  useOpenDetailPlatformId,
-} from "@/lib/view-transition";
-import {
-  copyImage,
-  copySvg,
-  downloadAsset,
-} from "@/lib/asset-actions";
+import { copyImage, copySvg, copyText, downloadAsset } from "@/lib/asset-actions";
+import { embedHtml } from "@/lib/embed-html";
 import {
   assetPath,
   badgePath,
@@ -22,9 +26,11 @@ import { useLiquidRender } from "@/lib/use-liquid-render";
 import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/cn";
 import { LiveChip } from "@/components/live-chip";
-
-const actionBtn =
-  "flex h-9 w-9 cursor-pointer items-center justify-center rounded-md text-neutral-600 hover:bg-neutral-200 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white";
+import {
+  iconTransitionName,
+  useOpenDetailPlatformId,
+  useTransitionNavigate,
+} from "@/lib/view-transition";
 
 const previewCls = "pointer-events-none mb-4 mt-1.5 h-24 w-24 select-none";
 const previewCommon = {
@@ -129,6 +135,8 @@ export function IconCard({
   const [live, setLive] = useState(false);
   const { resolvedTheme } = useTheme();
   const location = useLocation();
+  const navigate = useTransitionNavigate();
+  const [menu, setMenu] = useState<{ x: number; y: number } | null>(null);
   const b = card.bundle;
   const p = card.platform;
 
@@ -162,8 +170,88 @@ export function IconCard({
   const badgeUrl = badgePath(p.id, badgeDark);
   const badgeName = `${p.id}-${badgeDark ? "dark" : "light"}.svg`;
 
+  /** Right-click menu rows for the facet on screen. */
+  const menuItems: ContextMenuItem[] = [
+    {
+      label: "Open details",
+      icon: Maximize2,
+      // Same navigation as a card click: background location + morph.
+      onSelect: () =>
+        navigate(`/icon/${p.id}`, { state: { background: location } }),
+    },
+  ];
+  if (!missing) {
+    if (shown === "glass" && b) {
+      menuItems.push(
+        {
+          label: "Copy PNG",
+          icon: ImageIcon,
+          onSelect: () =>
+            copyImage(assetPath(b.slug), `${card.title} — 1024px PNG`),
+        },
+        {
+          label: "Download PNG 1024",
+          icon: Download,
+          onSelect: () => downloadAsset(assetPath(b.slug), `${b.slug}.png`),
+        }
+      );
+      if (b.hasDark)
+        menuItems.push({
+          label: "Download PNG 1024 (dark)",
+          icon: Moon,
+          onSelect: () =>
+            downloadAsset(
+              assetPath(b.slug, { dark: true }),
+              `${b.slug}-dark.png`
+            ),
+        });
+      menuItems.push({
+        label: "Copy embed HTML",
+        icon: CodeXml,
+        onSelect: () =>
+          copyText(embedHtml(b), `${card.title} — <picture> embed`),
+      });
+    } else if (shown === "badge") {
+      menuItems.push(
+        {
+          label: `Copy SVG (${badgeDark ? "dark" : "light"})`,
+          icon: Copy,
+          onSelect: () =>
+            copySvg(
+              badgeUrl,
+              `${p.name} — ${badgeDark ? "dark" : "light"} badge SVG`
+            ),
+        },
+        {
+          label: `Download SVG (${badgeDark ? "dark" : "light"})`,
+          icon: Download,
+          onSelect: () => downloadAsset(badgeUrl, badgeName),
+        }
+      );
+    } else {
+      menuItems.push(
+        {
+          label: "Copy SVG",
+          icon: Copy,
+          onSelect: () => copySvg(flatPath(p.id), `${card.title} — flat SVG`),
+        },
+        {
+          label: "Download SVG",
+          icon: Download,
+          onSelect: () => downloadAsset(flatPath(p.id), `${p.id}.svg`),
+        }
+      );
+    }
+  }
+
   return (
-    <div className="flex flex-col items-center justify-center rounded-md border border-neutral-200 px-3.5 py-3 hover:bg-neutral-100/80 dark:border-neutral-800 dark:hover:bg-neutral-800/20">
+    <div
+      onContextMenu={(e) => {
+        e.preventDefault();
+        setMenu({ x: e.clientX, y: e.clientY });
+      }}
+      className="flex flex-col items-center justify-center rounded-md border border-neutral-200 px-3.5 py-3 hover:bg-neutral-100/80 dark:border-neutral-800 dark:hover:bg-neutral-800/20"
+    >
       <div className="flex h-6 w-full items-center justify-end space-x-2 pb-0.5">
         {shown === "flat" && facet === "glass" && (
           <span
@@ -217,86 +305,15 @@ export function IconCard({
         </div>
       </TransitionLink>
 
-      <div className="flex items-center space-x-0.5">
-        {missing ? null : shown === "glass" ? (
-          <>
-            <button
-              type="button"
-              title="Copy 1024px PNG to clipboard"
-              onClick={() =>
-                copyImage(assetPath(b!.slug), `${card.title} — 1024px PNG`)
-              }
-              className={actionBtn}
-            >
-              <ImageIcon size={16} strokeWidth={1.8} />
-            </button>
-            <button
-              type="button"
-              title="Download 1024px PNG"
-              onClick={() => downloadAsset(assetPath(b!.slug), `${b!.slug}.png`)}
-              className={actionBtn}
-            >
-              <Download size={16} strokeWidth={1.8} />
-            </button>
-          </>
-        ) : shown === "badge" ? (
-          <>
-            <button
-              type="button"
-              title={`Copy badge SVG (${badgeDark ? "dark" : "light"})`}
-              onClick={() =>
-                copySvg(
-                  badgeUrl,
-                  `${p.name} — ${badgeDark ? "dark" : "light"} badge SVG`
-                )
-              }
-              className={actionBtn}
-            >
-              <Copy size={16} strokeWidth={1.8} />
-            </button>
-            <button
-              type="button"
-              title={`Download badge SVG (${badgeDark ? "dark" : "light"})`}
-              onClick={() => downloadAsset(badgeUrl, badgeName)}
-              className={actionBtn}
-            >
-              <Download size={16} strokeWidth={1.8} />
-            </button>
-          </>
-        ) : (
-          <>
-            <button
-              type="button"
-              title="Copy flat SVG"
-              onClick={() =>
-                copySvg(flatPath(p.id), `${card.title} — flat SVG`)
-              }
-              className={actionBtn}
-            >
-              <Copy size={16} strokeWidth={1.8} />
-            </button>
-            <button
-              type="button"
-              title="Download flat SVG"
-              onClick={() => downloadAsset(flatPath(p.id), `${p.id}.svg`)}
-              className={actionBtn}
-            >
-              <Download size={16} strokeWidth={1.8} />
-            </button>
-          </>
-        )}
-        {p.url && (
-          <a
-            href={p.url}
-            target="_blank"
-            rel="noreferrer"
-            title={`${p.name} website`}
-            className={actionBtn}
-          >
-            <LinkIcon size={16} strokeWidth={1.8} />
-          </a>
-        )}
-      </div>
+      {menu && (
+        <ContextMenu
+          x={menu.x}
+          y={menu.y}
+          items={menuItems}
+          label={`${p.name} actions`}
+          onClose={() => setMenu(null)}
+        />
+      )}
     </div>
   );
 }

@@ -1,12 +1,12 @@
 import { useState } from "react";
 import {
+  CodeXml,
   Copy,
   Download,
   ExternalLink,
   ImageIcon,
 } from "lucide-react";
 import {
-  ASSET_BASE,
   assetPath,
   badgePath,
   flatPath,
@@ -20,6 +20,7 @@ import {
   copyText,
   downloadAsset,
 } from "@/lib/asset-actions";
+import { embedHtml } from "@/lib/embed-html";
 import { useLiquidRender } from "@/lib/use-liquid-render";
 import { cn } from "@/lib/cn";
 import { LiveChip } from "@/components/live-chip";
@@ -62,24 +63,9 @@ function formatAdded(added: string): string {
       });
 }
 
-/** Absolute base for the hotlink URL pattern: production ships the R2
- *  release prefix in ASSET_BASE already; dev's relative /library gets
- *  the current origin so the shown URL is actually fetchable. */
-function hotlinkBase(): string {
-  return ASSET_BASE.startsWith("http")
-    ? ASSET_BASE
-    : `${window.location.origin}${ASSET_BASE}`;
-}
-
 /** One Liquid Glass bundle: large preview (light/dark renditions, live
- *  render for recipe bundles), PNG actions, and the hotlink URL pattern. */
-function GlassSection({
-  bundle,
-  platformName,
-}: {
-  bundle: GlassBundle;
-  platformName: string;
-}) {
+ *  render for recipe bundles), PNG actions, and the <picture> embed copy. */
+function GlassSection({ bundle }: { bundle: GlassBundle }) {
   const [live, setLive] = useState(false);
   const liveUri = useLiquidRender(bundle.slug, 512, live && bundle.recipe);
   const alt = `${bundle.title} app icon`;
@@ -90,7 +76,6 @@ function GlassSection({
   });
   const imgCls = "h-64 w-64 select-none";
   const common = { decoding: "async" as const, width: 256, height: 256 };
-  const pattern = `${hotlinkBase()}/${bundle.slug}-{size}.avif`;
 
   return (
     <Section title={bundle.variant ? `Liquid Glass — ${bundle.title}` : "Liquid Glass"}>
@@ -171,40 +156,17 @@ function GlassSection({
             <span>PNG 1024 dark</span>
           </button>
         )}
-      </div>
-
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between space-x-2 rounded-md border border-neutral-200 bg-neutral-50 py-1 pl-3 pr-1 dark:border-neutral-800 dark:bg-neutral-950/40">
-          <code
-            title={pattern}
-            className="truncate font-mono text-xs text-neutral-600 dark:text-neutral-400"
-          >
-            {pattern}
-          </code>
-          <button
-            type="button"
-            title="Copy hotlink URL pattern"
-            onClick={() =>
-              copyText(pattern, `${platformName} — hotlink URL pattern`)
-            }
-            className={iconBtn}
-          >
-            <Copy size={15} strokeWidth={1.8} />
-          </button>
-        </div>
-        <p className="text-xs text-neutral-500 dark:text-neutral-400">
-          Hotlink sizes 32 · 64 · 128 · 256 · 512 as{" "}
-          <code className="font-mono">.avif</code> or{" "}
-          <code className="font-mono">.webp</code>
-          {bundle.hasDark && (
-            <>
-              ; dark rendition at{" "}
-              <code className="font-mono">{bundle.slug}-dark-{"{size}"}</code>
-            </>
-          )}
-          . The bare <code className="font-mono">{bundle.slug}.png</code> is
-          1024px.
-        </p>
+        <button
+          type="button"
+          title="Copy a ready-to-paste <picture> element — AVIF/WebP sources, dark rendition, lazy-loading fallback"
+          onClick={() =>
+            copyText(embedHtml(bundle), `${bundle.title} — <picture> embed`)
+          }
+          className={labeledBtn}
+        >
+          <CodeXml size={15} strokeWidth={1.8} />
+          <span>Copy embed HTML</span>
+        </button>
       </div>
     </Section>
   );
@@ -363,7 +325,7 @@ export function IconDetail({ platform }: { platform: Platform }) {
       </header>
 
       {p.bundles.map((b) => (
-        <GlassSection key={b.slug} bundle={b} platformName={p.name} />
+        <GlassSection key={b.slug} bundle={b} />
       ))}
       {p.hasFlat && (
         <VectorSection platform={p} named={p.bundles.length === 0} />
