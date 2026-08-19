@@ -15,7 +15,7 @@ const SHOWCASE: ShowcaseEntry[] = [
     name: "Podnews",
     url: "https://podnews.net",
     description:
-      "Daily podcasting news — platform icons across listen links and directory pages.",
+      "Daily news for the podcast and on-demand audio industry.",
   },
 ];
 

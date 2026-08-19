@@ -279,8 +279,12 @@ export const facetCounts: Record<Facet, number> = {
  */
 export function facetCards(list: Card[], facet: Facet): Card[] {
   if (facet === "glass") return list;
+  // One card per platform, and only platforms that ship the facet — the
+  // grid shows what exists; gaps are the missing-flat/badge lenses' job.
   const seen = new Set<string>();
   return list.filter((c) => {
+    if (facet === "flat" ? !c.platform.hasFlat : !c.platform.hasBadge)
+      return false;
     if (seen.has(c.platform.id)) return false;
     seen.add(c.platform.id);
     return true;

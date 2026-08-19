@@ -35,7 +35,9 @@ function Badge({ children }: { children: React.ReactNode }) {
 }
 
 export function Sidebar() {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
+  // Facet switches keep the visitor's search/sort context (docs links stay clean).
+  const carry = (href: string) => href + search;
   const categories = getCategories();
 
   // The three facets are the navigation. Icon note: Ticket is the
@@ -61,7 +63,7 @@ export function Sidebar() {
         {links.map(({ href, label, icon: Icon, badge }) => (
           <Link
             key={href}
-            to={href}
+            to={carry(href)}
             className={cn(itemBase, pathname === href && itemActive)}
           >
             <span className="flex items-center space-x-2">
