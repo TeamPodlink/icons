@@ -205,56 +205,59 @@ export function DocsPage({
         </button>
       </div>
 
-      <div className="mx-auto max-w-6xl px-6">
-        {headings.length > 0 && (
-          <div className="block pt-6 lg:hidden">
-            <button
-              type="button"
-              aria-expanded={tocOpen}
-              onClick={() => setTocOpen((v) => !v)}
-              className="flex w-full cursor-pointer items-center justify-between rounded-md border border-neutral-200 px-3 py-2 text-sm font-medium hover:bg-neutral-100 dark:border-neutral-800 dark:hover:bg-neutral-800/40"
-            >
-              <span>On this page</span>
-              <ChevronDown
-                size={16}
-                strokeWidth={1.8}
-                className={cn(
-                  "text-neutral-500 transition-transform duration-200",
-                  tocOpen && "rotate-180"
-                )}
-              />
-            </button>
-            {tocOpen && (
-              <div className="px-3 pt-2">
-                <TocLinks headings={headings} active={active} onJump={jump} />
-              </div>
-            )}
-          </div>
-        )}
-
-        <div className="flex gap-8 lg:gap-12">
-          <article
-            ref={articleRef}
-            className="my-10 w-full max-w-3xl flex-1 space-y-8"
+      {/* Mobile TOC: a flush bar under the header, spanning the card
+          (svgl's docs collapsible — rounded-none, side/top borders off). */}
+      {headings.length > 0 && (
+        <div className="block lg:hidden">
+          <button
+            type="button"
+            aria-expanded={tocOpen}
+            onClick={() => setTocOpen((v) => !v)}
+            className="flex w-full cursor-pointer items-center justify-between border-b border-neutral-200 px-4 py-2.5 text-sm font-medium hover:bg-neutral-100 dark:border-neutral-800 dark:hover:bg-neutral-800/40"
           >
-            <div>
-              <h1 className="scroll-mt-16 text-2xl font-semibold tracking-tight">
-                {title}
-              </h1>
-              <p className="mt-2 text-neutral-600 dark:text-neutral-400">
-                {intro}
-              </p>
-            </div>
-            {children}
-          </article>
-
-          {headings.length > 0 && (
-            <aside className="sticky top-16 my-10 hidden w-60 flex-shrink-0 self-start lg:block">
-              <p className="mb-2 text-sm font-medium">On this page</p>
+            <span>On this page</span>
+            <ChevronDown
+              size={16}
+              strokeWidth={1.8}
+              className={cn(
+                "text-neutral-500 transition-transform duration-200",
+                tocOpen && "rotate-180"
+              )}
+            />
+          </button>
+          {tocOpen && (
+            <div className="border-b border-neutral-200 px-4 py-2 dark:border-neutral-800">
               <TocLinks headings={headings} active={active} onJump={jump} />
-            </aside>
+            </div>
           )}
         </div>
+      )}
+
+      {/* svgl's docs row: the article centers itself inside the free
+          space (mx-auto + its own padding) while the rail hugs the card's
+          right edge — no shared max-width wrapper around the pair. */}
+      <div className="flex gap-8 lg:gap-12">
+        <article
+          ref={articleRef}
+          className="mx-auto mb-6 mt-8 w-full max-w-3xl flex-1 space-y-8 px-6 lg:px-4"
+        >
+          <div>
+            <h1 className="scroll-mt-16 text-2xl font-semibold tracking-tight">
+              {title}
+            </h1>
+            <p className="mt-2 text-neutral-600 dark:text-neutral-400">
+              {intro}
+            </p>
+          </div>
+          {children}
+        </article>
+
+        {headings.length > 0 && (
+          <aside className="sticky top-20 mt-8 hidden w-60 flex-shrink-0 self-start pr-6 lg:block lg:pr-4">
+            <p className="mb-2 text-sm font-medium">On this page</p>
+            <TocLinks headings={headings} active={active} onJump={jump} />
+          </aside>
+        )}
       </div>
     </PageCard>
   );
