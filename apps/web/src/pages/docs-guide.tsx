@@ -41,10 +41,12 @@ Badge         /badges   "Listen on …" badges, light + dark — served
 
       <Section title="Per-icon downloads">
         <P>
-          Every card carries copy and download actions for the facet on
-          screen: Liquid Glass cards copy or download the 1024px PNG; vector
-          and badge cards copy or download the SVG. Badge actions target the
-          rendition currently displayed — light or dark follows your theme.
+          Right-click any card for its actions: Liquid Glass cards copy or
+          download the 1024px PNG (plus the dark rendition where one
+          exists) and copy the embed HTML; vector and badge cards copy or
+          download the SVG. Badge actions target the rendition currently
+          displayed — light or dark follows your theme. Clicking a card
+          opens its detail view, where the same actions appear as buttons.
         </P>
       </Section>
 
@@ -60,24 +62,35 @@ Badge         /badges   "Listen on …" badges, light + dark — served
 
       <Section title="Hotlinking">
         <P>
-          Liquid Glass rasters are served from an immutable release prefix on
-          the asset CDN — files under a published release never change, so
-          hotlinking is safe and cache-friendly. The URL pattern:
+          The fastest correct embed is <strong>Copy embed HTML</strong> —
+          right-click a Liquid Glass card (or use the button on its detail
+          page) and paste. You get a complete <code>&lt;picture&gt;</code>{" "}
+          element: AVIF with a WebP fallback, 1x/2x renditions for a 64px
+          icon, the dark rendition wired to{" "}
+          <code>prefers-color-scheme</code> when one exists, and a
+          lazy-loading <code>&lt;img&gt;</code> fallback. For example:
         </P>
-        <Code>{`https://assets.icons.podlink.com/<release>/<slug>.png            1024px PNG
-https://assets.icons.podlink.com/<release>/<slug>-<size>.avif    sized raster
-https://assets.icons.podlink.com/<release>/<slug>-dark-<size>.avif
-
-<release>   the asset release, e.g. 0.2.0 (new renders publish
-            under a new release; old prefixes stay up)
-<slug>      the bundle slug — the platform id, e.g. overcast
-<size>      32 | 64 | 128 | 256 | 512 (.webp also available;
-            omit the size for the 1024px .png)
--dark       the dark rendition, where one exists`}</Code>
+        <Code>{`<picture>
+  <source media="(prefers-color-scheme: dark)" type="image/avif"
+          srcset=".../overcast-dark-64.avif 1x, .../overcast-dark-128.avif 2x">
+  <source media="(prefers-color-scheme: dark)" type="image/webp"
+          srcset=".../overcast-dark-64.webp 1x, .../overcast-dark-128.webp 2x">
+  <source type="image/avif" srcset=".../overcast-64.avif 1x, .../overcast-128.avif 2x">
+  <source type="image/webp" srcset=".../overcast-64.webp 1x, .../overcast-128.webp 2x">
+  <img src=".../overcast-64.webp" alt="Overcast app icon"
+       width="64" height="64" loading="lazy">
+</picture>`}</Code>
         <P>
-          A 32px-CSS icon costs ~2 KB as AVIF. Use the sized AVIF/WebP
-          renditions for pages and the 1024px PNG for design tools.
+          Assets are served from an immutable release prefix on the asset
+          CDN — files under a published release never change, so hotlinking
+          is safe and cache-friendly. A 32px-CSS icon costs ~2 KB as AVIF.
         </P>
+        <P>URL anatomy, if you'd rather assemble your own:</P>
+        <Code>{`https://assets.icons.podlink.com/<release>/<slug>[-dark]-<size>.avif|.webp
+https://assets.icons.podlink.com/<release>/<slug>.png   ← 1024px PNG
+
+<release> e.g. 0.2.0 · <slug> platform id, e.g. overcast
+<size> 32 | 64 | 128 | 256 | 512 · -dark where a dark rendition exists`}</Code>
       </Section>
 
       <Section title="Bulk download">
