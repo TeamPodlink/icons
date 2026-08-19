@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useLocation } from "react-router";
+import { useLayoutEffect, useState } from "react";
 import { Copy, Download, Maximize2 } from "lucide-react";
 import {
   ContextMenu,
@@ -19,6 +18,7 @@ import { cn } from "@/lib/cn";
 import {
   CARD_VT_ATTR,
   CELL_VT_ATTR,
+  consumePendingReturnKey,
   nameCardForTransition,
   useTransitionNavigate,
 } from "@/lib/view-transition";
@@ -122,7 +122,6 @@ export function IconCard({
   /** The directory-level facet view; the card adapts artwork + actions. */
   facet?: Facet;
 }) {
-  const location = useLocation();
   const navigate = useTransitionNavigate();
   // Menu actions resolve to the rendition on screen (theme-scoped).
   const darkTheme = useTheme().resolvedTheme === "dark";
@@ -132,13 +131,21 @@ export function IconCard({
 
   // Shared-element morph: the artwork carries no view-transition-name at
   // rest (a named element is lifted above the root snapshot in every
-  // transition — 70 lifted cards would paint over the incoming dialog).
+  // transition — 70 lifted cards would paint over the incoming detail).
   // Navigations to the detail name this one card imperatively for just
-  // the transition window; the data attribute is the lookup handle.
+  // the transition window; the data attributes are the lookup handles.
   const openDetails = () => {
     nameCardForTransition(card.key);
-    navigate(`/icon/${p.id}`, { state: { background: location } });
+    navigate(`/icon/${p.id}`);
   };
+
+  // Return morph: the detail's back handler records this card's key
+  // before navigating; consuming it here — a layout effect inside the
+  // router's commit, before the new-state capture — names the freshly
+  // mounted cell + artwork so the hero has a destination to shrink into.
+  useLayoutEffect(() => {
+    if (consumePendingReturnKey(card.key)) nameCardForTransition(card.key);
+  }, [card.key]);
 
   // What this card actually shows: the glass view falls back to the flat
   // vector for platforms that have no glass bundle yet (card.facet).
@@ -225,7 +232,6 @@ export function IconCard({
           working (right-click bubbles to the cell's context menu). */}
       <TransitionLink
         to={`/icon/${p.id}`}
-        state={{ background: location }}
         aria-label={`${p.name} details`}
         title={`${p.name} details`}
         onClick={(e) => {

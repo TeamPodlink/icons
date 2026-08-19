@@ -4,9 +4,10 @@
 // lifted into the ::view-transition pseudo-layer, which paints over the
 // root snapshot. So NO grid card carries a name at rest: the one
 // transitioning card is named imperatively for exactly the transition
-// window (see nameCardForTransition / useIconTransitionHandoff) — its
-// artwork box as `icon-<key>` and its root cell as `card-<key>` — and
-// only the detail side (preview + dialog panel) is named in React.
+// window (nameCardForTransition on open, the pending-return-key handoff
+// on close) — its artwork box as `icon-<key>` and its root cell as
+// `card-<key>` — and only the detail side (hero + container) is named
+// in React.
 //
 // react-router only honors `viewTransition` through the data router
 // (`router.navigate`) — the declarative navigator that `useNavigate()`
@@ -15,12 +16,7 @@
 // `document.startViewTransition` (Firefox) just get the plain instant
 // navigation: the router feature-detects and skips the transition.
 
-import {
-  useCallback,
-  useContext,
-  useLayoutEffect,
-  type CSSProperties,
-} from "react";
+import { useCallback, useContext, type CSSProperties } from "react";
 import {
   UNSAFE_DataRouterContext,
   useNavigate,
@@ -162,27 +158,26 @@ export function nameCardForTransition(key: string): boolean {
 }
 
 /**
- * The card ↔ detail-preview name handoff, from the preview's side. React
- * layout effects run inside the router's flushSync update — after the
- * browser captures the old state, before it captures the new one — which
- * is the only window where both snapshots stay duplicate-free:
- *
- * - mount (open commit): the preview owns `icon-<key>` now; shed the
- *   name the click handler put on the grid card, so the new capture has
- *   one named element, not two.
- * - unmount (close/back commit): hand the name to the grid card so the
- *   return morph has a destination. No card on the page (docs route,
- *   filtered grid, full-page detail) is fine — the preview simply exits
- *   with the cross-fade.
- *
- * Pass null to opt out (a preview that never morphs).
+ * The return-morph destination for a detail → grid navigation. The grid
+ * mounts during the router's flushSync commit, so nothing exists to name
+ * before the back navigation starts — instead the back handler records
+ * which card should receive the names, and the card's own mount layout
+ * effect (running inside that commit, after DOM mutations, before the
+ * browser captures the new state) consumes the key and names itself.
+ * Popstate-initiated returns (browser back) can't pre-record and simply
+ * cross-fade. The failsafe timer in nameCardForTransition returns the
+ * grid to rest if no transition consumes the names.
  */
-export function useIconTransitionHandoff(key: string | null) {
-  useLayoutEffect(() => {
-    if (key === null) return;
-    clearCardTransitionName(key);
-    return () => {
-      nameCardForTransition(key);
-    };
-  }, [key]);
+let pendingReturnKey: string | null = null;
+
+export function setPendingReturnKey(key: string) {
+  pendingReturnKey = key;
+}
+
+/** True (and consumed) when this card is the recorded return-morph
+ *  destination. */
+export function consumePendingReturnKey(key: string): boolean {
+  if (pendingReturnKey !== key) return false;
+  pendingReturnKey = null;
+  return true;
 }
