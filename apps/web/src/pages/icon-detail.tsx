@@ -11,6 +11,7 @@ import {
   Copy,
   Download,
   PenTool,
+  SquareArrowOutUpRight,
   StretchHorizontal,
 } from "lucide-react";
 import {
@@ -58,10 +59,16 @@ function parseDetailFacet(raw: string | null): Facet {
   return "glass";
 }
 
-/** Toolbar dropdown: a labeled button (Copy / Download + chevron, no
- *  leading icon — the centered segmented control needs the room) whose
- *  menu opens anchored to the button's bottom-right edge, reusing the
- *  ContextMenu in its anchored (alignRight) mode. */
+const toolbarBtnCls =
+  "flex cursor-pointer items-center space-x-1.5 rounded-md px-2 py-1.5 text-sm text-neutral-600 hover:bg-neutral-200 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white";
+
+/** Toolbar action: a labeled button (Copy / Download; no leading icon —
+ *  the centered segmented control needs the room). With one leaf option
+ *  (vector/badge: just the SVG) it's a one-click button firing that
+ *  action directly; with more (glass) it grows a chevron and opens the
+ *  menu anchored to the button's bottom-right edge (ContextMenu in
+ *  alignRight mode). Driven by the shared builders' item count, so it
+ *  stays correct if the trees change. */
 function ToolbarMenu({
   label,
   items,
@@ -75,6 +82,19 @@ function ToolbarMenu({
   // remember whether the menu was open at press time so a second click
   // toggles closed instead of instantly reopening.
   const wasOpenRef = useRef(false);
+  const single =
+    items.length === 1 && !items[0].children ? items[0] : null;
+  if (single)
+    return (
+      <button
+        type="button"
+        title={`${label} ${single.label}`}
+        onClick={() => single.onSelect?.()}
+        className={toolbarBtnCls}
+      >
+        <span>{label}</span>
+      </button>
+    );
   return (
     <>
       <button
@@ -93,7 +113,7 @@ function ToolbarMenu({
           const r = btnRef.current!.getBoundingClientRect();
           setMenu({ x: r.right, y: r.bottom + 4 });
         }}
-        className="flex cursor-pointer items-center space-x-1.5 rounded-md px-2 py-1.5 text-sm text-neutral-600 hover:bg-neutral-200 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-white"
+        className={toolbarBtnCls}
       >
         <span>{label}</span>
         <ChevronDown size={14} strokeWidth={1.8} />
@@ -217,6 +237,18 @@ export function IconDetailPage() {
             <ArrowLeft size={16} strokeWidth={1.8} />
           </button>
           <h1 className="truncate text-sm font-medium">{p.name}</h1>
+          {p.url && (
+            <a
+              href={p.url}
+              target="_blank"
+              rel="noreferrer noopener"
+              title={`${p.name} website`}
+              aria-label={`${p.name} website`}
+              className="shrink-0 text-neutral-400 hover:text-black dark:text-neutral-500 dark:hover:text-white"
+            >
+              <SquareArrowOutUpRight size={13} strokeWidth={1.8} />
+            </a>
+          )}
         </div>
         {segments.length > 0 ? (
           <div
