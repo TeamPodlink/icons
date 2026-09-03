@@ -51,3 +51,6 @@ packages/refraction/manifest.json
 
 # TypeScript incremental build cache
 *.tsbuildinfo
+
+# Stale Next.js build output (site is Vite now)
+.next/
