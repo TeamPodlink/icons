@@ -400,7 +400,9 @@ sRGB→P3 conversion per-pixel — only the final P3-coded value clips
 instrument pair-curves (10 sRGB + 8 p3, in- and out-of-gamut) fit at
 ≤ 1.6 RMSE, total 11.1 vs 23.1 under the old law. Sweep: podvine
 14.62 → 2.12, itunes 2.20 → 1.78, tunestr 9.00 → 8.78; resso
-2.40 → 2.45 (red-ceiling constant, see below).
+2.40 → 2.45 (red-ceiling constant, see below). This same law is why
+ictool and the browser disagree on saturated gradients under the
+flat-icon gate — see "SVG gradients under the flat gate" below.
 
 **The display-p3 solid soft-knee (solved 2026-08-17,
 `probe-p3-solid.py`).** The ledger's "small unexplained deviation on
@@ -1280,42 +1282,105 @@ the raster path never visits. Re-source the artwork without filters
 (the `icon-to-flat-svg` skill's declared-fill route) if the dark
 rendition is wanted back.
 
-## SVG gradients: ictool and the browser interpolate in different spaces (measured 2026-09-13)
+## SVG gradients under the flat gate: it IS the CoreSVG stop law (measured 2026-09-13)
 
 Fallout from the filter investigation, and a standing noise floor under
 the flat-icon gate. **Solid** colors agree between the two rasterizers
-to ≤ 1/255 (table above). **Gradients** do not, and no output-side
-color transform can reconcile them, because the disagreement is not
-about gamut at all — it shows up on stops that are plain in-gamut hex.
+to <= 1/255 (table above). **Gradients** do not — and the cause is
+already solved, upstream in this ledger: it is "The CoreSVG
+gradient-stop law" / "The extended gradient-stop law + the engine
+lerp-space gap", the same renderer behaviour `translate_icon.py` has
+compensated for since 2026-08-17. ictool does **not** interpolate in
+an exotic space. It lerps in plain encoded sRGB, exactly like the
+browser — over stops it has first TRANSFORMED, chiefly a green FLOOR
+of `0.0185·R + 0.0320·B` in linear light. No gamut is involved, which
+is why it reproduces on plain in-gamut hex.
 
-Linear gradient `#ff9f00 → #ef006b`, both stops well inside sRGB, read
-along the ramp (ictool→sRGB vs Chrome):
+> **CORRECTED 2026-09-13.** This entry originally recorded ictool's
+> interpolation space as "unidentified" and filed the divergence as an
+> open problem. It was a rediscovery of the solved law. Everything
+> below was re-measured from fresh ictool renders (12 vertical ramps at
+> 1024², per-row median of the central 25% of columns; ephemeral
+> `gradient-reconcile/probe.mjs`, rendering recipe borrowed from
+> `probe-gradient-law.py`, which stays the durable instrument).
 
-| t | ictool→sRGB | Chrome | ΔG |
+The entry's own case, `#ff9f00 → #ef006b` — both stops well inside
+sRGB — scored against ictool's ramp in both coding spaces:
+
+| model (lerp in the named space) | vs raw P3-coded | vs ictool→sRGB |
+| --- | --- | --- |
+| declared stops, encoded sRGB (= Chrome) | 9.00 | 13.01 |
+| declared stops, linear sRGB | 10.64 | 14.06 |
+| declared stops, linear P3 | 10.64 | 14.06 |
+| declared stops, encoded P3 | 7.62 | 11.88 |
+| **stop law, then encoded-sRGB lerp** | **0.63** (max 1.6) | **0.72** (max 3.8) |
+
+The recorded "best of the four: RMSE 7.29, max 16" reproduces as
+7.62 / max 16.3 — so that baseline was measured against ictool's RAW
+P3-coded pixels, never converted. Transforming the stops first takes it
+**7.6 → 0.63**, down to the render's own sampling noise. Row for row
+against the published table, in the green column the entry called
+unidentified:
+
+| t | Chrome | ictool→sRGB | stop law |
 | --- | --- | --- | --- |
-| 0.125 | 253,144,10 | 252,138,13 | 6 |
-| 0.375 | 249,114,39 | 248,99,40 | 15 |
-| 0.625 | 245,84,66 | 244,59,67 | 25 |
-| 0.875 | 241,54,94 | 240,19,93 | **35** |
+| 0.125 | 253,139,13 | 253,144,14 | 253,144,13 |
+| 0.375 | 249,99,40 | 249,114,40 | 249,114,40 |
+| 0.625 | 245,60,67 | 245,84,67 | 245,84,67 |
+| 0.875 | 241,20,94 | 241,54,93 | 241,54,94 |
 
-Chrome's values are reproduced to **≤ 1/255** by a plain
-encoded-sRGB lerp between the destination-space stops. ictool's are
-not, and are not reproduced by lerping in encoded sRGB, linear sRGB,
-encoded P3, or linear P3 either (best of the four: RMSE 7.29, max 16)
-— its interpolation space is **unidentified**. Corroborating controls:
-a near-neutral dark gradient agrees to ≤ 2/255 in hex (both spaces
-coincide when the stops are unsaturated) and disagrees by up to 6/255
-when the same stops are written in P3; and radial-gradient **geometry**
-agrees — tunestr's own `scale(45.1428)` background gradient tracks the
-analytic `t = |p − c| / r` in both renderers.
+The mechanism on this pair: `#ef006b` has zero green, so the floor
+lifts its stop to `G = 0.0185·0.8714 + 0.0320·0.1478 = 0.0208` in
+linear light ≈ 40/255 encoded, and the ramp's green rides above the
+browser's by an amount growing toward that stop. That is the whole
+ΔG-35 signature — one channel, one clamp.
 
-Practical consequence: the gate's threshold of 8 has a saturated-
-gradient noise floor baked into it that has nothing to do with the
-artwork being wrong. Today no committed icon is near it (the worst
-non-edge residual outside tunestr is 1.04), so it is a note, not a
-problem. If a future icon fails the gate on a large saturated gradient
-with its *non-edge* RMSE carrying the error, this is why — and raising
-the threshold is still the wrong answer.
+**What the re-measurement keeps.**
+
+- Chrome IS the plain encoded-sRGB lerp of the declared stops: RMSE
+  <= 0.37, max 0.8/255, on every one of the twelve ramps. So the gate's
+  ict-vs-Chrome disagreement equals the stop transform exactly, with no
+  third term hiding in it.
+- No **output**-side color transform can reconcile the two, and raising
+  the threshold is still the wrong answer. The law transforms STOPS;
+  the same color as a solid fill renders exact (a measurably different
+  cell of the renderer — see the display-p3 solid soft-knee), so one
+  pixel value would need two different corrections.
+- Near-neutral ramps agree because the floor sits below their green:
+  dark `#1c1f26 → #2b3038` scores 0.46 (ictool→sRGB vs Chrome).
+- Radial-gradient **geometry** agrees — tunestr's `scale(45.1428)`
+  background gradient tracks the analytic `t = |p − c| / r` in both
+  renderers. Only the color ramp differs.
+
+**Practical consequence, quantified.** The flat gate scores ictool
+against a Chrome reference, so a large saturated gradient contributes a
+floor the artwork is not responsible for: a full-bleed
+`#ff9f00 → #ef006b` ramp scores **12.93** over the ramp region
+(delivery sRGB vs Chrome) — past the threshold of 8 on its own. Today
+no committed icon is near it (the worst non-edge residual outside
+tunestr is 1.04), so it is a note, not a problem. The failure mode to
+recognise: a gate failure on a large saturated gradient, with the
+*non-edge* RMSE carrying the error and the excess concentrated in one
+channel toward the less-saturated stop. A closed-form fix already
+exists — `gradient_stop_ext()` in `translate_icon.py` — and could be
+applied to the reference SVG's stops before rasterizing, the way the
+translator does for the engine. NOT attempted; not needed until an icon
+actually fails this way.
+
+**Spot-check: the older law's numbers reproduce.** The ten
+`probe-gradient-law.py` instrument pairs, re-rendered and scored
+against raw P3-coded ictool:
+
+- The 2026-08-17 law **as stated** (`G' = clamp(G, kR·R + kB·B,
+  span + kR·R + kB·B)`, span 0.9540) fits all ten at **<= 1.15** — the
+  recorded "<= 1.2" holds. The `span` ceiling is load-bearing: dropping
+  it to 1.0 costs red→green 0.97 → 2.11 and green→blue 0.53 → 2.01.
+- The extended law (`gradient_stop_ext`) fits all ten at **<= 0.98**,
+  and all twelve ramps at <= 0.98 P3-coded / <= 1.51 in delivery sRGB —
+  inside the recorded "<= 1.6".
+- The failed-candidate figures reproduce too: violet→teal 9.88 against
+  the recorded 9.9, and a best-of-four aggregate over the ten pairs of
+  11.04 against the recorded 11.7 (nine candidates there, four here).
 
 ## iCatcher dark-rendition and glass-parameter laws (measured 2026-09-13)
 
