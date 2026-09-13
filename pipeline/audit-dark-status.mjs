@@ -116,15 +116,45 @@ function parseColor(str) {
   throw new Error(`unparsed color: ${str}`);
 }
 
-/** RGBA buffer (CANVAS²·4) for a canvas fill (solid or 2-stop vertical
- *  linear gradient); null when the bundle declares none. */
-function canvasFillBuffer(fill) {
+/** The paint a bundle's canvas shows in the DEFAULT (light) rendition.
+ *  Icon Composer writes three shapes — `solid` (15 catalog bundles),
+ *  `linear-gradient` (44) and `automatic-gradient` (4) — each optionally
+ *  alongside `fill-specializations`, whose appearance-less entry is the
+ *  default (it restates the top-level paint in every catalog bundle;
+ *  read anyway, so a spec-only fill can't read as "no canvas"). */
+function defaultFillPaint(fill) {
   if (!fill) return null;
+  if (typeof fill === "string") return { solid: fill };
+  if (fill.solid || fill["linear-gradient"] || fill["automatic-gradient"])
+    return fill;
+  const dflt = (fill["fill-specializations"] ?? []).find((s) => !s.appearance);
+  return dflt?.value ?? null;
+}
+
+/** RGBA buffer (CANVAS²·4) for a canvas fill; null when the bundle
+ *  declares none.
+ *
+ *  Gradients always ramp top-to-bottom over the full canvas height:
+ *  ictool IGNORES a canvas fill's `orientation` (measured fill-
+ *  orientation law, pipeline/README.md), so neither does this.
+ *
+ *  `automatic-gradient` is painted as its flat base color. The measured
+ *  model (same ledger) is base at the bottom plus a per-channel top
+ *  lift of 9/255 (gray) to 28/255 (saturated); leaving the lift out
+ *  under-reads ringMax by at most 0.11 on the top row and meanLuma by
+ *  at most ~0.03, always toward "native". No hasDark:false bundle uses
+ *  this fill shape today. */
+function canvasFillBuffer(fill) {
+  const paint = defaultFillPaint(fill);
+  if (!paint) return null;
   let top, bottom;
-  if (typeof fill === "string") top = bottom = parseColor(fill);
-  else if (fill["linear-gradient"]) {
-    top = parseColor(fill["linear-gradient"][0]);
-    bottom = parseColor(fill["linear-gradient"][1]);
+  if (typeof paint === "string") top = bottom = parseColor(paint);
+  else if (paint.solid) top = bottom = parseColor(paint.solid);
+  else if (paint["automatic-gradient"])
+    top = bottom = parseColor(paint["automatic-gradient"]);
+  else if (paint["linear-gradient"]) {
+    top = parseColor(paint["linear-gradient"][0]);
+    bottom = parseColor(paint["linear-gradient"][1]);
   } else return null;
   const buf = Buffer.alloc(CANVAS * CANVAS * 4);
   for (let y = 0; y < CANVAS; y++) {
@@ -162,10 +192,29 @@ function preprocessSvg(text) {
   );
 }
 
+/** A layer's opacity in the DEFAULT (light) rendition: the
+ *  appearance-less entry of `opacity-specializations`. 37 catalog
+ *  layers pin it to 0 — the dark twins of split bundles, which must
+ *  not appear in the light composite at all — and apple's three carry
+ *  0.95/0.18/0.17. Compositing those at full strength was measuring
+ *  artwork the Default rendition never shows. */
+function defaultOpacity(layer) {
+  const specs = layer["opacity-specializations"];
+  if (!specs) return 1;
+  return specs.find((s) => !s.appearance)?.value ?? 1;
+}
+
 /** Rasterize one layer at its placed size per the measured placement
  *  law (1 unit = 1 canvas unit, centered, canvas-clipped; scale
- *  multiplies, translation offsets). Returns a sharp composite spec. */
-async function layerComposite(bundlePath, layer) {
+ *  multiplies, translation offsets). Returns a sharp composite spec.
+ *
+ *  Raster layers are read as raw bytes, which is the measured law: the
+ *  catalog's PNGs are untagged (56), sRGB-chunk-tagged (25) or
+ *  gray-gamma-2.2-tagged (7), and all three composite as encoded sRGB
+ *  ("Raster layers", pipeline/README.md — the 2.2 decode is refuted at
+ *  6/255). No catalog PNG carries a Display-P3 profile; one that did
+ *  would need the p3ToSrgb treatment, like a declared P3 color. */
+async function layerComposite(bundlePath, layer, opacity) {
   const file = join(bundlePath, "Assets", layer["image-name"]);
   const scale = layer.position?.scale ?? 1;
   const [tx, ty] = layer.position?.["translation-in-points"] ?? [0, 0];
@@ -202,7 +251,17 @@ async function layerComposite(bundlePath, layer) {
     left = Math.max(0, left);
     top = Math.max(0, top);
   }
-  return { input: await img.ensureAlpha().png().toBuffer(), left, top };
+  let input = await img.ensureAlpha().png().toBuffer();
+  if (opacity < 1) {
+    const { data, info } = await sharp(input)
+      .ensureAlpha()
+      .raw()
+      .toBuffer({ resolveWithObject: true });
+    for (let i = 3; i < data.length; i += 4)
+      data[i] = Math.round(data[i] * opacity);
+    input = await sharp(data, { raw: info }).png().toBuffer();
+  }
+  return { input, left, top };
 }
 
 /** Build the bundle's 1024 RGBA layer composite (icon.json order is
@@ -220,7 +279,9 @@ async function buildComposite(bundlePath) {
     if (g.hidden) continue;
     for (const layer of [...(g.layers ?? [])].reverse()) {
       if (layer.hidden) continue;
-      specs.push(await layerComposite(bundlePath, layer));
+      const opacity = defaultOpacity(layer);
+      if (opacity === 0) continue; // invisible in the Default rendition
+      specs.push(await layerComposite(bundlePath, layer, opacity));
     }
   }
   return sharp(await base.composite(specs).png().toBuffer())
