@@ -62,6 +62,22 @@
 //     full-bleed background the SVG declares). A quality gate may
 //     divert a genuinely-bad SVG; a blind rasterizer must not. This
 //     error is fatal, never a fall-through to the raster path.
+//   - droppedFilterCheck() is a DETERMINISTIC divert that does not go
+//     through the RMSE at all. ictool's SVG filter support is partial
+//     and primitive-dependent (MEASURED 2026-09-13 — see the ledger
+//     entry "ictool's partial SVG filter support"): it honours
+//     feGaussianBlur / feOffset / feFlood+feBlend and both implicit
+//     and named primitive chains, but it renders tunestr's committed
+//     drop-shadow filter as a NO-OP — its render is bit-identical
+//     (RMSE 0.000) with and without the `filter="url(#…)"` reference,
+//     where Chrome's moves 13.93. A dropped filter is silent: a
+//     subtle one (a soft shadow, a slight inner glow) would score
+//     under the threshold and ship as `flat-svg` with the artwork's
+//     effect simply missing. So when the artwork references a filter,
+//     the script renders ictool BOTH ways: identical output + a
+//     Chrome reference that does move = ictool dropped it = raster.
+//     The check is silent on icons whose filters ictool actually
+//     renders, so it costs no dark renditions it needn't.
 //
 // Usage:
 //   node pipeline/build-svg-icons.mjs [--all] [--only <id>]
@@ -283,6 +299,74 @@ async function centralRmse(ictoolPng, chromeRefPng) {
   return Math.sqrt(sum / a.length);
 }
 
+/** Every `filter="url(#…)"` / `style="filter:url(#…)"` reference. */
+const FILTER_REF = /\sfilter="url\(#[^)]*\)"|filter:\s*url\(#[^)]*\)\s*;?/g;
+
+/** Whole-frame RGBA RMSE at 256px, no color conversion — both sides
+ *  come from the same rasterizer, so they share a coding space. */
+async function frameRmse(pngA, pngB) {
+  const raw = (p) =>
+    sharp(p).resize(256, 256).ensureAlpha().raw().toBuffer();
+  const [a, b] = await Promise.all([raw(pngA), raw(pngB)]);
+  let sum = 0;
+  for (let i = 0; i < a.length; i++) sum += (a[i] - b[i]) ** 2;
+  return Math.sqrt(sum / a.length);
+}
+
+/**
+ * Deterministic detector for an SVG filter that ictool silently DROPS.
+ *
+ * MEASURED 2026-09-13: ictool's filter support is partial and
+ * primitive-dependent, so neither "filters are fine" nor "filters are
+ * fatal" is true (see the header). The only reliable test is to render
+ * the artwork twice and ask ictool itself: strip the filter references
+ * and re-render. If ictool's output does not budge while Chrome's does,
+ * ictool never applied the filter — the SVG layer cannot reproduce the
+ * artwork no matter what the RMSE says, because a subtle enough effect
+ * scores under the threshold and ships missing.
+ *
+ * Returns a reason string when the filter is dropped, else null
+ * (no filters, a filter ictool honours, or a filter that is a visual
+ * no-op in both rasterizers and so cannot be silently lost).
+ */
+async function droppedFilterCheck(id, svg, scale) {
+  const refs = svg.match(FILTER_REF);
+  if (!refs) return null;
+  const stripped = svg.replace(FILTER_REF, "");
+
+  const renderIctool = (text, tag) => {
+    const dir = join(work, `${id}-filter-${tag}.icon`);
+    writeSingleLayerBundle(dir, "icon.svg", scale);
+    writeFileSync(join(dir, "Assets/icon.svg"), text);
+    const png = join(work, `${id}-filter-${tag}.png`);
+    ictoolRender(dir, png, 256);
+    rmSync(dir, { recursive: true, force: true });
+    return png;
+  };
+  const ictOn = renderIctool(svg, "on");
+  const ictOff = renderIctool(stripped, "off");
+  const refOn = join(work, `${id}-filter-ref-on.png`);
+  const refOff = join(work, `${id}-filter-ref-off.png`);
+  chromeRasterize(svg, refOn, 256);
+  chromeRasterize(stripped, refOff, 256);
+
+  const [ictDelta, chromeDelta] = await Promise.all([
+    frameRmse(ictOn, ictOff),
+    frameRmse(refOn, refOff),
+  ]);
+  // ictool unmoved (< 0.5) while the browser clearly moved (>= 1.0)
+  // is the dropped-filter signature. A filter both rasterizers ignore
+  // is decorative dead weight, not a silent loss.
+  if (ictDelta < 0.5 && chromeDelta >= 1)
+    return (
+      `ictool DROPS this artwork's filter — its render is unchanged ` +
+      `(RMSE ${ictDelta.toFixed(3)}) with the ${refs.length} ` +
+      `filter reference(s) stripped, while Chrome's moves ` +
+      `${chromeDelta.toFixed(2)}`
+    );
+  return null;
+}
+
 // ----------------------------------------------------- split machinery
 
 function parseColor(s) {
@@ -497,6 +581,7 @@ for (const { id, dir, meta } of buildTargets) {
   const bdir = join(dir, bname);
   let source = "flat-svg";
   let rmse = null;
+  let dropped = null;
 
   try {
     if (!forceRaster.has(id) && !forceBrowser.has(id)) {
@@ -512,8 +597,12 @@ for (const { id, dir, meta } of buildTargets) {
       chromeRasterize(svg, ref, 256);
       await assertReferenceSane(ref, svg, id);
       rmse = await centralRmse(render, ref);
+      // Independent of the score: a filter ictool never applied is a
+      // silent loss the RMSE can miss when the effect is subtle.
+      dropped = await droppedFilterCheck(id, svg, CANVAS / vb);
+      if (dropped) console.log(`  ${id}: ${dropped}`);
     }
-    if (forceRaster.has(id) || forceBrowser.has(id) || rmse > THRESHOLD) {
+    if (forceRaster.has(id) || forceBrowser.has(id) || dropped || rmse > THRESHOLD) {
       // The browser is ground truth for these SVGs — ictool and librsvg
       // each mangle different subsets of modern SVG.
       source = "flat-svg-browser";
@@ -529,9 +618,13 @@ for (const { id, dir, meta } of buildTargets) {
       ],
     };
     writeFileSync(join(dir, "meta.json"), JSON.stringify(meta, null, 2) + "\n");
-    results.push({ id, source, rmse: rmse == null ? null : +rmse.toFixed(2) });
+    results.push({
+      id, source, rmse: rmse == null ? null : +rmse.toFixed(2),
+      ...(dropped ? { divert: "dropped-filter" } : {}),
+    });
     console.log(
-      `ok ${id} (${source}${rmse != null ? `, rmse ${rmse.toFixed(2)}` : ""})`
+      `ok ${id} (${source}${rmse != null ? `, rmse ${rmse.toFixed(2)}` : ""}` +
+        `${dropped ? ", diverted: ictool dropped the artwork's filter" : ""})`
     );
   } catch (e) {
     rmSync(bdir, { recursive: true, force: true });
