@@ -35,11 +35,46 @@
 //   - Knockout designs (glyph punched out of an overlay above a white
 //     base) are unsplittable: near-full glyph coverage detects them.
 //
+// The quality gate (MEASURED 2026-09-13 — see the pipeline/README.md
+// ledger entry "The P3 reference-raster trap"):
+//   - The REFERENCE raster is rendered by headless Chrome, never by
+//     sharp/librsvg. librsvg paints `color(display-p3 …)` as fully
+//     TRANSPARENT, so a P3 icon's reference came back with the
+//     background missing (icatcher: opaque coverage 0.29 where the
+//     artwork declares a full-bleed square) and the gate scored the
+//     honest SVG bundle at RMSE 75.66 — silently diverting it to
+//     flat-svg-browser and costing it its dark rendition. Chrome is
+//     already this script's fallback rasterizer and its declared
+//     ground truth; using it for the reference too means the gate
+//     compares ictool against the very render the fallback would ship.
+//   - The comparison is done in sRGB. ictool renders P3-CODED pixels
+//     (icatcher's canvas: 42,86,167 = the declared display-p3 numbers
+//     verbatim); Chrome screenshots are sRGB-coded and untagged (the
+//     same blue: 21,87,173). Comparing those raw is apples-to-oranges
+//     and scored 8.82 — still over the default threshold 8. Converting
+//     the ictool side P3->sRGB with the delivery path's own
+//     withIccProfile("srgb") scores 2.95. `--force-color-profile=
+//     display-p3` does NOT make Chrome emit P3 pixels (measured:
+//     byte-identical output), so sRGB — the delivery space — is the
+//     only apples-to-apples frame.
+//   - assertReferenceSane() ABORTS the whole run if the reference
+//     raster is implausible (an all-but-empty raster, or missing the
+//     full-bleed background the SVG declares). A quality gate may
+//     divert a genuinely-bad SVG; a blind rasterizer must not. This
+//     error is fatal, never a fall-through to the raster path.
+//
 // Usage:
 //   node pipeline/build-svg-icons.mjs [--all] [--only <id>]
 //     [--threshold 8] [--force-raster <id,...>] [--browser <id,...>]
 //     [--no-split] [--split-existing]
 //   --all             include inactive platforms
+//   --threshold       central-RMSE ceiling (default 8) above which the
+//                     SVG layer is rejected for a Chrome raster. It is
+//                     NOT a workaround for a bad reference render — a
+//                     raised threshold used to be the only way to keep
+//                     a P3 icon's SVG bundle, and that workaround was
+//                     load-bearing and invisible. Fixed at the root;
+//                     leave this alone.
 //   --browser         skip the SVG layer for these ids, go straight to
 //                     a Chrome raster
 //   --no-split        build single-layer bundles only
@@ -108,10 +143,17 @@ function ictoolRender(bundle, out, size, rendition = "Default") {
   ]);
 }
 
+// A rasterizer that silently misread the source — not an icon that
+// merely scored badly. Fatal: it escapes the per-platform catch so the
+// run stops instead of quietly shipping a raster.
+class RasterizerError extends Error {}
+
 // Browser-grade SVG rasterization via headless Chrome. Handles what
 // neither ictool nor librsvg can: foreignObject (Figma conic-gradient
 // exports), color(display-p3 ...) fills, invalid-but-browser-tolerated
-// markup like stop-color="none".
+// markup like stop-color="none". This is the ONLY SVG rasterizer in
+// this script — sharp/librsvg is a comparison tool, never a renderer
+// (see the header's quality-gate note).
 function chromeRasterize(svgText, outPng, size) {
   const dir = join(work, `chrome-${Math.floor(Math.random() * 1e9)}`);
   mkdirSync(dir, { recursive: true });
@@ -120,12 +162,65 @@ function chromeRasterize(svgText, outPng, size) {
     join(dir, "wrap.html"),
     `<!doctype html><html><head><style>html,body{margin:0;padding:0}img{width:${size}px;height:${size}px;display:block}</style></head><body><img src="icon.svg"></body></html>`
   );
+  rmSync(outPng, { force: true });
   execFileSync(CHROME, [
     "--headless=new", "--disable-gpu", `--screenshot=${outPng}`,
     `--window-size=${size},${size}`, "--default-background-color=00000000",
     join(dir, "wrap.html"),
   ], { stdio: "ignore" });
   rmSync(dir, { recursive: true, force: true });
+  if (!existsSync(outPng))
+    throw new RasterizerError(
+      `headless Chrome wrote no screenshot to ${outPng}.\n` +
+        `  likely cause: ${CHROME} is missing or refused to start.\n` +
+        `  fix: install Google Chrome, or run the rasterizing steps on ` +
+        `the maintainer Mac.`
+    );
+}
+
+/**
+ * Loud guard on the reference raster. A quality gate is only meaningful
+ * if the reference is a faithful render; a rasterizer that silently
+ * dropped paint would fail every honest SVG bundle and divert it to a
+ * raster with no dark rendition (the P3 trap — see header). Throws
+ * RasterizerError, which is fatal.
+ */
+async function assertReferenceSane(refPng, svg, id) {
+  const { data } = await sharp(refPng)
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  const n = data.length / 4;
+  let visible = 0, opaque = 0;
+  for (let i = 3; i < data.length; i += 4) {
+    if (data[i] > 25) visible++;
+    if (data[i] > 250) opaque++;
+  }
+  const cov = { visible: visible / n, opaque: opaque / n };
+  const why =
+    `  likely cause: the rasterizer did not understand this artwork — ` +
+    `most often a color syntax it silently drops (librsvg paints ` +
+    `color(display-p3 …) fully transparent), a missing external ` +
+    `resource, or malformed markup Chrome refused to parse.\n` +
+    `  fix: render ${join("platforms", id, "icon.svg")} by hand ` +
+    `(chromeRasterize) and look at it. NEVER paper over this by ` +
+    `raising --threshold: the raster path skips the dark-variant ` +
+    `split, so a mis-gated icon ships without a Dark rendition.`;
+  if (cov.visible < 0.05)
+    throw new RasterizerError(
+      `${id}: reference raster is empty (visible coverage ` +
+        `${cov.visible.toFixed(4)} of the canvas).\n${why}`
+    );
+  const fullBleed = new RegExp(
+    `d="${FULL}"|<rect[^>]*\\bwidth="(?:32|100%)"[^>]*\\bheight="(?:32|100%)"`
+  ).test(svg);
+  if (fullBleed && cov.opaque < 0.95)
+    throw new RasterizerError(
+      `${id}: icon.svg declares a full-bleed background but the ` +
+        `reference raster is only ${(cov.opaque * 100).toFixed(1)}% ` +
+        `opaque.\n${why}`
+    );
+  return cov;
 }
 
 function writeSingleLayerBundle(dir, layerFile, scale) {
@@ -156,17 +251,33 @@ function writeSingleLayerBundle(dir, layerFile, scale) {
   );
 }
 
-// RMSE over the central 60% square (inside the squircle mask) at 256px.
-async function centralRmse(pngA, pngB) {
+/**
+ * RMSE over the central 60% square (inside the squircle mask) at 256px,
+ * between an ictool render and a Chrome reference raster.
+ *
+ * COLOR SPACE: the two sides live in different ones. ictool emits
+ * P3-coded pixels (sRGB-gamut content expressed in P3 coordinates — see
+ * "Color management" in pipeline/README.md); Chrome screenshots are
+ * sRGB-coded and untagged. So the ictool side goes through the delivery
+ * path's own P3->sRGB conversion first, and both are compared in sRGB.
+ * Measured on icatcher: 8.82 raw vs 2.95 converted — the raw number
+ * alone would have failed the default threshold of 8.
+ */
+async function centralRmse(ictoolPng, chromeRefPng) {
   const size = 256;
   const off = Math.round(size * 0.2);
   const w = size - 2 * off;
   const region = { left: off, top: off, width: w, height: w };
-  const [a, b] = await Promise.all(
-    [pngA, pngB].map((p) =>
-      sharp(p).resize(size, size).extract(region).removeAlpha().raw().toBuffer()
-    )
-  );
+  const crop = (p, toSrgb) => {
+    let s = sharp(p).resize(size, size);
+    // Lossless for this content; see build-assets.mjs's toSrgb.
+    if (toSrgb) s = s.withIccProfile("srgb", { attach: false });
+    return s.extract(region).removeAlpha().raw().toBuffer();
+  };
+  const [a, b] = await Promise.all([
+    crop(ictoolPng, true),
+    crop(chromeRefPng, false),
+  ]);
   let sum = 0;
   for (let i = 0; i < a.length; i++) sum += (a[i] - b[i]) ** 2;
   return Math.sqrt(sum / a.length);
@@ -394,11 +505,12 @@ for (const { id, dir, meta } of buildTargets) {
       cpSync(svgPath, join(bdir, "Assets/icon.svg"));
       const render = join(work, `${id}-ictool.png`);
       ictoolRender(bdir, render, 256);
+      // Chrome, not sharp/librsvg — librsvg drops color(display-p3 …)
+      // entirely, which turned this gate into a silent raster diversion
+      // (see the header's quality-gate note).
       const ref = join(work, `${id}-ref.png`);
-      await sharp(svgPath, { density: (72 * 256) / vb })
-        .resize(256, 256)
-        .png()
-        .toFile(ref);
+      chromeRasterize(svg, ref, 256);
+      await assertReferenceSane(ref, svg, id);
       rmse = await centralRmse(render, ref);
     }
     if (forceRaster.has(id) || forceBrowser.has(id) || rmse > THRESHOLD) {
@@ -423,6 +535,13 @@ for (const { id, dir, meta } of buildTargets) {
     );
   } catch (e) {
     rmSync(bdir, { recursive: true, force: true });
+    // A broken rasterizer is not a per-icon failure to shrug off: every
+    // later icon would be gated against garbage too, and the raster
+    // fallback would quietly swallow them all. Stop the run.
+    if (e instanceof RasterizerError) {
+      console.error(`\nABORT — reference rasterizer failed.\n${e.message}\n`);
+      process.exit(1);
+    }
     results.push({ id, source: "FAILED", error: String(e.message).slice(0, 90) });
     console.error(`FAIL ${id}: ${e.message}`);
   }
@@ -451,6 +570,10 @@ if (doSplit) {
       splitResults.push({ id, outcome });
       console.log(`split ${id}: ${outcome}`);
     } catch (e) {
+      if (e instanceof RasterizerError) {
+        console.error(`\nABORT — glyph rasterizer failed.\n${e.message}\n`);
+        process.exit(1);
+      }
       splitResults.push({ id, outcome: `FAILED: ${e.message}` });
       console.error(`split FAIL ${id}: ${e.message}`);
     }
