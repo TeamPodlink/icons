@@ -13,10 +13,8 @@
         "title": "iCatcher!",
         "variant": null,
         "file": "iCatcher.icon",
-        "source": "appstore-artwork",
-        "appStoreId": 414419105,
-        "hasDark": false,
-        "darkStatus": "missing"
+        "source": "flat-svg-split",
+        "hasDark": true
       }
     ]
   }
