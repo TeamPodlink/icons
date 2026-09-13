@@ -1076,6 +1076,92 @@ a rebuild would route it to `flat-svg-browser` under either the old or
 the new gate; out-of-gamut P3 stops are an unsolved case, not a bug in
 the gate.
 
+## The dark-status composite's blind spots (measured 2026-09-13, `audit-dark-status.mjs`)
+
+Same class as the P3 reference-raster trap, one script over: the
+darkStatus audit builds its own 1024 composite with sharp, and it was
+reading artwork the Default rendition does not show — and not reading
+artwork it does.
+
+**P3 read as sRGB.** The audit's local librsvg shim (librsvg paints
+`color(display-p3 …)` fully transparent) mapped P3 components straight
+to bytes, `v * 255`. Measured against headless Chrome — this repo's SVG
+ground truth — over 13 catalog-realistic swatches, that reading is
+wrong by up to **46/255** (`display-p3(.902 .1804 .3373)`: Chrome
+`251,0,82`, naive `230,46,86`), and it put two coordinate systems in
+one buffer. The replacement (sRGB transfer function, P3→sRGB primaries
+matrix, clipped) is **byte-exact against Chrome, max |Δ| 0/255 over all
+13**, and within 1/255 of sharp's ICC transform on an ictool master
+(icatcher's canvas, P3-coded `42,86,166` → sharp `21,87,172`, scalar
+`21,87,173`). Nothing else in the repo converts a declared COLOR:
+build-assets and build-svg-icons convert RASTERS through
+`withIccProfile("srgb")`, and build-svg-icons answers librsvg by
+rasterizing in Chrome, which this script cannot do (it runs on any
+platform, with no renderer). The scalar converter is therefore a new
+implementation, instrumented against that same Chrome path, not a
+shared one.
+
+**Three composite blind spots, found in the same read.** `fill: {solid:
+…}` (15 bundles) and `fill: {automatic-gradient: …}` (4) parsed as NO
+canvas — only `linear-gradient` was handled, alongside a bare string
+Icon Composer never writes (ictool exits 255 on one). And the
+appearance-less entry of a layer's `opacity-specializations` was
+ignored, so the 37 catalog layers pinned to opacity 0 — split bundles'
+dark twins, invisible in the light rendition — composited at full
+strength. Against the audit's own corroboration channel, the rendered
+light master's luminance (n=70, `|composite meanLuma − masterLuma|`):
+
+    median 0.051 → 0.013,  max 0.759 → 0.331
+    ring-transparent false alarms 8 → 0
+
+`automatic-gradient` is painted as its flat base; the measured model
+(bottom stop = the input, per-channel top lift 9/255 gray to 28/255
+saturated) leaves ringMax under-read by ≤ 0.11 on the top row — always
+toward "native", and no hasDark:false bundle uses that shape today.
+
+**No recorded verdict moved.** All 7 hasDark:false bundles stay
+`native`, 0 `missing`, matching their committed darkStatus. tunestr is
+the only one carrying P3 (19 gradient stops): ringMax 0.376 → 0.392,
+meanLuma 0.159 → 0.152, still 0.148 clear of the 0.30 threshold. But
+eight bundles WOULD have flipped had they been hasDark:false — five
+wrongly native (hark meanLuma 0.174 → 0.830 against master 0.829, queue
+0.279 → 0.834, playerfm, iheartradio, downcast) and three wrongly
+missing (podkicker 0.950 → 0.173 against master 0.191, spotify,
+tunein). The nearest recorded bracket margin is greatpods at 0.010
+(ringMax 0.298 vs 0.308); the conversion alone moves ringMax by up to
++0.075 (castamatic). Unmeasured margins that happen to hold are luck,
+not a verdict.
+
+**Refuted in passing: the border-ring law is hue-dependent.** The
+recorded law is `max encoded channel < ~0.308`, bracket (0.302, 0.314).
+Instrument (one .icon per case: a flat canvas fill, a 256px untagged
+sRGB patch of `230,46,86` centred, `--platform macOS --rendition
+Default` at 1024, read the centre pixel — RAW iff the patch's bytes
+come back verbatim):
+
+| declared canvas fill | max channel | render |
+| --- | --- | --- |
+| `gray:0.310` | 0.310 | RAW |
+| `gray:0.312` | 0.312 | CONVERT |
+| `srgb:0.25,0,0` | 0.250 | RAW |
+| `srgb:0.30,0,0` | 0.300 | **CONVERT** |
+| `srgb:0,0.20,0` | 0.200 | **CONVERT** |
+| `srgb:0,0,0.30` | 0.300 | RAW |
+| `display-p3:0.25,0,0` | 0.250 (sRGB 0.277) | CONVERT |
+| `display-p3:0.295,0,0` | 0.295 (sRGB 0.326) | CONVERT |
+
+Neutrals pin the threshold to (0.310, 0.312) — tighter than the
+recorded bracket — but green flips below 0.20 and blue is still RAW at
+0.30, which no single max-channel reading explains, in P3-coded or in
+sRGB coordinates. The canvas auto-gradient's saturation-dependent top
+lift (9/255 gray vs 24–28/255 saturated) is the obvious suspect and
+does not fit either. UNSOLVED; it makes the audit's ringRaw disjunct
+optimistic for saturated dark artwork, which is why the meanLuma
+disjunct carries the verdict for exactly those bundles (snipd,
+truefans, tunestr today). The conversion fix still measures right on
+this table: at declared 0.295 the naive reading predicts RAW where
+ictool renders CONVERT.
+
 ## Adding a platform or icon
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md).
