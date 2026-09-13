@@ -22,6 +22,15 @@
 //
 //   darkStatus = "native"  ⇔  ringRaw OR meanLuma < 0.30
 //
+// The composite is built in ENCODED sRGB, and so are both statistics
+// and their brackets: declared `display-p3` colors are converted
+// (p3ToSrgb, measured byte-exact against Chrome), raster layers are
+// read as bytes (the measured raster color law), and everything else —
+// 63 of 70 bundles' sRGB/gray declarations — is already there. Reading
+// P3 components as sRGB bytes, as this script used to, mis-stated a
+// saturated color by up to 46/255 and put two coordinate systems in
+// one buffer (measured 2026-09-13; see the ledger).
+//
 // Runs on any platform (no ictool: the composite is built from the
 // committed bundle sources via sharp). When a rendered 1024 light
 // master exists (packages/refraction/assets/<slug>.png, or --assets
@@ -55,15 +64,47 @@ const write = args.includes("--write");
 const only = flag("--only");
 const assetsDir = flag("--assets") ?? join(root, "packages/refraction/assets");
 
+/** display-p3 -> sRGB, both encoded (the CSS Color 4 / ICC conversion:
+ *  sRGB transfer function, P3->sRGB primaries matrix, clipped).
+ *
+ *  This is the scalar twin of the delivery path's RASTER conversion
+ *  (`withIccProfile("srgb", { attach: false })` — build-assets' toSrgb,
+ *  build-svg-icons' centralRmse). Nothing in the repo converted a
+ *  declared COLOR, so this is a new implementation, not a shared one;
+ *  it is instrumented against both of the repo's ground truths
+ *  (measured 2026-09-13):
+ *    - headless Chrome rendering the same `color(display-p3 …)` fills:
+ *      BYTE-EXACT, max |Δ| 0/255 over 13 swatches (the naive
+ *      components-as-sRGB reading this replaces: max |Δ| 46/255);
+ *    - sharp's ICC transform on an ictool master (icatcher's canvas,
+ *      P3-coded 42,86,166): sharp 21,87,172 vs 21,87,173 here. */
+const srgbEotf = (v) => (v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+const srgbOetf = (v) => (v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055);
+const P3_TO_SRGB = [
+  [1.2249401762, -0.2249401762, 0.0],
+  [-0.0420569547, 1.0420569547, 0.0],
+  [-0.0196375546, -0.0786360454, 1.0982736093],
+];
+const clamp = (v) => Math.min(1, Math.max(0, v));
+function p3ToSrgb(r, g, b) {
+  const l = [r, g, b].map(srgbEotf);
+  return P3_TO_SRGB.map((row) =>
+    clamp(srgbOetf(clamp(row[0] * l[0] + row[1] * l[1] + row[2] * l[2])))
+  );
+}
+
 /** Parse an icon.json color string into [r,g,b,a] 0-1 encoded values.
- *  Declared numbers are used as encoded channels regardless of the
- *  srgb/display-p3 coordinate space — the dark gate's bracket is wide
- *  relative to that coding difference. */
+ *  Everything is returned in sRGB — the one space the composite's two
+ *  statistics and their calibrated brackets live in (63 of 70 bundles
+ *  declare their colors in sRGB or gray, where this is the identity). */
 function parseColor(str) {
   const num = (s) => Number(s);
   let m;
   if ((m = str.match(/^display-p3:([\d.]+),([\d.]+),([\d.]+)(?:,([\d.]+))?$/)))
-    return [num(m[1]), num(m[2]), num(m[3]), m[4] ? num(m[4]) : 1];
+    return [
+      ...p3ToSrgb(num(m[1]), num(m[2]), num(m[3])),
+      m[4] ? num(m[4]) : 1,
+    ];
   if ((m = str.match(/^srgb:([\d.]+),([\d.]+),([\d.]+)(?:,([\d.]+))?$/)))
     return [num(m[1]), num(m[2]), num(m[3]), m[4] ? num(m[4]) : 1];
   if ((m = str.match(/^gray:([\d.]+)(?:,([\d.]+))?$/)))
@@ -96,14 +137,26 @@ function canvasFillBuffer(fill) {
   return buf;
 }
 
-/** Neutralize CSS Color 4 display-p3 fills for librsvg (which drops
- *  them): encoded-channel rgb() approximation, same convention as
- *  parseColor. */
+/** Substitute CSS Color 4 display-p3 colors for librsvg, which paints
+ *  them fully transparent: the converted sRGB rgb()/rgba() equivalent,
+ *  same convention as parseColor. Applies anywhere in the document —
+ *  the catalog's 238 occurrences are `fill`/`stroke` attributes and
+ *  `stop-color`s inside gradients (tunestr's 19 are all gradient
+ *  stops), and a text substitution reaches all of them alike.
+ *
+ *  This is the audit's own librsvg workaround; build-svg-icons.mjs
+ *  answers the same librsvg limitation by rasterizing in headless
+ *  Chrome instead (the P3 reference-raster trap, pipeline/README.md).
+ *  Chrome is not available to this script by design — it runs on any
+ *  platform, with no renderer — so the conversion is done in numbers
+ *  here, instrumented against that same Chrome path (see p3ToSrgb). */
 function preprocessSvg(text) {
   return text.replace(
     /color\(\s*display-p3\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*(?:\/\s*([\d.]+)\s*)?\)/g,
     (_, r, g, b, a) => {
-      const c = [r, g, b].map((v) => Math.round(Number(v) * 255)).join(",");
+      const c = p3ToSrgb(Number(r), Number(g), Number(b))
+        .map((v) => Math.round(v * 255))
+        .join(",");
       return a ? `rgba(${c},${a})` : `rgb(${c})`;
     }
   );
