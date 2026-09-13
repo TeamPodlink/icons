@@ -1067,14 +1067,19 @@ conversion. The canvas runs `[34,33,34]` → `[18,19,15]`, the
 0.192→0.078 pin.)
 
 **Still carrying the blind spot:** `tunestr` scores 17.64 even with the
-fixed reference. That one is genuine, not a rasterizer failure — its
-radial gradients declare P3 stops *outside* the sRGB gamut
-(`color(display-p3 .9961 .4431 .1529)`), where ictool's colorimetric
-clip and Chrome's clip legitimately disagree (ictool→sRGB
-`[235,101,45]` vs Chrome `[255,88,38]`). It is recorded `flat-svg` and
-a rebuild would route it to `flat-svg-browser` under either the old or
-the new gate; out-of-gamut P3 stops are an unsolved case, not a bug in
-the gate.
+fixed reference. That one is genuine, not a rasterizer failure. It is
+recorded `flat-svg`, and a rebuild routes it to `flat-svg-browser`
+under either the old or the new gate.
+
+> **CORRECTED 2026-09-13.** This paragraph originally blamed
+> out-of-gamut P3 stops, citing "ictool→sRGB `[235,101,45]` vs Chrome
+> `[255,88,38]`". That was the trap this very entry documents, applied
+> to itself: `[235,101,45]` is ictool's **raw P3-coded** pixel, never
+> converted. Converted it reads `[254,89,11]`. **The clips do not
+> disagree** — see "ictool's partial SVG filter support" below, where
+> 8 solid P3 patches (5 outside the sRGB gamut) match Chrome to
+> ≤ 1/255 after conversion. tunestr's 17.64 is its SVG **filters**,
+> which ictool drops outright; out-of-gamut stops contribute ~2.
 
 ## The dark-status composite's blind spots (measured 2026-09-13, `audit-dark-status.mjs`)
 
