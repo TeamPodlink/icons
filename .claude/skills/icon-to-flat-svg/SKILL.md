@@ -62,7 +62,26 @@ Canvas fill lives at top-level `fill`; layer fills in each layer's
 
 Keep declared component values verbatim (trim trailing zeros, leading
 `0.` → `.`). Do NOT gamut-convert for the committed file — the house
-convention ships `color(display-p3 …)` as-is. `linear-gradient` with
+convention ships `color(display-p3 …)` as-is.
+
+> **`color(display-p3 …)` is house style, and it used to break the
+> builder.** librsvg (what `sharp` rasterizes SVG with) paints P3
+> colors **fully transparent** — not "approximately", *gone*. Until
+> 2026-09-13 `pipeline/build-svg-icons.mjs` rendered its quality-gate
+> reference with librsvg, so a P3 icon was compared against a render
+> with the paint missing: icatcher's reference came back 29.1% opaque
+> and the honest SVG bundle scored central RMSE 75.66 against a
+> threshold of 8, silently diverting it to the raster fallback — which
+> the dark-variant split never touches, so the icon shipped with no
+> Dark rendition. All 11 P3 icons in the flat-svg family scored 69–164.
+> The builder now renders its reference in headless Chrome and aborts
+> loudly on an implausible reference, so **you do not need to avoid P3
+> syntax** — but never reach for `--threshold` to make a gate pass, and
+> never rasterize a house SVG with sharp/librsvg for any purpose where
+> the colors matter. See "The P3 reference-raster trap" in
+> `pipeline/README.md`.
+
+`linear-gradient` with
 `orientation {start,stop}` in unit coords maps to `<linearGradient
 gradientUnits="userSpaceOnUse">` with coords × 32 (e.g. start (0.5,0) →
 stop (0.5,1) ⇒ `x1="16" x2="16" y1="0" y2="32"`).
@@ -160,8 +179,15 @@ on dark frames.
 3. `node pipeline/validate.mjs` — exit 0.
 4. Visual: render a review sheet against the ictool 1024 master
    (`packages/refraction/assets/<slug>.png`) — master | icon.svg @256 |
-   @32 | badge, in both masks. librsvg (sharp) cannot parse
-   `color(display-p3 …)`: substitute matrix-converted sRGB values in the
-   *sheet renders only*, never in committed files. Glyph silhouette and
+   @32 | badge, in both masks. Rasterize the SVGs with **headless
+   Chrome** (copy `chromeRasterize` from `pipeline/build-svg-icons.mjs`)
+   — librsvg (sharp) drops `color(display-p3 …)` to transparent, so a
+   sharp-rendered sheet lies about every P3 icon. If you must use
+   sharp, substitute matrix-converted sRGB values in the *sheet renders
+   only*, never in committed files. Comparing a Chrome render against
+   an ictool master is cross-color-space: ictool emits P3-coded pixels,
+   Chrome sRGB-coded ones, so put the ictool side through
+   `withIccProfile("srgb", { attach: false })` first (icatcher: RMSE
+   8.82 raw vs 2.95 converted). Glyph silhouette and
    placement must align with the master by eye at 256; the flat fill
    replacing the glass material is expected and correct.

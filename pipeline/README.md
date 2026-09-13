@@ -984,6 +984,98 @@ their official homepage `url`s (castbox/icatcher already had theirs;
 downcastapp.com, gpodder.net, www.iheart.com, www.listennotes.com
 verified live and same-entity).
 
+## The P3 reference-raster trap (measured 2026-09-13, `build-svg-icons.mjs`)
+
+`build-svg-icons.mjs` gates a platform's SVG-layer bundle on how closely
+ictool's render matches a REFERENCE raster of the same `icon.svg`. That
+reference was rendered by sharp/librsvg — **and librsvg paints
+`color(display-p3 …)` as fully transparent**. The maintainer draws his
+flat art in P3, so the gate was scoring honest bundles against a
+reference with the paint missing, then diverting them to
+`flat-svg-browser`. The raster path is never visited by the split pass,
+so a diverted icon silently ships **without a Dark rendition**.
+
+Measured on icatcher (background `color(display-p3 .1647 .3373 .6549)`,
+a full-bleed `M0 0h32v32H0z`): the librsvg reference returns `[0,0,0,0]`
+at every background pixel — opaque coverage **0.2909**, mean alpha
+77.78/255 — and the gate scored the correct SVG bundle at central RMSE
+**75.66** against a default threshold of 8. It only ever built right
+because of a load-bearing `--threshold 999`.
+
+Not a one-off. Sweeping the 16 `flat-svg`/`flat-svg-split` platforms,
+all 11 whose `icon.svg` uses P3 syntax scored 69–164 under the old
+reference — stenofm 164.41, podchaser 153.12, tunestr 128.67, podfriend
+121.70, podnews 119.77, subscribebyemail 115.97, podcastindex 113.71,
+rephonic 108.44, subscribeonandroid 104.00, icatcher 75.66, podlp 69.05.
+Every one was a no-flag rebuild away from reverting to a raster. Note
+the failure is not always visible in alpha: where the background is hex
+and only the glyph is P3, the reference stays 100% opaque and merely
+loses the glyph (podcastindex, podnews, rephonic, subscribebyemail,
+subscribeonandroid, tunestr all read opaque 1.0000).
+
+**Fix — Chrome renders the reference, and the comparison happens in
+sRGB.** Two independent parts, both load-bearing:
+
+1. *Rasterizer.* The script already drives headless Chrome for its
+   `flat-svg-browser` fallback and already documents the browser as
+   ground truth for these SVGs. Using Chrome for the reference too means
+   the gate compares ictool against the very render the fallback would
+   ship, and removes the second rasterizer (and its separate blind
+   spots: foreignObject, CSS color functions, tolerated-invalid markup)
+   from the trust chain. Pre-converting P3→sRGB for librsvg's benefit
+   was the alternative; it scores the same (2.86 vs 2.95, pure edge AA)
+   but patches one syntax and leaves the next one — `oklch`,
+   `color-mix` — to re-open the trap.
+2. *Color space.* ictool emits P3-CODED pixels; icatcher's canvas reads
+   `[42,86,167]` — the declared display-p3 numbers verbatim. Chrome
+   screenshots are sRGB-coded and untagged: the same blue reads
+   `[21,87,173]`. Compared raw that is RMSE **8.82** — still over the
+   threshold, so swapping the rasterizer alone would NOT have fixed it.
+   Converting the ictool side P3→sRGB with the delivery path's own
+   `withIccProfile("srgb", { attach: false })` gives **2.95**.
+   `--force-color-profile=display-p3` does *not* make Chrome emit P3
+   pixels (measured: byte-identical output to the default run), so sRGB
+   — the delivery space — is the only apples-to-apples frame.
+
+**Loud guard.** `assertReferenceSane()` aborts the whole run (exit 1,
+never a fall-through to the raster path) when the reference raster is
+implausible: visible coverage < 0.05, or < 95% opaque where the SVG
+declares a full-bleed background. A quality gate may divert a
+genuinely-bad SVG; a blind rasterizer must not. Chrome returns opaque
+**1.0000** on all 16 flat-svg-family icons, so the 0.95 bracket is not
+tight. `chromeRasterize` also fails loudly if Chrome writes no
+screenshot. Verified live by re-pointing the reference at librsvg: the
+run aborts naming P3 as the likely cause, and leaves no bundle behind.
+
+**Structural backstop.** `validate.mjs` now checks that a bundle's
+recorded `source` matches its layer kind — `flat-svg`,
+`flat-svg-split`, `official-svg` must hold SVG layers;
+`flat-svg-browser` must hold a raster. True across the catalog today
+(17 SVG-source bundles, all all-SVG) and it catches this class of
+regression at PR time, on any platform, with no ictool.
+
+**Proof.** `node pipeline/build-svg-icons.mjs --only icatcher` with no
+`--threshold` flag now records `flat-svg-split` at RMSE 2.95 and
+reproduces the committed bundle byte-identically (`icon.json` and
+`Assets/icon.svg` both unchanged; `meta.json` identical after
+`build-assets.mjs --only icatcher` re-measures `hasDark`). The Dark
+rendition's auto-tint survives: the glyph measures **[21, 87, 173]** —
+the declared P3 blue in sRGB, exactly. (The Dark export is untagged
+sRGB, per the dark classifier's RAW path — its canvas ring reads
+34/255 = 0.133, under the ~0.308 bracket — so that number needs no
+conversion. The canvas runs `[34,33,34]` → `[18,19,15]`, the
+0.192→0.078 pin.)
+
+**Still carrying the blind spot:** `tunestr` scores 17.64 even with the
+fixed reference. That one is genuine, not a rasterizer failure — its
+radial gradients declare P3 stops *outside* the sRGB gamut
+(`color(display-p3 .9961 .4431 .1529)`), where ictool's colorimetric
+clip and Chrome's clip legitimately disagree (ictool→sRGB
+`[235,101,45]` vs Chrome `[255,88,38]`). It is recorded `flat-svg` and
+a rebuild would route it to `flat-svg-browser` under either the old or
+the new gate; out-of-gamut P3 stops are an unsolved case, not a bug in
+the gate.
+
 ## Adding a platform or icon
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md).
