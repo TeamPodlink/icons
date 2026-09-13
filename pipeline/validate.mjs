@@ -83,11 +83,38 @@ for (const { id, dir, meta } of platforms) {
     const assets = new Set(
       existsSync(join(bundle, "Assets")) ? readdirSync(join(bundle, "Assets")) : []
     );
-    const names = JSON.stringify(doc).match(/"image-name"\s*:\s*"([^"]+)"/g) ?? [];
-    for (const m of names) {
-      const file = m.match(/"image-name"\s*:\s*"([^"]+)"/)[1];
+    const layerFiles = [
+      ...JSON.stringify(doc).matchAll(/"image-name"\s*:\s*"([^"]+)"/g),
+    ].map((m) => m[1]);
+    for (const file of layerFiles)
       if (!assets.has(file)) err(`${bid}: layer asset missing: Assets/${file}`);
+
+    // The recorded `source` must match what the bundle actually holds.
+    // build-svg-icons.mjs picks between an SVG-layer bundle and a
+    // Chrome-raster fallback on a measured RMSE gate, and only the SVG
+    // modes go through the dark-variant split — so a bundle that says
+    // flat-svg-split while holding a PNG is an icon that silently lost
+    // its Dark rendition. (That regression was real: a rasterizer blind
+    // to color(display-p3 …) scored honest SVG bundles at RMSE 75-164
+    // and diverted them. Fixed at the root 2026-09-13; this is the
+    // structural backstop. See the pipeline/README.md ledger.)
+    const SVG_LAYER_SOURCES = ["flat-svg", "flat-svg-split", "official-svg"];
+    const isSvg = (f) => f.toLowerCase().endsWith(".svg");
+    if (SVG_LAYER_SOURCES.includes(b.source) && layerFiles.length) {
+      const raster = layerFiles.filter((f) => !isSvg(f));
+      if (raster.length)
+        err(
+          `${bid}: source "${b.source}" promises SVG layers but the bundle ` +
+            `has raster layer(s): ${raster.join(", ")} — either the build ` +
+            `was diverted to the raster fallback (rerun ` +
+            `build-svg-icons.mjs) or the source is mislabelled`
+        );
     }
+    if (b.source === "flat-svg-browser" && layerFiles.some(isSvg))
+      err(
+        `${bid}: source "flat-svg-browser" is the raster fallback but the ` +
+          `bundle has SVG layer(s): ${layerFiles.filter(isSvg).join(", ")}`
+      );
 
     if (b.recipe) {
       if (!existsSync(join(root, `packages/engine/recipes/${b.slug}.mjs`)))
