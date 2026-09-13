@@ -60,14 +60,14 @@
       "blend-mode": "normal",
       "specular": false,
       "translucency": {
-        "enabled": false,
-        "value": 0
+        "enabled": true,
+        "value": 0.5
       },
       "layers": [
         {
           "image-name": "icon.svg",
           "name": "icon",
-          "glass": false,
+          "glass": true,
           "position": {
             "scale": 32,
             "translation-in-points": [
