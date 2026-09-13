@@ -1170,3 +1170,265 @@ ictool renders CONVERT.
 ## Adding a platform or icon
 
 See [CONTRIBUTING.md](../CONTRIBUTING.md).
+
+## ictool's partial SVG filter support (measured 2026-09-13, `build-svg-icons.mjs`)
+
+The flat-icon quality gate's last hole was not where it was thought to
+be. Instrument: temp single-layer bundles built from `platforms/*/
+icon.svg`, ictool-rendered at 256 and scored against a headless-Chrome
+reference by the gate's own `centralRmse`.
+
+**First, what is NOT wrong: the gamut clip.** A synthetic sheet of 8
+solid `color(display-p3 …)` patches — 5 of them outside the sRGB gamut
+— renders through ictool and through Chrome, and after the delivery
+path's P3→sRGB conversion the two agree to **≤ 1/255 on every channel**:
+
+| declared P3 | ictool raw (P3-coded) | ictool→sRGB | Chrome |
+| --- | --- | --- | --- |
+| .9961 .4431 .1529 | 254,113,39 | 255,101,0 | 255,101,0 |
+| .8588 .0667 .4196 | 220,34,107 | 240,0,107 | 239,0,107 |
+| .8471 .3647 .9961 | 216,93,254 | 233,82,255 | 233,82,255 |
+| .3961 .0627 .7608 | 101,16,194 | 111,0,202 | 111,0,202 |
+| .9020 .1804 .3373 | 230,46,85 | 251,0,81 | 251,0,82 |
+| .1333 .1137 .3765 | 34,29,96 | 35,29,100 | 35,29,100 |
+
+So "the two clips legitimately disagree" is false, and the gate needs
+no shared clip transform. (Swapping sharp's `withIccProfile("srgb")`
+for a hard-coded P3→sRGB matrix was tried and **rejected**: it moves
+tunestr only 17.64 → 17.77 and *regresses* `netflix` 1.06 → **12.17**.
+`withIccProfile` converts from each file's own declared profile, so it
+is a no-op on ictool output that is already sRGB-coded; a hard-coded
+matrix assumes every ictool render is P3 and over-saturates the ones
+that are not. Leave the ICC path alone.)
+
+**What is wrong: filters.** ictool renders tunestr's `icon.svg`
+**bit-identically** — central RMSE **0.000** — with and without its two
+`filter="url(#…)"` references, where Chrome's render moves **13.93**.
+ictool never applied the artwork's drop shadow or inner shadow at all.
+Attribution of tunestr's 17.64, by ablation:
+
+| variant | RMSE |
+| --- | --- |
+| as committed (P3 + filters) | 17.64 |
+| P3 stops rewritten as sRGB hex, filters kept | 16.45 |
+| P3 kept, filter references stripped | 10.44 |
+| hex + filters stripped | 8.46 |
+
+Filters are the dominant term; the P3 syntax is worth ~2 and the
+out-of-gamut stops essentially nothing. The residual is also *area*,
+not antialiasing: splitting tunestr's error by the reference's local
+luma gradient, non-edge pixels (81.7% of the crop) carry **52.7%** of
+the squared error at RMSE 14.23, against 0.00–1.04 non-edge RMSE for
+every one of the other 15 flat-svg platforms.
+
+**Support is partial, not absent** — so neither "filters are fine" nor
+"filters are fatal" is a usable rule. Synthetic sweep (white disk on a
+blue canvas, one filter primitive set at a time, ict-vs-chrome RMSE):
+
+| filter | ictool moved | Chrome moved | ict vs chrome |
+| --- | --- | --- | --- |
+| feGaussianBlur sd=3 | 55.91 | 55.09 | 7.36 |
+| `style="filter:url(#…)"`, same blur | 55.91 | 55.09 | 7.36 |
+| feOffset dx=4 dy=4 | 106.39 | 110.94 | 20.36 |
+| blur + offset, implicit chain | 98.54 | 100.80 | 5.63 |
+| same chain, named `result`/`in` | 98.54 | 100.80 | 5.63 |
+| feFlood + feBlend multiply | 153.08 | 152.55 | **0.58** |
+| feColorMatrix → red | 36.89 | 171.96 | **174.70** |
+| tunestr's shadow filter verbatim | 36.89 | 10.62 | **44.30** |
+
+ictool honours blur, offset, and both chaining forms; it mis-renders
+`feColorMatrix`; and on tunestr's committed artwork (which combines
+`feColorMatrix` with `filterUnits="userSpaceOnUse"`) it drops the
+filter entirely.
+
+**The hole, and the fix.** The RMSE cannot see a *subtle* dropped
+filter: a soft shadow or a slight inner glow scores under the
+threshold of 8 and ships as `flat-svg` with the effect silently
+missing. `droppedFilterCheck()` asks ictool itself instead of guessing
+— render the artwork with and without its filter references, and
+divert to `flat-svg-browser` when **ictool's output does not budge
+(< 0.5) while Chrome's does (≥ 1.0)**. It is a deterministic divert
+that bypasses the score entirely, and it stays silent on filters ictool
+actually renders, so it costs no dark renditions it needn't. Verified
+on scratch platforms: tunestr's artwork diverts with the reason logged;
+an feFlood+feBlend filter ictool honours builds `flat-svg` at RMSE
+0.58, no divert.
+
+**Sweep, all 16 `flat-svg`/`flat-svg-split` platforms** (gate as
+shipped; `non-edge` is the area-only RMSE):
+
+| id | RMSE | non-edge | | id | RMSE | non-edge |
+| --- | --- | --- | --- | --- | --- | --- |
+| curiocaster | 6.35 | 0.00 | | podlp | 2.60 | 0.00 |
+| greatpods | 2.99 | 0.70 | | podnews | 3.85 | 0.00 |
+| icatcher | 2.95 | 0.00 | | podstation | 3.94 | 0.00 |
+| netflix | 1.06 | 1.04 | | rephonic | 3.40 | 0.64 |
+| podcastindex | 5.11 | 0.00 | | stenofm | 2.35 | 0.92 |
+| podchaser | 4.00 | 0.98 | | subscribebyemail | 4.08 | 0.00 |
+| podengine | 2.39 | 0.00 | | subscribeonandroid | 1.95 | 0.00 |
+| podfriend | 5.59 | 0.20 | | **tunestr** | **17.64** | **14.23** |
+
+Only tunestr references a filter, so the other 15 never enter the new
+check — unchanged by construction.
+
+**Open, and deliberately left open:** tunestr's committed bundle still
+records `source: "flat-svg"` while its ictool render is missing the
+artwork's shadows. A rebuild now produces the *right* answer
+(`flat-svg-browser`, with the reason logged) — that is a correction,
+not a regression, and it costs tunestr the dark-variant split, which
+the raster path never visits. Re-source the artwork without filters
+(the `icon-to-flat-svg` skill's declared-fill route) if the dark
+rendition is wanted back.
+
+## SVG gradients: ictool and the browser interpolate in different spaces (measured 2026-09-13)
+
+Fallout from the filter investigation, and a standing noise floor under
+the flat-icon gate. **Solid** colors agree between the two rasterizers
+to ≤ 1/255 (table above). **Gradients** do not, and no output-side
+color transform can reconcile them, because the disagreement is not
+about gamut at all — it shows up on stops that are plain in-gamut hex.
+
+Linear gradient `#ff9f00 → #ef006b`, both stops well inside sRGB, read
+along the ramp (ictool→sRGB vs Chrome):
+
+| t | ictool→sRGB | Chrome | ΔG |
+| --- | --- | --- | --- |
+| 0.125 | 253,144,10 | 252,138,13 | 6 |
+| 0.375 | 249,114,39 | 248,99,40 | 15 |
+| 0.625 | 245,84,66 | 244,59,67 | 25 |
+| 0.875 | 241,54,94 | 240,19,93 | **35** |
+
+Chrome's values are reproduced to **≤ 1/255** by a plain
+encoded-sRGB lerp between the destination-space stops. ictool's are
+not, and are not reproduced by lerping in encoded sRGB, linear sRGB,
+encoded P3, or linear P3 either (best of the four: RMSE 7.29, max 16)
+— its interpolation space is **unidentified**. Corroborating controls:
+a near-neutral dark gradient agrees to ≤ 2/255 in hex (both spaces
+coincide when the stops are unsaturated) and disagrees by up to 6/255
+when the same stops are written in P3; and radial-gradient **geometry**
+agrees — tunestr's own `scale(45.1428)` background gradient tracks the
+analytic `t = |p − c| / r` in both renderers.
+
+Practical consequence: the gate's threshold of 8 has a saturated-
+gradient noise floor baked into it that has nothing to do with the
+artwork being wrong. Today no committed icon is near it (the worst
+non-edge residual outside tunestr is 1.04), so it is a note, not a
+problem. If a future icon fails the gate on a large saturated gradient
+with its *non-edge* RMSE carrying the error, this is why — and raising
+the threshold is still the wrong answer.
+
+## iCatcher dark-rendition and glass-parameter laws (measured 2026-09-13)
+
+Recovered during the iCatcher work; each one below was **re-measured
+here from fresh synthetic bundles**, because the original
+`scratchpad/icatcher-glass/` artifacts are ephemeral and are gone.
+Where the re-measurement disagreed with the reported number, the
+re-measurement is what is recorded.
+
+1. **The canvas fill is emitted in P3-coded space, but the dark
+   auto-tint is computed in sRGB.** Synthetic bundle: canvas default
+   fill `display-p3:0.1647,0.3373,0.6549`, one bare near-white SVG
+   layer, dark `fill-specialization`. The Default rendition's canvas
+   reads `[41, 85, 167]` — the declared P3 numbers verbatim. The Dark
+   rendition's auto-tinted glyph reads **`[21.12, 86.81, 172.68]`**,
+   against that same P3 color converted to sRGB,
+   **`[20.85, 87.32, 172.77]`** — a match within **0.51/255** per
+   channel. This is why a dark glyph never numerically equals its
+   declared P3 background: the two live in different coding spaces by
+   construction, and comparing them raw reproduces the P3 trap.
+2. **The canvas edge is a fixed inward darkening — and a cheap
+   provenance test.** Flat canvas fill, row 512, delta against the
+   plateau 300 px inboard: **−16 to −21 encoded units** at the mask
+   edge, decaying monotonically to 0 by **d ≈ 10–11 px**. It is
+   *additive*, not proportional: a white canvas (plateau 255) and a
+   0.1-gray canvas (plateau 25) both darken by −19 at the edge.
+   Bit-identical (max diff **0**) across `specular` ∈ {false, true,
+   inside, outside} and `translucency` {off, on 0.5}. **Corollary:**
+   artwork whose canvas edge is *brighter* than its interior, or whose
+   edge treatment is wider than ~12 px at 1024, was not produced by
+   ictool.
+3. **`refractivity` and `blur-material` are inert over a flat canvas.**
+   Group-level schema (`refractivity: {enabled, strength, depth}` and
+   `blur-material`, siblings of `blend-mode` — *not* layer keys), glass
+   disk over a solid canvas: `strength` ∈ {−1, −0.5, 0, 0.43, 0.86} ×
+   `depth` ∈ {0.1, 0.3, 0.5} and `blur-material` ∈ {0.01, 0.25, 0.5,
+   1.0} all land within **max 3/255** of the refractivity-off baseline,
+   whole-image RMSE ≤ **0.124**. They are only measurable against a
+   *textured* underlayer — do not spend sweep budget on them over flat
+   fills. (Mind the key names: under the wrong ones ictool silently
+   ignores the whole block and the sweep reads a perfect, meaningless
+   0.)
+4. **`lighting: individual` vs `combined` is bit-identical on a
+   single-layer group** (max diff **0**) — as it must be, since there
+   is nothing to combine. Stated alone that is a trap, so the contrast
+   goes with it: on a **two**-layer group the same switch moves
+   **max 115, RMSE 1.90**. The law is "single-layer groups cannot
+   distinguish the two", not "the setting does nothing".
+5. **Group blend modes collapse to 4 distinguishable outcomes on a
+   white layer over a mid-blue canvas.** ictool accepts exactly ten
+   modes; measured against `normal` (whole-image RMSE, 1024):
+
+   | outcome | modes | RMSE vs normal |
+   | --- | --- | --- |
+   | white (identical to normal) | normal, screen, hard-light, lighten, plus-lighter | **0.00** |
+   | canvas | multiply, plus-darker, darken | 137.8 |
+   | lightened | overlay | 90.3 |
+   | softened | soft-light | 104.0 |
+
+   Five of ten modes are indistinguishable from `normal` for
+   white-on-color single-layer documents, and three more are
+   indistinguishable from each other — so a blend-mode sweep on such a
+   document needs 4 renders, not 10.
+6. **App Store artwork does not round-trip byte-identically.** Carried
+   from the iCatcher provenance work and **not re-verified here** (the
+   artifacts are gone): a committed `light.png` against a fresh iTunes
+   `/1024x1024bb.png` of the same upload differed at RMSE 5.40, max
+   109, over 73.8% of pixels, all on edges — resampling and
+   recompression. Whatever the exact figures, the operational rule
+   stands and is cheap to honour: **re-fetch comparisons must be
+   tolerance-based, never hash-based.**
+
+**Provenance verdict — iCatcher's App Store artwork is a legacy
+pre-Liquid-Glass marketing icon**, on three independent grounds: its
+baked rim traces a corner of R = 127.5 / n = 1.33, nowhere near
+Apple's mask (R ≈ 312–335, n ≈ 2.45–2.65, see below); its canvas edge
+lighting has the wrong sign and width for law 2 above; and its glyph
+shading is bevel-and-emboss with a 1-px hard edge plus an offset drop
+shadow, which the Liquid Glass renderer does not produce. That is why
+the catalog's handmade bundle cannot match it — and should not try.
+
+## The ictool mask is tangent at row 0 — never threshold it (measured 2026-09-13)
+
+A caveat raised against the superellipse fit recorded in
+`.claude/skills/icon-to-flat-svg/SKILL.md` (corner R = 311.7 px at
+1024, exponent n = 2.450): thresholding ictool's rendered mask alpha at
+≥ 250 gives a corner extent of ~332 px at y = 0, not 311.7. It was
+claimed to be a threshold/antialiasing artifact. **Verified subpixel,
+and the claim only half holds.**
+
+Instrument: ictool 1024 renders, alpha channel, 50%-coverage contour by
+linear interpolation between adjacent samples, sampled by row where the
+boundary is steeper than 45° and by column where it is shallower.
+Confirmed first that the mask is a single stamped shape — Tunestr,
+PodEngine and Overcast give **identical** contours to the last digit.
+
+- Hard threshold α ≥ 250 at row 0: x = **331** (reproduces the ~332).
+- Subpixel 50% contour at row 0: x = **316.46**. Full opacity at 335.
+- So ~15 px of the ~20 px gap is threshold overshoot. The rest is not.
+
+The deeper point is that **row 0 is the tangent row**: the superellipse
+corner meets the flat top edge with a horizontal tangent, so dx/dy is
+unbounded there and the alpha ramp is 30 px wide (α runs 52→206 across
+x = 310…323). A horizontal "corner extent" read anywhere in that row is
+ill-conditioned at *any* threshold, subpixel included.
+
+Fitted properly — perpendicular distance to the analytic superellipse,
+1428 well-conditioned contour samples pooled over three bundles — the
+recorded values give **rms 1.041 px, max 2.878 px**, while a free
+refit prefers **R ≈ 335, n ≈ 2.65** at **rms 0.712 px, max 1.109 px**.
+Both are within antialiasing noise of the silhouette and R trades off
+strongly against n, so the committed path is not wrong; but the
+recorded R is at the low end of the admissible band, and the ~332
+reading was a *signal*, not purely an artifact. Re-measuring the mask
+subpixel, off the tangent rows, is an open item before anyone
+standardizes flat icons on the Apple mask.

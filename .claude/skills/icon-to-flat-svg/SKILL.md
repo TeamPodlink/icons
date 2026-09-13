@@ -151,6 +151,18 @@ silhouette, rms 0.72 px — antialiasing noise level. A *pure* full-body
 superellipse does not fit (best n = 4.09, max 2.4 px). The house
 squircle deviates from Apple's mask by up to 11 px at 1024 (0.35 units).
 
+> **Re-measure the mask by subpixel contour, never by a hard alpha
+> threshold, and never along row 0 / column 0.** The corner meets the
+> flat edge with a horizontal tangent, so dx/dy is unbounded there: an
+> α ≥ 250 read of row 0 returns x = 331 where the 50%-coverage contour
+> is 316.46 and this fit says 311.7 — all three describe the same
+> silhouette. On the contour proper (1428 samples, 3 bundles, identical
+> shapes) R = 311.7 / n = 2.450 scores rms 1.041 px / max 2.878 px and
+> a free refit prefers R ≈ 335 / n ≈ 2.65 at rms 0.712 / max 1.109, so
+> R and n are near-degenerate here and R = 311.7 sits at the low end of
+> the band. Settle this before standardizing on the Apple mask
+> (measured 2026-09-13, `pipeline/README.md`).
+
 Standardizing flat icons on the Apple mask is an **open maintainer
 decision** — until it's made, commit nothing that assumes the Apple
 path; keep the house default.
