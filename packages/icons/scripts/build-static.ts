@@ -113,8 +113,22 @@ function textWidth(text: string, fontSize: number, letterSpacing = 0): number {
 
 // ── Icon generation ────────────────────────────────────────────────
 
+// The squircle mask is `<prefix>_m`, and prefixIds turns a source id of "m"
+// into exactly that — so a `clip-path="url(#m)"` in the artwork resolves to
+// the generator's <mask> (not a clipPath) and the browser silently drops
+// the clip. Measured 2026-09-14 on queue: its 36 conic wedges rendered as a
+// full unclipped disc on the site while the raw file rendered fine.
+function assertNoMaskIdCollision(content: string, maskId: string, source: string): void {
+  if (content.includes(`id="${maskId}"`))
+    throw new Error(
+      `${source}: an id in the artwork prefixes to "${maskId}", which is the ` +
+        `generator's own squircle mask id — rename the id (anything but "m")`,
+    )
+}
+
 function generateIcon(sourceSvg: string, name: string): string {
   const content = prefixIds(extractSvgContent(sourceSvg), name)
+  assertNoMaskIdCollision(content, `${name}_m`, `${name}/icon.svg`)
   const viewBox = extractViewBox(sourceSvg)
   const fill = extractRootFill(sourceSvg)
   const fillAttr = fill ? ` fill="${fill}"` : ''
@@ -151,6 +165,7 @@ function generateBadge(
   // Replace currentColor with the badge foreground color
   iconContent = iconContent.split('currentColor').join(fg)
   iconContent = prefixIds(iconContent, prefix)
+  assertNoMaskIdCollision(iconContent, `${prefix}_m`, `${name} ${variant} badge`)
 
   // Text layout
   const textBlockTop = (BADGE_H - (SMALL_LINE_HEIGHT + LARGE_LINE_HEIGHT)) / 2

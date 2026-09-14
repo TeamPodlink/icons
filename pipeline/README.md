@@ -3215,3 +3215,13 @@ ours: top 146,171,240 → 146,170,239; left 111,143,228 → 109,142,228;
 right of the hole 175,195,248 → 177,196,250; lobe 60,102,213 →
 62,103,213. Facet drift **17.98 → 6.6** (vs artwork 6.56, vs master
 6.61); the heat map is now only the plate's emboss and its shadow.
+
+**Follow-up 4: the `_m` id trap.** The conic wedges rendered as a full
+unclipped disc on the site while the raw file rendered clipped in
+Chrome. Cause: the wedges' clipPath was `id="m"`; build-static's
+prefixIds turns that into `queue_m`, which is the generator's OWN
+squircle mask id, so `clip-path="url(#queue_m)"` resolved to a `<mask>`
+— not a clipPath — and the browser dropped the clip silently. Renamed
+to `mark`, and `generateIcon`/`generateBadge` now throw when any
+prefixed id equals the mask id, so the next "m" fails the build instead
+of shipping unclipped.
