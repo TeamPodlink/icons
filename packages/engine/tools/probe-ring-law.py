@@ -24,19 +24,28 @@
 #                 verbatim; CONVERT iff they come back soft-knee
 #                 converted (the p3-solid law).
 #
-# Sections:
-#   repro    the 8 rows recorded in the ledger, re-measured
-#   bisect   per-axis bisection of the flip point (gray, R, G, B, and
-#            mixed hues) on a flat two-stop `linear-gradient`
-#   mech     the same colors across four canvas mechanisms -- flat
-#            linear-gradient, literal gradient with the modeled
-#            auto-gradient lift baked into the top stop, `solid`, and a
-#            full-bleed opaque PNG canvas layer (which takes no
-#            auto-gradient at all) -- plus the RENDERED top-row value,
-#            to see what the classifier actually had in front of it
-#   fit      candidate laws scored against the bisected thresholds
+# Sections (each authored as minimal .icon bundles and rendered):
+#   repro      the 8 rows recorded in the ledger, re-measured (8/8)
+#   scan       RAW/CONVERT at 32 points per axis -- establishes that every
+#              ray through black is monotone, so bisection is sound
+#   bisect     the flip point along 13 color axes
+#   patchdep   the same flip points against four different readout patches;
+#              identical, so the gate reads the ring, not ring-vs-artwork
+#   mech       five canvas mechanisms -- flat `linear-gradient` [C,C],
+#              `automatic-gradient`, `solid`, a full-bleed PNG canvas
+#              (which takes no automatic gradient at all), and a literal
+#              two-stop with the MEASURED auto-gradient lift baked in
+#   grid       the flip point along all 61 directions of the unit cube
+#   minchan    the flip point against the direction's smallest component
+#   dominance  pairs where the brighter color reads DARKER -- the result
+#              that rules out every brightness statistic
+#   hue        the chroma bound around the S=1 hue circle, 2.5 degrees
+#   switch     where the chroma constraint lets go (an absolute floor on
+#              the minimum channel, not a saturation ratio)
+#   fit        convexity, and closed forms scored on held-out directions
+#   law        the law, validated against 400 random canvases
 #
-#   $PYTHON probe-ring-law.py [--section repro|bisect|mech|fit] [--skip-render]
+#   $PYTHON probe-ring-law.py [--section <name>] [--skip-render]
 import argparse
 import json
 import os
