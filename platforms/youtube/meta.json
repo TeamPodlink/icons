@@ -11,7 +11,7 @@
         "title": "YouTube",
         "variant": null,
         "file": "YouTube.icon",
-        "source": "appstore-artwork-split",
+        "source": "flat-svg-split",
         "appStoreId": 544007664,
         "hasDark": true
       }
