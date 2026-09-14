@@ -141,17 +141,18 @@ export function GlassArtwork({ bundle }: { bundle: GlassBundle }) {
 }
 
 /** The flat vector, scaled up to fill its container's width as a square
- *  (like the glass hero), with the same pointer parallax. `named`
- *  (glass-less platforms, where the flat artwork IS the card's morph
- *  hero — the platform id is its key) carries the transition name; the
- *  Vector segment of a glass platform renders it unnamed, so the morph
- *  names stay on the glass hero only. */
+ *  (like the glass hero), with the same pointer parallax. `transitionKey`
+ *  names it for the card ↔ hero morph: the detail page passes the grid
+ *  card's key (bundle slug, or the platform id for glass-less platforms)
+ *  whichever facet is showing; pass null to render it unnamed. */
 export function FlatArtwork({
   platform,
-  named = true,
+  transitionKey = platform.id,
 }: {
   platform: Platform;
-  named?: boolean;
+  /** The grid-card key this hero morphs from (bundle slug, or the
+   *  platform id for glass-less platforms); null renders it unnamed. */
+  transitionKey?: string | null;
 }) {
   const parallax = useParallax<HTMLDivElement>();
   return (
@@ -159,8 +160,8 @@ export function FlatArtwork({
       <div
         ref={parallax.ref}
         style={
-          named
-            ? { viewTransitionName: iconTransitionName(platform.id) }
+          transitionKey
+            ? { viewTransitionName: iconTransitionName(transitionKey) }
             : undefined
         }
         className="relative aspect-square w-full"
@@ -186,12 +187,28 @@ export function FlatArtwork({
 /** The "Listen on" badge as the hero: only the rendition matching the
  *  current theme (swapped by the dark class like the glass hero),
  *  natural wide aspect, same pointer parallax. */
-export function BadgeArtwork({ platform }: { platform: Platform }) {
+export function BadgeArtwork({
+  platform,
+  transitionKey = null,
+}: {
+  platform: Platform;
+  /** As FlatArtwork: the grid-card key the badge hero morphs from. Named
+   *  on the container, since the light/dark <img> pair swaps via CSS. */
+  transitionKey?: string | null;
+}) {
   const parallax = useParallax<HTMLDivElement>();
   const alt = `Listen on ${platform.name} badge`;
   const imgCls = "h-auto w-full select-none";
   return (
-    <div ref={parallax.ref} className="relative w-full py-2">
+    <div
+      ref={parallax.ref}
+      style={
+        transitionKey
+          ? { viewTransitionName: iconTransitionName(transitionKey) }
+          : undefined
+      }
+      className="relative w-full py-2"
+    >
       <img
         src={badgePath(platform.id, false)}
         alt={alt}

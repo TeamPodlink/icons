@@ -291,10 +291,11 @@ export function IconDetailPage() {
       {/* The selected variant's hero, scaled to fit the available space:
           square heroes take min(column width, viewport height minus the
           chrome, 512px — the largest sized rendition); the badge keeps
-          its natural wide aspect at up to 36rem. The glass hero (and the
-          flat hero standing in for glass-less platforms) carries the
-          container-pair name so the grid cell ↔ detail morph stays
-          wired; other variants render unnamed. Right-click anywhere on
+          its natural wide aspect at up to 36rem. Every hero carries the
+          container-pair name and its artwork the icon name, keyed like
+          the grid card (panelKey), so the cell ↔ detail morph runs for
+          glass, vector and badge alike — the grid the user came from
+          decides which artwork the card showed. Right-click anywhere on
           the hero for the grid's Copy ▸ / Download ▸ tree. */}
       <div
         onContextMenu={(e) => {
@@ -308,17 +309,12 @@ export function IconDetailPage() {
             <GlassArtwork bundle={p.bundles[0]} />
           </div>
         ) : facet === "flat" && p.hasFlat ? (
-          <div
-            style={{
-              ...(p.bundles.length === 0 ? cardTransitionStyle(p.id) : null),
-              width: SQUARE_HERO_WIDTH,
-            }}
-          >
-            <FlatArtwork platform={p} named={p.bundles.length === 0} />
+          <div style={{ ...cardTransitionStyle(panelKey(p)), width: SQUARE_HERO_WIDTH }}>
+            <FlatArtwork platform={p} transitionKey={panelKey(p)} />
           </div>
         ) : facet === "badge" && p.hasBadge ? (
-          <div style={{ width: "min(100%, 36rem)" }}>
-            <BadgeArtwork platform={p} />
+          <div style={{ ...cardTransitionStyle(panelKey(p)), width: "min(100%, 36rem)" }}>
+            <BadgeArtwork platform={p} transitionKey={panelKey(p)} />
           </div>
         ) : null}
       </div>
