@@ -68,14 +68,14 @@
 // diagnoses in the ledger, "Facet drift: flat vs light Liquid Glass"):
 //   central RMSE min 0.47, q1 1.68, median 25.67, q3 46.59, max 147.42.
 //   The material's cost is read off pairs whose artwork is the same on
-//   both sides BY CONSTRUCTION: the 16 flat-svg* bundles with glass off
+//   both sides BY CONSTRUCTION: the 15 flat-svg* bundles with glass off
 //   (their layer IS icon.svg) score 0.47-1.68 — the instrument's noise
 //   floor; icatcher, the same construction with glass on, scores
-//   26.67; the 8 decanted bundles (flat assembled from the bundle's
+//   26.67; the 9 decanted bundles (flat assembled from the bundle's
 //   own layers) score 24.67-55.32 (apple's three translucent glass
 //   layers are the top). So material alone costs ~25-55 and never
 //   more. The `glass` column shows the bundle's glass layers / specular:
-//   the 44 appstore/adaptive/catalog raster bundles have neither, and
+//   the 42 appstore/adaptive/catalog raster bundles have neither, and
 //   ictool hands their raster through unchanged (master vs the App
 //   Store's own PNG: RMSE 0.1-1.9 on 16 of them), so on those pairs the
 //   score is entirely artwork drift. The whole-frame `frame` metric
@@ -85,9 +85,10 @@
 //   largest gap is 77.46 -> 97.35 (12 pairs above), the next 55.32 ->
 //   73.75; all 15 pairs above 55 are artwork mismatches (different
 //   generation of the brand's icon, inverted plate, wrong brand red,
-//   glyph scale), and for every one the App Store's current artwork
-//   matches the GLASS side (RMSE 0.1-1.9, same crop) — the flat
-//   icon.svg is the stale side.
+//   glyph scale); for 13 of the 14 on the App Store the current store
+//   artwork matches the GLASS side (RMSE 0.1-1.9, same crop; podurama's
+//   Android-sourced bundle 25.0, still 3x closer than the flat) — the
+//   flat icon.svg is the stale side.
 
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
