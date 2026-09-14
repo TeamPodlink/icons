@@ -230,6 +230,74 @@ export function BadgeArtwork({
   );
 }
 
+/** Dev-only "Compare" hero: the light Liquid Glass rendition beside the
+ *  flat vector — the facet-drift audit's pair (pipeline/audit-facet-
+ *  drift.mjs) on screen — plus a blend of the two under a slider, so
+ *  registration and colour differences read as ghosting. Always the
+ *  LIGHT rendition, whatever the site theme: that is the pair the audit
+ *  scores, and the flat has no dark rendition to compare against. The
+ *  caption is the bundle's drift from the committed snapshot. */
+export function CompareArtwork({
+  platform,
+  bundle,
+}: {
+  platform: Platform;
+  bundle: GlassBundle;
+}) {
+  const [mix, setMix] = useState(50);
+  const glass = {
+    src: assetPath(bundle.slug, { size: 512 }),
+    srcSet: `${assetPath(bundle.slug, { size: 512 })} 1x, ${assetPath(bundle.slug)} 2x`,
+  };
+  const imgCls = "aspect-square w-full select-none";
+  const cell = "flex flex-col items-center space-y-2";
+  const cap = "font-mono text-xs text-neutral-500 dark:text-neutral-400";
+  return (
+    <div className="w-full space-y-6 py-2">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+        <div className={cell}>
+          <img {...glass} alt={`${bundle.title} Liquid Glass, light`} decoding="async" className={imgCls} />
+          <span className={cap}>Liquid Glass · light</span>
+        </div>
+        <div className={cell}>
+          <img src={flatPath(platform.id)} alt={`${platform.name} vector`} decoding="async" className={imgCls} />
+          <span className={cap}>Vector</span>
+        </div>
+        <div className={cell}>
+          <div className="relative aspect-square w-full">
+            <img {...glass} alt="" aria-hidden="true" decoding="async" className="absolute inset-0 h-full w-full select-none" />
+            <img
+              src={flatPath(platform.id)}
+              alt={`${platform.name} vector over Liquid Glass at ${mix}%`}
+              decoding="async"
+              style={{ opacity: mix / 100 }}
+              className="absolute inset-0 h-full w-full select-none"
+            />
+          </div>
+          <label className={cn(cap, "flex w-full items-center space-x-2")}>
+            <span className="shrink-0">glass</span>
+            <input
+              type="range"
+              min={0}
+              max={100}
+              value={mix}
+              onChange={(e) => setMix(Number(e.target.value))}
+              aria-label="Blend between Liquid Glass and vector"
+              className="w-full"
+            />
+            <span className="shrink-0">vector</span>
+          </label>
+        </div>
+      </div>
+      <p className={cn(cap, "text-center")}>
+        facet drift (central RMSE, light glass vs vector):{" "}
+        {bundle.drift === null ? "unmeasured" : bundle.drift.toFixed(2)}
+        {" · "}pipeline/audit-facet-drift.mjs --write
+      </p>
+    </div>
+  );
+}
+
 /** One Liquid Glass bundle: large preview (light/dark renditions, live
  *  render for recipe bundles), PNG actions, and the <picture> embed copy.
  *  Parked behind DETAIL_SECTIONS during the morph-lock milestone. */

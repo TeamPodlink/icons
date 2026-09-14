@@ -11,6 +11,7 @@ import {
   Copy,
   Download,
   PenTool,
+  ScanEye,
   SquareArrowOutUpRight,
   StretchHorizontal,
 } from "lucide-react";
@@ -20,13 +21,14 @@ import {
 } from "@/components/context-menu";
 import {
   BadgeArtwork,
+  CompareArtwork,
   FlatArtwork,
   GlassArtwork,
 } from "@/components/icon-detail";
 import { MaterialsIcon } from "@/components/materials-icon";
 import { PageCard } from "@/components/page-card";
 import { copyItemsFor, downloadItemsFor } from "@/lib/asset-menus";
-import { resolvePlatform, type Facet, type Platform } from "@/lib/platforms";
+import { lensesEnabled, resolvePlatform, type Facet, type Platform } from "@/lib/platforms";
 import { useTheme } from "@/lib/theme";
 import { useTitle } from "@/lib/use-title";
 import {
@@ -53,9 +55,16 @@ const SQUARE_HERO_WIDTH = "min(100%, calc(100vh - 20rem), 32rem)";
 /** ?facet= on /icon/:id, matching the site's param conventions: "vector"
  *  or "badge" select an alternate hero; absent/unknown means glass
  *  ("flat" accepted as the legacy spelling of vector). */
-function parseDetailFacet(raw: string | null): Facet {
+/** The detail's segments are the three facets plus, in dev only, a
+ *  fourth: "compare", the light Liquid Glass rendition against the flat
+ *  vector — the facet-drift audit's pair, on screen. Not a Facet: no
+ *  route, no card, no assets of its own; gated like the QA lenses. */
+type DetailFacet = Facet | "compare";
+
+function parseDetailFacet(raw: string | null): DetailFacet {
   if (raw === "vector" || raw === "flat") return "flat";
   if (raw === "badge") return "badge";
+  if (raw === "compare" && lensesEnabled) return "compare";
   return "glass";
 }
 
@@ -166,7 +175,7 @@ export function IconDetailPage() {
   const p = platform;
   // Only the variants this platform actually ships become segments.
   const segments: {
-    facet: Facet;
+    facet: DetailFacet;
     label: string;
     icon: React.ComponentType<{ size?: number; strokeWidth?: number }>;
   }[] = [
@@ -179,6 +188,9 @@ export function IconDetailPage() {
     ...(p.hasBadge
       ? [{ facet: "badge" as const, label: "Badge", icon: StretchHorizontal }]
       : []),
+    ...(lensesEnabled && p.bundles.length > 0 && p.hasFlat
+      ? [{ facet: "compare" as const, label: "Compare glass vs vector (dev)", icon: ScanEye }]
+      : []),
   ];
   const requested = parseDetailFacet(params.get("facet"));
   // A ?facet the platform doesn't ship falls back to its first variant.
@@ -186,10 +198,10 @@ export function IconDetailPage() {
     ? requested
     : segments[0]?.facet ?? "glass";
 
-  const setFacet = (f: Facet) => {
+  const setFacet = (f: DetailFacet) => {
     const next = new URLSearchParams(params);
     if (f === "glass") next.delete("facet");
-    else next.set("facet", f === "flat" ? "vector" : "badge");
+    else next.set("facet", f === "flat" ? "vector" : f);
     setParams(next, { replace: true, preventScrollReset: true });
   };
 
@@ -207,9 +219,11 @@ export function IconDetailPage() {
     else navigate("/");
   };
 
-  const copyItems = copyItemsFor(facet, p, p.bundles[0] ?? null, darkTheme);
+  // The compare view offers the glass rendition's assets (its left half).
+  const assetFacet: Facet = facet === "compare" ? "glass" : facet;
+  const copyItems = copyItemsFor(assetFacet, p, p.bundles[0] ?? null, darkTheme);
   const downloadItems = downloadItemsFor(
-    facet,
+    assetFacet,
     p,
     p.bundles[0] ?? null,
     darkTheme
@@ -315,6 +329,10 @@ export function IconDetailPage() {
         ) : facet === "badge" && p.hasBadge ? (
           <div style={{ ...cardTransitionStyle(panelKey(p)), width: "min(100%, 36rem)" }}>
             <BadgeArtwork platform={p} transitionKey={panelKey(p)} />
+          </div>
+        ) : facet === "compare" && p.bundles[0] ? (
+          <div style={{ width: "min(100%, 64rem)" }}>
+            <CompareArtwork platform={p} bundle={p.bundles[0]} />
           </div>
         ) : null}
       </div>

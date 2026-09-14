@@ -3419,3 +3419,17 @@ fitted by least squares over 14,590 matched pixels inside the P
 stops — blue (79,116,194) → (53,117,231), red → (231,50,70). Facet
 drift **15.67 → 5.18**, mean channel −0.2/−0.1/+0.3; the map is
 recorded in icon.svg's header comment. Snapshot refreshed.
+
+### The dev-only Compare segment (2026-09-14)
+
+The detail page's segmented control grows a fourth segment in dev
+(`scan-eye`, gated like the QA lenses): **Compare**, the facet-drift
+audit's pair on screen — the LIGHT Liquid Glass rendition beside the
+flat vector, plus the two blended under a slider so registration and
+colour differences read as ghosting — captioned with the bundle's
+drift from the committed snapshot. Always the light rendition whatever
+the site theme, because that is the pair the audit scores and the flat
+has no dark rendition. `?facet=compare` deep-links it; a production
+build parses it back to glass and never lists it. Copy/Download on this
+segment offer the glass assets. Not a Facet (no route, card or assets
+of its own) — a `DetailFacet` union local to the page.
