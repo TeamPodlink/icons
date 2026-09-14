@@ -1,7 +1,7 @@
 import { useId, type CSSProperties } from 'react'
 import { getIconData } from '../core/index.js'
 import { getPlatform } from '../core/platforms.js'
-import { resolveBadgeContent, resolveBadgeViewBox } from '../core/resolve.js'
+import { resolveBadgeContent, resolveBadgeViewBox, hasBadgeArtwork } from '../core/resolve.js'
 import { shapes } from '../core/shapes.js'
 import type { IconShape } from '../core/types.js'
 
@@ -20,6 +20,10 @@ export interface PlatformBadgeProps {
 }
 
 const FONT_FAMILY = "'Inter', system-ui, sans-serif"
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const __DEV__ = (globalThis as any).process?.env?.NODE_ENV !== 'production'
+const warnedShapes = new Set<string>()
 
 export function PlatformBadge({
   platform,
@@ -71,8 +75,22 @@ export function PlatformBadge({
   // Replace currentColor with foreground
   iconContent = iconContent.split('currentColor').join(fg)
 
-  const needsClip = shape !== 'square'
+  // Badge artwork already carries its own clipping — squircle, circle, or
+  // deliberately none for a bare mark — so only the icon.svg fallback gets a
+  // shape applied. This mirrors generateBadge() in scripts/build-static.ts,
+  // which is what produces the static badges under static/badges/.
+  const isArtwork = hasBadgeArtwork(data, theme)
+  const needsClip = !isArtwork && shape !== 'square'
   const shapeDef = shapes[shape]
+
+  if (__DEV__ && isArtwork && shapeProp !== undefined && !warnedShapes.has(platform)) {
+    warnedShapes.add(platform)
+    console.warn(
+      `[@podlink/icons] <PlatformBadge platform="${platform}" shape="${shapeProp}"> — ` +
+        `shape is ignored because this platform ships badge artwork that already ` +
+        `carries its own shape. It applies only to platforms that fall back to icon.svg.`,
+    )
+  }
 
   const badgeStyle: CSSProperties = {
     display: 'inline-flex',

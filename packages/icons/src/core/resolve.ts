@@ -31,3 +31,17 @@ export function resolveBadgeViewBox(data: IconData, variant: 'light' | 'dark'): 
   if (data.badge) return data.badgeViewBox ?? data.viewBox
   return data.viewBox
 }
+
+/**
+ * Whether resolveBadgeContent picked badge artwork rather than falling back
+ * to the icon.
+ *
+ * Badge artwork already carries whatever clipping it is meant to have: 26 of
+ * the 67 badges wrap themselves in a squircle or circle clipPath, and the
+ * other 41 are bare marks that must not be clipped at all. Only the icon
+ * fallback needs a shape applied to it.
+ */
+export function hasBadgeArtwork(data: IconData, variant: 'light' | 'dark'): boolean {
+  if (variant === 'dark') return Boolean(data.badgeDark ?? data.badge)
+  return Boolean(data.badge)
+}
