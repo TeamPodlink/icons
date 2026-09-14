@@ -1928,3 +1928,54 @@ with **15**, i.e. the natural break has landed exactly on apple's
 55.32 material ceiling. The 15 stale pairs are now cleanly separated
 from the material band rather than straddling it — youtube and spreaker
 had been sitting in the ambiguous zone because of these defects.
+
+### rssradio: the downloaded "RSSRadio" is a different app (2026-09-13)
+
+A Mac App Store copy of "RSSRadio" was inspected for a decant. **Do not
+adopt its artwork, and do not retry this.** It is not the app this
+catalog entry tracks.
+
+| | catalogued entry | the downloaded app |
+| --- | --- | --- |
+| store id | 386600664 | 6758008388 |
+| listing | Podcast Player - Video & RSS | RSSRadio |
+| seller | Maple Media Apps, LLC | Mitsuhiro Hashimoto |
+| first released | 2010-09-26 | 2026-01-23 |
+| bundle id | — | `info.adolfoi.rssradio` |
+| icon | centred symmetric arcs + dot, orange | radio-receiver illustration |
+
+`platforms/rssradio/meta.json` points at `id386600664`. Measured on the
+256 central crop: the catalogued app's LIVE store artwork matches our
+shipped master at **1.90**, while the downloaded app's `light.png` is
+**101.03** from that same store art and 100.89 from our master. Our
+bundle is current and correct; the download is an unrelated 2026 app
+that took the name — the podyssey.fm/podyssey.com pattern.
+
+It has no `IconImageStack` either (`assetutil -I` over its wrapped iOS
+`Assets.car`: 16 Icon Image, 4 PackedImage, 1 MultiSized Image, zero
+stacks), so there was never a Liquid Glass icon to decant. Its
+`tinted.png` is byte-identical to `light.png` (md5 a86be561…), the
+CoreUI fallback the ipatool skill warns about; its `dark.png` is
+genuine but belongs to the wrong app.
+
+**Still open:** rssradio's flat facet (113.57) is the generic RSS feed
+glyph — corner-anchored quarter-arcs — where the app's mark is centred
+symmetric arcs with a dot below. The bundle is `appstore-artwork-split`
+(raster), so there is no vector to convert; fixing the flat needs a
+first-party vector from Maple Media. Separately, the catalogued app is
+no longer *named* RSSRadio, which is a curation question for the
+maintainer, not an artwork one.
+
+### ivoox: flat rebuilt from first-party vector (2026-09-13)
+
+`https://static-1.ivoox.com/img/icons/r25/logo_i_white.svg` is iVoox's
+own asset and carries the whole current icon — plate plus figure mark.
+Its plate is `#F45F31` = (244,95,49), the exact plate the audit
+measured on the shipped raster, so vector and bundle are the same
+generation before any fitting. Placed full-bleed (build-static applies
+the squircle) with the mark at `scale(32/413)` = `.07748184`.
+
+Facet drift **97.35 -> 0.56** central, mean channel delta
++0.0/-0.0/+0.1 — inside the vector-for-vector floor, and independent
+evidence that the bundle is current. **Stale list 15 -> 14.** This is
+the template for the remaining 13: a first-party vector, not a trace.
