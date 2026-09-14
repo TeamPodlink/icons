@@ -2788,3 +2788,24 @@ catalogue serves.
    named something else. Splitting a generic `rss` entry from the
    platform would resolve all three; that is a curation decision for the
    maintainer, not an artwork one.
+
+### build-svg-icons cannot split a GRADIENT plate (2026-09-14)
+
+`splitBackground()` lifts up to three full-bleed rects into the canvas,
+but `parseColor()` returns null for `fill="url(#…)"`, so it stops at the
+first gradient-filled plate. With that rect still covering the canvas,
+glyph coverage exceeds 0.65 and the split is refused as
+`knockout-or-leftover-bg` — the bundle ships unsplit as `flat-svg`, a
+full-bleed layer that hides ictool's dark canvas, so the Dark rendition
+is the light one. rss (a vertical #FA9C39 -> #E26C2D plate) hit this;
+metacast would have too.
+
+The correct output for such a flat is exactly what the builder already
+produces for a solid plate, just with two canvas stops: the gradient as
+the canvas `linear-gradient` (orientation start (0.5,0) -> stop (0.5,1)
+matches a vertical SVG gradient), the standard `gray:0.192 -> 0.078`
+dark specialization, and the glyph as a bare SVG layer with NO
+opacity-specializations. The auto-tint law then does the rest — measured
+on rss: the dark arcs read (226,108,45) and (249,156,58), the gradient's
+own two stops sampled per-pixel, with facet drift **1.29**. Built by
+hand for rss and metacast; the builder should learn to do it.

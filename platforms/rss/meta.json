@@ -5,5 +5,17 @@
     "feed"
   ],
   "url": "https://www.rssboard.org/rss-specification",
-  "added": "2026-09-14"
+  "added": "2026-09-14",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "rss",
+        "title": "RSS",
+        "variant": null,
+        "file": "RSS.icon",
+        "source": "flat-svg-split",
+        "hasDark": true
+      }
+    ]
+  }
 }
