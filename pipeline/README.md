@@ -3225,3 +3225,19 @@ squircle mask id, so `clip-path="url(#queue_m)"` resolved to a `<mask>`
 to `mark`, and `generateIcon`/`generateBadge` now throw when any
 prefixed id equals the mask id, so the next "m" fails the build instead
 of shipping unclipped.
+
+**Follow-up 5: the cut must follow the band; the fan must reach the
+lobe.** Two defects on the site after the conic landed. (1) A seam at
+the hole: the cut was a straight ray at 27°, but the band's angular
+span moves with radius — 30–83° at the hole's edge, 15–27° mid-radius,
+31–34° at the lobe (table in the session) — so NO ray is hidden at
+every radius (the intersection is empty by 5.4°) and the dark/light
+seam surfaced just above the band at the hole. The two end wedges now
+meet along the band's CENTRELINE (y 18.359 to x 21.25, then the arc of
+radius 4.453 about A, then straight down to the fan's edge), which is
+white at every radius; the 32 plain sectors run 50° → 370° and the end
+wedges are bounded by that curve, colours from the same law (clamped at
+the ends). (2) The lobe corner was plate: the fan's radius was 12 and
+the lobe's rounded corner sits at r 12.27 from the disc centre. Radius
+14. Central RMSE vs master 6.61 → **5.33**; no plate-coloured pixel
+inside the mark (3 antialiased ones at 1024).
