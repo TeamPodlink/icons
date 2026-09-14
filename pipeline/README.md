@@ -3241,3 +3241,21 @@ the ends). (2) The lobe corner was plate: the fan's radius was 12 and
 the lobe's rounded corner sits at r 12.27 from the disc centre. Radius
 14. Central RMSE vs master 6.61 → **5.33**; no plate-coloured pixel
 inside the mark (3 antialiased ones at 1024).
+
+**Follow-up 6: the inner shadow, searched.** The residual inside the
+Q was the plate's downward shadow on the blue (measured at the edges
+in Follow-up 3's session: 60,90,167 just under a plate edge vs 74,108,
+204 twelve px on). Modelled as an SVG inner shadow on the clipped fan
+(flood → composite out of SourceAlpha → blur → offset → composite in →
+merge over) and grid-searched in Chrome at 1024, scored as RMSE within
+the mark against the artwork (`scratchpad/is/search.mjs`, 108 renders
+over three passes). Plain: **6.46**. Coarse pass (dy/σ/opacity ∈
+{.25,.5,.75}×{.25,.5,.75}×{.3,.5,.7}) pointed to the small corner
+(3.90 at .25/.25/.3); the refined pass (dy .1–.3, σ .1–.3, opacity
+.2–.4) bottomed at **dy .3, σ .3, opacity .2 → 3.67**, a flat optimum
+(.25/.3/.2 → 3.71, .3/.2/.2 → 3.71); a third pass over shadow colour
+(#000 vs #0A1E64 vs #1B3A9C) and opacity .15/.25 kept black and .2 —
+every blue tint scored worse. Shipped in icon.svg and badge.svg; the
+badge is the same file with the tight viewBox. Central RMSE vs the
+master 5.33 → **3.76**; the heat map now shows only the plate's own
+emboss, which is outside the Q and out of scope for the flat.
