@@ -1945,20 +1945,33 @@ of Chrome launches rather than one per cell. Over 67 platforms × 2
 themes, cases missing the static badge by rmse > 5 fall
 
 ```
-before  109 / 134      after  4 / 134
+before  109 / 134      after these two fixes  4 / 134      now  0 / 134
 ```
 
-and the 4 that remain are gpodder and podurama in both themes — the
-svgo defect below, not a layout one. Among the other 130 the largest
-residual is **3.71**, pure sub-pixel edge antialiasing from the two
-different nesting depths. Worst cases before the fix: podengine 169.47,
-podstation 166.26, podfriend 154.25, listennotes 144.41, siriusxm
-143.38, each landing under 3.4 after.
+The 4 that remained were gpodder and podurama in both themes. They were
+not a layout defect and — despite what this document said for a while —
+not an svgo defect either; see "svgo in codegen" below for what they
+actually were. Among the other 130 the largest residual was **3.71**,
+pure sub-pixel edge antialiasing from the two different nesting depths.
+Worst cases before the fix: podengine 169.47, podstation 166.26,
+podfriend 154.25, listennotes 144.41, siriusxm 143.38, each landing
+under 3.4 after.
+
+All 134 now sit at **rmse 0.00**, at 24 px and at 240 px alike, measured
+with both sides restated as standalone documents so the only variable is
+the artwork. Stronger than the raster result: the two generators now emit
+**byte-identical** artwork and root fill for all 134 cases, once the
+differing id prefixes are normalized. Nothing is left for a rasterizer to
+disagree about, so the 3.71 the earlier sweep saw is the ceiling on what
+nesting depth alone can contribute — that part of the old measurement
+stands.
 
 The regression test (`src/react/badge-static-parity.test.tsx`) asserts
 inner-viewBox and clip parity against `static/badges/<id>-<theme>.svg`
 for every platform in both themes. It fails 45 of 72 on the viewBox bug
-alone and 69 of 72 on the clip bug alone.
+alone and 69 of 72 on the clip bug alone. It now also compares the
+artwork itself and its root fill — placement parity is what let the
+gpodder and podurama defect sit undetected behind a green suite.
 
 ### Two traps this turned up
 
@@ -1976,14 +1989,34 @@ sRGB-red control          -> 255,0,0
 ```
 
 That is the P3 reference-raster trap wearing a different hat: it made
-the component's dropped root `fill` look load-bearing when it is not.
-`generateBadge()` propagates the source's root fill onto the nested
-`<svg>` and codegen does not carry it at all, so the divergence is real
-in the code — but **0 of the 61 badge files with a root fill have any
-drawable element that depends on inheriting it**; every one carries its
-own fill. So it is inert today and was left alone. It is a live trap for
-the next badge authored with a stroke-only path, which is exactly the
-case `CLAUDE.md`'s root-`fill` convention exists for.
+the component's dropped root `fill` look load-bearing in files where it
+is not. `generateBadge()` propagates the source's root fill onto the
+nested `<svg>` and codegen did not carry it at all, so the divergence
+was real in the code.
+
+**The conclusion drawn here was wrong, and it cost a second
+investigation.** This section used to claim that 0 of the 61 badge files
+with a root fill had any drawable element depending on it — "every one
+carries its own fill" — and so the divergence was inert. That came from
+reading markup after librsvg had just burned us for trusting the wrong
+oracle. Reading markup is the wrong oracle too: it is easy to see that
+most elements carry their own fill and miss the few that do not.
+
+Rendering answers it properly. Render every source file's content with
+its root fill and again without it, and compare: of the 113 source SVGs
+that declare one, **4 change** — gpodder and podurama, in `icon.svg` and
+`badge.svg` alike, at rmse 47–55. Both draw paths that carry a `stroke`
+and no `fill` of their own, so without the inherited `fill="none"` they
+fill black. That is exactly the stroke-only case `CLAUDE.md`'s
+root-`fill` convention exists for; it was not hypothetical and not in
+the future, it was already shipping in two platforms.
+
+Codegen now carries the fill (`rootFill`, `badgeRootFill`,
+`badgeDarkRootFill` on `IconData`), `resolveBadgeRootFill()` walks the
+same fallback chain as the content and viewBox, and both components put
+it on the nested `<svg>` — the same element `build-static.ts` puts it
+on. The lesson generalizes past this bug: **an inertness claim about
+rendering has to be settled by rendering.**
 
 **`:scope > defs` silently matches nothing on an SVG element in jsdom**,
 even when the `<defs>` is a direct child. The first version of the clip
@@ -1991,25 +2024,86 @@ assertion used it and passed against the unfixed component; it had
 already made the existing `PlatformIcon` square-shape test vacuous. Use
 an explicit `children` check.
 
-### Open: svgo mangles two badges in codegen
+### svgo in codegen: acquitted, then removed anyway
 
-Separate, pre-existing, and NOT fixed here. Codegen runs the stored
-content through svgo (`preset-default`); `build-static.ts` does not. For
-two platforms that changes the rendering. Rendering the source
-`badge.svg` against the library's stored content, both in Chrome, same
-viewBox:
+This section used to be titled "svgo mangles two badges in codegen" and
+it was wrong on the diagnosis. Keeping the record because the way it was
+wrong is reusable.
+
+**The claim.** Codegen ran stored content through svgo
+(`preset-default`); `build-static.ts` did not. Rendering the source
+`badge.svg` against the library's stored content showed gpodder at rmse
+61.99 and podurama at 59.79, with everything else under 3. The `<g>`
+count dropped 3 → 1 on gpodder, so `collapseGroups` looked obvious.
+
+**The measurement that settles it.** That comparison moved two variables
+at once: svgo ran, *and* `extractSvgContent()` dropped the root
+`fill="none"`. Separate them — four cells, source as the reference, all
+rendered in Chrome at 240 px:
 
 ```
-gpodder     rmse 61.99     svgo collapses 3 <g> into 1
-podurama    rmse 59.79     same element counts, attribute-level change
-truefans    rmse  2.74
-icatcher    rmse  2.56
-spotify     rmse  0.00
-apple       rmse  0.05
-podstation  rmse  0.06
+                                  gpodder   podurama
+svgo + fill dropped  (as shipped)   55.38      51.78
+svgo + fill carried                  0.07       0.07
+no svgo + fill dropped              55.38      51.78
+no svgo + fill carried               0.00       0.00
 ```
 
-This is why gpodder and podurama still miss the static badge by rmse ~60
-after both fixes above. It is a codegen/svgo defect, not a badge-layout
-one, and the right fix is to pin down which preset-default plugin is at
-fault rather than to widen the layout change.
+svgo is not the variable. The damage is identical with it and without
+it, and with the fill carried svgo lands at 0.07 — antialiasing. A
+leave-one-out sweep over the 33 `preset-default` plugins codegen left
+enabled agrees: on podurama the only one that changes the output at all is
+`convertPathData`, which edits path data and cannot turn white into
+black. `collapseGroups` was a real element-count change and a visual
+no-op — a coincidence that looked like a cause.
+
+The actual cause is the dropped root fill; see "Two traps" above.
+
+**So why remove svgo.** With the fill fixed, svgo was no longer
+*breaking* anything, but it was still the only reason the library and
+the static files carried different bytes for the same artwork — two
+generators, two pieces of markup, drift by construction. That drift is
+what forced this investigation to first establish which divergences were
+even real. Measured over all 142 source files:
+
+```
+config                stored   gzip    worst vs static @24px   @240px
+preset-default       209786  52373                     9.23      7.63
+floatPrecision 4     216707  54471                     0.67      3.86
+floatPrecision 8     224581  56106                     0.66      3.86
+convertPathData off  225040  56376                     2.58      0.79
+no svgo              226451  56729                     0.00      0.00
+```
+
+Three things in that table decided it:
+
+- **Nearly all the saving is one plugin rounding coordinates.** Drop
+  `convertPathData` and svgo takes off 0.6% instead of 7.4%. The sources
+  are clean exports — no comments, no `<metadata>`, no editor namespaces
+  anywhere in the corpus — so there is no hygiene left for it to do.
+- **The rounding is visible, not sub-pixel.** 9.23 at the 24 px a
+  default 40 px badge actually renders its icon at. It gets *worse* at
+  small sizes, because a fixed geometry shift costs proportionally more
+  pixels there.
+- **Precision does not buy it back.** The residual stops improving at
+  `floatPrecision` 4 and sits at 3.86 even at 8, because other plugins
+  restructure the markup too. Only removing svgo reaches 0.00.
+
+What was left was 4.3 KB gzipped bought by degrading artwork, in a repo
+whose entire pipeline exists to keep renders faithful. `iconDataMap` is
+a single object literal and does not tree-shake, so that 4.3 KB is real
+and it is paid by every consumer — it is the honest cost of this call,
+and it is one line of `codegen.ts` to reverse if it ever stops being
+worth it.
+
+Codegen now reads source bytes and stores them. All 134 platform/theme
+cases render the static badge's icon block at **rmse 0.00**, and the
+parity test compares the artwork exactly rather than within a tolerance,
+because there is no longer anything to tolerate.
+
+**The reusable part.** A comparison across two pipelines with two
+differences in it cannot attribute blame, however plausible the story
+the diff tells. Both times this document guessed from markup —
+`collapseGroups` because the `<g>` count moved, "every badge carries its
+own fill" because most elements do — it guessed wrong, and both times
+one factorial rendering sweep settled it in minutes.
