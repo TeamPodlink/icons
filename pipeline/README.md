@@ -2970,3 +2970,16 @@ which is precisely what the old adaptive-icon `glyph-dark.png` was
 (modal (239,43,122)), so the dark rendition's convention is unchanged.
 Source adaptive-icon-split -> flat-svg-split. Facet drift 71.40 ->
 **1.22**; dark glyph measured (239,42,122).
+
+### youtubemusic: registration, then a measured ring (2026-09-14)
+
+91.66 -> 51.91 by the fit instrument's similarity (disc 704 -> 782 px,
+`translate(-1.7710 -1.7710) scale(1.11080)`, aspect 0.00%). The rest
+was not scale: the diff showed both edges of the white ring offset, and
+a centreline scan put the master's ring at inner r 6.94 / outer 7.61
+(32-space) against ours at 6.43 / 7.41 — thinner and further out. An
+annulus is two concentric circles, so the radii were set to the
+measured values (6.248 / 6.851 pre-transform; thickness 0.88 -> 0.603)
+without touching any other geometry. **51.91 -> 5.36**, mean channel
++0.0/+0.8/-0.1. Measuring a primitive's radius is registration; it is
+not redrawing.
