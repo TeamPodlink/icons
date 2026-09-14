@@ -3283,3 +3283,27 @@ the badge is the bare mark and has no plate. Whole-icon central RMSE
 vs the master 3.76 → **2.67** (vs the artwork 2.59), which is inside
 the resampling floor's neighbourhood: the two facets now differ by the
 Liquid Glass squircle and antialiasing, not by design.
+
+### rssradio: drawn from the App Store glyph (2026-09-14)
+
+RSSRadio had no flat and a raster badge. The App Store glyph
+(`glyph.png`, the mark split from its plate) is four primitives, so
+the flat is drawn from measurements rather than traced. Radial scans
+about the dot: dot r **95** px at (511.5, 713.5); three concentric
+strokes of thickness **50** at radial [181,230] / [316,365] / [450,499]
+→ mid-radii **205 / 340 / 474** (pitch ~134.5), identical on both
+sides to the pixel. Every arc vanishes at exactly **45.0°** from
+vertical with a taper that is no single round cap: the caps ARE round
+(zoomed, semicircular) but their tips align on the 45° line, so each
+stroke ends at 45° − asin(25/r) — 38.0° / 40.8° / 42.0°. Plate = the
+bundle's own canvas gradient #FF8802 → #FF4931 (what the split lifted
+from the artwork). Mark silhouette IoU vs the glyph **0.972** with the
+first draft's half-pixel radial bias removed (bodies now agree to the
+pixel at 0° and 30°; the residual is threshold asymmetry between a
+white-level test on ours and an alpha test on the glyph). Badge: the
+mark is white, so a self-clipped squircle plate. Facet drift vs the
+App Store master **5.23**, mean channel −0.1/−1.0/−1.3 — the
+raster's soft edge. The bundle keeps the official artwork; as a bare
+white SVG layer the mark would auto-tint in Dark exactly as
+glyph-dark.png does, if ever swapped. Vector count 68 → 69, "missing
+flat" 3 → 2 (airshow, disctopia).
