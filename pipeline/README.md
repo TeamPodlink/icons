@@ -1605,8 +1605,11 @@ that band at 55.32. The 42 raster-sourced bundles (appstore-artwork,
 adaptive-icon, catalog-artwork, official-artwork) have no glass layers
 and no specular, and ictool hands their raster through unchanged: the
 App Store's current 1024 PNG of the same app matches the master at
-**RMSE 0.1–1.9** on 16 of 16 such bundles checked (table below). On
-those pairs the entire score is artwork drift.
+**RMSE 0.1–1.9** on 16 of the 18 such bundles checked (table below);
+the two exceptions, spreaker 10.1 and podurama 25.0, are the
+Android-sourced `adaptive-icon*` bundles, whose artwork is the APK's,
+not the App Store's. On all of these pairs the entire score is
+artwork drift.
 
 Distribution (67, central): min 0.47, q1 1.68, **median 25.67**,
 q3 46.59, max 147.42. Largest gap 77.46 → 97.35 (12 pairs above), next
