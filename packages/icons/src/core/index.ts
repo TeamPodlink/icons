@@ -1,6 +1,11 @@
 export { platforms, getPlatform, resolvePlatformId } from './platforms.js'
 export { shapes } from './shapes.js'
-export { resolveBadgeContent, resolveBadgeViewBox, hasBadgeArtwork } from './resolve.js'
+export {
+  resolveBadgeContent,
+  resolveBadgeViewBox,
+  resolveBadgeRootFill,
+  hasBadgeArtwork,
+} from './resolve.js'
 export { extractSvgContent, extractViewBox, prefixIds, minifySvg } from './svg.js'
 
 export type { Platform, IconData, IconShape, ShapeDefinition } from './types.js'

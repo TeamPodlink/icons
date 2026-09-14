@@ -3,7 +3,8 @@
 /**
  * Codegen script: reads src/source-icons/ and generates:
  * - src/generated/icons.ts     — map of platform id → IconData (viewBox, content,
- *                                 badge?/badgeViewBox?, badgeDark?/badgeDarkViewBox?)
+ *                                 rootFill?, badge?/badgeViewBox?/badgeRootFill?,
+ *                                 badgeDark?/badgeDarkViewBox?/badgeDarkRootFill?)
  * - src/generated/platform-ids.ts — TypeScript union type for autocomplete
  */
 
@@ -11,7 +12,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSy
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import { optimize } from 'svgo'
-import { extractSvgContent, extractViewBox, prefixIds } from '../src/core/svg.js'
+import { extractSvgContent, extractViewBox, extractRootFill, prefixIds } from '../src/core/svg.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -44,11 +45,24 @@ function readSvgFile(path: string): string | undefined {
   return readFileSync(path, 'utf-8')
 }
 
-function processSvg(raw: string, prefix: string): { viewBox: string; content: string } {
+interface Processed {
+  viewBox: string
+  content: string
+  /**
+   * The root <svg fill>, kept because extractSvgContent() throws the root
+   * element away and a stroke-only path relies on inheriting it. svgo leaves
+   * this attribute alone on all 142 source files, so reading it off the
+   * optimized string keeps everything here derived from one document.
+   */
+  rootFill: string | null
+}
+
+function processSvg(raw: string, prefix: string): Processed {
   const optimized = optimizeSvg(raw)
   const viewBox = extractViewBox(optimized)
+  const rootFill = extractRootFill(optimized)
   const content = prefixIds(extractSvgContent(optimized), prefix)
-  return { viewBox, content }
+  return { viewBox, content, rootFill }
 }
 
 function escapeForTemplate(s: string): string {
@@ -111,14 +125,14 @@ function main() {
 
       // Process badge.svg (optional)
       const badgeRaw = readSvgFile(join(dir, 'badge.svg'))
-      let badge: { viewBox: string; content: string } | undefined
+      let badge: Processed | undefined
       if (badgeRaw) {
         badge = processSvg(badgeRaw, `${id}-badge`)
       }
 
       // Process badge-dark.svg (optional)
       const badgeDarkRaw = readSvgFile(join(dir, 'badge-dark.svg'))
-      let badgeDark: { viewBox: string; content: string } | undefined
+      let badgeDark: Processed | undefined
       if (badgeDarkRaw) {
         badgeDark = processSvg(badgeDarkRaw, `${id}-badge-dark`)
       }
@@ -126,13 +140,22 @@ function main() {
       let entry = `  '${id}': {\n`
       entry += `    viewBox: '${icon.viewBox}',\n`
       entry += `    content: \`${escapeForTemplate(icon.content)}\`,\n`
+      if (icon.rootFill) {
+        entry += `    rootFill: '${icon.rootFill}',\n`
+      }
       if (badge) {
         entry += `    badge: \`${escapeForTemplate(badge.content)}\`,\n`
         entry += `    badgeViewBox: '${badge.viewBox}',\n`
+        if (badge.rootFill) {
+          entry += `    badgeRootFill: '${badge.rootFill}',\n`
+        }
       }
       if (badgeDark) {
         entry += `    badgeDark: \`${escapeForTemplate(badgeDark.content)}\`,\n`
         entry += `    badgeDarkViewBox: '${badgeDark.viewBox}',\n`
+        if (badgeDark.rootFill) {
+          entry += `    badgeDarkRootFill: '${badgeDark.rootFill}',\n`
+        }
       }
       entry += `  }`
 

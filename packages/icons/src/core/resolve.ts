@@ -45,3 +45,27 @@ export function hasBadgeArtwork(data: IconData, variant: 'light' | 'dark'): bool
   if (variant === 'dark') return Boolean(data.badgeDark ?? data.badge)
   return Boolean(data.badge)
 }
+
+/**
+ * Resolve the root <svg fill> that goes with resolveBadgeContent's result.
+ *
+ * Must walk the same fallback chain as the content, and for the same reason
+ * the viewBox does: the fill belongs to the file the content came from, and
+ * badge.svg, badge-dark.svg and icon.svg can each declare a different one.
+ *
+ * Returns undefined when that file declared no root fill, which is the
+ * common case — 113 of the 142 source files carry one, but only gpodder's
+ * and podurama's actually have a stroke-only path depending on it.
+ */
+export function resolveBadgeRootFill(
+  data: IconData,
+  variant: 'light' | 'dark',
+): string | undefined {
+  if (variant === 'dark') {
+    if (data.badgeDark) return data.badgeDarkRootFill
+    if (data.badge) return data.badgeRootFill
+    return data.rootFill
+  }
+  if (data.badge) return data.badgeRootFill
+  return data.rootFill
+}

@@ -20,6 +20,19 @@ export interface IconData {
   badgeViewBox?: string
   badgeDark?: string
   badgeDarkViewBox?: string
+  /**
+   * The root <svg fill> of the source file, which has to travel with the
+   * content because `content` is the INNER markup — the root element that
+   * carried the fill is gone by the time it is stored.
+   *
+   * It is not decoration. `fill="none"` on the root is how a stroke-only
+   * path is kept from being filled (see CLAUDE.md's root-`fill` convention);
+   * drop it and that path inherits the SVG default of black. Today gpodder
+   * and podurama both depend on it in icon.svg and badge.svg alike.
+   */
+  rootFill?: string
+  badgeRootFill?: string
+  badgeDarkRootFill?: string
 }
 
 export interface ShapeDefinition {
