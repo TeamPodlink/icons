@@ -3434,3 +3434,27 @@ has no dark rendition. `?facet=compare` deep-links it; a production
 build parses it back to glass and never lists it. Copy/Download on this
 segment offer the glass assets. Not a Facet (no route, card or assets
 of its own) — a `DetailFacet` union local to the page.
+
+### pocketcasts: the official glyph, sized to the bundle (2026-09-14)
+
+pocketcasts.com/podcast-producers ships "Listen on" badge SVGs (also
+`/pocketcasts_badges.zip`); each carries the mark as a group named
+"Glyph" inside a red roundel (#F43E37) — Pocket Casts' own vector of the
+P-in-circle. The flat now uses that path verbatim on a #F43E37 plate
+(the Material #F44336 it had was 1–3/255 off the master's 245,62,55).
+Sizing came from the bundle, not the roundel: placed at a guess and
+measured with fit-flat-glyph against the decanted master — glass mark
+734 × 734 px at 1024, centred, aspectD **0.00%** (same drawing) —
+the fit's `translate(-0.6812 -0.6812) scale(1.04261)` composed onto the
+guess gives `translate(4.5319) scale(2.1173)`, a 22.94-unit mark; the
+re-fit reads 0.00% / 0.0 px. Facet drift **40.83 → 7.56** (the
+remainder is the decanted layer's glass material: `0/2+s`, mean channel
+−3.7/−4.1/−4.1). Badge: the roundel itself, red disc + glyph as a bare
+mark (viewBox 4 4 24 24), replacing the circle-clipped old flat.
+`flatSource: official`.
+
+Trap on the way: the badge's header comment quoted the Sketch group
+name "Pocket-Casts-Roundel---Red", and `--` inside an XML comment is
+invalid XML — Chrome and librsvg reject the whole file, so the site
+showed a broken image while validate passed. validate.mjs now refuses
+`--` inside any comment of icon.svg / badge.svg / badge-dark.svg.

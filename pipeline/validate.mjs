@@ -34,6 +34,14 @@ for (const { id, dir, meta } of platforms) {
   if (!meta.added) err(`${id}: meta.json missing "added" (YYYY-MM-DD first-addition date)`);
   else if (!/^\d{4}-\d{2}-\d{2}$/.test(meta.added))
     err(`${id}: added must be a YYYY-MM-DD date, got ${JSON.stringify(meta.added)}`);
+  // XML forbids "--" inside a comment; librsvg and Chrome refuse the whole
+  // file, so a chatty header comment silently blanks an icon on the site.
+  for (const f of ["icon.svg", "badge.svg", "badge-dark.svg"]) {
+    const fp = join(dir, f);
+    if (!existsSync(fp)) continue;
+    for (const m of readFileSync(fp, "utf8").matchAll(/<!--([\s\S]*?)-->/g))
+      if (m[1].includes("--")) err(`${id}/${f}: "--" inside an XML comment (invalid XML; renderers reject the file)`);
+  }
   if (meta.flatSource !== undefined && !["official", "drawn"].includes(meta.flatSource))
     err(`${id}: flatSource must be "official" or "drawn", got ${JSON.stringify(meta.flatSource)}`);
   if (meta.categories && !Array.isArray(meta.categories))
