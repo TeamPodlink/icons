@@ -2415,3 +2415,60 @@ and removing it is a regression unless the glow is rebuilt.
 
 **If it is rebuilt, model a tinted outer glow against the measured
 profile above — not a drop shadow, and not via `shadow`.**
+
+### The shadow `kind` enum: it is `layer-color`, not "chromatic" (2026-09-13)
+
+Looking for a chromatic shadow — one tinted by the layer's own colour
+rather than a neutral grey — the value is spelled **`layer-color`**.
+From `IconComposerFoundation`'s serialized enum (adjacent to the
+`IconComposition.Group.Snapshot` Codable keys), the wire values are:
+
+    "kind": "neutral" | "layer-color" | "none"
+
+with a fourth Swift case `automatic` that has no serialized spelling
+beside the other three. These are read out of the framework's string
+table, so they evidence the FORMAT; they are not a claim about
+rendering, which is measured separately below.
+
+`shadow-specializations` is also a supported key, so a shadow CAN vary
+by appearance — a dark-mode-specific shadow is expressible. The full
+specialization set the framework carries:
+
+    asset-mirroring, blend-mode, blur-material, fill, glass, hidden,
+    image-name, lighting, opacity, position, refractivity,
+    refractivity-depth, refractivity-strength, shadow,
+    specular-highlight-placement, specular, translucency
+
+**Nothing reachable on this Mac uses either.** Across every `.icon`
+bundle on disk — our 70, the 24-bundle decanted corpus, and the two
+apps that ship their authoring source (`Cloudflare WARP.app`,
+`NPR.app/Wrapper/one.app/AppIcon.icon`) — all 33 shadowed groups
+declare `neutral` (32) or `none` (1). Zero `layer-color`, zero
+`shadow-specializations`. There is no worked example to copy.
+
+Note for future surveys: a regex of `"kind" *: *"[a-z]*"` silently
+MISSES `layer-color` — the hyphen is outside the class — and Apple's
+own exporter spaces the key as `"kind" : ` with a space before the
+colon (NPR's source does this; ours do not). Match `[a-z-]` and allow
+the space.
+
+**It would change nothing for us in any case.** The earlier control
+varied only `opacity` at `kind: neutral`; extending it across the kinds
+on jiosaavn's group, with the blob masked off so a generated shadow
+would be visible against a flat canvas:
+
+| kind | opacity | md5 | vs store |
+| --- | --- | --- | --- |
+| (absent) | — | 3272bbfe04 | 7.45 |
+| none | 0.5 / 1.5 | 3272bbfe04 | 7.45 |
+| neutral | 0.5 / 1.5 | 3272bbfe04 | 7.45 |
+| layer-color | 0.5 / 1.5 | 3272bbfe04 | 7.45 |
+| automatic | 0.5 / 1.5 | 3272bbfe04 | 7.45 |
+
+One md5 for all nine. ictool accepts `layer-color` and `automatic`
+without complaint and draws neither.
+
+The irony is that `layer-color` is precisely the right SEMANTIC for
+jiosaavn: its halo is a teal glow in the disc's own hue (measured
+above), which is what a layer-coloured shadow describes. Apple's live
+compositor would draw it; our raster path never will.
