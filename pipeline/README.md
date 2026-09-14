@@ -2983,3 +2983,23 @@ measured values (6.248 / 6.851 pre-transform; thickness 0.88 -> 0.603)
 without touching any other geometry. **51.91 -> 5.36**, mean channel
 +0.0/+0.8/-0.1. Measuring a primitive's radius is registration; it is
 not redrawing.
+
+### anytimeplayer: registered off the inner features (2026-09-14)
+
+The Anytime repo (amugofjava/anytime_podcast_player) holds no vector of
+the mark — its iOS 1024 icon is our shipped master at RMSE 0.19, the
+only VectorDrawable is the launcher BACKGROUND, and `docs/apple.svg` is
+the App Store badge — so this was a registration job. The fit
+instrument could not measure it because the ring reads as bleeding off
+the raw glyph.png; on the rendered master it does not (outer edge at
+r 438.5 px, well inside 1024). Two measurement mistakes on the way,
+recorded so they are not repeated: walking outward from the centre for
+"the ring" hits the white play triangle first (a 21 px "ring"), and
+fitting on that gave a 2x12 px "feature". Correct: find the ring from
+the canvas EDGE inward on the centre row, then bbox the white triangle
+strictly inside it. Triangle 501x588 -> 558x656, aspectD -0.17%, fit
+`translate(-1.8981 -1.7248) scale(1.11377)`; the ring wanted ~2.5% more
+than the triangle, so its annulus radii were set to the master's
+measured 387.5 / 438.5 px, as youtubemusic's were. **73.75 -> 19.19**,
+mean channel +0.0/+0.4/+0.7, diff a uniform hairline on every edge —
+the raster-recreation floor for this pair, not chased further.
