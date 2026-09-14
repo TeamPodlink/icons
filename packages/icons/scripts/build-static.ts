@@ -230,12 +230,18 @@ function main() {
     for (const p of data.platforms || []) platformMap.set(p.id, p.name)
   }
 
-  // Discover platform directories (skip _review)
+  // Discover platform directories (skip _review). A platform needs icon.svg
+  // for its flat icon, but a badge only needs badge.svg: platforms whose
+  // only artwork is a raster bundle (airshow, disctopia, queue, rssradio)
+  // ship a raster badge.svg and no flat, so they are badge-only here.
   const platformDirs = readdirSync(SOURCE_DIR)
     .filter((name) => {
       if (name.startsWith('_')) return false
       const dirPath = join(SOURCE_DIR, name)
-      return statSync(dirPath).isDirectory() && existsSync(join(dirPath, 'icon.svg'))
+      return (
+        statSync(dirPath).isDirectory() &&
+        (existsSync(join(dirPath, 'icon.svg')) || existsSync(join(dirPath, 'badge.svg')))
+      )
     })
     .sort()
 
@@ -244,13 +250,16 @@ function main() {
 
   for (const name of platformDirs) {
     const dir = join(SOURCE_DIR, name)
-    const iconSvg = readFileSync(join(dir, 'icon.svg'), 'utf-8')
+    const hasFlat = existsSync(join(dir, 'icon.svg'))
     const platformName = platformMap.get(name) || name.charAt(0).toUpperCase() + name.slice(1)
 
     try {
-      writtenIcons.add(`${name}.svg`)
-      writeFileSync(join(ICONS_DIR, `${name}.svg`), generateIcon(iconSvg, name))
-      icons++
+      if (hasFlat) {
+        const iconSvg = readFileSync(join(dir, 'icon.svg'), 'utf-8')
+        writtenIcons.add(`${name}.svg`)
+        writeFileSync(join(ICONS_DIR, `${name}.svg`), generateIcon(iconSvg, name))
+        icons++
+      }
 
       const darkBadgeIcon = resolveBadgeIcon(dir, 'dark')
       const lightBadgeIcon = resolveBadgeIcon(dir, 'light')

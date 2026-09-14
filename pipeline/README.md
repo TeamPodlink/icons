@@ -3094,3 +3094,32 @@ Stale list after this pass (67 pairs, pandora excluded): median 7.44
 -> **5.36**, q3 19.19; everything above 30 is now either decanted glass
 (apple, pocketcasts, podcastrepublic, moonfm, tunein, spotify — the
 material band) or the two official-raster holdouts above.
+
+### A badge for every platform, rasters included (2026-09-14)
+
+Four active platforms had no badge because they have no `icon.svg`:
+airshow, disctopia, queue, rssradio — their only artwork is the raster
+bundle (App Store artwork), and the badge generator only walked
+platforms with a flat. Rather than draw marks we do not have, each now
+ships a `badge.svg` whose artwork is an `<image>` of the bundle's own
+pixels (160 px PNG, base64, 17-39 KB per file), chosen by the badge
+rule — the mark bare when it reads on both pills, plated when it does
+not:
+
+| slug | artwork | viewBox |
+| --- | --- | --- |
+| airshow | the split balloon (`glyph.png`) cropped to its bbox + 2% | `6.094 2.906 19.813 26.25` (bare) |
+| disctopia | the split D (`glyph.png`) cropped the same way | `8.375 5.813 16.875 20.375` (bare) |
+| queue | the light Liquid Glass rendition — the artwork is a single plate+mark raster | `0 0 32 32` (plated) |
+| rssradio | the light Liquid Glass rendition — a white mark needs its orange plate on the white pill | `0 0 32 32` (plated) |
+
+Bare crops keep their viewBox in the icon's 32-unit space, like the
+vector bare marks ("8 8 24 24"), so the badge places them where the
+mark sits in the icon. `build-static.ts` now walks platforms that have
+either `icon.svg` or `badge.svg` and emits only what each has: 67
+icons, 142 badges (71 platforms). `build-data.mjs` already derived
+`hasBadge` from the file, so the site's badge facet, grid count and
+"missing badge" category follow. Not extended: the npm package's
+codegen still requires `icon.svg`, so `<PlatformBadge>` has no entry
+for these four (its `IconData.content` is the flat icon and there is
+none); the parity test walks the same set and is unaffected.
