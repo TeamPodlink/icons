@@ -626,14 +626,24 @@ on the ring, still RAW). The law that fits all 14 instruments and
 every catalog bundle:
 
     raw ⇔ every pixel of the composite's 1-px border ring is opaque
-          AND has max encoded channel < ~0.308   (bracket (0.302, 0.314))
+          AND max(c) < 0.308
+          AND max(c) − min(c) < chromaBound(hue(c))
+
+The max-channel half of that was all this cell recorded until
+2026-09-13 (`< ~0.308`, bracket (0.302, 0.314)); it is a real cap but
+only half the gate, and on its own it is optimistic for saturated
+rings. The chroma half, the measured 144-entry `chromaBound` table and
+the proof that the gate is not monotone are in "The ring law is a
+hue-dependent chroma bound" below.
 
 - *Composite* means canvas fill showing through transparent artwork
   edges counts: fountain/luminary (glyphs over declared dark
   canvases) render RAW — proven causally by darkcanvas/whitecanvas/
   gradcanvas instruments. An undeclared canvas contributes nothing.
-- *Per-pixel max channel*: saturated green, blue, and half-red/half-
-  blue full-bleeds all CONVERT despite low mean/luma.
+- *Per-pixel, not aggregated*: saturated green, blue, and half-red/
+  half-blue full-bleeds all CONVERT despite low mean/luma — but which
+  of them converts is set by chroma, not by the max channel: a blue
+  full-bleed is still raw at 0.310 while a green one converts at 0.112.
 - *Opacity*: a 1-px transparent top row kills it (CONVERT); a 60-px
   interior transparent hole does not (RAW).
 - Catalog raw set: fountain, luminary, metacast, podverse, disctopia,
@@ -1140,11 +1150,11 @@ tunein). The nearest recorded bracket margin is greatpods at 0.010
 not a verdict.
 
 **Refuted in passing: the border-ring law is hue-dependent.** The
-recorded law is `max encoded channel < ~0.308`, bracket (0.302, 0.314).
-Instrument (one .icon per case: a flat canvas fill, a 256px untagged
-sRGB patch of `230,46,86` centred, `--platform macOS --rendition
-Default` at 1024, read the centre pixel — RAW iff the patch's bytes
-come back verbatim):
+recorded law was `max encoded channel < ~0.308`, bracket (0.302,
+0.314). Instrument (one .icon per case: a flat canvas fill, a 256px
+untagged sRGB patch of `230,46,86` centred, `--platform macOS
+--rendition Default` at 1024, read the centre pixel — RAW iff the
+patch's bytes come back verbatim):
 
 | declared canvas fill | max channel | render |
 | --- | --- | --- |
@@ -1160,14 +1170,103 @@ come back verbatim):
 Neutrals pin the threshold to (0.310, 0.312) — tighter than the
 recorded bracket — but green flips below 0.20 and blue is still RAW at
 0.30, which no single max-channel reading explains, in P3-coded or in
-sRGB coordinates. The canvas auto-gradient's saturation-dependent top
-lift (9/255 gray vs 24–28/255 saturated) is the obvious suspect and
-does not fit either. UNSOLVED; it makes the audit's ringRaw disjunct
-optimistic for saturated dark artwork, which is why the meanLuma
-disjunct carries the verdict for exactly those bundles (snipd,
-truefans, tunestr today). The conversion fix still measures right on
-this table: at declared 0.295 the naive reading predicts RAW where
-ictool renders CONVERT.
+sRGB coordinates. **Solved the same day** — it is a chroma bound, and
+the auto-gradient lift this cell suspected is not the cause; see below.
+The conversion fix still measures right on this table: at declared
+0.295 the naive reading predicts RAW where ictool renders CONVERT.
+
+## The ring law is a hue-dependent chroma bound (solved 2026-09-13, `probe-ring-law.py`)
+
+The border-ring gate's max-channel threshold above is real but is only
+its cap. The instrument authors one minimal .icon per case — the canvas
+fill under test, a 256px untagged sRGB patch of `230,46,86` centred, no
+position — renders at 1024/scale-1 and reads the centre pixel: RAW iff
+the patch's bytes come back verbatim, CONVERT iff soft-knee converted.
+It reproduces all 8 rows of the table above, 8/8.
+
+**What it is not.** Three findings kill the whole brightness family
+before any fitting:
+
+- *Not a contrast law.* Re-bisecting gray/R/G/B against four different
+  readout patches — (230,46,86), (30,215,96), (0,122,255), (255,149,0)
+  — gives flip points identical to four decimals. The gate reads the
+  ring, not the ring against the artwork.
+- *Not the automatic gradient's top lift*, which this cell's
+  predecessor suspected. `solid: C` and a flat two-stop
+  `linear-gradient: [C, C]` flip at the same value on every axis, and a
+  full-bleed PNG canvas — which takes no automatic gradient at all —
+  shows the same hue spread one 8-bit step higher. The lift only shifts
+  `automatic-gradient` canvases down, and baking the *measured* lift
+  into a literal two-stop reproduces that shift exactly for gray
+  (0.2500 = 0.2500).
+- *Not monotone.* `(0.08, 0.30, 0.08)` renders RAW while
+  `(0, 0.116, 0)` — dimmer in **every** channel — renders CONVERT.
+  Two more pairs do the same. No max, no luma, no weighted mean in any
+  of these coordinate systems can order those two that way, which is
+  why the recorded law had no repair as a threshold.
+
+**What it is.** Rays through the origin are monotone (13/13 axes, one
+transition over a 32-point scan), and 40 midpoints of measured boundary
+colours all render RAW — so the RAW set is a convex, star-shaped body.
+It is not a polytope of few facets (a 9-facet difference-bound fit
+leaves 0.30 of radial error on held-out directions) and not a quadric
+(the least-squares form comes back indefinite). What *is* exact is the
+chroma. Holding hue and sliding the minimum channel up, the flip holds
+`max − min` constant while the max channel itself moves by 0.03:
+
+    (e,1,e)   0.1113 0.1123 0.1133 0.1143 0.1191 0.1211 0.1240 0.1318 0.1377
+    max−min   0.1113 0.1112 0.1110 0.1097 0.1120 0.1114 0.1091 0.1107 0.1102
+    (1,e,e)   0.2812 0.2812 0.2861 0.2920 0.2998 0.3037
+    max−min   0.2812 0.2784 0.2804 0.2803 0.2818 0.2794
+    e =         0.00   0.01   0.02   0.04   0.06   0.08   0.12   0.16   0.20
+
+Green's bound is 0.111, red's 0.281. The constraint lets go on an
+**absolute** floor on the minimum channel, not a saturation ratio: at
+green V = 0.300 the switch sits between an r=b floor of 0.050 and
+0.055. So the S=1 hue circle, where `min = 0` and chroma is the max
+channel, *is* the bound, measured directly:
+
+    raw ⇔ ring opaque
+          AND max(c) < 0.308
+          AND max(c) − min(c) < chromaBound(hue(c))
+
+`chromaBound` is 144 measured samples 2.5° apart (0.1118 flat across
+hue 120–180, 0.2817 across 300–360, and at the cap through the
+blues, hue 220–292.5). 2.5° and not 10°: the bound climbs 0.09 between hue 205
+and 220, and a 10° table read conservatively rejects chroma 0.2353 at
+hue 218 — greatpods' own ring colour, `(16,38,76)`, which ictool renders
+RAW. The cap survives at 0.308: neutrals flip in (0.3096, 0.3105) and
+no measured direction flips below 0.3086.
+
+**Validation**, 400 random canvases under 0.36, `solid` fills, 238 of
+which render RAW:
+
+|  | predicted raw | unsound | conservative |
+| --- | --- | --- | --- |
+| this law | 202 | **0** | 36 (15.1% of the raw set) |
+| recorded `maxEnc < 0.308` | 259 | **29** | 0 |
+
+The table is read at the lower of the two bracketing samples, which is
+what buys the zero: the law is an inner bound, never claiming raw where
+ictool converts. The 15.1% it gives up is the price, and it is the
+right side to err on for a `darkStatus` verdict.
+
+**Still unfit**: the boundary between hue samples, and the gentle rise
+of the bound as the minimum channel comes up below the release floor
+(green gains 0.026 of max between min/max 0 and 0.20 — the ramp above,
+which the flat chroma bound reads conservatively). Both are bounded and
+both err toward "convert".
+
+**`audit-dark-status.mjs` now gates every ring pixel on this law**
+(`RING_CAP` + `CHROMA_BY_HUE`, replacing `RING_BRACKET`), and reports
+the worst ring chroma as `ringChr`. **No recorded verdict moves**: all 7
+hasDark:false bundles stay `native`, 0 `missing`. greatpods is the one
+that came close — ringMax 0.298 is under the cap but its ring chroma is
+0.235 at hue 218, and its meanLuma 0.317 would not have caught it; its
+ring is a single colour and ictool renders it RAW directly, both as a
+declared solid and as a full-bleed PNG, so the table agrees with the
+renderer rather than merely with itself. snipd, truefans and tunestr
+still ride the meanLuma disjunct (ring chroma 0.290 / 0.502 / 0.278).
 
 ## Adding a platform or icon
 
