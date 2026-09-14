@@ -10,32 +10,9 @@
       },
       "layers": [
         {
-          "image-name": "dark.png",
-          "name": "dark",
-          "glass": false,
-          "opacity-specializations": [
-            {
-              "value": 0
-            },
-            {
-              "appearance": "dark",
-              "value": 1
-            }
-          ]
-        },
-        {
-          "image-name": "light.png",
-          "name": "light",
-          "glass": false,
-          "opacity-specializations": [
-            {
-              "value": 1
-            },
-            {
-              "appearance": "dark",
-              "value": 0
-            }
-          ]
+          "image-name": "heart.png",
+          "name": "heart",
+          "glass": false
         }
       ]
     }

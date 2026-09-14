@@ -2611,7 +2611,16 @@ carry them are not inert across the board — only on the non-glass ones.
 Before concluding a property does nothing, vary the thing that gates
 it, not just the property.
 
-### deezer's flat is a DELIBERATE divergence — do not "fix" it (2026-09-13)
+### deezer: both facets now carry Deezer's own wordmark-free heart (2026-09-13)
+
+> **Superseded within the hour.** The section below planned to live with
+> a permanent ~106 divergence because our flat is heart-only while the
+> shipped icon carries a wordmark. That turned out to be unnecessary:
+> **Deezer themselves ship a wordmark-free heart-only icon** — it is
+> their DARK variant, `dark.png`, which has zero white pixels. Adopting
+> it for both appearances gives the wanted composition with official
+> artwork, and drift went **106.13 -> 5.45**. See the correction at the
+> end of this section. The colour measurements below all still stand.
 
 `platforms/deezer/icon.svg` is intentionally the heart mark ALONE. The
 shipped app icon — and therefore the bundle — also carries the white
@@ -2644,3 +2653,43 @@ but which Chrome renders as (176,45,255). Like siriusxm and hark, the
 earlier sweep could not catch it because deezer's plate is a raster
 (`light.png`), so there is no `srgb:` declaration in the bundle to
 compare against. That makes three found only via the master.
+
+### deezer, resolved: their dark variant IS the heart-only icon (2026-09-13)
+
+The divergence note above is withdrawn. Deezer ships two full-bleed
+rasters and they are not the same picture:
+
+| asset | plate | heart | wordmark |
+| --- | --- | --- | --- |
+| `light.png` | (0,0,0) x780,312 | (162,56,255) 605x605 @(512.0,423.5) | 56,993 white px |
+| `dark.png` | (0,0,0) x830,831 | (162,56,255) 620x620 @(511.5,530.5) | **none** |
+
+Their dark icon has **no white pixels at all**: it is the heart alone,
+enlarged and dropped back toward centre now that nothing sits under it.
+That is exactly the composition wanted, drawn by the vendor, so there
+was never a need to choose between "our composition" and "official
+artwork" — they are the same thing.
+
+**The bundle** is now one full-bleed layer, `heart.png` (the former
+`dark.png`), shown in both appearances; `light.png` and the unreferenced
+`glyph.png` are gone. `hasDark` flips to **false** and
+audit-dark-status classifies it **native**, which is right: a
+black-plated heart looks the same in either appearance. Source stays
+`appstore-artwork` — it still is.
+
+**The flat** keeps our vector, scaled onto the vendor's heart-only
+composition: 566x566 @(510.5,531.5) -> 620x620 @(511.5,530.5), applied
+as `translate(-1.4908 -1.6159) scale(1.09541)`. The registration was
+already nearly right — our heart sat within 1 px of theirs on both axes
+— which says our SVG was traced from this same wordmark-free artwork
+and merely scaled down. Only the size was wrong.
+
+**Facet drift 147.42 -> 106.13 (colour) -> 5.45 (composition)**, mean
+channel delta +0.0/+0.5/-0.0. deezer leaves the stale list; 9 -> 8
+pairs above the break.
+
+The lesson worth keeping: before recording a divergence as permanent,
+check whether the vendor already ships the variant you want. A
+second rendition in the same bundle can be a different composition, not
+just a different colourway — and here the "dark" asset was really the
+mark-only lockup.

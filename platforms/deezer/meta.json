@@ -13,7 +13,8 @@
         "file": "Deezer.icon",
         "source": "appstore-artwork",
         "appStoreId": 292738169,
-        "hasDark": true
+        "hasDark": false,
+        "darkStatus": "native"
       }
     ]
   }
