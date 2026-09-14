@@ -11,7 +11,7 @@
         "title": "Antennapod",
         "variant": null,
         "file": "Antennapod.icon",
-        "source": "adaptive-icon-split",
+        "source": "flat-svg-split",
         "hasDark": true
       }
     ]

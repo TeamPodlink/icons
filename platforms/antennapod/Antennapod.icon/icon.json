@@ -65,9 +65,16 @@
       },
       "layers": [
         {
-          "image-name": "glyph-dark.png",
-          "name": "glyph-dark",
+          "image-name": "icon-dark.svg",
+          "name": "icon-dark",
           "glass": false,
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          },
           "opacity-specializations": [
             {
               "value": 0
@@ -79,9 +86,16 @@
           ]
         },
         {
-          "image-name": "glyph.png",
-          "name": "glyph",
+          "image-name": "icon.svg",
+          "name": "icon",
           "glass": false,
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          },
           "opacity-specializations": [
             {
               "value": 1

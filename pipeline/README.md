@@ -3010,3 +3010,87 @@ than the triangle, so its annulus radii were set to the master's
 measured 387.5 / 438.5 px, as youtubemusic's were. **73.75 -> 19.19**,
 mean channel +0.0/+0.4/+0.7, diff a uniform hairline on every edge —
 the raster-recreation floor for this pair, not chased further.
+
+### The raster-recreation band: four rasters swapped for their vectors (2026-09-14)
+
+The upper band of the stale list after the registration pass was six
+pairs whose bundle layer is a raster of the same mark the flat draws:
+downcast 47.09, antennapod 45.86, podcastaddict 35.66, podkicker 34.99,
+globalplayer 34.65, youtube 30.56. Each was measured with
+fit-flat-glyph first; the ones whose aspectD was ~0 (same drawing) had
+their flat registered and then the raster layer replaced by that mark
+as an SVG layer on the already-lifted canvas, so the two facets share
+one file's geometry.
+
+| slug | fit | change | drift |
+| --- | --- | --- | --- |
+| youtube | +3.99%, aspectD 0.57% | flat `translate(-0.6377 -0.6377) scale(1.03989)`; glyph.png -> bare SVG layer | 30.56 -> **0.73** |
+| podkicker | +1.95%, aspectD 0.28% | same-triple stop `display-p3 1 .7216 .2941` -> #FFB84B (APK glyph reads 255,214,2 -> 255,182,72; badge's #FFD507 twin too); flat `translate(-0.2007 -0.3908) scale(1.0195)`; adaptive raster -> bare SVG layer | 34.99 -> **0.97** |
+| podcastaddict | -4.23%, aspectD -0.15% | plate #FF7E00 -> #F4842D (the APK canvas); long-shadow stops from a linear fit along the APK glyph's own diagonal, #DB3721 -> #F5802C; mark registered `translate(0.6302 0.6152) scale(0.95773)` and the shadow band recomputed from the scaled circle (r 10.216, 45° tangents) so it still reaches the corner; dark twin = mark in #F4842D, which is exactly what glyph-dark.png held | 35.66 -> **0.91** |
+| antennapod | (fit could not isolate — gradient plate) | rebuilt from the branding repo, below | 45.86 -> **5.76** |
+
+**downcast keeps its raster.** aspectD -6.81% is not a shadow (the
+App Store glyph's bbox is identical at alpha 8/128/250) — the App Store
+icon draws a bolder D with different arc proportions. The flat's mark
+turns out to be Downcast's own site logo (`downcastapp.com/images/
+downcast-site-logo.svg`, Illustrator export, #E10000 disc + white
+"D & Waves" — our path data is that file scaled 0.3225), so both facets
+are official and they are different cuts of the mark. The bundle stays
+on the App Store artwork, the leading indicator for the icon.
+
+**globalplayer keeps its raster.** Registration already agrees (0.71%,
+aspectD 0.18%); the 34.65 is the App Store artwork's glossy triangle
+and darker blues against our flat gradient, and globalplayer.com's
+sprite is loaded externally (no inline symbol) — no vector to swap in.
+
+### antennapod: rebuilt from github.com/AntennaPod/branding (2026-09-14)
+
+The branding repo's `Launcher Icon/ic_play_store.svg` renders at central
+RMSE **5.70** against our APK-decanted master — it IS the launcher
+window (the 108-unit adaptive icon cropped to its visible 512), and the
+canvas we had already lifted is exactly its background gradient sampled
+at that window (f 0.18298 -> 0.81355 of #00C8FA -> #364FF3 = #0AB2F9 ->
+#2C66F4; the bundle's 0.03874,0.69822,0.97537 -> 0.17302,0.39982,0.95796
+matches to 5 decimals, so it is untouched). `ic_composite_1024.svg` is
+the full 108 bleed (mark at 67%, scores 66.55) and is not what any
+launcher shows. Flat, badge (the official round logo is this window
+clipped to a disc) and both bundle layers now carry the play-store
+paths verbatim under one composed matrix
+`matrix(0.47058 0 0 0.47058 -0.94105 -0.94103)` (path scale
+1.0635851 x 3.7795276 x 1.8730429 x 32/512; mark centre lands at
+x 15.99999). The dark twin fills both paths with the canvas gradient
+expressed in path space — the same per-pixel tint the old
+glyph-dark.png measured (24,146,247 at 42% height).
+
+**Two ictool filter laws, measured on the way.** The official drop
+shadow is `feFlood .35 -> feComposite in SourceGraphic -> feGaussianBlur
+1.5 -> feOffset dy .748 -> feComposite over`. ictool does not support
+feComposite: it rendered the whole mark as a blur (35.80). Rewritten as
+a black 35% copy of the mark under a blur+offset filter (exactly
+equivalent in Chrome), and then measured against Chrome variants of the
+flat by ablation (each ictool render scored against Chrome renders of
+the flat with the shadow removed / opacity 1 / lengths in root units /
+no offset / no blur):
+
+| layer structure | ictool matches |
+| --- | --- |
+| filter on a `<g>` (with `opacity`, or with `fill-opacity` on the paths) | the NO-shadow flat, 2.38 — **filters on `<g>` are dropped** |
+| filter on each `<path>`, `fill-opacity=".35"` | the flat with σ and dy in ROOT units, 2.54 (vs 10.61 as-authored) — **primitive lengths are read in the root viewBox's units, the ancestor `transform` scale is ignored**; fill-opacity IS honoured (opacity-1 variant 20.23) |
+| feMerge / feDropShadow forms | mangled, 35-39 |
+
+So the bundle layer has the filter on the paths with stdDeviation and
+dy pre-multiplied by the group scale (1.5 x 0.47058 = 0.70587,
+0.748085 x 0.47058 = 0.35203), recorded in an XML comment in the file;
+the flat keeps the official numbers because Chrome applies them in path
+space. Facet drift 45.86 -> 35.80 (mangled) -> 11.55 (dropped) ->
+**5.76**; the residual is ictool's blur kernel around every shadow
+edge (widening the filter region gains only 0.65, not taken). This
+refines the "partial SVG filter support" entry above: honoured
+primitives are honoured on `<path>` elements, in root units. gpodder's
+blur went raster before this was known; it is a candidate for an SVG
+layer under the same compensation.
+
+Stale list after this pass (67 pairs, pandora excluded): median 7.44
+-> **5.36**, q3 19.19; everything above 30 is now either decanted glass
+(apple, pocketcasts, podcastrepublic, moonfm, tunein, spotify — the
+material band) or the two official-raster holdouts above.
