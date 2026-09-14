@@ -2952,3 +2952,21 @@ stays as the vector facet: it measures **8.97** whole-frame against the
 official vector and its petals register to it at -0.16% / 1.5 px.
 Facet drift **115.55 -> 13.37**, the raster-recreation band; the
 residual is petal-blend colour (mean -5.6/-3.4/-6.5), not geometry.
+
+### podurama: Liquid Glass rebuilt from our SVG; diagonal plate is unliftable (2026-09-14)
+
+The official adaptive-icon raster places its glyph right and low and
+oversized (the audit's 34 px / 30 px offsets and 5.9% aspect gap); the
+maintainer judged it a mistake and chose our SVG's drawing, scale and
+position for the bundle. Built through build-svg-icons: light passes
+at RMSE 4.65, but the split is refused —
+`unsplittable-gradient-plate: stop 0 at offset .5` — correctly: the
+plate is a DIAGONAL gradient (0,0)->(32,32) whose first stop sits at
+offset .5, and neither the diagonal nor the mid-offset can be a canvas
+gradient (fill-orientation law). So the twin is hand-built: the light
+layer is the whole flat, plate included; the dark layer is the glyph
+alone in the former plate colour #EF2B7A on the standard gray pin —
+which is precisely what the old adaptive-icon `glyph-dark.png` was
+(modal (239,43,122)), so the dark rendition's convention is unchanged.
+Source adaptive-icon-split -> flat-svg-split. Facet drift 71.40 ->
+**1.22**; dark glyph measured (239,42,122).

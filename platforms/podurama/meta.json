@@ -10,8 +10,7 @@
         "title": "Podurama",
         "variant": null,
         "file": "Podurama.icon",
-        "source": "adaptive-icon-split",
-        "appStoreId": 1497491520,
+        "source": "flat-svg-split",
         "hasDark": true
       }
     ]
