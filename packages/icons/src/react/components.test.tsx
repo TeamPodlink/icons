@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { render } from '@testing-library/react'
 import { PlatformIcon } from './PlatformIcon.js'
 import { PlatformBadge } from './PlatformBadge.js'
@@ -29,8 +29,17 @@ describe('PlatformIcon', () => {
   it('does not add defs for square shape', () => {
     const { container } = render(<PlatformIcon platform="spotify" shape="square" />)
     const svg = container.querySelector('svg')
-    const defs = svg?.querySelector(':scope > defs')
-    expect(defs).toBeNull()
+    // Not ':scope > defs' — jsdom returns null for that on SVG elements even
+    // when the <defs> is a direct child, so the assertion would always pass.
+    const defs = [...(svg?.children ?? [])].filter((c) => c.tagName === 'defs')
+    expect(defs).toHaveLength(0)
+  })
+
+  it('adds defs for a non-square shape', () => {
+    const { container } = render(<PlatformIcon platform="spotify" shape="circle" />)
+    const svg = container.querySelector('svg')
+    const defs = [...(svg?.children ?? [])].filter((c) => c.tagName === 'defs')
+    expect(defs).toHaveLength(1)
   })
 
   it('adds defs with clipPath for circle shape', () => {
@@ -95,5 +104,31 @@ describe('PlatformBadge', () => {
   it('overrides platform name', () => {
     const { container } = render(<PlatformBadge platform="spotify" platformName="Custom Name" />)
     expect(container.textContent).toContain('Custom Name')
+  })
+
+  // Badge artwork carries its own shape, so shape only applies to the
+  // icon.svg fallback. Every platform ships badge.svg today, so in practice
+  // it is inert — assert that rather than let it drift back.
+  it('ignores shape for platforms that ship badge artwork', () => {
+    for (const shape of ['square', 'circle', 'superellipse'] as const) {
+      const { container } = render(<PlatformBadge platform="spotify" shape={shape} />)
+      const outer = container.querySelector('svg')
+      const defs = [...(outer?.children ?? [])].filter((c) => c.tagName === 'defs')
+      expect(defs, `shape="${shape}"`).toHaveLength(0)
+    }
+  })
+
+  it('warns in dev when an ignored shape is passed explicitly', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    render(<PlatformBadge platform="deezer" shape="circle" />)
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('shape is ignored'))
+    warn.mockRestore()
+  })
+
+  it('does not warn when shape is left at its default', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    render(<PlatformBadge platform="pandora" />)
+    expect(warn).not.toHaveBeenCalled()
+    warn.mockRestore()
   })
 })

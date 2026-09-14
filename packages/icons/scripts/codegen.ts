@@ -2,15 +2,16 @@
 
 /**
  * Codegen script: reads src/source-icons/ and generates:
- * - src/generated/icons.ts     — map of platform id → { viewBox, content, badge?, badgeDark? }
+ * - src/generated/icons.ts     — map of platform id → IconData (viewBox, content,
+ *                                 rootFill?, badge?/badgeViewBox?/badgeRootFill?,
+ *                                 badgeDark?/badgeDarkViewBox?/badgeDarkRootFill?)
  * - src/generated/platform-ids.ts — TypeScript union type for autocomplete
  */
 
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
-import { optimize } from 'svgo'
-import { extractSvgContent, extractViewBox, prefixIds } from '../src/core/svg.js'
+import { extractSvgContent, extractViewBox, extractRootFill, prefixIds } from '../src/core/svg.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
 const ROOT = join(__dirname, '..')
@@ -18,36 +19,42 @@ const ROOT = join(__dirname, '..')
 const SOURCE_DIR = join(ROOT, '../../platforms')
 const GENERATED_DIR = join(ROOT, 'src/generated')
 
-function optimizeSvg(raw: string): string {
-  const result = optimize(raw, {
-    multipass: true,
-    plugins: [
-      {
-        name: 'preset-default',
-        params: {
-          overrides: {
-            // Keep IDs — we prefix them ourselves
-            cleanupIds: false,
-            // Keep viewBox
-            removeViewBox: false,
-          },
-        },
-      },
-    ],
-  })
-  return result.data
-}
-
 function readSvgFile(path: string): string | undefined {
   if (!existsSync(path)) return undefined
   return readFileSync(path, 'utf-8')
 }
 
-function processSvg(raw: string, prefix: string): { viewBox: string; content: string } {
-  const optimized = optimizeSvg(raw)
-  const viewBox = extractViewBox(optimized)
-  const content = prefixIds(extractSvgContent(optimized), prefix)
-  return { viewBox, content }
+interface Processed {
+  viewBox: string
+  content: string
+  /**
+   * The root <svg fill>, kept because extractSvgContent() throws the root
+   * element away and a stroke-only path relies on inheriting it.
+   */
+  rootFill: string | null
+}
+
+/**
+ * Read a source SVG into the three pieces icons.ts stores.
+ *
+ * DELIBERATELY NOT OPTIMIZED. This used to run svgo's preset-default, which
+ * build-static.ts does not, so the library and the static files were built
+ * from different markup and drifted by construction. svgo's saving here is
+ * almost entirely convertPathData rounding coordinates to 3 decimals: of the
+ * 7.4% it takes off the stored content, 6.8 points come from that one plugin
+ * and everything else together accounts for 0.6%. The sources are clean
+ * exports with no comments, metadata or editor namespaces to strip.
+ *
+ * Rounding is not free. Against the shipped static badges in headless Chrome,
+ * at the 24px the default badge renders its icon at, the worst case went from
+ * 0.00 (no svgo) to 9.23 (svgo) — visible, not sub-pixel. See "svgo in
+ * codegen" in pipeline/README.md for the full table.
+ */
+function processSvg(raw: string, prefix: string): Processed {
+  const viewBox = extractViewBox(raw)
+  const rootFill = extractRootFill(raw)
+  const content = prefixIds(extractSvgContent(raw), prefix)
+  return { viewBox, content, rootFill }
 }
 
 function escapeForTemplate(s: string): string {
@@ -110,14 +117,14 @@ function main() {
 
       // Process badge.svg (optional)
       const badgeRaw = readSvgFile(join(dir, 'badge.svg'))
-      let badge: { viewBox: string; content: string } | undefined
+      let badge: Processed | undefined
       if (badgeRaw) {
         badge = processSvg(badgeRaw, `${id}-badge`)
       }
 
       // Process badge-dark.svg (optional)
       const badgeDarkRaw = readSvgFile(join(dir, 'badge-dark.svg'))
-      let badgeDark: { viewBox: string; content: string } | undefined
+      let badgeDark: Processed | undefined
       if (badgeDarkRaw) {
         badgeDark = processSvg(badgeDarkRaw, `${id}-badge-dark`)
       }
@@ -125,11 +132,22 @@ function main() {
       let entry = `  '${id}': {\n`
       entry += `    viewBox: '${icon.viewBox}',\n`
       entry += `    content: \`${escapeForTemplate(icon.content)}\`,\n`
+      if (icon.rootFill) {
+        entry += `    rootFill: '${icon.rootFill}',\n`
+      }
       if (badge) {
         entry += `    badge: \`${escapeForTemplate(badge.content)}\`,\n`
+        entry += `    badgeViewBox: '${badge.viewBox}',\n`
+        if (badge.rootFill) {
+          entry += `    badgeRootFill: '${badge.rootFill}',\n`
+        }
       }
       if (badgeDark) {
         entry += `    badgeDark: \`${escapeForTemplate(badgeDark.content)}\`,\n`
+        entry += `    badgeDarkViewBox: '${badgeDark.viewBox}',\n`
+        if (badgeDark.rootFill) {
+          entry += `    badgeDarkRootFill: '${badgeDark.rootFill}',\n`
+        }
       }
       entry += `  }`
 

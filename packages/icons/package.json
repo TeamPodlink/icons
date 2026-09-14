@@ -58,7 +58,7 @@
     "format": "prettier --write 'src/**/*.{ts,tsx}' 'scripts/**/*.ts' '*.config.*'",
     "format:check": "prettier --check 'src/**/*.{ts,tsx}' 'scripts/**/*.ts' '*.config.*'",
     "prepublishOnly": "pnpm build",
-    "pretest": "pnpm codegen"
+    "pretest": "pnpm codegen && pnpm build:static"
   },
   "peerDependencies": {
     "react": ">=18",
@@ -87,7 +87,6 @@
     "prettier": "^3.8.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "svgo": "^3.3.0",
     "tsup": "^8.3.0",
     "tsx": "^4.19.0",
     "typescript": "^5.9.2",
