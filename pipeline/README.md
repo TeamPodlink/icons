@@ -2854,3 +2854,29 @@ per-pixel. Old recipes unchanged: podstation (white plate, dark twin)
 and stenofm (P3 plate) rebuilt before and after the change give
 byte-identical bundles (icon.json md5 7bffda3c… and cfe5d6b0…
 respectively, Assets identical).
+
+### build-svg-icons cannot twin a MIXED-TONE glyph (2026-09-14)
+
+goodpods' official mark is `#333` strokes with `#fff` ear-cup fills. The
+splitter lifted the solid `#FCDB00` plate correctly, then produced NO
+dark twin: the glyph is not near-white, so the auto-tint gate does not
+apply, and it is not monochrome-dark, so `needsWhiteGlyph` does not
+fire either. It fell between the two rules and shipped as a single bare
+layer — which on the dark canvas put `#333` strokes on a `#333` plate:
+38,162 px of (51,51,51) rendered invisible, with only the white fills
+left floating. Measured before the fix, not assumed.
+
+The correct output is the metacast structure, built by hand here:
+`icon-dark.svg` = `icon.svg` through `retintDark()` (which already
+leaves `#fff` alone and recolours only dark hex/black, i.e. exactly the
+"swap dark and light" wanted), two layers swapped by
+opacity-specializations, and — for a strict swap — the dark canvas
+pinned to the mark's own colour (`srgb:0.2,0.2,0.2` = #333333) rather
+than the standard grey pin. Result: light plate (254,220,0) with
+(51,51,51) strokes; dark plate #333 with (253,219,2) strokes and white
+fills; facet drift **99.36 -> 1.29**.
+
+The gap is narrow and the fix is mechanical: when a split glyph has a
+dark component (any fill retintDark would touch) AND a light component,
+emit the retintDark twin instead of nothing. The white-fill-only and
+dark-only cases are already handled; only the mixture is not.

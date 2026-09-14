@@ -37,8 +37,8 @@
         "appearance": "dark",
         "value": {
           "linear-gradient": [
-            "gray:0.19200,1.00000",
-            "gray:0.07800,1.00000"
+            "srgb:0.20000,0.20000,0.20000,1.00000",
+            "srgb:0.20000,0.20000,0.20000,1.00000"
           ],
           "orientation": {
             "start": {
@@ -65,9 +65,46 @@
       },
       "layers": [
         {
-          "image-name": "glyph.png",
-          "name": "glyph",
-          "glass": false
+          "image-name": "icon-dark.svg",
+          "name": "icon-dark",
+          "glass": false,
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          },
+          "opacity-specializations": [
+            {
+              "value": 0
+            },
+            {
+              "appearance": "dark",
+              "value": 1
+            }
+          ]
+        },
+        {
+          "image-name": "icon.svg",
+          "name": "icon",
+          "glass": false,
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          },
+          "opacity-specializations": [
+            {
+              "value": 1
+            },
+            {
+              "appearance": "dark",
+              "value": 0
+            }
+          ]
         }
       ]
     }
