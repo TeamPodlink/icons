@@ -2,12 +2,12 @@ import { useLayoutEffect, useMemo, useRef } from "react";
 import { useState } from "react";
 import { useLocation, useSearchParams } from "react-router";
 import Fuse from "fuse.js";
-import { ArrowDownUp, ArrowUpDown, Check, Search, TrendingUp } from "lucide-react";
+import { ArrowDownUp, ArrowUpDown, Check, Ruler, Search, TrendingUp } from "lucide-react";
 import { useEffect } from "react";
 import { IconCard } from "@/components/icon-card";
 import { WarningBanner } from "@/components/warning-banner";
 import { PageCard } from "@/components/page-card";
-import { facetCards, type Card, type Facet } from "@/lib/platforms";
+import { facetCards, lensesEnabled, type Card, type Facet } from "@/lib/platforms";
 
 /** Alphabetical compare that ignores punctuation, so "’sodes" sorts
  *  under S instead of leading the list on its apostrophe. */
@@ -55,18 +55,28 @@ function useScrollMemory(anchorRef: React.RefObject<HTMLElement | null>) {
   }, [key, anchorRef]);
 }
 
-/** Sort cycle: Latest → A-Z → Popular → Latest. "latest" is the
- *  default and stays out of the URL (?sort=alphabetical / ?sort=popular). */
-const SORTS = ["latest", "alphabetical", "popular"] as const;
-type Sort = (typeof SORTS)[number];
+/** Sort orders: Latest (default, stays out of the URL), A-Z, Popular —
+ *  and, dev-only like the QA lenses, Drift: highest facet drift first
+ *  (central RMSE between the light Liquid Glass master and the flat,
+ *  from the committed apps/web/lib/facet-drift.json snapshot), the
+ *  re-sourcing worklist in ranked form. ?sort=drift is refused on a
+ *  production build the same way the lenses are absent from it. */
+const ALL_SORTS = ["latest", "alphabetical", "popular", "drift"] as const;
+type Sort = (typeof ALL_SORTS)[number];
+const SORTS: readonly Sort[] = lensesEnabled
+  ? ALL_SORTS
+  : ALL_SORTS.filter((s) => s !== "drift");
 
 const parseSort = (raw: string): Sort =>
-  raw === "alphabetical" || raw === "popular" ? raw : "latest";
+  raw === "alphabetical" || raw === "popular" || (raw === "drift" && lensesEnabled)
+    ? raw
+    : "latest";
 
 const SORT_META: Record<Sort, { label: string; Icon: typeof ArrowUpDown }> = {
   latest: { label: "Latest", Icon: ArrowUpDown },
   alphabetical: { label: "A-Z", Icon: ArrowDownUp },
   popular: { label: "Popular", Icon: TrendingUp },
+  drift: { label: "Drift", Icon: Ruler },
 };
 
 /** Shows the CURRENT sort; tapping reveals the options with the current
@@ -179,6 +189,12 @@ export function Directory({
         (a, b) =>
           (a.popularityRank ?? Infinity) - (b.popularityRank ?? Infinity) ||
           byTitle(a.title, b.title)
+      );
+    else if (sort === "drift")
+      // "drift": worst facet agreement first; unmeasured (flat-only
+      // cards, bundles newer than the snapshot) sink to the bottom.
+      list.sort(
+        (a, b) => (b.drift ?? -1) - (a.drift ?? -1) || byTitle(a.title, b.title)
       );
     else
       // "latest": newest first-addition date first (meta.json "added",

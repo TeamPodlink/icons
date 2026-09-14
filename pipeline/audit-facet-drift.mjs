@@ -119,6 +119,11 @@ const flag = (name) =>
 const only = flag("--only");
 const sheets = args.includes("--sheets");
 const jsonOut = flag("--json");
+// --write: refresh the committed snapshot the site's dev-only "Drift" sort
+// reads (apps/web/lib/facet-drift.json, slug -> central RMSE), the way
+// op3-popularity.json feeds the Popular sort. A snapshot, not a build
+// step: the audit needs ictool masters and Chrome, which CI never has.
+const writeSnapshot = args.includes("--write");
 const floor = args.includes("--floor");
 const work = flag("--work") ?? "/tmp/facet-drift-work";
 const assetsDir = join(root, "packages/refraction/assets");
@@ -485,6 +490,12 @@ if (expected.length) {
     console.log(`  ${r.slug} (${r.central.toFixed(2)}): ${EXPECTED_DIVERGENCE[r.slug]}`);
 }
 if (sheets) console.log(`sheets: ${join(work, "sheets")}/<slug>.png (flat | glass | 4x|diff|)`);
+if (writeSnapshot) {
+  const snap = join(root, "apps/web/lib/facet-drift.json");
+  const central = Object.fromEntries(rows.map((r) => [r.slug, Math.round(r.central * 100) / 100]));
+  writeFileSync(snap, JSON.stringify({ generated: new Date().toISOString().slice(0, 10), pairs: rows.length, central }, null, 2) + "\n");
+  console.log(`snapshot: ${snap.replace(root + "/", "")} (${rows.length} pairs)`);
+}
 if (jsonOut) {
   writeFileSync(jsonOut, JSON.stringify({ rows, skipped, quartiles: [c[0], q(0.25), q(0.5), q(0.75), c[c.length - 1]], gap }, null, 2) + "\n");
   console.log(`json: ${jsonOut}`);

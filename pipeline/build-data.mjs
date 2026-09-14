@@ -24,6 +24,12 @@ for (const [id, adj] of pinned)
   measured.splice(Math.max(0, adj.pinRank - 1), 0, id);
 const popularityRank = Object.fromEntries(measured.map((id, i) => [id, i + 1]));
 
+// Facet-drift snapshot (pipeline/audit-facet-drift.mjs --write): central
+// RMSE between the light Liquid Glass master and the flat, per bundle slug.
+// Optional — absent until the audit has been run with --write.
+const driftPath = join(root, "apps/web/lib/facet-drift.json");
+const drift = existsSync(driftPath) ? JSON.parse(readFileSync(driftPath, "utf8")).central ?? {} : {};
+
 const out = readPlatforms().map(({ id, dir, meta }) => ({
   id,
   name: meta.name,
@@ -46,6 +52,7 @@ const out = readPlatforms().map(({ id, dir, meta }) => ({
     hasDark: b.hasDark ?? false,
     darkStatus: b.darkStatus ?? null,
     source: b.source ?? null,
+    drift: drift[b.slug] ?? null,
   })),
 }));
 

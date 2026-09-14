@@ -18,6 +18,12 @@ export interface GlassBundle {
   darkStatus: "native" | "missing" | null;
   /** Provenance rung: decanted | appstore-artwork | flat-svg | flat-svg-split | flat-svg-browser | null (pre-monorepo, unlabeled). */
   source: string | null;
+  /** Facet drift: central-crop RMSE between the light Liquid Glass master
+   *  and the flat icon, from the committed snapshot
+   *  apps/web/lib/facet-drift.json (pipeline/audit-facet-drift.mjs
+   *  --write). null when unmeasured (no flat, or snapshot predates the
+   *  bundle). Drives the dev-only "Drift" sort. */
+  drift: number | null;
 }
 
 export interface Platform {
@@ -179,6 +185,8 @@ export interface Card {
   popularity: number | null;
   /** Position in the Popular sort: curated pins (snapshot adjustments) + OP3 share order. */
   popularityRank: number | null;
+  /** Facet drift of the card's bundle — see GlassBundle.drift; null for flat-only cards. */
+  drift: number | null;
 }
 
 export const cards: Card[] = platforms.flatMap((p): Card[] => {
@@ -193,6 +201,7 @@ export const cards: Card[] = platforms.flatMap((p): Card[] => {
       added: p.added,
       popularity: p.popularity,
       popularityRank: p.popularityRank,
+      drift: b.drift,
     }));
   if (p.hasFlat)
     return [
@@ -206,6 +215,7 @@ export const cards: Card[] = platforms.flatMap((p): Card[] => {
         added: p.added,
         popularity: p.popularity,
         popularityRank: p.popularityRank,
+        drift: null,
       },
     ];
   return [];

@@ -3350,3 +3350,21 @@ fell **6.5% → 1.8%** of the frame on every pair, and `frame` RMSE with
 it (antennapod 24.22 → 13.17, podurama 21.01 → 11.34, queue 24.14 →
 15.19); `central` is unchanged, as it should be. The legacy path
 survives only in this ledger and build-static's comment.
+
+### The dev-only Drift sort (2026-09-14)
+
+The facet-drift audit's ranking now reaches the site: `audit-facet-drift.mjs
+--write` refreshes a committed snapshot, `apps/web/lib/facet-drift.json`
+(slug → central RMSE, 2 dp, with the generation date and pair count),
+the way `op3-popularity.json` feeds the Popular sort — a snapshot, not
+a build step, because the audit needs ictool masters and Chrome, which
+CI never has. build-data attaches it as `bundle.drift` (null when
+unmeasured: no flat, or a bundle newer than the snapshot), and the
+directory's sort menu grows a fourth order, **Drift** — worst agreement
+first, unmeasured last, ties A-Z — gated to dev exactly like the QA
+lenses (`lensesEnabled`): a production build neither lists it nor
+honours `?sort=drift`. First snapshot: 69 pairs, top of the list
+pandora 105.27 (expected divergence), apple 55.32, downcast 47.09,
+pocketcasts 40.83. Re-run `--write` after any facet change you want the
+sort to reflect; the audit's own console output remains the ledger's
+instrument.
