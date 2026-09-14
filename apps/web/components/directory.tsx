@@ -216,9 +216,7 @@ export function Directory({
           className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-neutral-200 bg-white/80 px-4 py-1.5 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/40"
         >
           <p className="font-mono text-sm text-neutral-600 dark:text-neutral-400">
-            {heading === "Home"
-              ? `${shown.length} ${noun}`
-              : `${heading} — ${shown.length} ${noun}`}
+            {`${shown.length} ${shown.length === 1 ? "result" : "results"}`}
           </p>
           <SortMenu sort={sort} onChange={setSort} />
         </div>

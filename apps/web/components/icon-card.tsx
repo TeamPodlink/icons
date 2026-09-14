@@ -139,9 +139,16 @@ export function IconCard({
   // transition — 70 lifted cards would paint over the incoming detail).
   // Navigations to the detail name this one card imperatively for just
   // the transition window; the data attributes are the lookup handles.
+  // The detail opens on the facet the grid was showing: /vector and
+  // /badges carry ?facet= so tapping through never snaps back to glass.
+  const detailHref =
+    facet === "glass"
+      ? `/icon/${p.id}`
+      : `/icon/${p.id}?facet=${facet === "flat" ? "vector" : "badge"}`;
+
   const openDetails = () => {
     nameCardForTransition(card.key);
-    navigate(`/icon/${p.id}`);
+    navigate(detailHref);
   };
 
   // Return morph: the detail's back handler records this card's key
@@ -252,7 +259,7 @@ export function IconCard({
           real anchor so cmd/middle-click and copy-link semantics keep
           working (right-click bubbles to the cell's context menu). */}
       <TransitionLink
-        to={`/icon/${p.id}`}
+        to={detailHref}
         aria-label={`${p.name} details`}
         title={`${p.name} details`}
         onClick={(e) => {
