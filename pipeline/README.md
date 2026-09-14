@@ -1881,3 +1881,50 @@ Notable pairs below the band (all have no glass layers unless noted):
   bundles; `ipatool`/vector re-sourcing for the raster ones), then
   re-run the instrument — each should drop into the no-material floor
   (≤ 5) since none of the 15 bundles carries material.
+
+### Repaired: the three flat defects below the band (2026-09-13)
+
+The four declared-color defects the audit named are fixed. None of the
+four bundles is built from `icon.svg` (three raster-sourced, spotify
+decanted), so no bundle was rebuilt and no recipe moved; only the flat
+facet changed. Before → after, same instrument, `--only`:
+
+| platform | central | frame | change |
+| --- | --- | --- | --- |
+| spreaker | 46.59 → **21.30** | 47.42 → 34.45 | `stop-color="none"` → `#EB9A00` |
+| youtube | 39.79 → **30.56** | — → 42.72 | red → `#FF0033` |
+| youtubemusic | 98.24 → **91.66** | 82.26 → 79.31 | red → `#FF0033` |
+| spotify | 35.38 → 36.06 | 38.18 → 37.67 | plate+glyph → `#000` |
+
+**The red is measured against Apple, not inferred.** The ledger's claim
+rested on the bundle's own `glyph.png`; that asset is untagged sRGB and
+reads (255,0,51) across 377,566 px, but an asset cannot vouch for
+itself. Apple's *live* artwork was fetched through the iTunes lookup
+API (`itunes.apple.com/lookup?id=544007664` / `1017492454`,
+`logo_youtube_2024_q4_color` and `logo_youtube_music_2024_q4_color`)
+and measured: both are untagged sRGB with a modal red of exactly
+**(255,0,51)**, 91,897 and 100,934 px. The flat's `display-p3 1 .0039 0`
+/ `display-p3 1 0 0` clip to (255,0,0) in Chrome, so the flat was the
+wrong side. youtubemusic stays stale on its disc scale — the red was
+only half its defect.
+
+**spotify is the exception that teaches the rule: do not arbitrate a
+declared color with RMSE against a materialized master.** Its plate and
+waveform were declared `display-p3 .0941 .0784 .0745` = (25,20,19); the
+bundle declares `gray:0` and Apple's live store icon is modal (0,0,0)
+over 126,414 px, so `#000` is the right declaration on provenance. The
+master, however, reads (3,3,3)–(6,6,6) in the central crop and (9,9,10)
+at the plate — the automatic-gradient lift — which sits *between* the
+two candidates. Central RMSE therefore rose 0.68 while frame fell 0.51,
+a wash; what actually improved is the mean channel error, |Δ| 5.1 →
+0.7 (from −5.3/−5.4/−4.7 to +1.4/−0.4/+0.2). Same lesson as overcast's
+cream disc above: material moves color, so on a material-carrying pair
+the master is evidence about the *rendition*, never about what the
+vector should declare. Provenance decides that.
+
+**The break sharpened.** Before the repairs the distribution's largest
+gap was 77.46 → 97.35 with 12 pairs above it; now it is 55.32 → 73.75
+with **15**, i.e. the natural break has landed exactly on apple's
+55.32 material ceiling. The 15 stale pairs are now cleanly separated
+from the material band rather than straddling it — youtube and spreaker
+had been sitting in the ambiguous zone because of these defects.
