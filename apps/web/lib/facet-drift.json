@@ -4,7 +4,6 @@
   "central": {
     "apple": 55.32,
     "downcast": 47.09,
-    "pocketcasts": 40.83,
     "podcastrepublic": 40.74,
     "moonfm": 39.1,
     "tunein": 37.58,
@@ -31,6 +30,7 @@
     "audacy": 11.43,
     "listennotes": 10.59,
     "truefans": 9.5,
+    "pocketcasts": 7.56,
     "soundcloud": 7.44,
     "antennapod": 5.76,
     "hark": 5.73,
