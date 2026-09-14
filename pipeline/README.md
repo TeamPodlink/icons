@@ -2472,3 +2472,45 @@ The irony is that `layer-color` is precisely the right SEMANTIC for
 jiosaavn: its halo is a teal glow in the disc's own hue (measured
 above), which is what a layer-coloured shadow describes. Apple's live
 compositor would draw it; our raster path never will.
+
+### Podcasts-decant.icon: no chromatic shadow, and where "chromatic" came from
+
+`~/Developer/recomposer/Podcasts-decant.icon` is Apple's own Podcasts
+icon decanted from the system catalog, and it is byte-for-byte the
+source of our `platforms/apple/ApplePodcasts.icon` (same keys, same
+three SVG assets). Its shadows are **three `neutral` groups** — 0.84,
+1.44, 0.4. No `layer-color`, no `shadow-specializations`. There is no
+chromatic shadow in it to copy.
+
+**"Chromatic" in the recomposer notes means chromatic ABERRATION, not a
+shadow kind.** Measured there from ground-truth renders: a chromatic
+meniscus glow at each disk-edge crossing inside the person, additive
+**~(+20,+20,+6)** at the inner-disk edge and **~(+23,+18,+26) violet**
+at the outer-disk edge, with ~5x flattened contrast and no geometric
+displacement. That is glass edge fringing, a different phenomenon from
+`shadow.kind` entirely.
+
+**Apple's dark variant gets its colour from layers, not shadows.** The
+shadow stays `neutral` in every appearance; the dark look is four
+specializations working together — `fill-specializations` turn the
+person light purple (`display-p3:0.876,0.668,1.0` ->
+`0.783,0.548,1.0`) and the circles brighter purple,
+`opacity-specializations` go 0.95->1, 0.18->1 and 0.17->0.91,
+`blend-mode-specializations` swap `plus-lighter`->`normal`, and
+`translucency-specializations` 0.36->0.5/0.45.
+
+**Independent corroboration that ictool is the odd one out.** The
+recomposer isolated Apple's rendered drop shadows by differencing layer
+renders: cast **~25 px downward, blurred sigma ~14**, peaking 22 px
+below the bottom edge, gone by ~60 px, none above; circle2 peaks at
+-3.7/255 and circle1 at -1.0, **a 3.6:1 ratio matching the decanted
+opacities 1.44 : 0.4**. So `neutral` shadows are real, and their
+`opacity` maps linearly onto rendered darkness — the property is not
+vestigial, ictool's exporter simply omits it.
+
+Its ground truth was captured from the SYSTEM renderer
+(`quicklook-capture/Podcasts-QuickLookRendering-{2048,4096}.png`,
+`QuickLookThumbnailing-1024.png`), not from ictool. **That names the
+path to shadow-accurate renders if we ever need them**: QuickLook
+capture of an installed icon, not `ictool --export-image`. It is a
+different pipeline, not a flag.
