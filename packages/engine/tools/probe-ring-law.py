@@ -499,15 +499,31 @@ def hue_unit(h):
             (1, 0, x)][int(h // 60) % 6]
 
 
+# The chroma bound is sampled at 2.5 degrees: at 10 degrees the conservative
+# "lower of the two bracketing samples" read is too coarse where the bound
+# climbs fastest (hue 205-220 gains 0.09 in 15 degrees), and it wrongly
+# rejected greatpods' own ring colour, which ictool renders RAW.
+HUE_STEP = 2.5
+HUE_N = int(360 / HUE_STEP)
+
 if want("hue"):
-    print("\n[hue] flip point around the S=1 hue circle (`solid` canvases)")
-    print("  hue    dir(r,g,b)              vFlip   colour at flip")
-    for h in range(0, 360, 10):
+    print("\n[hue] chroma bound around the S=1 hue circle (`solid` canvases)")
+    print("  at min = 0 the chroma max - min IS the max channel, so the flip")
+    print("  point along each hue ray is that hue's chroma bound.")
+    table = []
+    for k in range(HUE_N):
+        h = k * HUE_STEP
         u = hue_unit(h)
         br, bl, bh = bisect_axis("srgb", u, probe=grid_probe)
         v = (br[0] + br[1]) / 2 if br else float("nan")
-        print(f"  {h:>3}    {str(tuple(round(x,3) for x in u)):<22} "
+        table.append(v)
+        print(f"  {h:>6.1f}  {str(tuple(round(x,3) for x in u)):<22} "
               f"{v:.4f}  {np.round(np.asarray(u) * v, 4)}")
+    np.save(os.path.join(WORK, "chroma-by-hue.npy"), np.array(table))
+    print(f"\n  CHROMA_BY_HUE ({HUE_N} entries, {HUE_STEP} deg apart):")
+    for i in range(0, HUE_N, 6):
+        row = ", ".join(f"{v:.4f}" for v in table[i:i + 6])
+        print(f"    {row},  // {i * HUE_STEP:g}-{(i + 5) * HUE_STEP:g}")
 
 # ---------------- where does the high-saturation constraint switch off? ------
 # Ray d(h, e) = (1-e)*hue_unit(h) + e*(1,1,1): max 1, min e, so S = 1 - e.
@@ -617,18 +633,38 @@ if want("fit"):
 # rule stays an INNER bound -- it never claims raw where ictool converts.
 # Table entries at ~0.311 are hues where no chroma bound binds before the cap.
 LAW_CAP = 0.308
-CHROMA_BY_HUE = [0.2817, 0.3120, 0.3120, 0.2681, 0.2280, 0.1958,   #   0- 50
-                 0.1685, 0.1733, 0.1782, 0.1821, 0.1841, 0.1323,   #  60-110
-                 0.1118, 0.1118, 0.1118, 0.1118, 0.1118, 0.1118,   # 120-170
-                 0.1118, 0.1343, 0.1675, 0.2231, 0.3110, 0.3101,   # 180-230
-                 0.3110, 0.3110, 0.3101, 0.3101, 0.3091, 0.3110,   # 240-290
-                 0.2817, 0.2817, 0.2817, 0.2817, 0.2817, 0.2817]   # 300-350
+CHROMA_BY_HUE = [
+    0.2817, 0.2925, 0.3071, 0.3101, 0.3120, 0.3120,  # 0-12.5
+    0.3110, 0.3101, 0.3120, 0.3022, 0.2886, 0.2788,  # 15-27.5
+    0.2681, 0.2583, 0.2466, 0.2378, 0.2280, 0.2183,  # 30-42.5
+    0.2104, 0.2026, 0.1958, 0.1880, 0.1812, 0.1753,  # 45-57.5
+    0.1685, 0.1704, 0.1724, 0.1724, 0.1733, 0.1753,  # 60-72.5
+    0.1763, 0.1782, 0.1782, 0.1792, 0.1802, 0.1812,  # 75-87.5
+    0.1821, 0.1831, 0.1831, 0.1831, 0.1841, 0.1567,  # 90-102.5
+    0.1499, 0.1411, 0.1323, 0.1255, 0.1216, 0.1147,  # 105-117.5
+    0.1118, 0.1118, 0.1118, 0.1118, 0.1118, 0.1118,  # 120-132.5
+    0.1118, 0.1118, 0.1118, 0.1118, 0.1118, 0.1118,  # 135-147.5
+    0.1118, 0.1118, 0.1118, 0.1118, 0.1118, 0.1118,  # 150-162.5
+    0.1118, 0.1118, 0.1118, 0.1118, 0.1118, 0.1118,  # 165-177.5
+    0.1118, 0.1167, 0.1216, 0.1274, 0.1343, 0.1411,  # 180-192.5
+    0.1489, 0.1577, 0.1675, 0.1782, 0.1919, 0.2065,  # 195-207.5
+    0.2231, 0.2437, 0.2681, 0.2974, 0.3110, 0.3091,  # 210-222.5
+    0.3101, 0.3101, 0.3101, 0.3101, 0.3101, 0.3110,  # 225-237.5
+    0.3110, 0.3110, 0.3110, 0.3110, 0.3110, 0.3110,  # 240-252.5
+    0.3101, 0.3101, 0.3101, 0.3101, 0.3101, 0.3101,  # 255-267.5
+    0.3101, 0.3101, 0.3101, 0.3101, 0.3091, 0.3110,  # 270-282.5
+    0.3110, 0.3110, 0.3110, 0.3110, 0.3081, 0.2944,  # 285-297.5
+    0.2817, 0.2817, 0.2817, 0.2817, 0.2817, 0.2817,  # 300-312.5
+    0.2817, 0.2817, 0.2817, 0.2817, 0.2817, 0.2817,  # 315-327.5
+    0.2817, 0.2817, 0.2817, 0.2817, 0.2817, 0.2817,  # 330-342.5
+    0.2817, 0.2817, 0.2817, 0.2817, 0.2817, 0.2817,  # 345-357.5
+]
 
 
 def hue_of(c):
     """HSV hue in degrees; None for a neutral (chroma 0)."""
-    r, g, b = c
-    mx, mn = max(c), min(c)
+    r, g, b = (float(x) for x in c)
+    mx, mn = max(r, g, b), min(r, g, b)
     if mx == mn:
         return None
     d = mx - mn
@@ -643,11 +679,11 @@ def hue_of(c):
 
 def chroma_bound(h):
     """The measured bound at hue h, taken at the lower of the two bracketing
-    10-degree samples so interpolation cannot make the rule optimistic."""
+    samples so interpolation cannot make the rule optimistic."""
     if h is None:
         return float("inf")
-    i = int(h // 10) % 36
-    return min(CHROMA_BY_HUE[i], CHROMA_BY_HUE[(i + 1) % 36])
+    i = int(h // HUE_STEP) % HUE_N
+    return min(CHROMA_BY_HUE[i], CHROMA_BY_HUE[(i + 1) % HUE_N])
 
 
 def law_raw(c):
