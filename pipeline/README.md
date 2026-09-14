@@ -3181,3 +3181,14 @@ rc = (26.5 − 19.125)/2 = **3.6875**, A = (21.25, 22.8125), outer edge
 4.9875, tip (24.78, 21.75). Silhouette IoU 0.986 → **0.991**
 (flat-only 734 px, artwork-only 17 at 512²); drift 17.62 → 17.98, the
 shading term.
+
+**Follow-up 2: the band's top edge is the artwork's.** With the bottom
+edge pinned to the hole's nadir, the 1.3 width (measured on the
+artwork's notched band) left the top edge 0.23 too low. The top edge
+now sits where the artwork's straight band starts, 563 px → **17.594**,
+so the band is **1.531** wide and its outer arc 5.219 (the artwork's
+outer-edge fit was 5.12). The corner circle, tip and lobe are
+unchanged. Silhouette IoU 0.991 → **0.9967** (253 flat-only px, 14
+artwork-only at 512²) — the remaining error is the antialiased rim.
+The maintainer's read of the artwork: a plain composition, no Liquid
+Glass material; the Liquid Glass bundle keeps the official raster.
