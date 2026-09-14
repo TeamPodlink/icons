@@ -13,9 +13,22 @@
 // "Raster layers", pipeline/README.md):
 //
 //   ringRaw    every pixel of the composite's 1-px border ring is
-//              opaque AND has max encoded channel < 0.308 (measured
-//              bracket (0.302, 0.314)) — ictool's own dark-artwork
-//              gate. ringRaw artwork is dark by Apple's own classifier.
+//              opaque AND passes ictool's own dark-artwork gate, which
+//              is a hue-dependent CHROMA bound, not a brightness
+//              threshold (measured 2026-09-13, probe-ring-law.py;
+//              ledger: "The ring law is a hue-dependent chroma bound"):
+//
+//                  max(c) < 0.308
+//                  AND max(c) − min(c) < CHROMA_BY_HUE[hue(c)]
+//
+//              The gate is genuinely non-monotone — (0.08, 0.30, 0.08)
+//              renders raw while (0, 0.116, 0), dimmer in every
+//              channel, converts — so the old "max encoded channel <
+//              0.308" was optimistic for saturated rings: on 400 random
+//              dark canvases it claimed raw 29 times where ictool
+//              converts. The table is read at the lower of the two
+//              bracketing hue samples, making this an inner bound: 0
+//              unsound over the same 400.
 //   meanLuma   mean encoded luminance (Rec. 709 on encoded values)
 //              over the composite — the SVG-era whole-background dark
 //              law's statistic (bracket (0.282, 0.314)).
@@ -54,7 +67,61 @@ import sharp from "sharp";
 import { readPlatforms, root } from "./lib.mjs";
 
 const CANVAS = 1024;
-const RING_BRACKET = 0.308; // measured (0.302, 0.314)
+// The cap on the max encoded channel. Neutrals flip in (0.3096, 0.3105)
+// and no measured direction flips below 0.3086, so the recorded 0.308
+// survives the re-measurement — it is the CHROMA bound below that the
+// recorded law was missing.
+const RING_CAP = 0.308;
+
+// Chroma bound at 2.5° hue steps, measured on the S=1 circle where chroma
+// IS the max channel (probe-ring-law.py --section hue). Entries near 0.311
+// are hues where no chroma bound binds before the cap. 2.5° and not 10°:
+// the bound climbs 0.09 between hue 205 and 220, and a 10° table read
+// conservatively rejects greatpods' own ring color, which renders raw.
+const HUE_STEP = 2.5;
+const CHROMA_BY_HUE = [
+  0.2817, 0.2925, 0.3071, 0.3101, 0.3120, 0.3120,  // 0-12.5
+  0.3110, 0.3101, 0.3120, 0.3022, 0.2886, 0.2788,  // 15-27.5
+  0.2681, 0.2583, 0.2466, 0.2378, 0.2280, 0.2183,  // 30-42.5
+  0.2104, 0.2026, 0.1958, 0.1880, 0.1812, 0.1753,  // 45-57.5
+  0.1685, 0.1704, 0.1724, 0.1724, 0.1733, 0.1753,  // 60-72.5
+  0.1763, 0.1782, 0.1782, 0.1792, 0.1802, 0.1812,  // 75-87.5
+  0.1821, 0.1831, 0.1831, 0.1831, 0.1841, 0.1567,  // 90-102.5
+  0.1499, 0.1411, 0.1323, 0.1255, 0.1216, 0.1147,  // 105-117.5
+  0.1118, 0.1118, 0.1118, 0.1118, 0.1118, 0.1118,  // 120-132.5
+  0.1118, 0.1118, 0.1118, 0.1118, 0.1118, 0.1118,  // 135-147.5
+  0.1118, 0.1118, 0.1118, 0.1118, 0.1118, 0.1118,  // 150-162.5
+  0.1118, 0.1118, 0.1118, 0.1118, 0.1118, 0.1118,  // 165-177.5
+  0.1118, 0.1167, 0.1216, 0.1274, 0.1343, 0.1411,  // 180-192.5
+  0.1489, 0.1577, 0.1675, 0.1782, 0.1919, 0.2065,  // 195-207.5
+  0.2231, 0.2437, 0.2681, 0.2974, 0.3110, 0.3091,  // 210-222.5
+  0.3101, 0.3101, 0.3101, 0.3101, 0.3101, 0.3110,  // 225-237.5
+  0.3110, 0.3110, 0.3110, 0.3110, 0.3110, 0.3110,  // 240-252.5
+  0.3101, 0.3101, 0.3101, 0.3101, 0.3101, 0.3101,  // 255-267.5
+  0.3101, 0.3101, 0.3101, 0.3101, 0.3091, 0.3110,  // 270-282.5
+  0.3110, 0.3110, 0.3110, 0.3110, 0.3081, 0.2944,  // 285-297.5
+  0.2817, 0.2817, 0.2817, 0.2817, 0.2817, 0.2817,  // 300-312.5
+  0.2817, 0.2817, 0.2817, 0.2817, 0.2817, 0.2817,  // 315-327.5
+  0.2817, 0.2817, 0.2817, 0.2817, 0.2817, 0.2817,  // 330-342.5
+  0.2817, 0.2817, 0.2817, 0.2817, 0.2817, 0.2817,  // 345-357.5
+];
+
+/** Is one encoded-sRGB ring pixel (0..255) dark by ictool's gate? */
+function pixelDark(r, g, b) {
+  const mx = Math.max(r, g, b) / 255;
+  const mn = Math.min(r, g, b) / 255;
+  if (mx >= RING_CAP) return false;
+  const chroma = mx - mn;
+  if (chroma === 0) return true; // neutral: no hue, no chroma bound
+  let h;
+  if (mx * 255 === r) h = (60 * ((g - b) / 255 / chroma)) % 360;
+  else if (mx * 255 === g) h = 60 * ((b - r) / 255 / chroma + 2);
+  else h = 60 * ((r - g) / 255 / chroma + 4);
+  const n = CHROMA_BY_HUE.length;
+  const i = Math.floor((((h % 360) + 360) % 360) / HUE_STEP) % n;
+  // lower of the two bracketing samples — never optimistic between them
+  return chroma < Math.min(CHROMA_BY_HUE[i], CHROMA_BY_HUE[(i + 1) % n]);
+}
 const LUMA_THRESHOLD = 0.3; // SVG-era bracket (0.282, 0.314)
 
 const args = process.argv.slice(2);
@@ -299,11 +366,19 @@ function measure(buf) {
   let ringMax = 0;
   let ringLumaSum = 0;
   let ringN = 0;
+  let ringDark = true; // every ring pixel passes ictool's gate
+  let ringChroma = 0; // worst max−min on the ring
   const ringPx = (x, y) => {
     const i = (y * CANVAS + x) * 4;
+    const [r, g, b] = [buf[i], buf[i + 1], buf[i + 2]];
     if (buf[i + 3] < 255) ringOpaque = false;
-    ringMax = Math.max(ringMax, buf[i], buf[i + 1], buf[i + 2]);
-    ringLumaSum += luma(buf[i], buf[i + 1], buf[i + 2]);
+    ringMax = Math.max(ringMax, r, g, b);
+    if (!pixelDark(r, g, b)) ringDark = false;
+    ringChroma = Math.max(
+      ringChroma,
+      (Math.max(r, g, b) - Math.min(r, g, b)) / 255
+    );
+    ringLumaSum += luma(r, g, b);
     ringN++;
   };
   for (let x = 0; x < CANVAS; x++) {
@@ -325,6 +400,8 @@ function measure(buf) {
   return {
     ringOpaque,
     ringMax: ringMax / 255,
+    ringDark,
+    ringChroma,
     ringLuma: ringLumaSum / ringN,
     meanLuma: lumaSum / (CANVAS * CANVAS),
   };
@@ -380,10 +457,11 @@ for (const { id, dir, meta } of readPlatforms()) {
     }
     const buf = await buildComposite(join(dir, b.file));
     const m = measure(buf);
-    const ringRaw = m.ringOpaque && m.ringMax < RING_BRACKET;
+    const ringRaw = m.ringOpaque && m.ringDark;
     const status = ringRaw || m.meanLuma < LUMA_THRESHOLD ? "native" : "missing";
     const borderline =
       (m.ringOpaque && m.ringMax > 0.28 && m.ringMax < 0.34) ||
+      (m.ringOpaque && m.ringDark && m.ringChroma > 0.09) ||
       (m.meanLuma > 0.27 && m.meanLuma < 0.33);
     const master = await masterStats(b.slug);
     rows.push({
@@ -392,6 +470,7 @@ for (const { id, dir, meta } of readPlatforms()) {
       ringRaw,
       ringOpaque: m.ringOpaque,
       ringMax: m.ringMax,
+      ringChroma: m.ringChroma,
       ringLuma: m.ringLuma,
       meanLuma: m.meanLuma,
       ...master,
@@ -413,6 +492,7 @@ console.log(
     "status".padEnd(9) +
     "ring".padEnd(6) +
     "ringMax".padEnd(9) +
+    "ringChr".padEnd(9) +
     "ringLuma".padEnd(10) +
     "meanLuma".padEnd(10) +
     "masterLuma".padEnd(12) +
@@ -425,6 +505,7 @@ for (const r of rows.sort((a, b) => a.slug.localeCompare(b.slug)))
       r.status.padEnd(9) +
       (r.ringRaw ? "raw" : "conv").padEnd(6) +
       fmt(r.ringMax).padEnd(9) +
+      fmt(r.ringChroma).padEnd(9) +
       fmt(r.ringLuma).padEnd(10) +
       fmt(r.meanLuma).padEnd(10) +
       fmt(r.masterLuma).padEnd(12) +
