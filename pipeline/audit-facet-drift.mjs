@@ -409,7 +409,14 @@ for (const p of pairs) {
 // (empty today: rssradio's generic RSS mark moved to its own `rss`
 // platform on 2026-09-14, so the pair it used to describe no longer
 // exists — rssradio simply has no flat facet now.)
-const EXPECTED_DIVERGENCE = {};
+const EXPECTED_DIVERGENCE = {
+  pandora:
+    "the shipped icon's wave-filled P is 157 paths / 117 clipPaths / 39 " +
+    "gradients with 6,141 stops (2.7 MB minified) — not a viable vector " +
+    "flat, and simplifying it would be redrawing Pandora's art; the flat " +
+    "is Pandora's own monochrome app-icon variant (Pandora_App_Icon_Black), " +
+    "geometry identical to the master (522x620 @(542.5,511.5), 0.00%)",
+};
 
 rows.sort((a, b) => b.central - a.central);
 

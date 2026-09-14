@@ -2896,3 +2896,26 @@ show the same mark as its light one. goodpods briefly had a
 Rule: derive `badge-dark.svg` from the BRAND, only when the mark itself
 needs a different colour to read on black; never from the icon's
 dark-mode compromise.
+
+### pandora: the wave fill is not a vector flat; the flat is Pandora's own black variant (2026-09-14)
+
+Pandora's brand kit (`PANDORA_AllBrandAsseets`, March 2020) ships the app
+icon as Illustrator EPS — DOS-EPS binaries with an `%AI9_DataStream`, no
+SVG. Converted with ghostscript -> `pdftocairo -svg`. Two findings:
+
+1. **The wave-filled P is the App Store icon, exactly.** Rendered, its P
+   is 522x620 centred (542.5,511.5), aspect 0.8419 — byte-for-byte the
+   master's P box, aspectD 0.00%, identity transform at scale 32/1000.
+2. **It cannot be a flat.** After svgo it is 157 paths averaging 17 KB
+   of `d` each, 117 clipPaths, 39 gradients carrying **6,141 stops** — a
+   flattened gradient mesh, 2.7 MB of path data. The catalogue's flats
+   are 0.5–8 KB. Any reduction that made it small would be a redrawing
+   of the art, which the doctrine forbids.
+
+So the flat uses Pandora's own **monochrome app-icon variant**
+(`Pandora_App_Icon_Black.eps`: white plate, P in #100F0D) — official,
+501 bytes, same geometry. Facet drift 103.70 -> **105.27** and it will
+stay there: the remaining gap is entirely the fill, recorded in
+`EXPECTED_DIVERGENCE` with these numbers as the falsifiable reason.
+Badge: black P for light, and — because black cannot read on a dark
+pill — the kit's white P for dark, the one case the badge rule permits.
