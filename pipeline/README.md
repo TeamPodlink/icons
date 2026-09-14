@@ -2940,9 +2940,16 @@ follows the vectors: `light.png` from `iconAppIconWhite.pdf`,
 `dark.png` from `iconAppIconDark.pdf` — the developer's own dark-UI
 variant, stronger petals, same framing (petals 85.1% of the plate,
 centred within 1 px in both). Source `catalog-artwork` ->
-`official-artwork`. Note the developer's dark variant keeps a WHITE
-plate; it is shipped as authored rather than re-plated to Apple's
-convention.
+`official-artwork`. **Correction:** a first render showed both
+variants on a white plate and this note called it "shipped as
+authored". It was not authored — it was pdftocairo's default white
+PAGE background; the SVG conversion of the same PDF is 54.5%
+transparent with no plate path at all. Rendered with `-transp`, both
+layers are transparent-backed and the canvas supplies the plates
+(white light, `gray:0.192 -> 0.078` dark), so the dark rendition is
+properly dark-plated. Lesson: a rasterizer's page background is not
+artwork; check the vector's own paths before attributing a plate to
+the vendor.
 
 The PDFs do not convert to clean SVG — pdftocairo turns the petals'
 transparency groups into an `<image>` soft mask plus filters (18 in the
