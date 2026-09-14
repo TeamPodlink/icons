@@ -3123,3 +3123,49 @@ icons, 142 badges (71 platforms). `build-data.mjs` already derived
 codegen still requires `icon.svg`, so `<PlatformBadge>` has no entry
 for these four (its `IconData.content` is the flat icon and there is
 none); the parity test walks the same set and is unaffected.
+
+### disctopia: the black inside the D was plate, not mark (2026-09-14)
+
+The appstore-artwork split cut `glyph.png` out of its black plate with a
+HARD mask: every pixel is "mark over black" at alpha 255, including the
+plate showing through the D's counters (112,634 pure-black pixels) and
+the antialiased edges (an outer-edge pixel read 115,137,164,255 — a
+mark colour premultiplied over black). So the counters painted black
+in the Dark rendition and in the badge. Fix on the asset: the mark's
+genuine colours all have max channel ≥ ~150 (histogram), so any pixel
+under 140 is plate or edge; those are unpremultiplied from black
+against the brightest mark pixel within 3 px (alpha = maxc/ref, colour
+= p/alpha), pure black → transparent. 112,634 knocked out, 6,086 edge
+pixels softened, gradient interiors untouched. Badge regenerated from
+the same file.
+
+### queue: hand-drawn from Boolean primitives (2026-09-14)
+
+Maintainer's call — no vector exists, so the flat is drawn, but from
+MEASURED primitives (1024-space fits, /32):
+
+- disc centre (16,16) R **10.5** (extremes 176..847 → 672 px exactly);
+- a CONCENTRIC hole r **3.125** (fit 511.6,510.9, r 99.9);
+- a band of width **1.3** leaving the hole to the right (straight part
+  y 17.67..18.97, measured 563..604 px) and bending down on a corner
+  circle A=(21.25,22.72) r **3.75** — the band's inner edge (fit
+  681.8,727 / r 117-120) and the lower-right lobe's rounded corner
+  (right tangent 796 px, bottom tangent 847 px) are the SAME circle;
+  the band's outer edge is concentric at r 5.05 (fit 5.12);
+- the lobe's flat bottom runs along the disc's bottom tangent y 26.47.
+
+The blue silhouette is one loop: corner circle from the band's tip
+down to its bottom tangent, flat bottom to the disc's bottom point,
+the disc round to where the band's outer edge exits, that edge back to
+the straight band, the hole, the straight band, the corner circle out
+to the tip (tip = disc ∩ corner circle, (24.85,21.66)). Gradient by
+least squares over the blue pixels: #4069D5 → #AFC2F8 along 68.6°
+up-right (model rms 17.8 — the artwork has shading beyond a plane).
+Plate #F2F2F2 (the artwork's, and the hole colour: a true knockout).
+Silhouette IoU vs the artwork **0.986** (first draft as a pure disc:
+0.958 — the lobe is not on the circle). Facet drift **17.62** against
+the App Store master, all shading (drop shadow, bevel, the darker
+lobe; mean channel −0.8/−0.8/−0.9). Badge = the bare mark, viewBox
+5.5 5.5 21 21 (knockouts show the pill, as the artwork's own dark
+rendition shows its canvas), replacing the raster badge. The bundle
+stays on the official artwork.
