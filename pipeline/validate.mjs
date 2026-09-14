@@ -124,6 +124,51 @@ for (const { id, dir, meta } of platforms) {
   }
 }
 
+// The same-triple wrong-space check. An icon.svg that declares
+// `color(display-p3 R G B)` whose triple is an exact n/255 in EVERY channel
+// is almost certainly an sRGB value written into the wrong colour function:
+// Chrome converts P3 -> sRGB and paints something the bundle never shipped.
+// 164 of 168 declarations carried this signature before the 2026-09-13
+// sweep, and 20 were proven wrong against their rendered masters.
+//
+// A real wide-gamut colour does not land on n/255 in all three channels, so
+// the signature is the cheap half of the test and needs no ictool, no
+// masters, and no network — which is why it can live here. The expensive
+// half, deciding whether a flagged declaration is ACTUALLY wrong, needs the
+// rendered master and lives in pipeline/audit-declared-colors.mjs.
+//
+// Everything already in the tree is allowlisted, so this is a ratchet: it
+// cannot fail on existing artwork, only on newly introduced declarations.
+{
+  const P3 = /color\(display-p3\s+([\d.]+)\s+([\d.]+)\s+([\d.]+)\s*\)/g;
+  const allowPath = join(root, "pipeline/p3-allowlist.json");
+  const allow = existsSync(allowPath)
+    ? JSON.parse(readFileSync(allowPath, "utf8")).allow ?? {}
+    : {};
+  for (const { id, dir } of platforms) {
+    for (const f of ["icon.svg", "badge.svg", "badge-dark.svg"]) {
+      const p = join(dir, f);
+      if (!existsSync(p)) continue;
+      const permitted = new Set(allow[`${id}/${f}`] ?? []);
+      for (const m of readFileSync(p, "utf8").matchAll(P3)) {
+        const v = m.slice(1, 4).map(Number);
+        if (!v.every((x) => Math.abs(x * 255 - Math.round(x * 255)) <= 0.02)) continue;
+        const key = v.join(" ");
+        if (permitted.has(key)) continue;
+        const hex = "#" + v.map((x) => Math.round(x * 255).toString(16).padStart(2, "0")).join("").toUpperCase();
+        err(
+          `${id}/${f}: color(display-p3 ${key}) is an exact n/255 in every ` +
+            `channel — the same-triple signature. Read as sRGB it is ${hex}. ` +
+            `Chrome will paint a DIFFERENT colour than that. Either declare ` +
+            `${hex}, or confirm it with ` +
+            `\`node pipeline/audit-declared-colors.mjs --only ${id}\` and add ` +
+            `it to pipeline/p3-allowlist.json`
+        );
+      }
+    }
+  }
+}
+
 if (errors.length) {
   console.error(`✗ ${errors.length} problem(s):`);
   for (const e of errors) console.error("  - " + e);

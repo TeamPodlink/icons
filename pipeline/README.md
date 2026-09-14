@@ -2693,3 +2693,60 @@ check whether the vendor already ships the variant you want. A
 second rendition in the same bundle can be a different composition, not
 just a different colourway — and here the "dark" asset was really the
 mark-only lockup.
+
+## The same-triple wrong-space law — closed (2026-09-13)
+
+**The bug.** An `icon.svg` declares `color(display-p3 R G B)` whose triple
+is an sRGB value in disguise: `display-p3 .6353 .2196 1` is (162,56,255),
+Deezer's exact brand purple, written into the wrong colour function.
+Chrome converts P3 -> sRGB and paints (176,45,255). The icon looks
+approximately right, so nothing catches it by eye.
+
+**The signature.** Every channel is an exact n/255. Before the sweep,
+**164 of 168** `display-p3` declarations across 42 files carried it — a
+real wide-gamut colour does not land on n/255 in all three channels 164
+times running. The only four that did not were sodes'.
+
+**Why it kept coming back.** The first detector compared `icon.svg`
+against the bundle's declared `"srgb:"` fills. That works only when the
+bundle DECLARES its plate; a bundle whose plate is a raster has nothing
+to compare against. siriusxm, hark, deezer and metacast were all
+invisible to it and were caught one at a time, by eye, over a day. Two
+thirds of the cases found by hand came from that blind spot.
+
+**The fix, in three parts.**
+
+1. `pipeline/audit-declared-colors.mjs` decides it by measurement, not by
+   reading markup. Per declaration: A = what Chrome actually paints
+   (measured off a rendered swatch, not a colour-space matrix
+   reimplemented here); B = the triple read as sRGB. Count master pixels
+   near each. B present and A absent is the bug and B is the hex to
+   declare; A present means consistent; neither means the facets draw
+   different artwork, which is `audit-facet-drift`'s job. Construction of
+   the bundle is irrelevant, so the blind spot is gone. `--write` rewrites
+   only what the master contradicts.
+
+2. **All 20 measurable bugs are fixed** (see the commit for the table).
+   Catalogue facet drift: median 19.37 -> 14.31, q1 1.57 -> 1.21, q3
+   37.52 -> 35.66. The audit now reports zero.
+
+3. `validate.mjs` carries the cheap half as a **ratchet**: any
+   `display-p3` declaration with the n/255 signature that is not in
+   `pipeline/p3-allowlist.json` fails the build, with the sRGB hex it
+   should be and the command to confirm it. The allowlist is seeded with
+   the 111 declarations that existed after the sweep, so it cannot fail on
+   current artwork — only on newly introduced ones. Verified by injecting
+   `color(display-p3 .1333 .1216 .1216)` into netflix: validate failed and
+   named `#221F1F`, which is precisely the hex that had been replaced.
+
+**What is deliberately NOT claimed.** 45 declarations are indeterminate
+and 11 live in `flat-svg*` bundles that are built from `icon.svg` and so
+cannot arbitrate their own source. Those may still be wrong; there is no
+evidence either way without external artwork, and guessing would be the
+same mistake in the other direction. They are allowlisted as unproven,
+not as correct.
+
+**The transferable lesson:** a detector that reads DECLARATIONS can only
+see platforms that declare. When a check keeps finding the same bug by
+hand after it has supposedly been swept, suspect the sweep's reach before
+suspecting the bug is rare.
