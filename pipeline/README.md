@@ -2750,3 +2750,41 @@ not as correct.
 see platforms that declare. When a check keeps finding the same bug by
 hand after it has supposedly been swept, suspect the sweep's reach before
 suspecting the bug is rare.
+
+### rssradio's flat is a generic RSS mark, by design (2026-09-14)
+
+`platforms/rssradio/icon.svg` is a hand-drawn icon for **RSS as a generic
+concept** — the corner-anchored quarter-arcs with a dot — not RSSRadio's
+app icon. The bundle IS the app icon. The two facets therefore draw
+different things on purpose, and rssradio's **113.57** is the instrument
+working, not a defect.
+
+It is now the first entry in `EXPECTED_DIVERGENCE` in
+`audit-facet-drift.mjs`: still listed in the table and marked
+`<- EXPECTED`, but excluded from the quartiles and the break count, so it
+cannot be mistaken for a re-sourcing job. Excluding it moves the
+catalogue median 13.12 -> 11.92 and q3 34.65 -> 30.89, which is the more
+honest summary — one deliberately-different pair was dragging both.
+
+**Do not "fix" this by drawing RSSRadio's mark into the flat.** The flat
+is carrying the platform's `"rss"` alias, which nothing else in the
+catalogue serves.
+
+**Two loose ends this exposed, neither acted on.**
+
+1. `BADGE_TEXT_OVERRIDES.rss` in `packages/icons/scripts/build-static.ts`
+   — `{ small: "Get the", large: "RSS Feed" }` — is **dead code**. The
+   override is keyed by platform ID and no platform has the id `rss`;
+   aliases never reach it. The generated badge is `rssradio-{light,dark}`
+   and reads "Listen on RSSRadio". Either a real `rss` platform should
+   exist, or the override should go.
+
+2. The entry is doing double duty, and its name no longer matches its
+   target: `meta.json` points at `id386600664`, which the App Store now
+   lists as **"Podcast Player - Video & RSS" by Maple Media Apps** (see
+   the rssradio identity note above — the app now CALLED RSSRadio is a
+   different developer's 2026 release). So one entry is simultaneously
+   the generic RSS concept, a platform named RSSRadio, and a listing
+   named something else. Splitting a generic `rss` entry from the
+   platform would resolve all three; that is a curation decision for the
+   maintainer, not an artwork one.

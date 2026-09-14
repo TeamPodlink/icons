@@ -400,6 +400,18 @@ for (const p of pairs) {
   if (sheets) await writeSheet(p.slug, f, g);
 }
 
+// Pairs whose facets are MEANT to differ. A high score here is the
+// instrument working, not a defect, and the entry exists so that neither a
+// later pass nor an agent "corrects" a deliberate choice. Keep this list
+// short and each reason falsifiable — deezer sat here for an hour on the
+// belief that a wordmark-free variant did not exist, until it turned out
+// the vendor ships one as their dark icon.
+const EXPECTED_DIVERGENCE = {
+  rssradio:
+    "the flat is a hand-drawn GENERIC RSS mark serving the platform's " +
+    "\"rss\" alias, not RSSRadio's app icon; the bundle is the app icon",
+};
+
 rows.sort((a, b) => b.central - a.central);
 
 const f2 = (v) => v.toFixed(2).padStart(6);
@@ -431,13 +443,15 @@ rows.forEach((r, i) =>
       "   " + pct(r.lumaShare) +
       "  " + pct(r.struct) +
       "  " + r.glass.padEnd(5) +
-      "  " + r.source
+      "  " + r.source +
+      (EXPECTED_DIVERGENCE[r.slug] ? "  <- EXPECTED" : "")
   )
 );
 
 // Distribution: quartiles and the largest gap between consecutive
 // central scores (the natural break, read from the data itself).
-const c = rows.map((r) => r.central).sort((a, b) => a - b);
+const scored = rows.filter((r) => !EXPECTED_DIVERGENCE[r.slug]);
+const c = scored.map((r) => r.central).sort((a, b) => a - b);
 const q = (p) => c[Math.min(c.length - 1, Math.floor(p * (c.length - 1)))];
 let gap = { size: 0, below: null, above: null, nAbove: 0 };
 for (let i = 1; i < c.length; i++) {
@@ -456,6 +470,12 @@ console.log(
         `(+${gap.size.toFixed(2)}); ${gap.nAbove} pair(s) above the break`
       : "")
 );
+const expected = rows.filter((r) => EXPECTED_DIVERGENCE[r.slug]);
+if (expected.length) {
+  console.log(`\nexcluded from the distribution — facets meant to differ:`);
+  for (const r of expected)
+    console.log(`  ${r.slug} (${r.central.toFixed(2)}): ${EXPECTED_DIVERGENCE[r.slug]}`);
+}
 if (sheets) console.log(`sheets: ${join(work, "sheets")}/<slug>.png (flat | glass | 4x|diff|)`);
 if (jsonOut) {
   writeFileSync(jsonOut, JSON.stringify({ rows, skipped, quartiles: [c[0], q(0.25), q(0.5), q(0.75), c[c.length - 1]], gap }, null, 2) + "\n");
