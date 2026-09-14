@@ -1,7 +1,7 @@
 import { useId, type CSSProperties } from 'react'
 import { getIconData } from '../core/index.js'
 import { getPlatform } from '../core/platforms.js'
-import { resolveBadgeContent } from '../core/resolve.js'
+import { resolveBadgeContent, resolveBadgeViewBox } from '../core/resolve.js'
 import { shapes } from '../core/shapes.js'
 import type { IconShape } from '../core/types.js'
 
@@ -65,10 +65,12 @@ export function PlatformBadge({
   const smallFontSize = 8.5 * scale
   const largeFontSize = 17.5 * scale
 
-  // Resolve badge icon content
+  // Resolve badge icon content and the viewBox it was authored in
   let iconContent = resolveBadgeContent(data, theme)
+  const iconViewBox = resolveBadgeViewBox(data, theme)
   // Replace currentColor with foreground
   iconContent = iconContent.split('currentColor').join(fg)
+
   const needsClip = shape !== 'square'
   const shapeDef = shapes[shape]
 
@@ -145,7 +147,7 @@ export function PlatformBadge({
         )}
         <g clipPath={needsClip ? `url(#${clipId})` : undefined}>
           <svg
-            viewBox={data.viewBox}
+            viewBox={iconViewBox}
             width={iconSize}
             height={iconSize}
             dangerouslySetInnerHTML={{ __html: iconContent }}
