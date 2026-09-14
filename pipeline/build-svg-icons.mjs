@@ -9,9 +9,11 @@
 //   flat-svg          whole SVG as one full-bleed neutral layer
 //   flat-svg-browser  1024px raster from headless Chrome — used when
 //                     ictool mangles the SVG (filters, foreignObject...)
-//   flat-svg-split    background lifted into the canvas fill; glyph
-//                     layer alone (+ white-recolored dark glyph for
-//                     monochrome-dark marks via opacity-specializations)
+//   flat-svg-split    background lifted into the canvas fill (a solid
+//                     plate, or a vertical two-stop gradient plate);
+//                     glyph layer alone (+ white-recolored dark glyph
+//                     for monochrome-dark marks via
+//                     opacity-specializations)
 //
 // Split rules (MEASURED by packages/engine/tools/probe-dark-tint*.py,
 // Icon Composer 2.0 — see the pipeline/README.md ledger):
@@ -34,6 +36,15 @@
 //     <= 0.2) fall back to a white twin.
 //   - Knockout designs (glyph punched out of an overlay above a white
 //     base) are unsplittable: near-full glyph coverage detects them.
+//   - A gradient plate (fill="url(#…)") is lifted only when it is a
+//     vertical, full-height, two-stop, opaque, untransformed
+//     linearGradient: ictool IGNORES the canvas fill's orientation and
+//     always paints top->bottom (fill-orientation law, re-measured
+//     2026-09-14), so any other geometry would render wrongly and is
+//     refused with a reason instead. The auto-tint then samples the
+//     plate's own two stops per-pixel — MEASURED on rss: dark arcs
+//     read (226,108,45)/(249,156,58). Stacked plates: the topmost
+//     opaque one shows, so it wins and the ones beneath are dropped.
 //
 // The quality gate (MEASURED 2026-09-13 — see the pipeline/README.md
 // ledger entry "The P3 reference-raster trap"):
@@ -394,13 +405,112 @@ function parseColor(s) {
 
 const FULL = String.raw`[Mm]0[ ,]0\s*h\s*32\s*v\s*32\s*[Hh]0\s*[zZ]`;
 
-// Detect + strip a leading full-canvas solid background. Two patterns:
+function svgAttrs(s) {
+  const attrs = {};
+  for (const m of s.matchAll(/([\w:-]+)="([^"]*)"/g)) attrs[m[1]] = m[2];
+  return attrs;
+}
+
+/** SVG length -> fraction of `scale` (percentages are of 100). */
+function fraction(v, dflt, scale) {
+  if (v == null) return dflt;
+  const m = String(v).trim().match(/^([+-]?[\d.]+)(%?)$/);
+  if (!m) return NaN;
+  return m[2] ? +m[1] / 100 : +m[1] / scale;
+}
+
+/**
+ * Resolve a plate's `fill="url(#id)"` to canvas stops. Returns
+ * { stops: [top, bottom] } or { reason } — never a guess.
+ *
+ * Only a VERTICAL, full-height, two-stop, fully opaque, untransformed
+ * <linearGradient> qualifies. That is not a temporary narrowing: ictool
+ * IGNORES the canvas fill's `orientation` and always paints a
+ * linear-gradient top-to-bottom over the full canvas (the
+ * fill-orientation law — MEASURED, see the pipeline/README.md ledger;
+ * re-measured 2026-09-14: diagonal, horizontal and vertical
+ * orientations render byte-for-byte alike). A horizontal or diagonal
+ * plate lifted into the canvas would render as the wrong gradient, so
+ * it is refused here and stays a full-bleed layer.
+ */
+function resolveGradientFill(svg, id) {
+  const esc = id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const lin = svg.match(
+    new RegExp(`<linearGradient\\b([^>]*\\bid="${esc}"[^>]*)>([\\s\\S]*?)</linearGradient>`)
+  );
+  if (!lin) {
+    if (new RegExp(`<radialGradient\\b[^>]*\\bid="${esc}"`).test(svg))
+      return { reason: `radial gradient #${id}` };
+    return { reason: `no <linearGradient id="${id}"> def` };
+  }
+  const attrs = svgAttrs(lin[1]);
+  if (attrs.gradientTransform)
+    return { reason: `gradient #${id} has a gradientTransform` };
+  if (attrs.href || attrs["xlink:href"])
+    return { reason: `gradient #${id} inherits via href` };
+  const stops = [...lin[2].matchAll(/<stop\b([^>]*?)\/?>/g)].map((m) =>
+    svgAttrs(m[1])
+  );
+  if (stops.length !== 2)
+    return { reason: `gradient #${id} has ${stops.length} stops (need 2)` };
+  const colors = [];
+  for (const [i, s] of stops.entries()) {
+    const off = fraction(s.offset, 0, 1);
+    if (Math.abs(off - i) > 1e-6)
+      return { reason: `gradient #${id} stop ${i} at offset ${s.offset} (need ${i})` };
+    const op = fraction(s["stop-opacity"], 1, 1);
+    if (Math.abs(op - 1) > 1e-6)
+      return { reason: `gradient #${id} stop ${i} has stop-opacity ${s["stop-opacity"]}` };
+    const c = parseColor(s["stop-color"] ?? "");
+    if (!c)
+      return { reason: `gradient #${id} stop ${i} color "${s["stop-color"]}" unparsed` };
+    colors.push(c);
+  }
+  // Geometry in canvas fractions. objectBoundingBox (the SVG default)
+  // is relative to the plate, which for a full-bleed plate IS the
+  // canvas; userSpaceOnUse is in viewBox units.
+  const scale = attrs.gradientUnits === "userSpaceOnUse" ? viewBoxSize(svg) : 1;
+  const x1 = fraction(attrs.x1, 0, scale), y1 = fraction(attrs.y1, 0, scale);
+  const x2 = fraction(attrs.x2, 1, scale), y2 = fraction(attrs.y2, 0, scale);
+  const near = (a, b) => Math.abs(a - b) < 1e-3;
+  const geom = `x1=${attrs.x1 ?? "0"} y1=${attrs.y1 ?? "0"} x2=${attrs.x2 ?? "100%"} y2=${attrs.y2 ?? "0"}`;
+  if (![x1, y1, x2, y2].every(Number.isFinite))
+    return { reason: `gradient #${id} geometry unparsed (${geom})` };
+  if (!near(x1, x2))
+    return {
+      reason:
+        `gradient #${id} is not vertical (${geom}); ictool ignores ` +
+        `orientation, so only a top->bottom plate can be a canvas fill`,
+    };
+  if (near(y1, 0) && near(y2, 1)) return { stops: colors };
+  if (near(y1, 1) && near(y2, 0)) return { stops: [colors[1], colors[0]] };
+  return { reason: `gradient #${id} is not full-height (${geom})` };
+}
+
+/** Drop a <linearGradient> def no longer referenced by the glyph. */
+function dropUnusedGradientDef(svg, id) {
+  if (svg.includes(`url(#${id})`)) return svg;
+  const esc = id.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return svg
+    .replace(
+      new RegExp(`<linearGradient\\b[^>]*\\bid="${esc}"[^>]*>[\\s\\S]*?</linearGradient>`),
+      ""
+    )
+    .replace(/<defs>\s*<\/defs>/, "");
+}
+
+// Detect + strip a leading full-canvas background. Two patterns:
 //   A: <path fill="C" d="M0 0h32v32H0z"/> (repeated paints all belong
-//      to the background stack; the LAST removed is the visible color)
+//      to the background stack; the TOPMOST opaque plate is the one
+//      that shows, so the LAST removed wins and anything fully covered
+//      beneath it is discarded). C may be a solid color or a
+//      url(#…) vertical two-stop linearGradient (resolveGradientFill).
 //   B: podcastindex-style defs path with fill, painted by a <use> at
 //      the head of the clip group (never touch the clipPath's <use>)
+// Returns { stops: [top, bottom], glyphSvg }, { reason } when a
+// gradient plate was found but cannot be lifted honestly, or null.
 function splitBackground(svg) {
-  let color = null;
+  let stops = null;
   let out = svg;
   for (let i = 0; i < 3; i++) {
     const re = new RegExp(
@@ -409,11 +519,17 @@ function splitBackground(svg) {
     const m = out.match(re);
     if (!m) break;
     const c = parseColor(m[1]);
-    if (!c) break;
-    color = c;
+    const u = c ? null : m[1].match(/^url\(#([^)]+)\)$/);
+    if (c) stops = [c, c];
+    else if (u) {
+      const g = resolveGradientFill(svg, u[1]);
+      if (g.reason) return { reason: g.reason };
+      stops = g.stops;
+    } else break;
     out = out.replace(m[0], "");
+    if (u) out = dropUnusedGradientDef(out, u[1]);
   }
-  if (color) return { color, glyphSvg: out };
+  if (stops) return { stops, glyphSvg: out };
   const m = svg.match(
     new RegExp(
       `<path id="([^"]+)" fill="([^"]+)"[^>]*d="${FULL}"[^>]*/>[\\s\\S]*?<use href="#\\1"\\s*/>`
@@ -426,10 +542,19 @@ function splitBackground(svg) {
         new RegExp(`(<g clip-path="[^"]*">)\\s*<use href="#${m[1]}"\\s*/>`),
         "$1"
       );
-      if (painted !== svg) return { color: c, glyphSvg: painted };
+      if (painted !== svg) return { stops: [c, c], glyphSvg: painted };
     }
   }
   return null;
+}
+
+/** Mean of two ic colors in the same space (for a gradient's twin tint). */
+function meanColor(a, b) {
+  const pa = a.match(/^([a-z0-9-]+):([\d.]+),([\d.]+),([\d.]+)/);
+  const pb = b.match(/^([a-z0-9-]+):([\d.]+),([\d.]+),([\d.]+)/);
+  if (!pa || !pb || pa[1] !== pb[1]) return a;
+  const mid = [2, 3, 4].map((i) => ((+pa[i] + +pb[i]) / 2).toFixed(5));
+  return `${pa[1]}:${mid.join(",")},1.00000`;
 }
 
 /** Coverage-weighted mean luminance + saturation of visible pixels. */
@@ -483,6 +608,7 @@ async function trySplit(id, dir, meta) {
   const svg = readFileSync(join(dir, "icon.svg"), "utf8");
   const split = splitBackground(svg);
   if (!split) return "no-detectable-bg";
+  if (split.reason) return `unsplittable-gradient-plate: ${split.reason}`;
 
   const glyphPng = join(work, `${id}-glyph.png`);
   chromeRasterize(split.glyphSvg, glyphPng, 256);
@@ -499,12 +625,17 @@ async function trySplit(id, dir, meta) {
   // layer / opacity-specialization disables that tint (measured law —
   // see header). Dark monochrome glyphs never auto-tint, so they get
   // an explicit dark twin recolored to the former background color
-  // (white if the background is untintable: max channel <= 0.2).
-  const cm = split.color.match(/^[a-z0-9-]+:([\d.]+),([\d.]+),([\d.]+)/);
+  // (white if the background is untintable: max channel <= 0.2). A
+  // gradient plate's twin is tinted with the mean of its two stops —
+  // a flat recolor has one color to give, and the mean is the honest
+  // summary of a linear ramp.
+  const [top, bottom] = split.stops;
+  const twinBase = top === bottom ? top : meanColor(top, bottom);
+  const cm = twinBase.match(/^[a-z0-9-]+:([\d.]+),([\d.]+),([\d.]+)/);
   const bgMax = cm ? Math.max(+cm[1], +cm[2], +cm[3]) : 1;
   const layers = [];
   if (needsWhiteGlyph) {
-    const twinColor = bgMax > 0.2 ? cssColor(split.color) : "#ffffff";
+    const twinColor = bgMax > 0.2 ? cssColor(twinBase) : "#ffffff";
     writeFileSync(
       join(bdir, "Assets/icon-dark.svg"),
       retintDark(split.glyphSvg, twinColor)
@@ -528,8 +659,11 @@ async function trySplit(id, dir, meta) {
         }
       : {}),
   });
-  const solid = {
-    "linear-gradient": [split.color, split.color],
+  // A solid plate is a two-equal-stop gradient; a gradient plate ships
+  // its own two stops. Either way the orientation is the only one
+  // ictool honors (top->bottom; fill-orientation law).
+  const canvas = {
+    "linear-gradient": [top, bottom],
     orientation: { start: { x: 0.5, y: 0 }, stop: { x: 0.5, y: 1 } },
   };
   writeFileSync(
@@ -537,9 +671,9 @@ async function trySplit(id, dir, meta) {
     JSON.stringify(
       {
         fill: {
-          ...solid,
+          ...canvas,
           "fill-specializations": [
-            { value: solid },
+            { value: canvas },
             { appearance: "dark", value: DARK_GRADIENT },
           ],
         },
