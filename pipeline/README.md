@@ -3259,3 +3259,27 @@ every blue tint scored worse. Shipped in icon.svg and badge.svg; the
 badge is the same file with the tight viewBox. Central RMSE vs the
 master 5.33 → **3.76**; the heat map now shows only the plate's own
 emboss, which is outside the Q and out of scope for the flat.
+
+**Follow-up 7: the pillow emboss.** First, the bundle's guts: Queue.icon
+holds two separate, fully opaque 1024 rasters (`light.png` 300 KB,
+`dark.png` 629 KB) toggled by opacity-specializations — not one asset
+re-lit by ictool. The blue Q is the same in both (145,170,239 vs
+144,169,238; the same 108,126,175 shadow under the disc's top edge),
+while the plate was re-rendered per appearance with its emboss re-lit:
+up-facing plate edges read 255 on the 242 light plate (+13, clipped)
+and 91 on the 50 dark plate (+41); down-facing edges 222 (−20) and 24
+(−26). Vertical edges are symmetric (237 either side), so the light is
+straight down. Modelled on the flat as two inner shadows on the
+knocked-out plate — white offset DOWN (highlight on up-facing edges)
+and black offset UP (shadow on down-facing edges), the plate oversized
+to −4..36 so the canvas edge casts nothing — and grid-searched in
+Chrome over plate pixels within 40 px of the mark
+(`scratchpad/pe/search.mjs`, 90 renders). Plain plate **4.58**; the
+shadow term dominates (opacity .1 beats .15/.2 by ~0.7); the highlight
+is insensitive (2.06–2.19 across its sweep, opacity 1 always best —
+the artwork clips it at 255). Optimum: highlight dy .3 / σ .15 /
+opacity 1, shadow dy −.4 / σ .3 / opacity .1 → **1.21**. Flat only —
+the badge is the bare mark and has no plate. Whole-icon central RMSE
+vs the master 3.76 → **2.67** (vs the artwork 2.59), which is inside
+the resampling floor's neighbourhood: the two facets now differ by the
+Liquid Glass squircle and antialiasing, not by design.
