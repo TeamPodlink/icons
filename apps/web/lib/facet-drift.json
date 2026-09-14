@@ -2,7 +2,6 @@
   "generated": "2026-09-14",
   "pairs": 69,
   "central": {
-    "pandora": 105.27,
     "apple": 55.32,
     "downcast": 47.09,
     "pocketcasts": 40.83,
@@ -23,6 +22,7 @@
     "anytimeplayer": 19.19,
     "fountain": 17.95,
     "spreaker": 16.42,
+    "pandora": 15.67,
     "podbean": 14.66,
     "podimo": 14.31,
     "podcastguru": 13.37,

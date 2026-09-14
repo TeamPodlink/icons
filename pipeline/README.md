@@ -3368,3 +3368,38 @@ pandora 105.27 (expected divergence), apple 55.32, downcast 47.09,
 pocketcasts 40.83. Re-run `--write` after any facet change you want the
 sort to reflect; the audit's own console output remains the ledger's
 instrument.
+
+### pandora: the wave fill as a 45 KB vector (2026-09-14)
+
+The 2.7 MB verdict above was wrong about WHY the file was big, and the
+maintainer's `<use>` question exposed it. Anatomy of the brand kit's
+`Pandora_App_Icon_RBG` as converted (1000-space): a white rounded
+plate; the P filled with a base gradient; then 38 ribbon groups, each
+`rect(P bbox) fill=gradient` clipped three times — the P outline, the
+ribbon shape (~650 bytes: a chain of r 53.3 arcs and lines, i.e. the
+wave edge, plus a short return), and a third clip of 40–110 KB. Those
+38 third clips are NOT geometry: they are scanline masks — thousands of
+0.1-px-tall `h…v.102h…Z` rects — a rasterized soft mask the PDF
+converter emitted as vectors. Dropping all 38 moves the Chrome render
+by **RMSE 2.23** whole-frame (3.0 MB → 304 KB, invisible in the sheet).
+The 39 gradients carry 6,141 stops, median 159 each; a greedy
+piecewise-linear pass at 2/255 keeps **287** (median 7; error 2.27
+vs the full file). Ribbons then render as plain filled paths inside one
+P clip: **44.7 KB**.
+
+**On `<use>`:** the wave edge IS one periodic curve (period ≈ 97.6 ×
+75.9 px), 48 ribbon pairs are exact translations (e.g. T → ab → aj → ar
+→ az at y steps of 32.1), and each ribbon is "everything below my
+edge" in painter's order. But each is cut to its own length — ribbons
+that end inside the P taper where the next edge overtakes them (zoomed:
+tapers, not caps) — so one referenced shape cannot express them, and at
+650 bytes apiece they were never the weight. Not pursued.
+
+Adopted as the flat (`flatSource: official`; the P scaled 0.032 onto a
+full-bleed white plate, the site's squircle standing in for the brand
+kit's rounded plate). Facet drift **105.27 → 15.67** (frame 17.70,
+mean channel −5.1/+3.2/+11.0) — the App Store artwork's wave
+arrangement differs from the brand kit's, so this is artwork drift
+between two official renditions, not ours. `EXPECTED_DIVERGENCE` is
+empty again; the Drift snapshot refreshed (69 pairs, median 5.36). The
+badges keep Pandora's black/white P.
