@@ -423,3 +423,57 @@ if want("mech"):
     same = all(v["lg"] is not None and v["solid"] is not None
                and abs(v["lg"] - v["solid"]) <= 0.002 for _, v in rows)
     print(f"  => lg == solid on every axis within 0.002: {same}")
+
+# ---------------- the full hue map -------------------------------------------
+# `solid` canvases (no lift, continuous float input) along every direction of
+# the unit cube whose largest component is 1, at quarter steps: 61 rays.
+GRID_STEPS = (0.0, 0.25, 0.5, 0.75, 1.0)
+GRID_DIRS = [(r, g, b) for r in GRID_STEPS for g in GRID_STEPS for b in GRID_STEPS
+             if max(r, g, b) == 1.0]
+
+
+def grid_probe(space, axis, v):
+    spec = case_spec(space, axis, v)
+    return run("gr-" + spec.replace(":", "-").replace(",", "_"),
+               fill={"solid": spec})[0]
+
+
+if want("grid"):
+    print(f"\n[grid] flip point of `solid` canvases along {len(GRID_DIRS)} "
+          f"cube directions")
+    print("  dir(r,g,b)        vFlip    color at flip (encoded sRGB)")
+    recs = []
+    for d in GRID_DIRS:
+        br, bl, bh = bisect_axis("srgb", d, probe=grid_probe)
+        if br is None:
+            print(f"  {str(d):<18} NOT BRACKETED {bl} {bh}")
+            continue
+        v = (br[0] + br[1]) / 2
+        c = np.asarray(d) * v
+        recs.append((d, v, c))
+        print(f"  {str(d):<18} {v:.4f}   {np.round(c, 4)}")
+    np.save(os.path.join(WORK, "grid.npy"),
+            np.array([(*d, v) for d, v, _ in recs], np.float64))
+    print(f"  => {len(recs)} rays bracketed, saved to {WORK}/grid.npy")
+
+# ---------------- how the minimum channel lifts the threshold ----------------
+# The grid says every direction with min > 0 flips at the neutral cap, while
+# min == 0 directions can flip far below it. Is that a discontinuity at zero,
+# or a ramp the grid's quarter steps stepped over?
+EPS = (0.0, 0.01, 0.02, 0.04, 0.06, 0.08, 0.12, 0.16, 0.20, 0.25, 0.35, 0.50, 1.0)
+MIN_FAMILIES = [
+    ("(e,1,e)", lambda e: (e, 1.0, e)),     # green, desaturated symmetrically
+    ("(e,1,0)", lambda e: (e, 1.0, 0.0)),   # green + red only
+    ("(0,1,e)", lambda e: (0.0, 1.0, e)),   # green + blue only
+    ("(1,e,e)", lambda e: (1.0, e, e)),     # red, desaturated symmetrically
+]
+
+if want("minchan"):
+    print("\n[minchan] flip point vs the smallest component of the direction")
+    print("  family      " + "".join(f"{e:>8}" for e in EPS))
+    for label, mk in MIN_FAMILIES:
+        row = f"  {label:<12}"
+        for e in EPS:
+            br, bl, bh = bisect_axis("srgb", mk(e), probe=grid_probe)
+            row += f"{br[0]:>8.4f}" if br else "    NONE"
+        print(row)
