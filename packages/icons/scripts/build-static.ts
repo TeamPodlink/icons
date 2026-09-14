@@ -39,6 +39,7 @@ const BADGE_TEXT_OVERRIDES: Record<string, { small: string; large: string }> = {
   subscribebyemail: { small: 'Subscribe by', large: 'Email' },
   subscribeonandroid: { small: 'Subscribe on', large: 'Android' },
   youtube: { small: 'Watch on', large: 'YouTube' },
+  netflix: { small: 'Watch on', large: 'Netflix' },
 }
 
 // Badge layout constants (derived from CSS)
