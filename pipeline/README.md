@@ -2351,7 +2351,14 @@ the diff tells. Both times this document guessed from markup —
 own fill" because most elements do — it guessed wrong, and both times
 one factorial rendering sweep settled it in minutes.
 
-## ictool ignores the group `shadow` property (measured 2026-09-13)
+## ictool ignores the group `shadow` property (measured 2026-09-13) — **PARTLY WRONG, SUPERSEDED**
+
+> **Correction (same day).** The law below is too broad. ictool renders
+> a group's shadow whenever the group contains a **glass layer**; it
+> ignores it only when every layer is `glass: false`, which both of the
+> controls below happened to be. See "The shadow renders — but only for
+> glass layers" at the end of this file. The measurements below are
+> accurate for the non-glass case and wrong as a general claim.
 
 **A Liquid Glass group's `shadow` is inert in everything this repo
 ships.** Asked whether jiosaavn's baked-in halo could be replaced by a
@@ -2416,7 +2423,12 @@ and removing it is a regression unless the glow is rebuilt.
 **If it is rebuilt, model a tinted outer glow against the measured
 profile above — not a drop shadow, and not via `shadow`.**
 
-### The shadow `kind` enum: it is `layer-color`, not "chromatic" (2026-09-13)
+### The shadow `kind` enum: it is `layer-color`, UI-labelled "Chromatic" (2026-09-13)
+
+> **Correction:** the naming below is right — Icon Composer's Shadow
+> menu reads Neutral / Chromatic / Off and "Chromatic" serializes to
+> `layer-color` — but the "draws neither" conclusion is wrong for glass
+> layers. See the end of this file.
 
 Looking for a chromatic shadow — one tinted by the layer's own colour
 rather than a neutral grey — the value is spelled **`layer-color`**.
@@ -2514,3 +2526,87 @@ Its ground truth was captured from the SYSTEM renderer
 path to shadow-accurate renders if we ever need them**: QuickLook
 capture of an installed icon, not `ictool --export-image`. It is a
 different pipeline, not a flag.
+
+## The shadow renders — but only for glass layers (measured 2026-09-13, CORRECTS the entries above)
+
+**I was wrong earlier today.** Two entries above conclude that ictool
+ignores a group's `shadow` outright. The real law is narrower:
+
+> **ictool renders a group's shadow if and only if the group contains a
+> layer with `glass: true`.** With every layer `glass: false`, the
+> shadow is not drawn at all and neither `kind` nor `opacity` has any
+> effect.
+
+Both earlier controls — spotify and jiosaavn — are `glass: false`
+bundles, so they measured the exception and I generalised it. The tell
+was there to be read: of the 17 shadowed groups in this catalog, the
+ones I sampled were exactly the non-glass ones.
+
+**The evidence** is `~/Developer/recomposer/Podcasts-colorful_shadows.icon`,
+a real authored bundle (Icon Composer's Shadow menu reads **Neutral /
+Chromatic / Off**), which writes the chromatic kind through a
+specialization:
+
+```json
+"shadow-specializations": [
+  {"value": {"kind": "neutral", "opacity": 0.4}},
+  {"appearance": "dark", "value": {"kind": "layer-color", "opacity": 4}}
+]
+```
+
+That confirms two format facts empirically rather than from framework
+strings: UI **"Chromatic" == `layer-color`**, and
+`shadow-specializations` is how a dark-only shadow is expressed — the
+Apple-dark-variant shape. It also calibrates the scale: the UI slider
+read **100% at `opacity: 4`**, so the decanted 0.84 / 1.44 / 0.4 are
+21% / 36% / 10%, and the range is NOT 0-1.
+
+Renders at 1024, macOS, same bundle, only the dark spec changed:
+
+| layers | dark shadow | Default md5 | Dark md5 |
+| --- | --- | --- | --- |
+| glass: true | `layer-color` @4 | 7a90b110 | **544ba938** |
+| glass: true | `neutral` @4 | 7a90b110 | **e4664dae** |
+| glass: false | `layer-color` @4 | — | 898a0ba0 |
+| glass: false | `neutral` @4 | — | 898a0ba0 |
+
+Default is identical across the first two (the specialization only
+touches dark), the Dark renditions differ, and flipping the same bundle
+to `glass: false` collapses both kinds to one render. Opacity is
+continuous where it applies — with glass on, `neutral` at 0 / 0.4 / 2 /
+4 gives four distinct md5s and `layer-color` another four, with the two
+kinds agreeing only at opacity 0, which is correct because zero opacity
+is no shadow either way.
+
+Visually, `layer-color` is a drop shadow tinted with the layer's own
+hue: on the purple Podcasts circles it reads as a purple glow.
+
+### What this does and does not unlock for jiosaavn
+
+It does NOT rescue the glow. Re-tested with the keyed blob removed and
+the layer switched to `glass: true`, scored against the live store
+artwork (the blob baseline is **2.29**, a clean disc with no glow is
+7.45):
+
+| glass | kind | opacity | vs store |
+| --- | --- | --- | --- |
+| false | layer-color | 4 | 7.45 |
+| true | (none) | — | 7.74 |
+| true | layer-color | 0.5 | 7.65 |
+| true | layer-color | 1 | 7.88 |
+| true | layer-color | 2 | 8.44 |
+| true | layer-color | 4 | 9.88 |
+| true | neutral | 2 | 8.52 |
+
+Every combination is worse, and monotone in opacity. Two reasons, both
+already in this ledger: ictool's shadow is **directional** — the
+recomposer measured Apple's at ~25 px down, sigma ~14, none above —
+while jiosaavn's halo is a radially symmetric glow; and `glass: true`
+also restyles the disc itself with the glass material, moving it away
+from the flat store disc. The keyed blob still wins on fidelity.
+
+**The general lesson is the one that matters:** a group's shadow is
+live for any glass group, so shadow settings on the 9 bundles that
+carry them are not inert across the board — only on the non-glass ones.
+Before concluding a property does nothing, vary the thing that gates
+it, not just the property.
