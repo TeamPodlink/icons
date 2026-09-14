@@ -12,6 +12,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSy
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import opentype from 'opentype.js'
+import { shapes } from '../src/core/shapes.js'
 import {
   extractSvgContent,
   extractViewBox,
@@ -30,16 +31,15 @@ const PLATFORMS_FILE = join(ROOT, 'src/data/platforms.json')
 const FONT_PATH = join(ROOT, 'node_modules/@fontsource/inter/files/inter-latin-400-normal.woff')
 
 // iOS-style squircle (superellipse) clip paths
-// The LEGACY squircle: one cubic per quarter with handles at 77.2% of the
-// half-size (corner cut 14.88% of the side along the diagonal, sides that
-// never run straight). It has masked every static flat and static-badge
-// fallback since @podlink/icons v0.1.0. It is NOT the house squircle —
-// that is the 10/11-handle shape in src/core/shapes.ts, which the React
-// components and the badge plates use (corner cut 11.17%, close to
-// iOS). Named 2026-09-14; geometry in pipeline/README.md, "The three
-// squircles".
-const LEGACY_SQUIRCLE_32 = 'M16 0c12.357 0 16 3.643 16 16s-3.643 16-16 16S0 28.357 0 16 3.643 0 16 0Z'
-const LEGACY_SQUIRCLE_24 = 'M12 0c9.268 0 12 2.732 12 12s-2.732 12-12 12S0 21.268 0 12 2.732 0 12 0Z'
+// The HOUSE squircle (10/11 handles) from src/core/shapes.ts masks every
+// static flat and static-badge fallback — the same path <PlatformIcon>
+// and <PlatformBadge> clip to and the badge plates carry, so the
+// package's static and React outputs agree. Until 2026-09-14 this was
+// the LEGACY squircle (77.2% handles, `M16 0c12.357 0 16 3.643 16 16…`),
+// squatter and 3.7% of the side deeper into the corner; see
+// pipeline/README.md, "The three squircles".
+const HOUSE_SQUIRCLE_32 = shapes.superellipse.svgPath(32)
+const HOUSE_SQUIRCLE_24 = shapes.superellipse.svgPath(24)
 
 // Platforms with custom badge text (instead of "Listen on" / platform name)
 const BADGE_TEXT_OVERRIDES: Record<string, { small: string; large: string }> = {
@@ -143,7 +143,7 @@ function generateIcon(sourceSvg: string, name: string): string {
 
   return minifySvg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
     <mask id="${name}_m" width="32" height="32" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:alpha">
-      <path d="${LEGACY_SQUIRCLE_32}"/>
+      <path d="${HOUSE_SQUIRCLE_32}"/>
     </mask>
     <g mask="url(#${name}_m)">
       <svg viewBox="${viewBox}" width="32" height="32"${fillAttr}>${content}</svg>
@@ -197,7 +197,7 @@ function generateBadge(
   if (isBadge) {
     iconBlock = `<svg x="${ICON_X}" y="${ICON_Y}" width="${ICON_SIZE}" height="${ICON_SIZE}" viewBox="${viewBox}"${fillAttr}>${iconContent}</svg>`
   } else {
-    iconBlock = `<mask id="${prefix}_m" width="${ICON_SIZE}" height="${ICON_SIZE}" x="${ICON_X}" y="${ICON_Y}" maskUnits="userSpaceOnUse" style="mask-type:alpha"><path d="${LEGACY_SQUIRCLE_24}" transform="translate(${ICON_X},${ICON_Y})"/></mask><g mask="url(#${prefix}_m)"><svg x="${ICON_X}" y="${ICON_Y}" width="${ICON_SIZE}" height="${ICON_SIZE}" viewBox="${viewBox}"${fillAttr}>${iconContent}</svg></g>`
+    iconBlock = `<mask id="${prefix}_m" width="${ICON_SIZE}" height="${ICON_SIZE}" x="${ICON_X}" y="${ICON_Y}" maskUnits="userSpaceOnUse" style="mask-type:alpha"><path d="${HOUSE_SQUIRCLE_24}" transform="translate(${ICON_X},${ICON_Y})"/></mask><g mask="url(#${prefix}_m)"><svg x="${ICON_X}" y="${ICON_Y}" width="${ICON_SIZE}" height="${ICON_SIZE}" viewBox="${viewBox}"${fillAttr}>${iconContent}</svg></g>`
   }
 
   return minifySvg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${badgeW} ${BADGE_H}">

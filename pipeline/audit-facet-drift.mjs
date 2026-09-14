@@ -79,7 +79,9 @@
 //   ictool hands their raster through unchanged (master vs the App
 //   Store's own PNG: RMSE 0.1-1.9 on 16 of them), so on those pairs the
 //   score is entirely artwork drift. The whole-frame `frame` metric
-//   carries the two masks' 6.5% disagreement in every pair (15.8-31.4
+//   carries the two masks' disagreement in every pair — 6.5% of the frame
+//   while the flats wore the legacy squircle, less since they moved to the
+//   house squircle on 2026-09-14 (15.8-31.4
 //   on its own for identical artwork), so `central` is the ranking
 //   metric and `frame` is reported for completeness. The distribution's
 //   largest gap is 77.46 -> 97.35 (12 pairs above), the next 55.32 ->

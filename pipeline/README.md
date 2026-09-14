@@ -3340,7 +3340,13 @@ site's Vector facet displays — clips to legacy; likewise
 `<PlatformBadge>`'s fallback mask is house where the static badge's is
 legacy. The badge parity
 test compares viewBox, clip *presence* and artwork, not the mask path,
-so it never saw this. The names settle which is which; whether build-static
-migrates the static flats and badge fallbacks from legacy to house (a
-visible change to every vector on the site, and the end of the 6.5%
-mask disagreement) is a separate decision, not taken here.
+so it never saw this. The names settled which is which, and the same day the maintainer
+retired the legacy shape: build-static now takes the house path from
+`shapes.superellipse.svgPath()` for the static flats and the
+static-badge fallbacks, so the package's static and React outputs
+clip identically and the site's Vector facet wears the house squircle.
+Measured on the full drift audit: the whole-frame mask disagreement
+fell **6.5% → 1.8%** of the frame on every pair, and `frame` RMSE with
+it (antennapod 24.22 → 13.17, podurama 21.01 → 11.34, queue 24.14 →
+15.19); `central` is unchanged, as it should be. The legacy path
+survives only in this ledger and build-static's comment.
