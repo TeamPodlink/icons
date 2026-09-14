@@ -269,7 +269,7 @@ async function writeSheet(slug, flatRgba, glassRgba) {
  *  off, which is how the catalog's own builders write "off". +s marks
  *  a group with specular on. Material (glass, specular, shadow,
  *  translucency, an automatic-gradient canvas) is what separates the
- *  master from its own layer artwork; the 44 raster-sourced bundles
+ *  master from its own layer artwork; the 42 raster-sourced bundles
  *  have none of it, and ictool passes their raster through unchanged
  *  (measured: master vs the App Store's own PNG, RMSE 0.1-1.9), so on
  *  those pairs the whole score is artwork. */
