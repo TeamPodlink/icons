@@ -80,8 +80,6 @@ def srgb_to_p3coded(v255):
 
 
 PATCH = (230, 46, 86)                       # the ledger's readout patch
-RAW = np.array(PATCH, np.float64)
-CONV = srgb_to_p3coded(PATCH)
 
 os.makedirs(WORK, exist_ok=True)
 
@@ -127,13 +125,13 @@ def spec_to_p3(spec):
 
 
 # ---------------- bundle authoring ------------------------------------------
-def patch_png(path):
+def patch_png(path, patch):
     arr = np.zeros((256, 256, 4), np.uint8)
-    arr[:, :] = (*PATCH, 255)
+    arr[:, :] = (*patch, 255)
     Image.fromarray(arr, "RGBA").save(path)
 
 
-def author(name, fill=None, bleed=None):
+def author(name, fill=None, bleed=None, patch=PATCH):
     """Render one case. `fill` is a canvas fill dict; `bleed` is an encoded
     sRGB triple painted as a full-bleed opaque PNG layer UNDER the patch
     (no declared canvas fill -- so no automatic gradient anywhere)."""
@@ -143,14 +141,14 @@ def author(name, fill=None, bleed=None):
     d = os.path.join(WORK, name + ".icon")
     shutil.rmtree(d, ignore_errors=True)
     os.makedirs(os.path.join(d, "Assets"))
-    patch_png(os.path.join(d, "Assets", "patch.png"))
-    layers = []
+    patch_png(os.path.join(d, "Assets", "patch.png"), patch)
+    # ictool paints `layers` top-first, so the patch must lead the list.
+    layers = [{"image-name": "patch.png", "name": "patch", "glass": False}]
     if bleed is not None:
         arr = np.zeros((1024, 1024, 4), np.uint8)
         arr[:, :] = (*np.round(np.clip(bleed, 0, 1) * 255).astype(int), 255)
         Image.fromarray(arr, "RGBA").save(os.path.join(d, "Assets", "bleed.png"))
         layers.append({"image-name": "bleed.png", "name": "bleed", "glass": False})
-    layers.append({"image-name": "patch.png", "name": "patch", "glass": False})
     doc = {"groups": [{"layers": layers}],
            "supported-platforms": {"squares": "shared"}}
     if fill:
@@ -177,10 +175,11 @@ def two_stop(top, bot):
                             "stop": {"x": 0.5, "y": 1}}}
 
 
-def verdict(im):
+def verdict(im, patch=PATCH):
     """Centre pixel -> RAW / CONVERT, with the distance to each hypothesis."""
     c = np.median(im[480:544, 480:544].reshape(-1, 3), axis=0)
-    dr, dc = np.abs(c - RAW).max(), np.abs(c - CONV).max()
+    raw = np.asarray(patch, np.float64)
+    dr, dc = np.abs(c - raw).max(), np.abs(c - srgb_to_p3coded(patch)).max()
     return ("RAW" if dr < dc else "CONVERT"), c, dr, dc
 
 
@@ -191,15 +190,15 @@ def canvas_read(im, y):
     return np.median(im[y:y + 24, 120:240].reshape(-1, 3), axis=0)
 
 
-def run(name, fill=None, bleed=None):
-    im = author(name, fill=fill, bleed=bleed)
-    v, c, dr, dc = verdict(im)
+def run(name, fill=None, bleed=None, patch=PATCH):
+    im = author(name, fill=fill, bleed=bleed, patch=patch)
+    v, c, dr, dc = verdict(im, patch)
     return v, c, dr, dc, canvas_read(im, 120)
 
 
 want = lambda s: a.section in (None, s)
-print(f"patch {PATCH}   RAW hypothesis {np.round(RAW,1)}   "
-      f"CONVERT hypothesis {np.round(CONV, 1)}")
+print(f"patch {PATCH}   RAW hypothesis {np.round(np.array(PATCH,float),1)}   "
+      f"CONVERT hypothesis {np.round(srgb_to_p3coded(PATCH), 1)}")
 
 # ---------------- repro ------------------------------------------------------
 if want("repro"):
@@ -252,22 +251,27 @@ def case_spec(space, axis, v):
     return literal(space, tuple(np.clip(np.asarray(axis, float) * v, 0, 1)))
 
 
-def classify(spec, fill=None, tag="bi"):
+def classify(spec, fill=None, tag="bi", patch=PATCH):
     name = tag + "-" + spec.replace(":", "-").replace(",", "_")
-    return run(name, fill=fill if fill is not None else flat_lg(spec))
+    return run(name, fill=fill if fill is not None else flat_lg(spec), patch=patch)
 
 
-def bisect_axis(space, axis, lo=0.0, hi=1.0, tol=0.001, fill_of=None, tag="bi"):
-    """Return (v_raw, v_conv) bracketing the flip, or None if not bracketed."""
-    fo = fill_of or (lambda s: flat_lg(s))
-    vlo = classify(case_spec(space, axis, lo), fill=fo(case_spec(space, axis, lo)), tag=tag)[0]
-    vhi = classify(case_spec(space, axis, hi), fill=fo(case_spec(space, axis, hi)), tag=tag)[0]
+def bisect_axis(space, axis, lo=0.0, hi=1.0, tol=0.001, probe=None, tag="bi",
+                patch=PATCH):
+    """Return ((v_raw, v_conv), None, None) bracketing the flip, else the two
+    failing endpoints. Monotonicity along each ray is established by
+    --section scan (13/13 axes, one transition each), so bisection is sound.
+
+    `probe(space, axis, v)` -> "RAW"/"CONVERT" selects the canvas mechanism;
+    the default is a flat two-stop `linear-gradient`."""
+    pr = probe or (lambda sp, ax, v: classify(case_spec(sp, ax, v), tag=tag,
+                                              patch=patch)[0])
+    vlo, vhi = pr(space, axis, lo), pr(space, axis, hi)
     if vlo != "RAW" or vhi != "CONVERT":
         return None, (lo, vlo), (hi, vhi)
     while hi - lo > tol:
         mid = (lo + hi) / 2
-        v = classify(case_spec(space, axis, mid), fill=fo(case_spec(space, axis, mid)), tag=tag)[0]
-        if v == "RAW":
+        if pr(space, axis, mid) == "RAW":
             lo = mid
         else:
             hi = mid
@@ -291,6 +295,19 @@ def report_point(space, axis, v):
     }
 
 
+# ---------------- dense scan (monotonicity) ----------------------------------
+if want("scan"):
+    print("\n[scan] RAW(.) / CONVERT(#) along each axis, v = 0.00 .. 0.62 step 0.02")
+    print("       (a single . -> # transition means the axis is monotone)")
+    for name, space, axis in AXES:
+        row = ""
+        for k in range(32):
+            v = k * 0.02
+            row += "." if classify(case_spec(space, axis, v), tag="sc")[0] == "RAW" else "#"
+        flips = sum(row[i] != row[i + 1] for i in range(len(row) - 1))
+        print(f"  {name:<12} {row}  transitions {flips}")
+
+
 if want("bisect"):
     print("\n[bisect] flip point per axis, flat two-stop `linear-gradient`")
     FLIPS = {}
@@ -309,3 +326,100 @@ if want("bisect"):
     np.save(os.path.join(WORK, "flips.npy"),
             np.array([(k, *map(str, v[:2]), v[2], v[3]) for k, v in FLIPS.items()],
                      dtype=object), allow_pickle=True)
+
+# ---------------- is the law about the canvas, or the contrast? --------------
+# If the flip point of a given canvas moves when the READOUT PATCH changes,
+# the classifier is reading a canvas/artwork relationship, not the ring.
+if want("patchdep"):
+    print("\n[patchdep] flip point vs readout-patch color")
+    PATCHES = [(230, 46, 86), (30, 215, 96), (0, 122, 255), (255, 149, 0),
+               (12, 12, 20)]
+    for pc in PATCHES:
+        if np.abs(srgb_to_p3coded(pc) - np.array(pc, float)).max() < 4:
+            print(f"  patch {pc}  SKIP: RAW and CONVERT differ by "
+                  f"{np.abs(srgb_to_p3coded(pc) - np.array(pc,float)).max():.1f}/255 "
+                  f"-- not separable")
+            continue
+        out = []
+        for name, space, axis in AXES[:4]:
+            tag = "pd%d_%d_%d" % pc
+            br, bl, bh = bisect_axis(space, axis, tag=tag, patch=pc)
+            out.append(f"{name} {('%.4f' % br[0]) if br else 'NONE'}")
+        print(f"  patch {str(pc):<16} " + "   ".join(out))
+
+# ---------------- canvas mechanism (is the auto-gradient lift the cause?) ----
+if want("mech"):
+    print("\n[mech] flip point per canvas mechanism")
+    print("  lg     flat two-stop `linear-gradient` [C, C]")
+    print("  ag     `automatic-gradient: C` (ictool derives its own top lift)")
+    print("  solid  `solid: C`")
+    print("  bleed  full-bleed opaque untagged-sRGB PNG layer, NO declared fill")
+    print("  lglift literal two-stop [measured ag top, C] -- the lift, baked in")
+
+    def mech_probe(kind):
+        def f(space, axis, v):
+            spec = case_spec(space, axis, v)
+            nm = f"me-{kind}-" + spec.replace(":", "-").replace(",", "_")
+            if kind == "lg":
+                return run(nm, fill=flat_lg(spec))[0]
+            if kind == "ag":
+                return run(nm, fill={"automatic-gradient": spec})[0]
+            if kind == "solid":
+                return run(nm, fill={"solid": spec})[0]
+            if kind == "bleed":
+                return run(nm, bleed=spec_to_srgb(spec))[0]
+            if kind == "lglift":
+                return run(nm, fill=two_stop(ag_top_literal(spec), spec))[0]
+            raise ValueError(kind)
+        return f
+
+    def ag_top(spec):
+        """MEASURE the automatic-gradient's top stop for `spec`: render the
+        canvas with blank artwork and linearly extrapolate the rendered
+        centre column to y=0 (the probe-autogradient-colored method). The
+        flat [C,C] gradient of the same C gives the no-lift reference, so
+        the lift is read as a difference of two renders -- no model."""
+        key = "agtop-" + spec.replace(":", "-").replace(",", "_")
+        cached = os.path.join(WORK, key + ".npy")
+        if os.path.exists(cached):
+            return np.load(cached)
+        prof = {}
+        for kind, fill in (("ag", {"automatic-gradient": spec}),
+                           ("lg", flat_lg(spec))):
+            im = author(f"{key}-{kind}", fill=fill, patch=(0, 0, 0))
+            col = np.median(im[:, 120:240, :], axis=1)      # clear of the patch
+            ys = np.arange(120, 900)
+            A = np.stack([np.ones(len(ys)), (ys + 0.5) / 1024], 1)
+            coef, *_ = np.linalg.lstsq(A, col[120:900], rcond=None)
+            prof[kind] = (coef[0], coef[0] + coef[1])       # (top, bottom)
+        lift = (prof["ag"][0] - prof["ag"][1]) - (prof["lg"][0] - prof["lg"][1])
+        np.save(cached, lift)
+        return lift
+
+    def ag_top_literal(spec):
+        """`spec` raised by its own measured auto-gradient lift, as a literal."""
+        head = spec.partition(":")[0]
+        base = spec_rgb(spec)
+        lift = ag_top(spec) / 255.0
+        if head == "display-p3":
+            top = np.clip(base + lift, 0, 1)
+        else:
+            top = np.clip(enc(P3_SRGB @ lin(np.clip(spec_to_p3(spec) + lift, 0, 1))),
+                          0, 1)
+        if head == "gray":
+            return gray(float(top.mean()))
+        return literal(head, tuple(top))
+
+    rows = []
+    for name, space, axis in AXES[:4] + [AXES[6], AXES[9]]:
+        line = f"  {name:<12}"
+        vals = {}
+        for kind in ("lg", "ag", "solid", "bleed", "lglift"):
+            br, bl, bh = bisect_axis(space, axis, probe=mech_probe(kind))
+            vals[kind] = br[0] if br else None
+            line += f" {kind} " + (f"{br[0]:.4f}" if br else " NONE ")
+        rows.append((name, vals))
+        print(line)
+    same = all(v["lg"] is not None and v["solid"] is not None
+               and abs(v["lg"] - v["solid"]) <= 0.002 for _, v in rows)
+    print(f"  => lg == solid on every axis within 0.002: {same}")
