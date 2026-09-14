@@ -477,3 +477,205 @@ if want("minchan"):
             br, bl, bh = bisect_axis("srgb", mk(e), probe=grid_probe)
             row += f"{br[0]:>8.4f}" if br else "    NONE"
         print(row)
+
+# ---------------- the headline: the classifier is not monotone ---------------
+if want("dominance"):
+    print("\n[dominance] a strictly brighter colour that renders DARKER")
+    PAIRS = [((0.0, 0.1160, 0.0), (0.0800, 0.3000, 0.0800)),
+             ((0.0, 0.1160, 0.1160), (0.0800, 0.3000, 0.3000)),
+             ((0.2900, 0.0, 0.0), (0.3000, 0.0400, 0.0400))]
+    for lo, hi in PAIRS:
+        dom = all(h >= l for l, h in zip(lo, hi))
+        vlo = run("dom-lo-%s" % (lo,), fill={"solid": srgb(*lo)})[0]
+        vhi = run("dom-hi-%s" % (hi,), fill={"solid": srgb(*hi)})[0]
+        print(f"  {str(lo):<26} {vlo:<8}   {str(hi):<26} {vhi:<8}"
+              f"  hi dominates lo: {dom}")
+
+# ---------------- V cap around the fully saturated hue circle ----------------
+def hue_unit(h):
+    """The S=1, V=1 RGB direction at hue angle h (degrees): max 1, min 0."""
+    x = 1 - abs((h / 60.0) % 2 - 1)
+    return [(1, x, 0), (x, 1, 0), (0, 1, x), (0, x, 1), (x, 0, 1),
+            (1, 0, x)][int(h // 60) % 6]
+
+
+if want("hue"):
+    print("\n[hue] flip point around the S=1 hue circle (`solid` canvases)")
+    print("  hue    dir(r,g,b)              vFlip   colour at flip")
+    for h in range(0, 360, 10):
+        u = hue_unit(h)
+        br, bl, bh = bisect_axis("srgb", u, probe=grid_probe)
+        v = (br[0] + br[1]) / 2 if br else float("nan")
+        print(f"  {h:>3}    {str(tuple(round(x,3) for x in u)):<22} "
+              f"{v:.4f}  {np.round(np.asarray(u) * v, 4)}")
+
+# ---------------- where does the high-saturation constraint switch off? ------
+# Ray d(h, e) = (1-e)*hue_unit(h) + e*(1,1,1): max 1, min e, so S = 1 - e.
+# A ray is "in the cap regime" iff it is still RAW at v = 0.300, just under
+# the universal cap -- one render per test, so the switch bisects cheaply.
+def sat_dir(h, e):
+    u = np.asarray(hue_unit(h), np.float64)
+    return tuple((1 - e) * u + e)
+
+
+if want("switch"):
+    print("\n[switch] the saturation at which the extra constraint lets go")
+    print("  probe: is the ray still RAW at v = 0.300 (just under the cap)?")
+    for h in range(0, 360, 30):
+        lo, hi = 0.0, 1.0
+        at = lambda e: run("sw-%d-%.4f" % (h, e),
+                           fill={"solid": srgb(*(np.asarray(sat_dir(h, e)) * 0.300))}
+                           )[0] == "RAW"
+        if at(lo):
+            print(f"  hue {h:>3}   already at cap at S = 1 (no extra constraint)")
+            continue
+        if not at(hi):
+            print(f"  hue {h:>3}   never reaches the cap even at S = 0")
+            continue
+        while hi - lo > 0.004:
+            mid = (lo + hi) / 2
+            if at(mid):
+                hi = mid
+            else:
+                lo = mid
+        print(f"  hue {h:>3}   switches at min/max = {(lo+hi)/2:.3f}  "
+              f"(S = {1-(lo+hi)/2:.3f})")
+
+# ---------------- fit ---------------------------------------------------------
+# 40 random midpoints of measured boundary colours all render RAW, so the RAW
+# region is convex -- it is a polytope {c : W c <= 1}, not a brightness
+# threshold. Candidate facet normals: the three channels (the recorded
+# max-channel cap) and the six channel DIFFERENCES, which is what the
+# saturation ramp measured (green's flip holds max - min constant at 0.111,
+# red's at 0.281). Each bound is set to the largest value any measured
+# boundary colour reaches, then the fit is validated on held-out directions.
+FUNCS = [("r", (1, 0, 0)), ("g", (0, 1, 0)), ("b", (0, 0, 1)),
+         ("r-g", (1, -1, 0)), ("r-b", (1, 0, -1)), ("g-r", (-1, 1, 0)),
+         ("g-b", (0, 1, -1)), ("b-r", (-1, 0, 1)), ("b-g", (0, -1, 1))]
+W = np.array([w for _, w in FUNCS], np.float64)
+
+
+def boundary(dirs, tag):
+    out = []
+    for d in dirs:
+        br, _, _ = bisect_axis("srgb", d, probe=grid_probe)
+        if br:
+            out.append((np.asarray(d, np.float64), (br[0] + br[1]) / 2))
+    return out
+
+
+def predict(d, t):
+    """Radial limit of {c : W c <= t} along direction d."""
+    s = W @ np.asarray(d, np.float64)
+    act = s > 1e-9
+    return (t[act] / s[act]).min() if act.any() else np.inf
+
+
+if want("fit"):
+    rng = np.random.default_rng(20260913)
+    rand = [tuple(x) for x in rng.random((60, 3))]
+    fit_dirs = GRID_DIRS + [hue_unit(h) for h in range(0, 360, 10)] + rand[:30]
+    hold_dirs = rand[30:]
+    print(f"\n[fit] {len(fit_dirs)} fitting directions, {len(hold_dirs)} held out")
+    B = boundary(fit_dirs, "fit")
+    H = boundary(hold_dirs, "hold")
+    np.save(os.path.join(WORK, "boundary-fit.npy"),
+            np.array([(*d, v) for d, v in B], np.float64))
+    np.save(os.path.join(WORK, "boundary-hold.npy"),
+            np.array([(*d, v) for d, v in H], np.float64))
+    X = np.array([d * v for d, v in B])
+    t = (W @ X.T).max(1)                      # tightest bound containing them
+    for (name, _), tv in zip(FUNCS, t):
+        print(f"  {name:<5} <= {tv:.4f}")
+
+    def score(name, S):
+        e = np.array([predict(d, t) - v for d, v in S])
+        print(f"  {name:<10} n {len(S):>3}  max |dv| {np.abs(e).max():.4f}  "
+              f"rms {np.sqrt((e ** 2).mean()):.4f}  worst over-predict {e.max():+.4f}")
+
+    score("fit", B)
+    score("held out", H)
+    rec = np.array([0.308] * 3 + [9] * 6, np.float64)   # the recorded law
+    e = np.array([predict(d, rec) - v for d, v in B + H])
+    print(f"  recorded   n {len(B)+len(H):>3}  max |dv| {np.abs(e).max():.4f}  "
+          f"rms {np.sqrt((e ** 2).mean()):.4f}  worst over-predict {e.max():+.4f}")
+
+# ---------------- the law -----------------------------------------------------
+# The boundary is convex but not a polytope of few facets and not a quadric.
+# What the ramps measure exactly is a constant CHROMA at the flip: holding
+# hue and sliding the minimum channel up, green flips at max - min = 0.111
+# across nine samples and red at 0.281 across five, while the max channel
+# itself moves by 0.03. So the law is a chroma bound, and the hue circle
+# (--section hue, 36 samples at min = 0, where chroma = max) IS that bound:
+#
+#     raw  <=>  ring opaque
+#               AND max(c) < CAP
+#               AND max(c) - min(c) < CHROMA_BY_HUE[hue(c)]
+#
+# CAP is the smallest cap measured over every direction; the chroma table is
+# read at the conservative (lower) of the two bracketing hue samples, so the
+# rule stays an INNER bound -- it never claims raw where ictool converts.
+# Table entries at ~0.311 are hues where no chroma bound binds before the cap.
+LAW_CAP = 0.308
+CHROMA_BY_HUE = [0.2817, 0.3120, 0.3120, 0.2681, 0.2280, 0.1958,   #   0- 50
+                 0.1685, 0.1733, 0.1782, 0.1821, 0.1841, 0.1323,   #  60-110
+                 0.1118, 0.1118, 0.1118, 0.1118, 0.1118, 0.1118,   # 120-170
+                 0.1118, 0.1343, 0.1675, 0.2231, 0.3110, 0.3101,   # 180-230
+                 0.3110, 0.3110, 0.3101, 0.3101, 0.3091, 0.3110,   # 240-290
+                 0.2817, 0.2817, 0.2817, 0.2817, 0.2817, 0.2817]   # 300-350
+
+
+def hue_of(c):
+    """HSV hue in degrees; None for a neutral (chroma 0)."""
+    r, g, b = c
+    mx, mn = max(c), min(c)
+    if mx == mn:
+        return None
+    d = mx - mn
+    if mx == r:
+        h = 60 * (((g - b) / d) % 6)
+    elif mx == g:
+        h = 60 * ((b - r) / d + 2)
+    else:
+        h = 60 * ((r - g) / d + 4)
+    return h % 360
+
+
+def chroma_bound(h):
+    """The measured bound at hue h, taken at the lower of the two bracketing
+    10-degree samples so interpolation cannot make the rule optimistic."""
+    if h is None:
+        return float("inf")
+    i = int(h // 10) % 36
+    return min(CHROMA_BY_HUE[i], CHROMA_BY_HUE[(i + 1) % 36])
+
+
+def law_raw(c):
+    c = [float(x) for x in c]
+    return max(c) < LAW_CAP and (max(c) - min(c)) < chroma_bound(hue_of(c))
+
+
+if want("law"):
+    print(f"\n[law] raw <=> max < {LAW_CAP} AND max - min < CHROMA_BY_HUE[hue]")
+    rng = np.random.default_rng(913)
+    N = 400
+    cols = rng.random((N, 3)) * 0.36
+    unsound = wasted = nraw = npred = 0
+    for i, c in enumerate(cols):
+        actual = run("law-%d" % i, fill={"solid": srgb(*c)})[0] == "RAW"
+        pred = law_raw(c)
+        nraw += actual
+        npred += pred
+        if pred and not actual:
+            unsound += 1
+            print(f"  UNSOUND {np.round(c,4)} predicted raw, renders CONVERT")
+        if actual and not pred:
+            wasted += 1
+    print(f"  {N} random canvases: {nraw} render RAW, the rule predicts {npred}")
+    print(f"  unsound (claims raw, ictool converts): {unsound}")
+    print(f"  conservative (ictool raws, rule says convert): {wasted}"
+          f"  = {wasted / max(nraw,1):.1%} of the raw set")
+    print(f"  recorded law (maxEnc < 0.308) on the same sample: "
+          f"{sum(1 for c in cols if max(c) < 0.308)} predicted raw, "
+          f"{sum(1 for i, c in enumerate(cols) if max(c) < 0.308 and run('law-%d' % i, fill={'solid': srgb(*c)})[0] != 'RAW')}"
+          f" of them UNSOUND")
