@@ -3403,3 +3403,19 @@ arrangement differs from the brand kit's, so this is artwork drift
 between two official renditions, not ours. `EXPECTED_DIVERGENCE` is
 empty again; the Drift snapshot refreshed (69 pairs, median 5.36). The
 badges keep Pandora's black/white P.
+
+**Follow-up: the colours were the brand kit's, not the app's.** The
+maintainer saw the new flat as duller than the Liquid Glass rendition.
+Measured inside the P at 256: mean saturation 0.752 vs 0.798, mean
+value 197 vs 211; the blues carry it — (79,116,194) where the master
+reads (51,127,232) — while the reds are slightly MORE saturated in the
+vector (233,37,66 vs 234,55,71). Not a colour-space misread: pdftocairo's
+own raster of the PDF matches the SVG to the unit, and reinterpreting
+the triples as Display P3 or Adobe RGB overshoots the reds (254,0,58)
+while still missing the blues. The App Store icon is simply a different
+grade of the same art. So the flat is graded to it: an affine RGB map
+fitted by least squares over 14,590 matched pixels inside the P
+(brand-kit render → master), rms 18.97 → 6.93, applied to all 287
+stops — blue (79,116,194) → (53,117,231), red → (231,50,70). Facet
+drift **15.67 → 5.18**, mean channel −0.2/−0.1/+0.3; the map is
+recorded in icon.svg's header comment. Snapshot refreshed.
