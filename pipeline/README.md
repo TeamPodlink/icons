@@ -2610,3 +2610,37 @@ live for any glass group, so shadow settings on the 9 bundles that
 carry them are not inert across the board — only on the non-glass ones.
 Before concluding a property does nothing, vary the thing that gates
 it, not just the property.
+
+### deezer's flat is a DELIBERATE divergence — do not "fix" it (2026-09-13)
+
+`platforms/deezer/icon.svg` is intentionally the heart mark ALONE. The
+shipped app icon — and therefore the bundle — also carries the white
+"DEEZER" wordmark below the heart. This is a maintainer choice: the
+flat facet is wanted as a mark, not a lockup.
+
+**Consequence: deezer will sit high on `audit-facet-drift.mjs` forever,
+and that is correct.** It reads 106.13 central after the colour fix
+below (was 147.42). Roughly 5% of the icon's pixels are wordmark
+(55,897 white px of 1,048,576 in the store artwork), and the heart is
+positioned differently as a direct result of the choice: the vendor
+pushes theirs up to make room for the wordmark, ours sits near centre
+where a mark-only composition belongs.
+
+  our flat  heart 566x566 @(510.5,531.5)
+  store art heart 603x603 @(512.0,424.0)   wordmark 55,897 white px
+  our glass heart 605x606 @(512.0,423.5)   — bundle matches the store
+
+**aspectD 0.00%**: the heart is the same shape in both, 6.5% smaller
+and lower. Do not scale and shift it to match the master — that would
+reproduce a wordmark-era composition in an icon that has no wordmark.
+
+**Colours now follow Deezer, measured from their live store artwork**
+(iTunes lookup 292738169): plate **(0,0,0)** over 771,596 px, heart
+**(162,56,255) = `#A238FF`** over 190,442 px. Ours had these inverted —
+a purple plate with a black heart — and the purple was a third
+same-triple wrong-space case: `color(display-p3 .6353 .2196 1)` whose
+triple read as sRGB is exactly (162,56,255), Deezer's heart purple,
+but which Chrome renders as (176,45,255). Like siriusxm and hark, the
+earlier sweep could not catch it because deezer's plate is a raster
+(`light.png`), so there is no `srgb:` declaration in the bundle to
+compare against. That makes three found only via the master.
