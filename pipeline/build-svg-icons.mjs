@@ -77,7 +77,11 @@
 //     through the RMSE at all. ictool's SVG filter support is partial
 //     and primitive-dependent (MEASURED 2026-09-13 — see the ledger
 //     entry "ictool's partial SVG filter support"): it honours
-//     feGaussianBlur / feOffset / feFlood+feBlend and both implicit
+//     feGaussianBlur / feOffset / feFlood+feBlend — on <path> elements
+//     only (dropped on <g>), with primitive lengths read in ROOT viewBox
+//     units regardless of ancestor transforms; measured 2026-09-14, see
+//     the ledger's "antennapod: rebuilt from github.com/AntennaPod/
+//     branding" — and both implicit
 //     and named primitive chains, but it renders tunestr's committed
 //     drop-shadow filter as a NO-OP — its render is bit-identical
 //     (RMSE 0.000) with and without the `filter="url(#…)"` reference,
