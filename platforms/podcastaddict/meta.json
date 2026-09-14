@@ -10,7 +10,7 @@
         "title": "Podcast Addict",
         "variant": null,
         "file": "PodcastAddict.icon",
-        "source": "adaptive-icon-split",
+        "source": "flat-svg-split",
         "hasDark": true
       }
     ]
