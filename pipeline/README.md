@@ -2919,3 +2919,36 @@ stay there: the remaining gap is entirely the fill, recorded in
 `EXPECTED_DIVERGENCE` with these numbers as the falsifiable reason.
 Badge: black P for light, and — because black cannot read on a dark
 pill — the kit's white P for dark, the one case the badge rule permits.
+
+### podcastguru: the app bundle's own vectors are the pale design (2026-09-14)
+
+Podcast Guru 1.0.38 (ipatool, `com.reallybadapps.podcastguru`): no
+`IconImageStack`, so no Liquid Glass icon yet, and the App Store icon is
+still the saturated black-outlined raster — byte-identical to the
+`light.png` we shipped (RMSE 0.00). But the catalogue carries 31
+`Vector` assets, and among them the app icon ITSELF as vector PDFs:
+`iconAppIconWhite.pdf` / `iconAppIconDark.pdf` (140- and 115-point
+boxes) plus the stacked logos. Carved out of the `.car` by `%PDF-` /
+`%%EOF` offsets (CoreUI keeps the PDF verbatim under "Preserved Vector
+Representation") and rendered with pdftocairo.
+
+**Every vector in the bundle is the pale translucent-petal design** —
+the version the brand shows everywhere except the iOS store tile. By
+the maintainer's criterion (in-app vectors are the leading indicator of
+brand direction) the saturated raster is the outlier, so the bundle now
+follows the vectors: `light.png` from `iconAppIconWhite.pdf`,
+`dark.png` from `iconAppIconDark.pdf` — the developer's own dark-UI
+variant, stronger petals, same framing (petals 85.1% of the plate,
+centred within 1 px in both). Source `catalog-artwork` ->
+`official-artwork`. Note the developer's dark variant keeps a WHITE
+plate; it is shipped as authored rather than re-plated to Apple's
+convention.
+
+The PDFs do not convert to clean SVG — pdftocairo turns the petals'
+transparency groups into an `<image>` soft mask plus filters (18 in the
+dark file), and ictool drops filters — so they ship as pixels, and our
+existing flat (a pale rendition drawn before this evidence existed)
+stays as the vector facet: it measures **8.97** whole-frame against the
+official vector and its petals register to it at -0.16% / 1.5 px.
+Facet drift **115.55 -> 13.37**, the raster-recreation band; the
+residual is petal-blend colour (mean -5.6/-3.4/-6.5), not geometry.
