@@ -1,16 +1,20 @@
 import type { IconShape, ShapeDefinition } from './types.js'
 
-// Podlink house squircle: one cubic per quadrant with handles at 10/11 of
+// The HOUSE squircle: one cubic per quadrant with handles at 10/11 of
 // the half-size — a close approximation of an n≈3.9 superellipse (max
 // deviation from a true n=4 squircle: 3.1px at 1024). Deliberately NOT
-// Apple's Liquid Glass mask, which is flat edges + n≈2.45 superellipse
-// corners and sits 11px away at 1024 (measured 2026-08-18; the fitted
-// Apple path lives in the icon-to-flat-svg skill).
+// Apple's Liquid Glass mask (the iOS squircle: flat edges + n≈2.45
+// superellipse corners, 11px away at 1024, measured 2026-08-18; the
+// fitted Apple path lives in the icon-to-flat-svg skill). Also not the
+// LEGACY squircle (77.2% handles) that scripts/build-static.ts still
+// masks the static flats with — see pipeline/README.md, "The three
+// squircles" (named 2026-09-14). This shape is <PlatformIcon>'s default,
+// <PlatformBadge>'s icon.svg fallback, and the badge plates' clip.
 // At size 32: inset = 1.455, half = 16  →  ratio = 1.455 / 16
-const SQUIRCLE_RATIO = 1.455 / 16
+const HOUSE_SQUIRCLE_RATIO = 1.455 / 16
 
-// Precomputed superellipse paths for common sizes
-const SQUIRCLE_PATHS: Record<number, string> = {
+// Precomputed house-squircle paths for common sizes
+const HOUSE_SQUIRCLE_PATHS: Record<number, string> = {
   24: 'M12 0C22.909 0 24 1.091 24 12S22.909 24 12 24S0 22.909 0 12S1.091 0 12 0Z',
   32: 'M16 0C30.545 0 32 1.455 32 16S30.545 32 16 32S0 30.545 0 16S1.455 0 16 0Z',
   48: 'M24 0C45.817 0 48 2.183 48 24S45.817 48 24 48S0 45.817 0 24S2.183 0 24 0Z',
@@ -18,10 +22,10 @@ const SQUIRCLE_PATHS: Record<number, string> = {
 }
 
 function superellipsePath(size: number): string {
-  if (SQUIRCLE_PATHS[size]) return SQUIRCLE_PATHS[size]
+  if (HOUSE_SQUIRCLE_PATHS[size]) return HOUSE_SQUIRCLE_PATHS[size]
 
   const half = size / 2
-  const inset = half * SQUIRCLE_RATIO
+  const inset = half * HOUSE_SQUIRCLE_RATIO
   const r = (n: number) => Math.round(n * 1000) / 1000
 
   // Generate the path following the same pattern as the precomputed ones

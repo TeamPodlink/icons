@@ -57,12 +57,12 @@ pipeline/                  lib.mjs (readPlatforms/readBundles) + generators.
   packages/icons/{src/generated,src/data/platforms.json,static,dist}.
 - Rendering runs ONLY on a maintainer Mac (ictool). CI validates
   structure and builds; it never renders.
-- Squircles: three ship — the iOS squircle (ictool's mask on every
-  Liquid Glass rendition), and two of ours whose naming is pending:
-  the 77.2%-handle path masking the static flats (build-static
-  `SQUIRCLE_32`) and the 90.9%-handle path in
-  `packages/icons/src/core/shapes.ts` (React shapes, badge plates).
-  Geometry and the open inconsistency: pipeline/README.md, "The three
+- Squircles: three, never interchanged — the iOS squircle (ictool's
+  mask on every Liquid Glass rendition), the house squircle (the 10/11
+  shape in `packages/icons/src/core/shapes.ts`: React components and
+  the badge plates' clip, `M16 0C30.545 0 32 1.455 32 16S…`), and the
+  legacy squircle (77.2% handles, `LEGACY_SQUIRCLE_*` in build-static:
+  the static flats' mask). Geometry: pipeline/README.md, "The three
   squircles".
 - Color: ictool renders are P3-coded sRGB-gamut content. Everything
   shipped (rasters, engine output) is converted P3→sRGB untagged; only

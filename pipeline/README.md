@@ -3308,10 +3308,13 @@ white SVG layer the mark would auto-tint in Dark exactly as
 glyph-dark.png does, if ever swapped. Vector count 68 → 69, "missing
 flat" 3 → 2 (airshow, disctopia).
 
-## The three squircles (measured 2026-09-14; naming pending)
+## The three squircles (named 2026-09-14)
 
-Three different "rounded squares" ship from this repo, and the code and
-the site disagree about which one is "ours". Measured on 1024-px masks
+Three different "rounded squares" ship from this repo: the **iOS**
+squircle, the **house** squircle (the 10/11 shape) and the **legacy**
+squircle (the rounder one) — named by the maintainer after the
+measurement below showed the code and the site disagreeing about
+which one was "ours". Measured on 1024-px masks
 (the iOS one from an ictool master's alpha, the other two rendered
 from their paths): the corner cut is how far along the diagonal the
 boundary sits inside the true corner, as a fraction of the side; the
@@ -3321,22 +3324,23 @@ pixel.
 | | definition | corner cut | straight run | corner-fit radius | where it is used |
 | --- | --- | --- | --- | --- | --- |
 | **iOS** | Apple's continuous-corner shape, ictool's own mask | 10.78% | 43.1% | 26.4% | every Liquid Glass rendition; never drawn by us |
-| **A** — handles at 77.2% | `M16 0c12.357 0 16 3.643 16 16 …` (build-static `SQUIRCLE_32`/`_24`) | 14.88% | 13.6% | 31.7% | the mask on every static flat (`static/icons/*.svg`, i.e. the site's Vector facet) and on the icon.svg fallback inside static badges; dates to @podlink/icons v0.1.0 (2026-02-08), undocumented |
-| **B** — handles at 90.9% (10/11) | `M16 0C30.545 0 32 1.455 32 16 …` (`packages/icons/src/core/shapes.ts`) | 11.17% | 23.3% | 26.0% | `<PlatformIcon>`'s default shape, `<PlatformBadge>`'s icon.svg fallback, and the self-clipped plate inside 17 badge.svg files (5 more use a circle); shapes.ts documents it as "the Podlink house squircle", an n≈3.9 superellipse chosen deliberately NOT to be Apple's |
+| **legacy** — handles at 77.2% | `M16 0c12.357 0 16 3.643 16 16 …` (build-static `LEGACY_SQUIRCLE_32`/`_24`) | 14.88% | 13.6% | 31.7% | the mask on every static flat (`static/icons/*.svg`, i.e. the site's Vector facet) and on the icon.svg fallback inside static badges; dates to @podlink/icons v0.1.0 (2026-02-08), undocumented |
+| **house** — handles at 90.9% (10/11) | `M16 0C30.545 0 32 1.455 32 16 …` (`packages/icons/src/core/shapes.ts`) | 11.17% | 23.3% | 26.0% | `<PlatformIcon>`'s default shape, `<PlatformBadge>`'s icon.svg fallback, and the self-clipped plate inside 17 badge.svg files (5 more use a circle); shapes.ts documents it as "the Podlink house squircle", an n≈3.9 superellipse chosen deliberately NOT to be Apple's |
 
 Radius profile (boundary distance from the centre, % of side, 0° → 45°):
-iOS 49.9 → 59.9, B 49.9 → 59.5, A 49.9 → 55.8. B is the in-between
-shape — corners within 0.4% of iOS, sides bowing — and A is the
-squattest: no straight sides to speak of, the roundest corners. The
-facet-drift audit's whole-frame "6.5% mask disagreement" is iOS vs A.
+iOS 49.9 → 59.9, house 49.9 → 59.5, legacy 49.9 → 55.8. House is the
+in-between shape — corners within 0.4% of iOS, sides bowing — and
+legacy is the squattest: no straight sides to speak of, the roundest corners. The
+facet-drift audit's whole-frame "6.5% mask disagreement" is iOS vs legacy.
 
 **The inconsistency this surfaced.** The npm package ships two
-squircles for the same job: `<PlatformIcon>` (React) clips to B while
+squircles for the same job: `<PlatformIcon>` (React) clips to house while
 `static/icons/*.svg` — the same package's static output, and what the
-site's Vector facet displays — clips to A; likewise `<PlatformBadge>`'s
-fallback mask is B where the static badge's is A. The badge parity
+site's Vector facet displays — clips to legacy; likewise
+`<PlatformBadge>`'s fallback mask is house where the static badge's is
+legacy. The badge parity
 test compares viewBox, clip *presence* and artwork, not the mask path,
-so it never saw this. Which of A and B is the house squircle is the
-maintainer's call (the site has shown A as "the vectors" since day
-one; the code has called B "house" as long); the other needs a name
-and, more to the point, one of the two consumers needs to change.
+so it never saw this. The names settle which is which; whether build-static
+migrates the static flats and badge fallbacks from legacy to house (a
+visible change to every vector on the site, and the end of the 6.5%
+mask disagreement) is a separate decision, not taken here.
