@@ -118,6 +118,22 @@ export function isPlatformLens(cat: string): boolean {
 }
 
 /**
+ * QA lenses are MAINTAINER TOOLING, not visitor-facing navigation: they
+ * are worklists of our own gaps ("missing badge", "hand-drawn art"),
+ * and a released site has no use for them — so they are gated to dev by
+ * default. `VITE_SHOW_LENSES=1` forces them on for a deployed preview.
+ *
+ * Both env reads fold to a constant at build time, so a production
+ * build genuinely DROPS the lens machinery rather than merely hiding
+ * it: with the flag off, `debugCategories` loses its only callers below
+ * and the bundler shakes it out with its label strings (measured — the
+ * lens labels are absent from dist/assets/index-*.js). Declared here,
+ * above `cards`, because that eager `flatMap` reads it.
+ */
+export const lensesEnabled =
+  import.meta.env.DEV || import.meta.env.VITE_SHOW_LENSES === "1";
+
+/**
  * QA lenses: every category is an actionable worklist of identifiable
  * problems — informational facts (provenance, feature coverage) are data
  * on the card, not lenses. Bundle-level: "missing dark" is the
@@ -172,7 +188,7 @@ export const cards: Card[] = platforms.flatMap((p): Card[] => {
       platform: p,
       facet: "glass",
       bundle: b,
-      categories: debugCategories(p, b),
+      categories: lensesEnabled ? debugCategories(p, b) : [],
       added: p.added,
       popularity: p.popularity,
       popularityRank: p.popularityRank,
@@ -185,7 +201,7 @@ export const cards: Card[] = platforms.flatMap((p): Card[] => {
         platform: p,
         facet: "flat",
         bundle: null,
-        categories: debugCategories(p, null),
+        categories: lensesEnabled ? debugCategories(p, null) : [],
         added: p.added,
         popularity: p.popularity,
         popularityRank: p.popularityRank,
@@ -216,6 +232,7 @@ export const ASSET_BASE = import.meta.env.VITE_ASSET_BASE ?? "/library";
  * member platform.
  */
 export function getCategories(): { name: string; count: number }[] {
+  if (!lensesEnabled) return [];
   const members = new Map<string, Set<string>>();
   for (const c of cards)
     for (const cat of c.categories) {
@@ -239,6 +256,7 @@ export function categorySlug(name: string): string {
 }
 
 export function getCardsByCategory(slug: string): Card[] {
+  if (!lensesEnabled) return [];
   return cards.filter(
     (c) =>
       c.categories.some((cat) => categorySlug(cat) === slug) &&

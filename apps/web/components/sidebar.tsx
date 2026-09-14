@@ -80,27 +80,30 @@ export function Sidebar() {
           </Link>
         ))}
       </nav>
-      <div className="h-px w-full bg-neutral-200 dark:bg-neutral-800" />
-      <ScrollFade
-        className="min-h-0 flex-1"
-        viewportClassName="pb-6"
-      >
-        <nav className="flex flex-col space-y-0.5">
-        {categories.map((c) => {
-          const href = `/directory/${categorySlug(c.name)}`;
-          return (
-            <Link
-              key={c.name}
-              to={href}
-              className={cn(itemBase, pathname === href && itemActive)}
-            >
-              <span className="truncate">{c.name}</span>
-              <Badge>{c.count}</Badge>
-            </Link>
-          );
-        })}
-        </nav>
-      </ScrollFade>
+      {/* QA lenses: maintainer worklists, empty (and unrouted) in a
+          released build — see lensesEnabled in lib/platforms. */}
+      {categories.length > 0 && (
+        <>
+          <div className="h-px w-full bg-neutral-200 dark:bg-neutral-800" />
+          <ScrollFade className="min-h-0 flex-1" viewportClassName="pb-6">
+            <nav className="flex flex-col space-y-0.5">
+              {categories.map((c) => {
+                const href = `/directory/${categorySlug(c.name)}`;
+                return (
+                  <Link
+                    key={c.name}
+                    to={href}
+                    className={cn(itemBase, pathname === href && itemActive)}
+                  >
+                    <span className="truncate">{c.name}</span>
+                    <Badge>{c.count}</Badge>
+                  </Link>
+                );
+              })}
+            </nav>
+          </ScrollFade>
+        </>
+      )}
     </aside>
   );
 }
