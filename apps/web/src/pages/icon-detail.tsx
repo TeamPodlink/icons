@@ -331,7 +331,7 @@ export function IconDetailPage() {
             <BadgeArtwork platform={p} transitionKey={panelKey(p)} />
           </div>
         ) : facet === "compare" && p.bundles[0] ? (
-          <div style={{ width: "min(100%, 64rem)" }}>
+          <div style={{ width: SQUARE_HERO_WIDTH }}>
             <CompareArtwork platform={p} bundle={p.bundles[0]} />
           </div>
         ) : null}

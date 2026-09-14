@@ -3424,9 +3424,10 @@ recorded in icon.svg's header comment. Snapshot refreshed.
 
 The detail page's segmented control grows a fourth segment in dev
 (`scan-eye`, gated like the QA lenses): **Compare**, the facet-drift
-audit's pair on screen — the LIGHT Liquid Glass rendition beside the
-flat vector, plus the two blended under a slider so registration and
-colour differences read as ghosting — captioned with the bundle's
+audit's pair on screen — the flat vector blended over the LIGHT Liquid
+Glass rendition under a slider (just the blend, sized like the square
+heroes; the side-by-side triptych was dropped the same day), so
+registration and colour differences read as ghosting — captioned with the bundle's
 drift from the committed snapshot. Always the light rendition whatever
 the site theme, because that is the pair the audit scores and the flat
 has no dark rendition. `?facet=compare` deep-links it; a production
