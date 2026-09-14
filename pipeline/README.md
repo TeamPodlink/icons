@@ -2883,3 +2883,16 @@ The gap is narrow and the fix is mechanical: when a split glyph has a
 dark component (any fill retintDark would touch) AND a light component,
 emit the retintDark twin instead of nothing. The white-fill-only and
 dark-only cases are already handled; only the mixture is not.
+
+### The dark-icon compromise does not transfer to badges (2026-09-14)
+
+A Liquid Glass icon's dark rendition is a negotiated thing: the app's
+brand meets Apple's dark-mode convention, and the result can be a
+recolour the brand would never ship on its own (goodpods' dark icon is
+white line-art with no yellow at all). A **badge** carries no such
+constraint — it is the brand's mark on a pill — so its dark pill should
+show the same mark as its light one. goodpods briefly had a
+`badge-dark.svg` derived from the dark icon; it was wrong and is gone.
+Rule: derive `badge-dark.svg` from the BRAND, only when the mark itself
+needs a different colour to read on black; never from the icon's
+dark-mode compromise.
