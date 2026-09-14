@@ -56,10 +56,16 @@ export function PlatformIcon({
         </defs>
       )}
       <g clipPath={needsClip ? `url(#${clipId})` : undefined}>
+        {/*
+          `fill` carries the source file's root <svg fill> onto the element
+          that now holds its content — see IconData.rootFill. Without it a
+          stroke-only path inherits the SVG default and fills black.
+        */}
         <svg
           viewBox={data.viewBox}
           width={size}
           height={size}
+          fill={data.rootFill}
           dangerouslySetInnerHTML={{ __html: data.content }}
         />
       </g>

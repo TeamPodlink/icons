@@ -1,7 +1,12 @@
 import { useId, type CSSProperties } from 'react'
 import { getIconData } from '../core/index.js'
 import { getPlatform } from '../core/platforms.js'
-import { resolveBadgeContent, resolveBadgeViewBox, hasBadgeArtwork } from '../core/resolve.js'
+import {
+  resolveBadgeContent,
+  resolveBadgeViewBox,
+  resolveBadgeRootFill,
+  hasBadgeArtwork,
+} from '../core/resolve.js'
 import { shapes } from '../core/shapes.js'
 import type { IconShape } from '../core/types.js'
 
@@ -69,9 +74,14 @@ export function PlatformBadge({
   const smallFontSize = 8.5 * scale
   const largeFontSize = 17.5 * scale
 
-  // Resolve badge icon content and the viewBox it was authored in
+  // Resolve badge icon content, the viewBox it was authored in, and the root
+  // fill it was authored under. The fill has to come along because the source
+  // file's root <svg> is not part of `content`: gpodder and podurama both draw
+  // stroke-only paths that fill black without the inherited fill="none".
+  // generateBadge() in scripts/build-static.ts puts it on the same element.
   let iconContent = resolveBadgeContent(data, theme)
   const iconViewBox = resolveBadgeViewBox(data, theme)
+  const iconRootFill = resolveBadgeRootFill(data, theme)
   // Replace currentColor with foreground
   iconContent = iconContent.split('currentColor').join(fg)
 
@@ -168,6 +178,7 @@ export function PlatformBadge({
             viewBox={iconViewBox}
             width={iconSize}
             height={iconSize}
+            fill={iconRootFill}
             dangerouslySetInnerHTML={{ __html: iconContent }}
           />
         </g>
