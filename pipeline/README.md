@@ -3169,3 +3169,15 @@ lobe; mean channel −0.8/−0.8/−0.9). Badge = the bare mark, viewBox
 5.5 5.5 21 21 (knockouts show the pill, as the artwork's own dark
 rendition shows its canvas), replacing the raster badge. The bundle
 stays on the official artwork.
+
+**Follow-up (same day): band flush with the hole.** The measured band
+bottom (18.97) sat 0.155 above the hole's nadir (19.125), leaving a
+notch where the band leaves the hole — the artwork has it (7 px at
+1024) but the maintainer wants the band to read as a stroke that
+continues the hole's outline. Two constraints fix every number: the
+band's bottom edge sits ON the nadir (yb 19.125, top 17.825), and the
+corner circle's bottom tangent stays ON the disc's bottom (26.5), so
+rc = (26.5 − 19.125)/2 = **3.6875**, A = (21.25, 22.8125), outer edge
+4.9875, tip (24.78, 21.75). Silhouette IoU 0.986 → **0.991**
+(flat-only 734 px, artwork-only 17 at 512²); drift 17.62 → 17.98, the
+shading term.
