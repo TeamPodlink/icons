@@ -2078,3 +2078,50 @@ Facet drift **97.35 -> 0.56** central, mean channel delta
 +0.0/-0.0/+0.1 — inside the vector-for-vector floor, and independent
 evidence that the bundle is current. **Stale list 15 -> 14.** This is
 the template for the remaining 13: a first-party vector, not a trace.
+
+### The same-triple wrong-space plate law (measured 2026-09-13)
+
+A recurring, mechanical flat-facet defect, found via soundcloud and
+then swept for: **an `icon.svg` declares `color(display-p3 R G B)` whose
+triple is byte-equal to its own bundle's `"srgb:R,G,B"` canvas fill.**
+The numbers were transcribed out of the bundle and wrapped in the wrong
+colour function, so Chrome converts P3 -> sRGB and paints a colour
+neither side intended. It is not a rendering trap, it is a source
+defect, and it is invisible to the eye at small sizes.
+
+Detector — exact triple match between the two declarations, excluding
+pure 0/1 components (those coincide by chance):
+
+| platform | declared | should be | central |
+| --- | --- | --- | --- |
+| soundcloud | `p3 1 .3333 0` | `#FF5500` | 140.89 → 25.02 |
+| audacy | `p3 .9961 .3137 0` | `#FE5000` | 14.39 → 11.43 |
+| goodpods | `p3 .9882 .8588 0` | `#FCDB00` | 99.50 → 99.36 |
+| playapod | `p3 .2627 .3216 .7176` | `#4352B7` | 26.13 → 26.03 |
+| podimo | `p3 .4745 .298 .9725` | `#794CF8` | 14.68 → 14.31 |
+| podurama | `p3 .9373 .1686 .4784` | `#EF2B7A` | 77.46 → 71.40 |
+
+41 `icon.svg` files declare `display-p3` and 28 of those sit beside a
+bundle declaring `srgb:`, but only these six share an exact triple.
+**Rank the fix by mean channel error, not by RMSE** — audacy's green
+mean went +9.5 → +1.2 for only 2.96 of RMSE, because a plate is a large
+low-variance area. Two of the six (goodpods, podurama) stay stale: their
+gap is a different plate and glyph registration, which colour cannot
+reach.
+
+**soundcloud also carried a registration offset**, and is the worked
+example of separating the two causes. After the recolour, 25.02 of the
+original 140.89 remained, and the diff was outline-only — interiors
+matching, edges glowing, the signature of a similarity offset rather
+than different artwork. Measured glyph bboxes at 1024: ours 816×365
+centred (511.5, 511.0), the bundle's `glyph.png` 798×354 centred
+(511.5, 520.5) — 2.2% wide, 3.1% tall, 9.5px high. Our left edge also
+landed exactly on the `3.25` clip rect, so the leftmost bar was
+clipped. The bbox-matching similarity `translate(.353 .6496)
+scale(.97791)` took it to **7.44** with no path data touched.
+
+The residual 0.8% aspect difference was deliberately NOT chased: `w`
+and `h` ratios disagree (0.9779 vs 0.9699) because thresholding
+antialiased thin waveform bars biases the height measurement, so
+squeezing it out would fit the bias, not the artwork. **Stale list
+15 → 13** (ivoox, soundcloud).
