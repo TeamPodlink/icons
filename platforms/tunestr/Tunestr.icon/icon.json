@@ -10,16 +10,9 @@
       },
       "layers": [
         {
-          "image-name": "icon.svg",
-          "name": "icon",
-          "glass": false,
-          "position": {
-            "scale": 32,
-            "translation-in-points": [
-              0,
-              0
-            ]
-          }
+          "image-name": "light.png",
+          "name": "light",
+          "glass": false
         }
       ]
     }

@@ -1273,14 +1273,37 @@ shipped; `non-edge` is the area-only RMSE):
 Only tunestr references a filter, so the other 15 never enter the new
 check — unchanged by construction.
 
-**Open, and deliberately left open:** tunestr's committed bundle still
-records `source: "flat-svg"` while its ictool render is missing the
-artwork's shadows. A rebuild now produces the *right* answer
-(`flat-svg-browser`, with the reason logged) — that is a correction,
-not a regression, and it costs tunestr the dark-variant split, which
-the raster path never visits. Re-source the artwork without filters
-(the `icon-to-flat-svg` skill's declared-fill route) if the dark
-rendition is wanted back.
+**Closed (rebuilt 2026-09-13).** tunestr's bundle used to record
+`source: "flat-svg"` while its ictool render was missing the artwork's
+shadows. Rebuilt through the divert: `flat-svg-browser`, reason logged,
+`hasDark: false` / `darkStatus: "native"` re-derived unchanged by the
+audit (ring `conv`, ringMax 0.392, meanLuma 0.147) — so nothing was
+lost by taking the raster path here; tunestr never had a dark rendition
+to split. Re-source the artwork without filters (the
+`icon-to-flat-svg` skill's declared-fill route) if an SVG layer is
+wanted back.
+
+**Scoring a raster bundle carries a resampling floor — do not read it
+as the flat gate's number.** A `flat-svg-browser` bundle's layer is a
+Chrome raster at 1024 that ictool then resamples to the scoring size,
+while the reference is Chrome rendering the SVG *directly* at that
+size. The two disagree on edge antialiasing before ictool does anything
+at all. Measured on tunestr at 256, central crop:
+
+| comparison | RMSE |
+| --- | --- |
+| Chrome@1024 → 256 vs Chrome@256 (rasterizer only) | 9.04 |
+| shipped `Assets/light.png` → 256 vs Chrome@256 | 9.04 |
+| rebuilt bundle's ictool render vs Chrome@256 | **9.47** |
+
+The floor *is* the score: ictool contributes ~0.4 over a 9.04 baseline,
+the residual is mean-zero (signed diff R/G/B −1.46/−0.94/−0.17) and
+localized (2.2% of samples exceed |20|) — the signature of edge
+resampling, not of a color or geometry defect. For contrast the SVG
+path scored **17.64** against the same reference, which is the dropped
+shadows. The flat gate itself is unaffected: it compares ictool
+rendering the *vector* at 256 against Chrome at 256, with no resampling
+step on either side, so `THRESHOLD 8` still means what it says.
 
 ## SVG gradients under the flat gate: it IS the CoreSVG stop law (measured 2026-09-13)
 

@@ -10,7 +10,7 @@
         "title": "Tunestr",
         "variant": null,
         "file": "Tunestr.icon",
-        "source": "flat-svg",
+        "source": "flat-svg-browser",
         "hasDark": false,
         "darkStatus": "native"
       }
