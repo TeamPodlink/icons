@@ -1520,3 +1520,361 @@ recorded R is at the low end of the admissible band, and the ~332
 reading was a *signal*, not purely an artifact. Re-measuring the mask
 subpixel, off the tangent rows, is an open item before anyone
 standardizes flat icons on the Apple mask.
+
+## Facet drift: flat vs light Liquid Glass (measured 2026-09-13, `audit-facet-drift.mjs`)
+
+**Question.** Which platforms' flat `icon.svg` and light Liquid Glass
+master show *different artwork*, as opposed to the same artwork under
+the glass material? Light renditions only; 67 pairs (every bundle with
+a light master AND a flat icon — airshow, disctopia and queue have no
+flat icon and are out of scope, nothing synthesized).
+
+**Instrument.** `node pipeline/audit-facet-drift.mjs` (`--only <slug>`,
+`--sheets` for flat | glass | 4×|diff| triptychs, `--json`, `--floor`).
+Both metrics at 256, the ledger's scoring size:
+
+- The flat side is `packages/icons/static/icons/<id>.svg` (icon.svg
+  under the SQUIRCLE_32 alpha mask, as `build-static.ts` ships it),
+  rasterized at **1024** by headless Chrome — `chromeRasterize()`
+  verbatim from `build-svg-icons.mjs`, never librsvg (45 of the 67
+  icon.svg files use `color(display-p3 …)`, which librsvg paints
+  transparent — the P3 reference-raster trap above).
+- The glass side is `packages/refraction/assets/<slug>.png`, the 1024
+  master after `build-assets.mjs`'s P3→sRGB squash.
+- Both 1024 rasters take the **identical** sharp resize to 256 (lanczos3,
+  premultiplied). `--floor` reproduces the resampling-asymmetry floor
+  from the tunestr entry with this script's own resizer: Chrome@1024→256
+  vs Chrome@256 of the same SVG = central **9.04** (frame 5.97) — the
+  ledger's 9.04 to the digit — which is what rendering the two sides at
+  different sizes would have cost before any artwork differed.
+- **Alpha.** Both frames are composited over one mid-gray (128,128,128)
+  before scoring. A pixel opaque on one side and transparent on the
+  other then costs |artwork − gray| — the same for light and dark
+  artwork — instead of an undefined RGB under zero alpha (scoring RGBA
+  raw would have let the transparent corners' stored RGB drive the
+  ranking). Inside the central crop every pair is fully opaque on both
+  sides (`cropα` 1.00/1.00; castamatic 0.95 on the flat side because
+  its canvas gradient is *declared* at `stop-opacity .964–.994`), so
+  `central` is numerically the ledger's `centralRmse()` (resize,
+  extract, removeAlpha) and comparable to every other figure here.
+- `central` — RMSE over the central 60% square (rows/cols 51..204), RGB.
+  Inside both masks, so artwork + material only. **The ranking metric.**
+- `frame` — RMSE over the whole 256 frame. The two masks disagree on
+  **6.5%** of the frame in every pair (measured coverage: SQUIRCLE_32
+  0.8722, Apple's mask 0.938), and that alone puts `frame` at
+  **15.8–31.4** on pairs whose artwork is identical (podchaser 0.71
+  central / 15.81 frame; curiocaster 1.68 / 31.41 — white plates cost
+  the most against gray). Reported for completeness; do not rank on it.
+- Diagnostics over the crop: mean signed glass−flat per channel (a
+  wrong brand color reads here), the fraction of pixels whose max
+  channel differs by > 40 (a moved/missing/extra element is localized
+  and large; material is diffuse), and `glass` = the bundle's glass
+  layers / visible layers for the light rendition (+s: specular group).
+
+**Trap 2, verified rather than trusted.** icatcher's canvas is
+declared `display-p3 0.1647,0.3373,0.6549` on *both* facets. A master
+still P3-coded would read `[42,86,167]`; the sRGB conversion reads
+`[21,87,173]`. Measured: Chrome raster `[21,87,173]`, master
+`[20,86,171]` — both sRGB, both untagged 8-bit (sharp metadata: uchar,
+no ICC), and Chrome's screenshot is 1024×1024 at DSF 1. The instrument
+re-asserts this at every start (±4/255) and refuses to score otherwise.
+
+**Guard bracket, measured not guessed.** The full-bleed sanity check
+first fired on amazonmusic at 87.2% opaque — which is exactly what
+SQUIRCLE_32 covers (0.8722, measured by rasterizing the bare path) —
+and then on castamatic at 59.9% *fully* opaque, which is its declared
+translucent canvas. The guard now tests *visibility* (α ≥ 128) against
+0.80: a dropped P3 fill leaves ~0.3, honest paint never goes under 0.87.
+
+### The material's cost, read off same-artwork pairs
+
+Pairs whose two sides carry the same artwork **by construction** fix
+what the material alone costs:
+
+| construction | pairs | central |
+| --- | --- | --- |
+| `flat-svg*` bundle, glass off — the glass layer IS icon.svg | 15 | **0.47–1.68** (the instrument's noise floor) |
+| App Store raster re-drawn as a vector, glass off | gaana, yoto, podhome | 2.27–4.73 |
+| `flat-svg-split` with glass ON (icatcher: 1 glass layer, translucency 0.5) | 1 | **26.67** |
+| `decanted` — flat assembled from the bundle's own layers (icon-to-flat-svg) | 9 | **24.67–55.32** |
+
+So the material — glass layers, specular, shadow, translucency, an
+`automatic-gradient` canvas — costs **~25 to 55 central RMSE and never
+more**; apple's three translucent glass layers (3/3+s) are the top of
+that band at 55.32. The 42 raster-sourced bundles (appstore-artwork,
+adaptive-icon, catalog-artwork, official-artwork) have no glass layers
+and no specular, and ictool hands their raster through unchanged: the
+App Store's current 1024 PNG of the same app matches the master at
+**RMSE 0.1–1.9** on 16 of 16 such bundles checked (table below). On
+those pairs the entire score is artwork drift.
+
+Distribution (67, central): min 0.47, q1 1.68, **median 25.67**,
+q3 46.59, max 147.42. Largest gap 77.46 → 97.35 (12 pairs above), next
+55.32 → 73.75. Everything above 55 — 15 pairs — is beyond what the
+material can produce, and the diff sheets confirm each is a different
+picture, not a shaded one.
+
+### Ranked table (worst first)
+
+| # | slug | central | frame | meanΔ R/G/B | >40 | glass | source |
+| ---: | --- | ---: | ---: | --- | ---: | --- | --- |
+| 1 | deezer | **147.42** | 155.00 | +0.8 +16.6 +6.2 | 74% | 0/2 | appstore-artwork |
+| 2 | metacast | **145.44** | 135.43 | -192.8 -20.4 -75.2 | 100% | 0/1 | appstore-artwork-split |
+| 3 | soundcloud | **140.89** | 95.80 | -83.4 -73.1 -87.5 | 40% | 0/2 | appstore-artwork-split |
+| 4 | siriusxm | **124.78** | 106.13 | +29.8 +29.6 -2.0 | 40% | 0/2 | appstore-artwork |
+| 5 | gpodder | **123.11** | 90.84 | -23.5 -2.1 -34.7 | 68% | 0/1 | official-svg |
+| 6 | podcastguru | **115.54** | 83.10 | -58.0 -63.0 -60.4 | 90% | 0/2 | catalog-artwork |
+| 7 | rssradio | **113.57** | 75.43 | +0.6 -54.0 -56.4 | 54% | 0/2 | appstore-artwork-split |
+| 8 | pandora | **103.70** | 69.85 | +95.9 -51.3 -66.5 | 66% | 0/2 | appstore-artwork |
+| 9 | goodpods | **99.50** | 114.90 | -19.0 -10.3 +20.1 | 41% | 0/1 | catalog-artwork-split |
+| 10 | youtubemusic | **98.24** | 82.26 | +0.0 -14.4 +26.8 | 91% | 0/1 | appstore-artwork-split |
+| 11 | amazonmusic | **97.61** | 70.76 | -32.3 -3.0 -3.6 | 56% | 0/2 | appstore-artwork-split |
+| 12 | ivoox | **97.35** | 75.29 | -4.3 +32.6 +36.9 | 72% | 0/2 | appstore-artwork-split |
+| 13 | podurama | **77.46** | 55.20 | -10.2 +12.2 -7.5 | 66% | 0/2 | adaptive-icon-split |
+| 14 | podcastapp | **75.94** | 52.44 | -5.2 -4.7 +0.8 | 29% | 0/2 | appstore-artwork-split |
+| 15 | anytimeplayer | **73.75** | 85.00 | +0.0 +0.9 +1.9 | 27% | 0/2 | appstore-artwork-split |
+| 16 | apple | **55.32** | 51.73 | -21.6 -17.7 -8.9 | 60% | 3/3+s | decanted |
+| 17 | downcast | **47.09** | 43.24 | -3.4 +4.8 +4.8 | 8% | 0/3 | appstore-artwork-split |
+| 18 | spreaker | **46.59** | 47.42 | +31.2 +33.4 +38.4 | 64% | 0/2 | adaptive-icon |
+| 19 | antennapod | **45.86** | 45.60 | +7.6 -1.2 -4.7 | 21% | 0/2 | adaptive-icon-split |
+| 20 | hark | **41.55** | 37.73 | -3.6 +17.5 +21.6 | 12% | 0/2 | appstore-artwork |
+| 21 | moonfm | **40.91** | 39.85 | +10.3 +32.2 +2.6 | 44% | 3/3+s | decanted |
+| 22 | pocketcasts | **40.83** | 33.96 | -3.8 -9.1 -5.7 | 10% | 0/2+s | decanted |
+| 23 | podcastrepublic | **40.74** | 43.18 | -19.3 -2.8 +6.1 | 18% | 1/1+s | decanted |
+| 24 | youtube | **39.79** | 45.79 | +0.0 -6.5 +34.0 | 82% | 0/1 | appstore-artwork-split |
+| 25 | tunein | **37.58** | 32.74 | +8.5 +1.2 +2.2 | 10% | 0/1+s | decanted |
+| 26 | podkicker | **37.52** | 39.60 | -0.3 +0.4 +19.0 | 28% | 0/1 | adaptive-icon |
+| 27 | podcastaddict | **35.66** | 39.17 | -1.0 -3.0 -1.1 | 17% | 0/2 | adaptive-icon-split |
+| 28 | spotify | **35.38** | 38.18 | -5.3 -5.4 -4.7 | 11% | 0/1 | decanted |
+| 29 | globalplayer | **34.65** | 37.86 | +17.4 -1.2 +10.8 | 39% | 0/2 | appstore-artwork |
+| 30 | overcast | **30.89** | 37.15 | -3.0 -22.6 -26.1 | 21% | 3/5+s | decanted |
+| 31 | castbox | **28.29** | 30.20 | +0.0 +9.3 +24.2 | 9% | 0/3 | appstore-artwork-split |
+| 32 | icatcher | **26.67** | 29.34 | -22.0 -16.7 -10.6 | 23% | 1/1 | flat-svg-split |
+| 33 | playapod | **26.13** | 26.43 | -0.2 -1.5 -2.0 | 5% | 0/2 | appstore-artwork-split |
+| 34 | castamatic | **25.67** | 29.55 | -10.9 -17.3 -12.1 | 9% | 3/6+s | decanted |
+| 35 | sodes | **24.67** | 29.22 | -11.2 -30.5 -5.8 | 29% | 1/1+s | decanted |
+| 36 | playerfm | **23.28** | 31.20 | +8.2 -0.6 +8.3 | 5% | 0/2 | appstore-artwork-split |
+| 37 | fountain | **20.80** | 32.51 | -0.1 +2.6 +11.0 | 3% | 0/1 | appstore-artwork-split |
+| 38 | audible | **20.68** | 28.06 | -1.5 -9.3 -13.5 | 5% | 0/3 | adaptive-icon-split |
+| 39 | podbean | **19.37** | 26.13 | +2.0 -8.0 +12.4 | 4% | 0/1 | appstore-artwork |
+| 40 | truefans | **18.92** | 27.40 | +8.5 +7.6 +18.7 | 2% | 0/1 | appstore-artwork |
+| 41 | podimo | **14.68** | 22.39 | -4.0 -0.4 -2.2 | 3% | 0/2 | appstore-artwork-split |
+| 42 | audacy | **14.39** | 29.32 | -0.0 +9.5 +1.5 | 2% | 0/2 | appstore-artwork-split |
+| 43 | podverse | **14.01** | 30.10 | +4.8 -0.1 -0.8 | 4% | 0/1 | appstore-artwork-split |
+| 44 | snipd | **13.12** | 23.61 | +5.1 +0.4 +1.1 | 5% | 0/1 | appstore-artwork |
+| 45 | iheartradio | **11.92** | 26.85 | -5.5 +0.8 +7.7 | 2% | 0/2 | appstore-artwork-split |
+| 46 | listennotes | **11.68** | 32.42 | -2.4 +1.4 -1.1 | 2% | 0/2 | official-artwork |
+| 47 | jiosaavn | **7.39** | 19.91 | -0.5 +1.5 +0.4 | 2% | 0/1 | appstore-artwork-split |
+| 48 | podhome | **4.73** | 29.06 | +0.3 +0.2 +0.3 | 0% | 0/1 | appstore-artwork-split |
+| 49 | yoto | **3.84** | 21.32 | +1.3 +1.9 +3.0 | 0% | 0/2 | appstore-artwork-split |
+| 50 | gaana | **2.27** | 22.21 | +0.4 -0.2 -0.2 | 0% | 0/2 | appstore-artwork-split |
+| 51 | curiocaster | **1.68** | 31.41 | +0.0 +0.0 +0.0 | 0% | 0/2 | flat-svg-split |
+| 52 | castro | **1.57** | 17.71 | +0.4 +0.5 +0.8 | 0% | 0/2 | catalog-artwork |
+| 53 | podfriend | **1.21** | 27.18 | -0.1 +0.2 +0.1 | 0% | 0/1 | flat-svg-split |
+| 54 | greatpods | **1.21** | 19.88 | +0.8 +0.5 +0.9 | 0% | 0/1 | flat-svg |
+| 55 | podcastindex | **1.08** | 31.37 | +0.0 -0.2 -0.1 | 0% | 0/1 | flat-svg-split |
+| 56 | podstation | **0.94** | 31.40 | +0.0 +0.0 +0.0 | 0% | 0/2 | flat-svg-split |
+| 57 | stenofm | **0.89** | 26.66 | +0.0 +0.0 -0.8 | 0% | 0/1 | flat-svg-split |
+| 58 | rephonic | **0.87** | 31.40 | +0.4 +0.0 +0.1 | 0% | 0/1 | flat-svg-split |
+| 59 | subscribebyemail | **0.79** | 31.40 | -0.2 +0.0 +0.0 | 0% | 0/1 | flat-svg-split |
+| 60 | podchaser | **0.71** | 15.81 | +0.0 -0.0 +0.0 | 0% | 0/1 | flat-svg-split |
+| 61 | podnews | **0.71** | 31.40 | +0.0 -0.1 -0.0 | 0% | 0/1 | flat-svg-split |
+| 62 | neuecast | **0.65** | 21.38 | +0.4 +0.4 +0.4 | 0% | 0/1 | catalog-artwork |
+| 63 | podengine | **0.62** | 31.40 | -0.0 -0.0 -0.0 | 0% | 0/2 | flat-svg-split |
+| 64 | podlp | **0.62** | 24.11 | -0.1 +0.0 +0.0 | 0% | 0/1 | flat-svg-split |
+| 65 | netflix | **0.60** | 21.47 | +0.1 +0.6 +0.3 | 0% | 0/1 | flat-svg |
+| 66 | tunestr | **0.60** | 23.39 | +0.0 -0.0 +0.2 | 0% | 0/1 | flat-svg-browser |
+| 67 | subscribeonandroid | **0.47** | 28.28 | -0.1 +0.0 +0.0 | 0% | 0/1 | flat-svg-split |
+
+### Which side is stale: the App Store cross-check
+
+The current App Store artwork (`itunes.apple.com/lookup` →
+`1024x1024bb.png`, the tolerance-based re-fetch the iCatcher entry
+prescribes) scored against both facets, same 256 central crop:
+
+| slug | central (flat vs glass) | store vs flat | store vs glass |
+| --- | ---: | ---: | ---: |
+| deezer | 147.42 | 147.5 | **0.5** |
+| metacast | 145.44 | 145.5 | **0.5** |
+| soundcloud | 140.89 | 140.9 | **0.2** |
+| siriusxm | 124.78 | 124.8 | **0.4** |
+| podcastguru | 115.54 | 115.4 | **0.7** |
+| rssradio | 113.57 | 113.6 | **1.9** |
+| pandora | 103.70 | 103.6 | **0.5** |
+| goodpods | 99.50 | 99.4 | **1.0** |
+| youtubemusic | 98.24 | 98.3 | **0.5** |
+| amazonmusic | 97.61 | 97.5 | **1.4** |
+| ivoox | 97.35 | 97.4 | **0.2** |
+| podurama | 77.46 | 77.1 | **25.0** |
+| podcastapp | 75.94 | 76.0 | **0.6** |
+| anytimeplayer | 73.75 | 73.8 | **0.1** |
+| apple | 55.32 | 54.6 | **20.7** |
+| downcast | 47.09 | 47.1 | **0.2** |
+| spreaker | 46.59 | 47.8 | **10.1** |
+| hark | 41.55 | 41.6 | **0.6** |
+| youtube | 39.79 | 40.1 | **0.5** |
+| overcast | 30.89 | 30.4 | **17.7** |
+
+For 16 of 20 the shipped icon **is** the glass master (≤ 1.9, i.e.
+the `appstore-artwork*` bundle is that PNG) and the flat icon is off
+by exactly the pair's drift. The four where the store sits between the
+facets: apple (the store PNG is Apple's own marketing raster of the
+same Liquid Glass design, 20.7 from ictool's render, 54.6 from the
+flat), overcast (17.7 — the decanted bundle's *material* tints its
+white disc; see below), podurama (25.0 — the bundle is the Android
+adaptive icon, which is not the iOS artwork), spreaker (10.1). In all
+four the glass side is still the closer one.
+
+### Diagnoses — the 15 pairs above the material band, plus the boundary case
+
+All colors are 8-bit sRGB from the 256 frames; glyph extents are the
+bounding box of non-plate pixels (max channel > 60 from the plate's
+modal color) inside rows/cols 24..232, at 256.
+
+1. **deezer 147.42** — different artwork. Flat: purple plate
+   (176,45,255) 47% of the crop, black heart-waveform. Glass: near-black
+   plate (1,1,1) 43%, purple (162,57,255) heart, plus a white "DEEZER"
+   wordmark the flat has no counterpart for (>40 on 74% of the crop).
+   Inverted plate/glyph and an extra element. Store = glass at 0.5.
+   **Flat is a previous generation of the icon — wrong side.**
+2. **metacast 145.44** — inverted plate. Flat: red (255,0,79) plate
+   75%, white ((m)). Glass: charcoal (25,27,29) plate 80%, red
+   (254,45,85) glyph; mean Δ −193 on R, >40 on 100% of the crop. Store
+   = glass at 0.5. **Flat wrong.**
+3. **soundcloud 140.89** — glyph color. Same cloud geometry (bbox
+   204×92 vs 200×89, same center), but the flat's cloud is white
+   (255,255,255) 35% and the glass's is black (18,18,18) 30%; the plate
+   orange also differs, (255,65,0) vs (255,85,0). Store = glass at 0.2.
+   **Flat wrong (glyph color and plate).**
+4. **siriusxm 124.78** — glyph scale. Same design (blue plate, white
+   S-star) but the glass glyph is much larger: white covers 70% of the
+   crop vs 58%, non-white 44.6% of the band vs 67.6%. Blue (1,1,245)
+   vs (1,0,234). Store = glass at 0.4. **Flat wrong (scale).**
+5. **gpodder 123.11** — different artwork. Flat: the older glossy
+   mascot on a lavender radial plate, no headphones. Glass: the mascot
+   with headphones on white, rebuilt from the project's official SVG
+   (commit 08577b2, `official-svg`). Not on the App Store, so no store
+   check; the bundle was deliberately re-sourced and the flat predates
+   it. **Flat is the stale generation.**
+6. **podcastguru 115.54** — different rendition and scale. Flat: pale
+   petals (`fill-opacity=".44"` on white; modal non-white colors
+   (121,117,227), (253,147,79)) at bbox 217×217. Glass: saturated
+   petals with a black outline, bbox 187×190 — smaller by 14%. Mean Δ
+   ≈ −60 on all channels, >40 on 90%. Store = glass at 0.7. **Flat
+   wrong.**
+7. **rssradio 113.57** — different glyph. Flat: the generic RSS arcs
+   on orange (255,134,3), white 54% of the crop. Glass: the app's
+   wifi-arcs-and-dot mark on an orange→red gradient (255,103,26 →
+   255,88,38). The consolidation commit (8afb4f4) replaced the bundle
+   with the app's artwork and left icon.svg a placeholder. Store =
+   glass at 1.9. **Flat wrong.**
+8. **pandora 103.70** — same geometry, different fill. The P's bbox is
+   identical on both sides (131×156 at (135,127.5), 36.8% of the band
+   on both), but the flat fills it solid blue (0,136,255)/(0,151,254)
+   and the glass has the multicolour wave fill ((228,40,70),
+   (168,27,150), …). Store = glass at 0.5. **Flat is the previous
+   generation of the fill — wrong side.**
+9. **goodpods 99.50** (frame 114.90, the only pair whose frame exceeds
+   its central) — different plate. Flat: yellow disc on a white plate
+   (yellow 77% of the crop, white in the corners — hence the frame).
+   Glass: full-bleed yellow (254,220,0) with a larger, differently
+   drawn headphone mark (bbox 207×136). Store = glass at 1.0. **Flat
+   wrong.**
+10. **youtubemusic 98.24** — brand red and disc scale. Flat declares
+    `color(display-p3 1 0 0)` → (255,0,0); the shipped glyph.png reads
+    (255,0,51) everywhere (mean Δ B +26.8, >40 on 91%). The flat disc
+    is also larger (non-white 52.3% of the band vs 40.4%). Store =
+    glass at 0.5. **Flat wrong on both.** The same red is in youtube
+    (#24, 39.79, glyph.png (255,0,51) vs flat `display-p3 1 .0039 0`).
+11. **amazonmusic 97.61** — different generation. Flat: two-line
+    "amazon / music" with the smile under "amazon", plate (88,218,227).
+    Glass: "music" over the smile, plate (60,228,237). Store = glass at
+    1.4. **Flat wrong.**
+12. **ivoox 97.35** — different generation. Flat: white "i" on an
+    orange→pink gradient. Glass: the figure mark on (244,95,49). Store
+    = glass at 0.2. **Flat wrong.**
+13. **podurama 77.46** — registration and plate. Same glyph, but the
+    glass glyph sits right and down (bbox center (156,137) vs (136,126))
+    and larger (151×189 vs 141×177); plate (239,42,123) vs (255,1,121).
+    The bundle is the Android adaptive icon (`adaptive-icon-split`);
+    the App Store icon is 25.0 from it and 77.1 from the flat. **Flat
+    wrong**, and the bundle itself is not the iOS artwork — a separate
+    sourcing question for a follow-up.
+14. **podcastapp 75.94** — glyph scale. Same plate (53,79,238) and
+    colors (mean Δ ≤ 5); the glass mic is smaller, 146×152 vs 158×168
+    (−8%). Store = glass at 0.6. **Flat wrong (scale).**
+15. **anytimeplayer 73.75** — glyph scale. Same plate and colors (mean
+    Δ ≈ 0), the glass mark is larger: it fills the 208-wide band vs 194
+    on the flat (≥ +7%), non-plate 40.7% vs 34.3%. Store = glass at
+    0.1. **Flat wrong (scale).**
+16. **apple 55.32** — the boundary case, and it is **material**. Same
+    purple plate; Apple's own bundle renders the person and both rings
+    as three translucent glass layers with specular (3/3+s), which the
+    flat draws opaque. The App Store's marketing raster of the same
+    design sits 20.7 from the master and 54.6 from the flat. Expected;
+    nothing to fix.
+
+Notable pairs below the band (all have no glass layers unless noted):
+
+- **downcast 47.09** — same design; the shipped raster carries its own
+  plate gradient and glyph shading that the flat flattens to
+  (225,0,0) + white. Store = glass at 0.2. A flat-facet simplification,
+  not a wrong picture.
+- **spreaker 46.59** — the flat's plate renders as a *gray vignette*
+  (modal (182,178,171)) where the bundle's `background.svg` and the
+  store show cream (254,245,228). icon.svg's radial gradient ends in
+  `stop-color="none" stop-opacity="0"` — the invalid-but-tolerated stop
+  the build-svg-icons header names — which Chrome interpolates toward
+  transparent black; the bundle spells the same stop as `#eb9a00` at
+  opacity 0. **Flat defect, worth fixing.**
+- **hark 41.55** — same plate ((244,232,223) both); the flat's arcs are
+  8% larger (109×156 vs 100×144) and more saturated ((167,37,31) vs
+  (154,48,38)). Store = glass at 0.6. Flat wrong, mildly.
+- **overcast 30.89** (3/5+s) — the flat's disc is (255,255,255); the
+  master's is (255,243,232). The bundle's `Background Circle.svg`
+  declares `#fff` too: the cream is the light rendition's glass
+  (default `glass-specializations` true) letting the orange canvas
+  through. The store artwork agrees with the master (17.7 vs 30.4).
+  **Material**, and a reminder that material moves color, not only
+  shading.
+- **spotify 35.38** — same artwork; the plate is declared
+  `color(display-p3 .0941 .0784 .0745)` = (25,20,19) on the flat but
+  `gray:0` (automatic-gradient) in the bundle, and reads (5,5,5) on the
+  master. A 20/255 plate mismatch on a near-black, plus the
+  automatic-gradient lift. Minor, but a declared-fill disagreement.
+- **pocketcasts 40.83, tunein 37.58, podcastrepublic 40.74, moonfm
+  40.91, spotify 35.38, castamatic 25.67, sodes 24.67** — decanted,
+  same artwork (overcast and apple above);
+  specular groups, automatic-gradient canvases and glass glyphs. The
+  material band.
+- **14–28 with no material** (podimo, audacy, podverse, snipd,
+  iheartradio, listennotes, castbox, playapod, playerfm, fountain,
+  audible, podbean, truefans) — raster-recreation drift: a plate hue a
+  few levels off, a gradient flattened to a solid, sub-pixel glyph
+  registration. Same picture.
+
+### Verdict
+
+- The glass material costs **25–55** central RMSE (256, 60% crop) on
+  identical artwork; the no-material floor is **≤ 1.7** (vector-for-
+  vector) to **≤ 5** (raster re-drawn as a vector). Whole-frame RMSE
+  carries a constant **6.5%** mask disagreement worth 16–31 on its own;
+  rank on `central`.
+- **15 of 67 pairs show different artwork**, all above 55, and in every
+  one the flat `icon.svg` is the stale or wrong side: for 13 of the 14
+  that are on the App Store the glass master equals the currently
+  shipped icon to ≤ 1.9 (podurama's bundle is the Android adaptive
+  icon, 25.0 from the store and still 3× closer than the flat;
+  gpodder's bundle is the project's official SVG). Causes: previous generation of the brand icon (deezer,
+  gpodder, pandora's fill, amazonmusic, ivoox, rssradio's placeholder),
+  inverted plate/glyph (metacast, soundcloud), a different plate
+  (goodpods), a different rendition (podcastguru), wrong brand red
+  (youtubemusic, and youtube below the band), glyph scale or
+  registration (siriusxm, podcastapp, anytimeplayer, podurama, hark).
+- Two flat defects below the band worth a fix: spreaker's
+  `stop-color="none"` vignette and the youtube/youtubemusic red.
+- Nothing was repaired in this pass. Follow-up: rebuild the 15 flat
+  icons from their bundles (the `icon-to-flat-svg` route for vector
+  bundles; `ipatool`/vector re-sourcing for the raster ones), then
+  re-run the instrument — each should drop into the no-material floor
+  (≤ 5) since none of the 15 bundles carries material.
