@@ -1266,7 +1266,7 @@ that came close — ringMax 0.298 is under the cap but its ring chroma is
 ring is a single colour and ictool renders it RAW directly, both as a
 declared solid and as a full-bleed PNG, so the table agrees with the
 renderer rather than merely with itself. snipd, truefans and tunestr
-still ride the meanLuma disjunct (ring chroma 0.290 / 0.502 / 0.278).
+still ride the meanLuma disjunct (ring chroma 0.290 / 0.502 / 0.282).
 
 ## Adding a platform or icon
 
