@@ -406,11 +406,10 @@ for (const p of pairs) {
 // short and each reason falsifiable — deezer sat here for an hour on the
 // belief that a wordmark-free variant did not exist, until it turned out
 // the vendor ships one as their dark icon.
-const EXPECTED_DIVERGENCE = {
-  rssradio:
-    "the flat is a hand-drawn GENERIC RSS mark serving the platform's " +
-    "\"rss\" alias, not RSSRadio's app icon; the bundle is the app icon",
-};
+// (empty today: rssradio's generic RSS mark moved to its own `rss`
+// platform on 2026-09-14, so the pair it used to describe no longer
+// exists — rssradio simply has no flat facet now.)
+const EXPECTED_DIVERGENCE = {};
 
 rows.sort((a, b) => b.central - a.central);
 

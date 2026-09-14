@@ -8,7 +8,7 @@
  * Ported from podcast-badges/scripts/generate-assets.mjs
  */
 
-import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'fs'
+import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync, unlinkSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import opentype from 'opentype.js'
@@ -207,6 +207,17 @@ function main() {
   mkdirSync(ICONS_DIR, { recursive: true })
   mkdirSync(BADGES_DIR, { recursive: true })
 
+  // Files this run produced. Anything else in the output directories is
+  // from a platform that has since been renamed, retired, or had its
+  // artwork moved elsewhere, and must be swept: these directories are
+  // gitignored, so a stale file is invisible to review, but
+  // sync-web-assets copies them into apps/web/public and the site would
+  // ship it. Caught on 2026-09-14, when splitting the generic RSS mark
+  // out of rssradio left `rssradio-{light,dark}.svg` behind — a badge
+  // for a platform that no longer has any badge artwork.
+  const writtenIcons = new Set<string>()
+  const writtenBadges = new Set<string>()
+
   if (!existsSync(SOURCE_DIR)) {
     console.error(`Source directory not found: ${SOURCE_DIR}`)
     process.exit(1)
@@ -237,12 +248,15 @@ function main() {
     const platformName = platformMap.get(name) || name.charAt(0).toUpperCase() + name.slice(1)
 
     try {
+      writtenIcons.add(`${name}.svg`)
       writeFileSync(join(ICONS_DIR, `${name}.svg`), generateIcon(iconSvg, name))
       icons++
 
       const darkBadgeIcon = resolveBadgeIcon(dir, 'dark')
       const lightBadgeIcon = resolveBadgeIcon(dir, 'light')
 
+      writtenBadges.add(`${name}-dark.svg`)
+      writtenBadges.add(`${name}-light.svg`)
       writeFileSync(
         join(BADGES_DIR, `${name}-dark.svg`),
         generateBadge(darkBadgeIcon.svg, name, platformName, 'dark', darkBadgeIcon.isBadge),
@@ -259,7 +273,20 @@ function main() {
     }
   }
 
-  console.log(`\n${icons} icons, ${badges} badges`)
+  let swept = 0
+  for (const [dir, keep, label] of [
+    [ICONS_DIR, writtenIcons, 'icon'],
+    [BADGES_DIR, writtenBadges, 'badge'],
+  ] as const) {
+    for (const f of readdirSync(dir)) {
+      if (keep.has(f)) continue
+      unlinkSync(join(dir, f))
+      swept++
+      console.log(`  swept stale ${label} ${f}`)
+    }
+  }
+
+  console.log(`\n${icons} icons, ${badges} badges${swept ? `, ${swept} stale file(s) swept` : ''}`)
 }
 
 main()

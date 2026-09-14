@@ -1,0 +1,9 @@
+{
+  "name": "RSS",
+  "active": true,
+  "aliases": [
+    "feed"
+  ],
+  "url": "https://www.rssboard.org/rss-specification",
+  "added": "2026-09-14"
+}
