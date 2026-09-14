@@ -3192,3 +3192,26 @@ unchanged. Silhouette IoU 0.991 → **0.9967** (253 flat-only px, 14
 artwork-only at 512²) — the remaining error is the antialiased rim.
 The maintainer's read of the artwork: a plain composition, no Liquid
 Glass material; the Liquid Glass bundle keeps the official raster.
+
+**Follow-up 3: the blue is a conic gradient cut by the band.** Ring
+samples at r = 250 px read 176,196,249 at 3 o'clock and fall
+MONOTONICALLY clockwise — 77 at the bottom, 112 at the left, 145 at the
+top, 164 at 11 o'clock — with the only jump (176 → 49) sitting under
+the band; the same angles at r = 150 and 320 read the same colours. So
+colour is a function of angle, not distance, and the "darker lobe" is
+just the dark end of the sweep (conic predicts 60,102,212 where the
+lobe reads 62,102,210). Fit on 9,411 blue pixels at least 28 px from
+any plate edge (emboss and shadow excluded): colour = a + b·θ, θ the
+clockwise angle from a cut at 27° (inside the band's 20–31° angular
+span, so the seam is hidden at every radius): **rms 1.37** against
+17.78 for the best plane and 17.55 for the best radial; adding a radial
+term moves it to 1.36 (slope −0.006/px, nothing); residual by θ decile
+within ±1.8. Endpoints θ=0 (just below the band) **#3761D3**, θ=1 (just
+above) **#BBCCFC**. SVG has no conic primitive, so the flat is 36
+ten-degree wedges, each a linear gradient between its boundary colours
+along the chord at r 8, overlapping 0.6° so no seam shows, clipped by
+the mark (10 KB). The four spots the maintainer eyedropped, artwork →
+ours: top 146,171,240 → 146,170,239; left 111,143,228 → 109,142,228;
+right of the hole 175,195,248 → 177,196,250; lobe 60,102,213 →
+62,103,213. Facet drift **17.98 → 6.6** (vs artwork 6.56, vs master
+6.61); the heat map is now only the plate's emboss and its shadow.
