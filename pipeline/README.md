@@ -2809,3 +2809,48 @@ opacity-specializations. The auto-tint law then does the rest — measured
 on rss: the dark arcs read (226,108,45) and (249,156,58), the gradient's
 own two stops sampled per-pixel, with facet drift **1.29**. Built by
 hand for rss and metacast; the builder should learn to do it.
+
+**Resolved (measured 2026-09-14).** `splitBackground()` now resolves a
+plate's `fill="url(#id)"` through `resolveGradientFill()`: a
+`<linearGradient>` with exactly two opaque stops at offsets 0 and 1
+becomes the canvas `linear-gradient` `[top, bottom]`, both stops
+converted through the same `parseColor()` as solid plates (hex and
+`color(display-p3 …)` alike). Stacked plates: the loop lifts in
+document order, so the topmost opaque plate wins and the ones fully
+covered beneath it are discarded (rss's solid #F18935 under the
+gradient). The gradient's `<linearGradient>` def is dropped from the
+glyph SVG once nothing references it — the emitted `Assets/icon.svg`
+is byte-identical to the hand-built one.
+
+What it refuses, with a reason (`unsplittable-gradient-plate: …`)
+instead of a guess: >2 stops, stop-opacity ≠ 1, offsets other than
+0/1, `gradientTransform`, `href` inheritance, radial gradients, and —
+the one that matters most — any geometry that is not vertical and
+full-height. That last refusal is the fill-orientation law, re-measured
+today with the fill-only instrument: bundles whose canvas gradient
+declares `orientation` diagonal (0,0)→(1,1), horizontal
+(0,0.5)→(1,0.5) and vertical (0.5,0)→(0.5,1) render byte-for-byte
+alike in ictool (corner samples 217,46,38 top / 14,0,229 bottom on all
+three), while Chrome renders the three SVG equivalents differently. So
+only a top→bottom SVG gradient maps honestly onto the canvas; a
+reversed vertical (y1=H→y2=0) is lifted with the stops swapped;
+horizontal/diagonal/kinked plates stay full-bleed layers rather than
+ship a wrong gradient. A monochrome-dark glyph over a gradient plate
+gets its twin tinted with the mean of the two stops (a flat recolor has
+one colour to give); no platform exercises that yet.
+
+Verification, rss rebuilt from scratch (liquidGlass cleared, bundle
+removed, `--only rss`): splits (`ok rss (flat-svg, rmse 2.64)`,
+`split rss: split`); the emitted `RSS.icon/icon.json` and
+`Assets/icon.svg` are byte-identical to the hand-built bundle (`git
+diff` empty), canvas stops `srgb:0.98039,0.61176,0.22353` →
+`srgb:0.88627,0.42353,0.17647`, single bare SVG layer, no
+opacity-specializations. `build-assets --only rss` → `ok rss (+dark)`,
+`hasDark` restored; `audit-facet-drift --only rss` → central **1.29**.
+Pixel tally of the regenerated `rss-dark.png`: 0 near-white pixels;
+34,973 within 3/255 of (226,108,45) and 34,773 within 3 of
+(249,156,58) — the dark arcs read the gradient's own stops, auto-tinted
+per-pixel. Old recipes unchanged: podstation (white plate, dark twin)
+and stenofm (P3 plate) rebuilt before and after the change give
+byte-identical bundles (icon.json md5 7bffda3c… and cfe5d6b0…
+respectively, Assets identical).
