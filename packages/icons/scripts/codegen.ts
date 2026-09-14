@@ -2,7 +2,8 @@
 
 /**
  * Codegen script: reads src/source-icons/ and generates:
- * - src/generated/icons.ts     — map of platform id → { viewBox, content, badge?, badgeDark? }
+ * - src/generated/icons.ts     — map of platform id → IconData (viewBox, content,
+ *                                 badge?/badgeViewBox?, badgeDark?/badgeDarkViewBox?)
  * - src/generated/platform-ids.ts — TypeScript union type for autocomplete
  */
 
@@ -127,9 +128,11 @@ function main() {
       entry += `    content: \`${escapeForTemplate(icon.content)}\`,\n`
       if (badge) {
         entry += `    badge: \`${escapeForTemplate(badge.content)}\`,\n`
+        entry += `    badgeViewBox: '${badge.viewBox}',\n`
       }
       if (badgeDark) {
         entry += `    badgeDark: \`${escapeForTemplate(badgeDark.content)}\`,\n`
+        entry += `    badgeDarkViewBox: '${badgeDark.viewBox}',\n`
       }
       entry += `  }`
 
