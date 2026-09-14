@@ -2867,14 +2867,17 @@ layer — which on the dark canvas put `#333` strokes on a `#333` plate:
 left floating. Measured before the fix, not assumed.
 
 The correct output is the metacast structure, built by hand here:
-`icon-dark.svg` = `icon.svg` through `retintDark()` (which already
-leaves `#fff` alone and recolours only dark hex/black, i.e. exactly the
-"swap dark and light" wanted), two layers swapped by
-opacity-specializations, and — for a strict swap — the dark canvas
-pinned to the mark's own colour (`srgb:0.2,0.2,0.2` = #333333) rather
-than the standard grey pin. Result: light plate (254,220,0) with
-(51,51,51) strokes; dark plate #333 with (253,219,2) strokes and white
-fills; facet drift **99.36 -> 1.29**.
+`icon-dark.svg` as a twin layer swapped in by opacity-specializations,
+and — for a strict swap — the dark canvas pinned to the mark's own
+colour (`srgb:0.2,0.2,0.2` = #333333) rather than the standard grey
+pin. The twin's colours are a MAINTAINER choice, not `retintDark()`'s
+output: the dark version carries no yellow at all — the `#333`
+strokes become `#fff` and the `#fff` ear-cup fills become `none`, so
+the plate shows through them. (A first cut used retintDark's answer,
+#333 -> #FCDB00 with white kept; it was rejected as still yellow.)
+Result: light plate (254,220,0) with (51,51,51) strokes; dark plate
+#333 with white strokes and open cups; facet drift **99.36 -> 1.29**
+(light only — the audit does not score dark).
 
 The gap is narrow and the fix is mechanical: when a split glyph has a
 dark component (any fill retintDark would touch) AND a light component,
