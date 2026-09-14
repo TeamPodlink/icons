@@ -42,6 +42,12 @@ export interface Platform {
   guidelinesUrl: string | null;
   hasFlat: boolean;
   hasBadge: boolean;
+  /** Where icon.svg came from — meta.json `flatSource`: "official" is a
+   *  vector the brand published (brand kit, site logo, source repo);
+   *  "drawn" is ours, whether hand-drawn or measured off a raster. null
+   *  = not yet attested. Provenance only; the bundle's `source` says how
+   *  the Liquid Glass bundle was BUILT, which is a different question. */
+  flatSource: "official" | "drawn" | null;
   bundles: GlassBundle[];
 }
 
@@ -92,21 +98,13 @@ export function sourceLabel(b: GlassBundle): string | null {
   return b.source ? SOURCE_LABEL[b.source] ?? b.source : null;
 }
 
-/** Sources hand-drawn by a maintainer rather than lifted from the app's
- *  own shipped artwork (decanted / store artwork / adaptive-icon rungs). */
-const HAND_DRAWN_SOURCES = new Set([
-  "flat-svg",
-  "flat-svg-split",
-  "flat-svg-browser",
-  "flat-svg-raster",
-]);
-
 /**
  * Lenses that describe the platform rather than a single bundle. They
  * chip on every one of the platform's cards (all facets) and are counted
  * by platform in getCategories(); bundle-level lenses count cards.
  */
 const PLATFORM_LENSES = new Set([
+  "hand-drawn art",
   "missing flat",
   "missing badge",
   "missing url",
@@ -139,10 +137,14 @@ export const lensesEnabled =
  * on the card, not lenses. Bundle-level: "missing dark" is the
  * dark-variant backlog (light artwork whose Apple-darkened rendition we
  * don't have yet; artwork measured as natively dark is correct as-is and
- * not flagged — split: pipeline/audit-dark-status.mjs); "hand-drawn art"
- * is the re-sourcing backlog (bundles built from maintainer-drawn SVG
- * before the official-artwork-only doctrine). Platform-level (see
- * PLATFORM_LENSES for count semantics): "missing flat" / "missing badge"
+ * not flagged — split: pipeline/audit-dark-status.mjs). Platform-level
+ * (see PLATFORM_LENSES for count semantics): "hand-drawn art" is the
+ * re-sourcing backlog — flats we drew ourselves (meta.json `flatSource:
+ * "drawn"`), to be replaced whenever the brand publishes a vector; it
+ * used to key off the bundle's `source` (flat-svg*), which only says the
+ * BUNDLE was built from the flat and swept in official vectors like
+ * AntennaPod's branding repo alongside marks we drew; "missing flat" /
+ * "missing badge"
  * are the artwork queues for platforms without a flat icon or badge,
  * "missing url" the meta.json website-link backfill, and "inactive"
  * retired platforms (0 today; kept for future retirements).
@@ -151,9 +153,8 @@ export function debugCategories(p: Platform, b: GlassBundle | null): string[] {
   const cats: string[] = [];
   if (b) {
     if (!b.hasDark && b.darkStatus !== "native") cats.push("missing dark");
-    if (b.source && HAND_DRAWN_SOURCES.has(b.source))
-      cats.push("hand-drawn art");
   }
+  if (p.flatSource === "drawn") cats.push("hand-drawn art");
   if (!p.hasFlat) cats.push("missing flat");
   if (!p.hasBadge) cats.push("missing badge");
   if (!p.url) cats.push("missing url");

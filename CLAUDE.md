@@ -17,6 +17,7 @@ Glass — plus the directory website.
 ```
 platforms/<id>/            ← SOURCE OF TRUTH, one folder per platform
   meta.json                  name, url, categories, aliases, guidelinesUrl,
+                             flatSource (official | drawn: icon.svg provenance),
                              liquidGlass.bundles[] (slug/title/variant/file/
                              recipe/rmse/hasDark)
   icon.svg                   flat 32×32 (viewBox "0 0 32 32")

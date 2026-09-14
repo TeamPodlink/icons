@@ -34,6 +34,8 @@ for (const { id, dir, meta } of platforms) {
   if (!meta.added) err(`${id}: meta.json missing "added" (YYYY-MM-DD first-addition date)`);
   else if (!/^\d{4}-\d{2}-\d{2}$/.test(meta.added))
     err(`${id}: added must be a YYYY-MM-DD date, got ${JSON.stringify(meta.added)}`);
+  if (meta.flatSource !== undefined && !["official", "drawn"].includes(meta.flatSource))
+    err(`${id}: flatSource must be "official" or "drawn", got ${JSON.stringify(meta.flatSource)}`);
   if (meta.categories && !Array.isArray(meta.categories))
     err(`${id}: categories must be an array`);
 

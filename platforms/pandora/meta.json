@@ -3,6 +3,7 @@
   "active": true,
   "url": "https://www.pandora.com",
   "added": "2023-02-06",
+  "flatSource": "official",
   "guidelinesUrl": "https://developer.pandora.com/docs/developer-resources/brand-assets/",
   "liquidGlass": {
     "bundles": [

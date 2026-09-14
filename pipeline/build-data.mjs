@@ -36,6 +36,7 @@ const out = readPlatforms().map(({ id, dir, meta }) => ({
   guidelinesUrl: meta.guidelinesUrl ?? null,
   hasFlat: existsSync(join(dir, "icon.svg")),
   hasBadge: existsSync(join(dir, "badge.svg")),
+  flatSource: meta.flatSource ?? null,
   bundles: (meta.liquidGlass?.bundles ?? []).map((b) => ({
     slug: b.slug,
     title: b.title,

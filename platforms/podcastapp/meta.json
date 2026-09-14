@@ -3,6 +3,7 @@
   "active": true,
   "url": "https://podcast.app",
   "added": "2023-02-06",
+  "flatSource": "official",
   "liquidGlass": {
     "bundles": [
       {
