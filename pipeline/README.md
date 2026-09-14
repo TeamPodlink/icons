@@ -1881,3 +1881,135 @@ Notable pairs below the band (all have no glass layers unless noted):
   bundles; `ipatool`/vector re-sourcing for the raster ones), then
   re-run the instrument — each should drop into the no-material floor
   (≤ 5) since none of the 15 bundles carries material.
+
+## PlatformBadge vs the static badge generator (measured 2026-09-13, `packages/icons`)
+
+`@podlink/icons`'s React `PlatformBadge` and the static badge generator
+(`scripts/build-static.ts`, `generateBadge()`) draw the same artwork two
+different ways, and the component was wrong on both counts. The static
+badges are the reference: they are what the website serves from
+`public/badges/`, what the npm package ships in `static/badges/`, and
+what `generateBadge()` has always got right.
+
+**1. The viewBox.** Badge art is authored independently of `icon.svg`
+and mostly carries a tighter viewBox. Of the 67 `badge.svg` files, 40
+use `"8 8 24 24"` and netflix uses `"2 2 28 28"`; only 26 use the icon's
+`"0 0 32 32"`. `generateBadge()` calls `extractViewBox(badgeIconSvg)`
+and nests `<svg x=8 y=8 width=24 height=24 viewBox="${viewBox}">`.
+`PlatformBadge` nested the content under `data.viewBox` — the ICON's —
+and `resolveBadgeViewBox()` returned `data.viewBox` unconditionally
+behind a docstring asserting badge and icon "in practice share the same
+viewBox". They do not; the claim survived because nothing called the
+function.
+
+Rendering content drawn in `minX..32` into a `0..32` window scales it by
+`width/32` about the origin and offsets it by `minX × 24/32`. Measured
+on ink bounding boxes at 10× (240 px per 24-unit box):
+
+```
+spotify  "8 8 24 24"   180x180 vs 240x240   scale 0.750   +60 px, +60 px
+youtube  "8 8 24 24"   180x128 vs 240x170   scale 0.750   +60 px, +51 px
+netflix  "2 2 28 28"   100x180 vs 114x206   scale 0.875   (offset +15 px)
+```
+
+Codegen already computed the badge's viewBox and discarded it, so the
+fix is to emit `badgeViewBox` / `badgeDarkViewBox` and have
+`resolveBadgeViewBox()` walk the same fallback chain as
+`resolveBadgeContent()`.
+
+**2. The clip.** `generateBadge()` applies the squircle mask ONLY when
+it falls back to `icon.svg`, because badge files already carry their own
+clipping. `PlatformBadge` clipped whenever `shape !== 'square'`, so it
+double-clipped self-clipped plates and clipped bare marks that are meant
+to bleed. The source data splits cleanly, which is what makes the
+generator's rule the right one — every `badge.svg` is one or the other:
+
+```
+26  viewBox "0 0 32 32"  + its own clipPath   plate (squircle or circle)
+41  tight viewBox        + no clipPath        bare mark
+```
+
+The double-clip on plates was a visual no-op (a circle and an identical
+squircle both sit inside the squircle), so only the bare marks were
+actually damaged — but the rule, not the coincidence, is what should
+hold. **`shape` is a public prop and this narrows it**: it now applies
+only to platforms with no `badge.svg`. Since all 67 library platforms
+ship one, it is inert in practice today, so the component warns in dev
+when a caller passes it explicitly.
+
+**Verification.** Component icon block vs the static badge's icon block
+(the 24×24 box at (8,8), cropped out of the full badge), rasterized by
+**headless Chrome — never librsvg**; see "The P3 reference-raster trap"
+above. All 134 cases go onto a few tall pages, so the sweep is a handful
+of Chrome launches rather than one per cell. Over 67 platforms × 2
+themes, cases missing the static badge by rmse > 5 fall
+
+```
+before  109 / 134      after  4 / 134
+```
+
+and the 4 that remain are gpodder and podurama in both themes — the
+svgo defect below, not a layout one. Among the other 130 the largest
+residual is **3.71**, pure sub-pixel edge antialiasing from the two
+different nesting depths. Worst cases before the fix: podengine 169.47,
+podstation 166.26, podfriend 154.25, listennotes 144.41, siriusxm
+143.38, each landing under 3.4 after.
+
+The regression test (`src/react/badge-static-parity.test.tsx`) asserts
+inner-viewBox and clip parity against `static/badges/<id>-<theme>.svg`
+for every platform in both themes. It fails 45 of 72 on the viewBox bug
+alone and 69 of 72 on the clip bug alone.
+
+### Two traps this turned up
+
+**librsvg is not a renderer here, and that includes measuring.** The
+first pass of this comparison used sharp/librsvg and produced 10 false
+mismatches (icatcher rmse 175, metacast 229, podlp 213). librsvg does
+not parse `color(display-p3 …)` and falls back to the inherited fill, so
+the same paint renders **black** with no root fill and **transparent**
+under `fill="none"`:
+
+```
+p3-red, no root fill      -> 0,0,0          (black)
+p3-red, root fill="none"  -> 255,255,255    (nothing painted)
+sRGB-red control          -> 255,0,0
+```
+
+That is the P3 reference-raster trap wearing a different hat: it made
+the component's dropped root `fill` look load-bearing when it is not.
+`generateBadge()` propagates the source's root fill onto the nested
+`<svg>` and codegen does not carry it at all, so the divergence is real
+in the code — but **0 of the 61 badge files with a root fill have any
+drawable element that depends on inheriting it**; every one carries its
+own fill. So it is inert today and was left alone. It is a live trap for
+the next badge authored with a stroke-only path, which is exactly the
+case `CLAUDE.md`'s root-`fill` convention exists for.
+
+**`:scope > defs` silently matches nothing on an SVG element in jsdom**,
+even when the `<defs>` is a direct child. The first version of the clip
+assertion used it and passed against the unfixed component; it had
+already made the existing `PlatformIcon` square-shape test vacuous. Use
+an explicit `children` check.
+
+### Open: svgo mangles two badges in codegen
+
+Separate, pre-existing, and NOT fixed here. Codegen runs the stored
+content through svgo (`preset-default`); `build-static.ts` does not. For
+two platforms that changes the rendering. Rendering the source
+`badge.svg` against the library's stored content, both in Chrome, same
+viewBox:
+
+```
+gpodder     rmse 61.99     svgo collapses 3 <g> into 1
+podurama    rmse 59.79     same element counts, attribute-level change
+truefans    rmse  2.74
+icatcher    rmse  2.56
+spotify     rmse  0.00
+apple       rmse  0.05
+podstation  rmse  0.06
+```
+
+This is why gpodder and podurama still miss the static badge by rmse ~60
+after both fixes above. It is a codegen/svgo defect, not a badge-layout
+one, and the right fix is to pin down which preset-default plugin is at
+fault rather than to widen the layout change.
