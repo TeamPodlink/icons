@@ -2789,6 +2789,53 @@ catalogue serves.
    platform would resolve all three; that is a curation decision for the
    maintainer, not an artwork one.
 
+### spotify: the bundle glyph verbatim, at the bundle's own placement (2026-09-14)
+
+Spotify's 36.06 was not the material band after all. Checked against
+Spotify's official 2024 brand asset (`Primary_Logo_Green_RGB.svg`) with
+both silhouettes normalised on the disc: the decanted bundle's
+`Assets/icon.svg` IS that logo (IoU 0.9993, 450 px of 1000² off — Apple
+CoreSVG re-export noise), while the old flat's mark was a different
+drawing (IoU 0.922, 5.2% of the disc mismatched: bars a previous
+generation, sitting ~1% of the disc low-right of the official ones).
+The disc was also 810 px wide at 1024 against the master's 820
+(101..920, exactly the bundle's 674 × 1.21958 at translation −1),
+because the old flat had been fitted into a 76/96 box rather than
+placed from icon.json.
+
+Rebuilt per the icon-to-flat-svg route: the bundle path verbatim, the
+layer's declared fill `display-p3 .118 .843 .376`, and the placement
+computed from icon.json (`translate(3.125 3.125) scale(.03811188)`
+— 100 pt top-left, 822 pt wide). Same instrument, `--only spotify`:
+
+| flat | central | frame | meanΔ R/G/B | luma% | >40 |
+| --- | --- | --- | --- | --- | --- |
+| old (drawn mark, 76/96 box) | 36.06 | 28.35 | +1.4 −0.4 +0.2 | 100% | 11% |
+| **bundle glyph, P3 green** | **2.90** | 13.59 | +1.4 +0.5 +0.6 | 99% | 0% |
+| bundle glyph, brand `#1ED760` | 18.02 | 19.02 | −20.6 +3.4 −13.4 | 10% | 0% |
+
+2.90 sits at the vector-for-vector floor; what remains is the specular
+group and the neutral shadow (luma 99%, no >40 pixels) plus the two
+masks' corner disagreement in `frame`.
+
+**The green stays declared P3, on provenance, not on the score.** The
+brand asset says `#1ED760` = (30,215,96) sRGB; the bundle declares the
+same triple as `display-p3` (the same-triple signature — in Spotify's
+own Icon Composer file), ictool clips it to (0,218,76), and Apple's live
+store artwork (`itunes.apple.com/lookup?id=324684580`, 1024) reads
+modal (0,~220,~80) over the same 821-px disc. So the icon Apple ships
+everywhere is the clipped P3 green, and `audit-declared-colors` reports
+the declaration consistent. The brand hex would be the *logo's* colour,
+not the *app icon's*; it costs 18.02, chroma-driven (luma 10%). The
+badge (`badge.svg`, the bare 24-unit disc) keeps `#1ED760` — it is the
+brand mark on a pill, where Spotify's guidelines apply — but its glyph
+is now the same bundle path as one knock-out fill: the bars are holes
+that reveal the pill behind (as in the official logo), replacing the
+old drawn `#181413` bars, placed `translate(8 8) scale(24/674)`. The `spotify/icon.svg` allowlist
+entry is gone: the verbatim `.118 .843 .376` is not an exact n/255
+triple, so the ratchet does not see it.
+
+
 ### build-svg-icons cannot split a GRADIENT plate (2026-09-14)
 
 `splitBackground()` lifts up to three full-bleed rects into the canvas,
