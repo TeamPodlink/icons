@@ -3540,3 +3540,29 @@ name "Pocket-Casts-Roundel---Red", and `--` inside an XML comment is
 invalid XML — Chrome and librsvg reject the whole file, so the site
 showed a broken image while validate passed. validate.mjs now refuses
 `--` inside any comment of icon.svg / badge.svg / badge-dark.svg.
+
+### tunein: the official vector, placed by the bundle's layer geometry (2026-09-14)
+
+cms.tunein.com ships the primary logo as a Sketch export
+(`/wp-content/uploads/2018/02/primary.svg`, 125 × 55: one evenodd path
+masking a #14D8CC rect). The flat now uses that path verbatim. Placement
+was not fitted, it was read off the bundle: the decanted `Logo -
+Full.svg` (viewBox 848 × 376) has no `position`, so ictool draws it at
+natural size centred on the 1024 canvas, top-left (88, 324); and the
+official 125 × 55 art resampled to 848 × 376 is x 6.784, y 6.836 — the
+bundle asset is 0.77% taller than the official aspect (whoever sized it
+did not hold the ratio). The flat reproduces that footprint exactly,
+`translate(2.75 10.125) scale(.212 .213636)`, so it registers with the
+master rather than with the press kit: measured teal bbox on the master
+and on the Chrome raster is the same x 88–935, y 324–699 (848 × 376).
+Glyph fill = the layer's declared light fill `srgb:0.078,0.847,0.800` =
+#14D8CC, the hex the official file paints; the old
+`color(display-p3 0 .851 .8039)` left the allowlist with it. Facet drift
+**37.58 → 4.97** (frame 28.41 → 11.29, `>40` 10% → 0%); what remains is
+the layer's glass material (`0/1+s`) and the automatic-gradient lift,
+mean channel +3.2/+4.2/+3.9. Badge: the bare mark, no plate and no
+squircle, in a viewBox that is the glyph's own bbox on the 32 canvas
+(`2.75 10.125 26.5 11.75`) so it fills the pill's icon slot edge to
+edge; #1C203C on the light pill (`badge.svg`), #14D8CC on the dark one
+(`badge-dark.svg`). Replaces a #00D9CD mark in a `8 8 24 24` box that
+sat bottom-heavy in the pill. `flatSource: official`.
