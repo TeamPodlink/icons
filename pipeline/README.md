@@ -3566,3 +3566,42 @@ squircle, in a viewBox that is the glyph's own bbox on the 32 canvas
 edge; #1C203C on the light pill (`badge.svg`), #14D8CC on the dark one
 (`badge-dark.svg`). Replaces a #00D9CD mark in a `8 8 24 24` box that
 sat bottom-heavy in the pill. `flatSource: official`.
+
+### podcastrepublic: the Liquid Glass constructions as the flat (2026-09-14)
+
+Podcast Republic's flat was a Q-curve trace of the ring — the bundle's
+own asset, `app_icon_512.svg`, is that same trace — on a solid
+`display-p3 .3608 .5216 .8667` plate, and drawn 6% too small (outer
+radius 12.07 against the 12.82 the bundle places): drift 40.74.
+Underneath the trace both marks are exact constructions, so the flat is
+now REBUILT from them, not traced (`pipeline/podcastrepublic-flat/`,
+1.1 KB): ring = annulus outer 10 / inner 8 minus two width-2 slots whose
+near edge lies on the two diagonals through the centre (the piece
+between them is an exact 90° annular sector, the other a 270° sector
+shortened by a slot width at each end); play = equilateral triangle,
+corner radius 10, rounded height 89.1, bounding box centred on the layer
+origin. Placement was read off the bundle, not fitted: the ring's
+`matrix(-0.110203 19.0817 -19.0817 -0.110203 486.1 28.4)` is scale
+19.082 at **90.331°** — the 0.33° is shipped artwork and stays (snapped
+to 90° the footprint mismatches 953 px in the gap wedges against the
+master vs 680 as shipped); the triangle's matrix is an exact 90° at
+1.547; icon.json's layer scale 2.15039 with translation −0.5 pt. Every
+edge lands within 0.5 px of the 1024 master (triangle base 408.0 vs
+407.9, apex 704.4 vs ~704, ring outer 921.2 vs 921). The glass also
+paints a ~4 px neutral shadow rim outside every edge (icon.json
+`shadow: neutral 0.5`), which a flat does not carry. Background: the
+ramp ictool paints for the canvas's automatic-gradient (display-p3
+0.322 0.522 0.878), least-squares fitted on the sRGB master's background
+pixels (rows 160–870, rms 1.4/255) and extrapolated to the frame,
+#569DFF → #3D85E4; the old P3 plate triple left the allowlist with the
+declaration. `flatSource: drawn`. Facet drift **40.74 → 14.89** (frame
+19.41, mean channel −10.0/−7.4/−3.3, `>40` 8%). What remains is the
+mark's material: the glass ramps from white at the top of the ring to
+(164,197,242) at its bottom (translucency 0.5 over the plate plus the
+lighting ramp). `--glyph ramp` paints that measured ramp (white held
+to row ~213, then to #9DC1F3) and scores **7.58** (frame 13.12, mean
+channel −0.5/−1.4/−2.3) — not shipped: the brand's flat mark is white
+and the tint is material, not artwork. Badge: the same art on a circular
+plate, as before (the Play Store icon is a circle), replacing the old
+trace on a #5C85DD disc in a `8 8 24 24` box; both files come from the
+one generator.
