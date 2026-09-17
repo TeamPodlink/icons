@@ -3085,6 +3085,41 @@ downcast-site-logo.svg`, Illustrator export, #E10000 disc + white
 are official and they are different cuts of the mark. The bundle stays
 on the App Store artwork, the leading indicator for the icon.
 
+> **downcast plate ramp, then a drawn glyph (2026-09-14).** First the
+> flat's #E10000 plate was replaced by the App Store artwork's eased
+> vertical red ramp (background.png is uniform in x; the centre column
+> fitted greedily to a 6-stop `linearGradient`, max deviation 1/255:
+> #E60000 → #E50000 @.233 → #DE0000 @.48 → #D00000 @.719 → #BC0000
+> @.935 → #B40000). Central **47.09 → 46.87**: plate RMSE 7.67 → 3.90
+> but the glyph region stayed at 71, so the pair was entirely the two
+> cuts of the mark. Then the site-logo glyph was replaced by a vector
+> drawn to the App Store glyph's MEASURED geometry
+> (`pipeline/downcast-flat/gen.mjs` holds every constant and emits the
+> paths): 0.5-coverage crossings of the master's G channel (white on a
+> G=0 plate), least-squares circles on each edge separately (rmse
+> 0.06-0.08 px at 1024). The D is a stem + a true semicircle (r 146.4,
+> tangent to the straight top and bottom edges) with r=9 outer corners;
+> its counter a circle (r 84.28) clipped by two horizontal lines, r=9
+> corners on the stem side and a 60 px fillet where the circle meets
+> the lines. Each arc is an annulus (inner and outer circles fitted
+> separately; centres differ by ~1.5 px) cut by two 45° lines, mirror
+> images about y=512, with 10.5 px apex fillets and 8 px fillets at the
+> inner junctions. Fillets are computed (offset-edge intersections),
+> not hand-placed; the three radii were chosen by scoring Chrome
+> renders against the master in windows around each corner. Trap
+> recorded: a crossing instrument that pairs a sub-pixel position on
+> one axis with an INTEGER index on the other puts every line and
+> circle centre 0.5 px off on the fixed axis — the first render's cap
+> lines were "0.6 px off" until both axes used pixel centres, after
+> which the canvas centre read exactly 512 and the bottom caps mirrored
+> the top ones. Rendered edges now sit within 0.3 px of the master's;
+> the master's remaining partial pixels are its squircle rim highlight,
+> not the glyph. Central **46.87 → 1.14**, frame 34.94 → 13.34,
+> `flatSource` official → drawn (the site logo was a different cut of
+> the mark). badge.svg takes the same glyph paths at the same
+> coordinates and the same plate ramp under its circle clip.
+
+
 **globalplayer keeps its raster.** Registration already agrees (0.71%,
 aspectD 0.18%); the 34.65 is the App Store artwork's glossy triangle
 and darker blues against our flat gradient, and globalplayer.com's
