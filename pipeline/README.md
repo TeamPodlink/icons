@@ -3605,3 +3605,692 @@ and the tint is material, not artwork. Badge: the same art on a circular
 plate, as before (the Play Store icon is a circle), replacing the old
 trace on a #5C85DD disc in a `8 8 24 24` box; both files come from the
 one generator.
+
+## Overcast: the AppIconDark stack folded into the default bundle (2026-09-17)
+
+The site's dark Overcast Liquid Glass icon was the default stack's own
+per-appearance dark (near-black canvas, orange knockout disc). The app
+also ships `AppIconDark`, its user-selectable Dark alternate (slate
+canvas, teal disc, light-cyan waves), and that is now the bundle's dark
+appearance — one `Overcast.icon`, no `-dark` variant slug returns.
+
+- **Source.** `AppIconDark` re-decanted from the installed Overcast
+  2026.8 catalog (`/Applications/Overcast.app/Wrapper/Overcast.app/
+  Assets.car`, decant host mode); icon.json and all three SVGs are
+  byte-identical to the 2026-07-19 extraction except the CoreSVG
+  generator comment (361 → 362), the same drift the default stack
+  showed on 2026-08-18. The App Store copy is 2026.8.1 but ipatool
+  could not fetch it (TLS handshake timeouts on the iTunes lookup);
+  the default stack was already byte-identical across 2026.7/2026.8.
+- **Why the canvas is a layer.** `AppIconDark`'s own Dark rendition
+  proves the tint-law ledger above: ictool forces the gray canvas
+  (34→15 8-bit over the declared slate) and tints the near-white
+  waves to the canvas default fill (its Default↔Dark RMSE is 41.8).
+  So the slate `0.267,0.306,0.341 → 0.169,0.184,0.204` gradient ships
+  as a full-canvas SVG layer (`Dark Canvas.svg`, a 1024 rect carrying
+  the stack's canvas gradient as its layer fill) in a bottom neutral
+  group (no shadow key, no specular, no translucency), opacity 0 in
+  Default/tinted and 1 in Dark — the mirror of the audible/spreaker
+  background-layer pattern. The fill's dark specialization declares
+  the same gradient for intent; ictool paints the layer.
+- **Layers.** Group 0 is now the AppIconDark group verbatim (same
+  material as the default stack's group 0: neutral 0.5 shadow,
+  individual lighting, specular, translucency 0.5): `Negative Circle
+  Waves` + `Negative Circle Tower` with opacity/glass specializations
+  `[{0,false},{dark 1,true},{tinted 0,false}]` — the dark-keyed
+  opacity specialization is what keeps the .92-luma waves untinted —
+  and the tinted-only `Negative Circle Combined` disc, which is the
+  same layer both stacks declare. The default stack's two dark-only
+  Combined layers (5 % plus-lighter white, orange gradient glass) are
+  gone; the Waves and Tower/Background Circle groups keep their
+  decanted dark specializations verbatim but are already opacity 0 in
+  Dark, so they are inert there.
+- **Measured.** Default rendition **byte-identical** to the prior GT
+  (0 differing bytes at 1024); `build-recipes.mjs --rebake --only
+  overcast` re-scores **7.12** and regenerates `recipes/overcast.mjs`
+  and `engine.mjs` byte-identical. Dark rendition vs the standalone
+  `AppIconDark` Default rendition: **RMSE 0.569**, max channel
+  difference 15, 96 % of pixels within ±1 — canvas, disc and wave
+  samples match to the byte; the residual is the ±1 material noise
+  plus faint glyph-edge structure. `validate.mjs` 71/71;
+  `build-assets.mjs --only overcast` keeps `hasDark: true`.
+
+### overcast: the flat facet assembled from the bundle's vector assets (2026-09-17)
+
+The old `overcast/icon.svg` was a drawn hybrid that matched neither
+appearance: orange canvas, a white r=12 circle, then the *Dark
+alternate's* slate gradient (`.2667 .3059 .3451 → .1333 .1922 .1725`)
+as a disc-with-tower knockout, and orange waves — facet drift **30.89**
+(the light master shows a cream disc in a near-black ring). Rebuilt per
+the icon-to-flat-svg route with zero drawn geometry: every path is a
+bundle asset verbatim (`Background Circle.svg`, `Tower.svg`,
+`Waves.svg`, all 1024-native, no `position` ⇒ `scale(.03125)`, no
+translation), every colour a declared light-appearance value:
+
+- canvas `display-p3 1 .65 .3 → .95 .412 .142`, vertical;
+- the Tower/Background Circle group at its declared **group opacity
+  0.9** (`<g opacity=".9">`): the white disc reads (255,244,233) over
+  the orange on the master and byte-for-byte the same on the flat;
+- `Tower.svg` (ring + tower, evenodd) in its declared layer gradient
+  `display-p3 .08 .12 .2 → #000`, `userSpaceOnUse` over the layer's
+  own bbox in bundle space (y 102.052 → 921.252, since the gradient is
+  referenced from inside the path's `scale(.03125)` user space);
+- `Waves.svg` in the layer's declared `display-p3 .956 .487 .192`,
+  which the master renders as (255,116,0) and the flat as (255,115,0).
+
+Same instrument, `--only overcast`:
+
+| flat | central | frame | meanΔ R/G/B | luma% | >40 |
+| --- | --- | --- | --- | --- | --- |
+| old (drawn hybrid) | 30.89 | — | — | — | — |
+| **bundle assets, declared fills** | **10.99** | 15.25 | −1.0 −2.1 −3.4 | 97% | 3% |
+
+What remains is material: the ring's glass rim and the wave arcs'
+specular highlights (the `4x|diff|` sheet is a thin outline of every
+edge, nothing displaced or missing), plus the two masks' corner
+disagreement in `frame`. None of the four new triples is an exact
+n/255, so the four stale `overcast/icon.svg` + `badge.svg` allowlist
+entries (the old hybrid's slate and orange) leave
+`pipeline/p3-allowlist.json`. `flatSource: "official"`. Badge: the same three
+layers as a bare mark, no canvas and no clip — the mark is the circle,
+so the badge gets no squircle — fitted to the 24-unit box from the
+ring's own bbox (`Tower.svg` 102.052 → 921.252, 819.2 pt ⇒
+`translate(5.0102 5.0102) scale(.029296875)`, `viewBox 8 8 24 24` as
+spotify). The group's declared opacity 0.9 is not carried: it is a
+composite against the orange canvas, which the pill replaces, so the
+disc ships at its declared `#fff`. Snapshot: overcast 30.89 → 10.99.
+
+## Parasocial and Podcast Parrot: two sourced from the shipped iOS apps (2026-09-17)
+
+Both IPAs came down via ipatool (the account acquired each $0 license;
+ipatool had to move 2.3.2 → 2.6.0 first — the old build gets HTTP 403
+"empty or non-plist body" from every store endpoint, owned apps included,
+which is Apple's SAP-signed-request change, not stale auth).
+
+### podcastparrot: decanted (`com.wegenerlabs.Podcast-Parrot` 1.6.7, id 1451559709)
+
+`assetutil -I` lists a genuine `IconImageStack` (Light/Dark/Tintable), so
+the bundle is decant host mode's assembly, untouched: one 1024 raster
+layer (`parrot.png`, alpha bbox 4,138 → 772,1023 — the bird runs off the
+left and bottom edges) in a group with specular, translucency 0.5 and a
+neutral 0.5 shadow; canvas `gray 1.0 → 0.925` in light with the standard
+`0.192 → 0.078` dark pin. The layer is declared **non-glass in light and
+glass in dark/tinted** (`glass-specializations`), which is exactly what
+the App Store's own rendition shows (a flat parrot on a glass plate). The
+three appearance layers dedupe to one PNG (RMSE 0 pairwise). `source:
+decanted`, `hasDark: true`. No vector of the mark exists anywhere in the
+app, so the first cut shipped a raster `badge.svg` (the light rendition
+at 160 px, the queue/rssradio form) and no `icon.svg`.
+
+**Vector flat facet (2026-09-17, `pipeline/podcastparrot-flat/`).** The
+maintainer supplied a hand-drawn parrot SVG (`supplied.svg`, 1024
+canvas: 25 elements — body, wing, three feather bands, face patch, eye,
+two-part beak, plus eleven translucent tints, shades and highlight
+overlays). It is *not* used as drawn: every colour and every feature
+placement is refit to the bundle's own `parrot.png`, and the toolchain
+re-runs byte-stable (`masks → segment → register → masks → fit stage2b
+→ overlays stage2b → compose stage3`, work dir `/tmp/podcastparrot-flat-
+work`):
+
+- registration: the supplied silhouette already sits within 1 px of the
+  raster's (alpha IoU 0.990, bbox 3/137/775 vs 4/138/772). The raster is
+  then segmented into colour classes (dark, white, peach, blue/purple,
+  warm) and each feature is registered to its class by translate + scale
+  about its centre, XOR-minimised: beak s .985 t(−1,0), wing s .99
+  t(−2,−2) (its three feather bands ride the same transform — the
+  purple-hue fit of the top band alone, s .915 t(9,−14), scored no
+  better overall and distorted the lobe), face patch s .975 t(1,−2); the
+  eye discs are circle fits to the white ring ∪ dark blob (iris r 55.74
+  at (506.01, 302.18), pupil r 35.33 at (506.27, 301.92); the supplied
+  59 / 36 at (506, 302));
+- colours: every base shape's gradient keeps the supplied geometry and
+  offsets and gets its stop colours by least squares over the raster
+  pixels visible through that shape (painter's order honoured), in the
+  shape's own gradient space; solids are the region mean. Strokes and
+  outlines are dropped (nothing in the raster has an outline);
+- overlays: three of the eleven are put back with their supplied
+  opacities held fixed and their colours refit over the stage-2 render
+  (head tint 12.65 → 10.55 in its region, bottom shade 14.55 → 13.45,
+  wing-tip glow 19.23 → 17.19); the six thin highlight strokes and
+  iris/beak glints never earned their place and stay out. The two chest
+  feather accents DID score (18.17 → 5.23 and 14.23 → 3.88 in their
+  regions, whole-figure 14.83 → 14.44) but read as too prominent on the
+  flat — refit to #FFE614 / #FFC10F at α .34 they are a hard-edged
+  yellow feather where the raster has a faint stroke — so they are
+  excluded by maintainer call (`OV` in overlays.mjs; ledger 2026-09-17).
+  A free per-stop opacity fit was tried and clamps into nonsense
+  (#FFFF2A at α 1) — the fixed-α fit is the one that lands.
+
+| stage | RMSE vs `parrot.png` over the overlap (1024, Chrome) |
+| --- | --- |
+| supplied, as drawn | 18.25 |
+| stage 1: overlays off, base colours refit | 15.91 |
+| stage 2b: + per-feature registration | 14.86 |
+| **stage 3: + three refit overlays (shipped)** | **14.83** |
+| stage 3 with the chest accents too | 14.44 (rejected, see above) |
+
+What remains is the raster's painterly shading (feather strokes, the rim
+darkening on the chest, soft edges) that no flat gradient carries. Facet
+drift central **13.87**, frame 17.10 (`--only podcastparrot`, glass
+0/1+s) — mid-table, under every raster-artwork pair. `icon.svg` is the
+declared light canvas (`gray 1.0 → 0.925` ⇒ #fff → #ECECEC, vertical)
+under the fitted parrot at `scale(.03125)`; `badge.svg` the same under
+the house squircle (plated: the bird is cut by the canvas edge), replacing
+the raster badge. `flatSource: drawn`.
+
+### parasocial: catalog artwork, flat measured into vectors (`com.supersimple.podcasts` 1.7.2, id 6792017587)
+
+No stack: three 1024 `Icon Image` renditions, and the dark one is a
+byte-identical fallback to light (RMSE 0), as is the App Store 1024
+(RMSE 0), so the bundle is the single-raster form on the in-car light
+PNG (`source: catalog-artwork`, `hasDark: false`; `split-raster-icons`
+skips it — "dark glyph with no tintable twin" — and `audit-dark-status`
+records `native`, flagged BORDERLINE at meanLuma 0.099).
+
+The flat facet is `pipeline/parasocial-flat/gen.mjs`, every constant a
+measurement of that PNG (the supplied `parasocialfm.svg` contributed only
+its structure — one bar, dot columns of 2/3/4 — and none of its
+geometry or colour):
+
+- shapes: half-coverage crossings of luminance with pixel centres on both
+  axes — bar 220.36 → 302.95 × 192.00 → 831.98 (82.6 wide, exactly 640
+  tall ⇒ y 6 → 26 in 32 units, x 8.177), ten dots of diameter 82.2–82.6
+  (r 41.2 px ⇒ 1.2875) at column x 13.865 / 18.845 / 23.823 and rows
+  16 ± 2.847, ± 5.692, ± 8.178 (component centroids, symmetric about
+  512 to 0.01 px);
+- colour: one horizontal ramp shared by every shape — colour is linear in
+  x inside each shape with a different slope per shape, so the gradient
+  carries eight stops, the per-shape profiles extrapolated to each
+  shape's true edge (#0771FE → #1E61F9 across the bar … #CB49A3 →
+  #FC5566 across the pink column); no y dependence (top vs bottom dot at
+  the same x agree to 1/255);
+- plate: a radial gradient, centre (512, 432) R 750, #141B3D → #050818,
+  least-squares over 1614 background samples, rms 0.30/255.
+
+Chrome render vs the in-car PNG at 1024: **RMSE 0.68** overall (bar
+1.15, dots 0.88; residual edge crossings within 0.1 px). Same instrument
+as everyone else: facet drift central **0.69**, frame 11.42 (the two
+masks' corners). `flatSource: drawn` (measured geometry, the downcast
+precedent). Badge: the same artwork under the house squircle clip — the
+plate is the mark's ground, so it ships plated.
+
+### Lenses: "hand-drawn art" retired, "raster elements" added (2026-09-17)
+
+"hand-drawn art" keyed off `flatSource: "drawn"` — a provenance fact,
+not a gap: a flat measured off the master (downcast, parasocial,
+podcastparrot) is a finished facet, and `flatSource` stays on the card
+as data. The lens that names the actual backlog is **"raster elements"**:
+every platform with at least one facet built from pixels.
+`build-data.mjs` derives `rasterFacets` per platform — `glass` when any
+bundle's `Assets/` holds a non-SVG file, `flat` / `badge` when that SVG
+embeds an `<image>` — and the lens fires on a non-empty list. Today 42 of
+73 platforms, all through their bundle (79 PNG layers vs 48 SVG across
+the catalogue); airshow and disctopia also through their raster badges.
+Dev-only like the other QA lenses (`lensesEnabled`); the production
+bundle still drops the label (checked: absent from `dist/assets/index-*.js`).
+
+### Temporary lens: "vector-ready raster" (2026-09-17)
+
+Which of the 42 raster bundles could be rebuilt from a vector we already
+ship? A raster bundle has no material, so its facet drift against the
+flat is artwork drift alone, and the measured floor for "the same mark,
+raster re-drawn as a vector" is central ≤ 5 (gaana / yoto / podhome,
+"The material's cost" above). `isVectorReady()` in
+`apps/web/lib/platforms.ts` therefore selects: raster glass facet, a
+vector flat (no `<image>`), drift ≤ 5, and a bundle source that is not
+`flat-svg-browser` (tunestr 0.60, gpodder 0.75: their PNG is already a
+Chrome render of the flat, made because ictool cannot paint those SVGs'
+filters — the fix there is rewriting the SVG, not swapping the asset).
+Eleven bundles qualify, in two shapes:
+
+| shape | slugs (drift) | swap |
+| --- | --- | --- |
+| split: canvas fill + `glyph.png` (+ `glyph-dark.png`) | ivoox 0.56, downcast 1.14, gaana 2.27, yoto 3.84, amazonmusic 4.47, podhome 4.73 | the youtube/podkicker/podcastaddict move: the flat's mark as a bare SVG layer on the already-lifted canvas; the dark twin follows the tint law |
+| single plate+mark raster (`light.png` [+ `dark.png`]) | neuecast 0.65, parasocial 0.69, castro 1.57, queue 2.72, siriusxm 3.65 | the `flat-svg` route (build-svg-icons.mjs): icon.svg becomes the layer; a non-vertical plate (parasocial's radial) rides inside the SVG since canvas fills paint vertically only |
+
+The next band (pandora 5.18, rssradio 5.23, youtubemusic 5.36, deezer
+5.45, hark 5.73) sits just over the floor and is worth a diff sheet each
+before deciding; pocketcasts 7.56 is decanted (developer PNG layers), a
+different question. Bundle-level lens, dev-only, to be removed once the
+swaps land.
+
+### The vector-ready round: nine raster bundles rebuilt from their flats (2026-09-17)
+
+Worked through the "vector-ready raster" lens (previous entry). Method
+per platform: drop the raster bundle and its `liquidGlass` entry, run
+`build-svg-icons.mjs --only <id>` (SVG layer, quality gate against a
+Chrome reference, dark split), restore `appStoreId`, then
+`build-assets --only`, `audit-dark-status --only --write` and
+`audit-facet-drift --only`. Old and new renders were compared side by
+side in both appearances.
+
+| slug | before → after (source) | drift before → after | dark |
+| --- | --- | --- | --- |
+| ivoox | appstore-artwork-split → flat-svg-split | 0.56 → 0.76 | auto-tint (was glyph-dark.png) |
+| gaana | appstore-artwork-split → flat-svg-split | 2.27 → 0.81 | auto-tint |
+| yoto | appstore-artwork-split → flat-svg-split | 3.84 → 1.63 | auto-tint (#FBF6F1 passes the near-white gate) |
+| amazonmusic | appstore-artwork-split → flat-svg-split | 4.47 → 1.67 | retint twin `icon-dark.svg` (black mark → the plate's cyan) |
+| podhome | appstore-artwork-split → flat-svg-split | 4.73 → 0.97 | white twin over the untintable black plate |
+| parasocial | catalog-artwork → flat-svg | 0.69 → 0.85 | native (radial plate is unsplittable; dark = light, as shipped) |
+| neuecast | catalog-artwork → flat-svg | 0.65 → 0.41 | native (diagonal plate, unsplittable) |
+| siriusxm | appstore-artwork → flat-svg-split | 3.65 → 0.68 | the app's shipped dark art, re-expressed as a vector twin `icon-dark.svg` (measured, next entry); a transient `flat-svg-shipped-dark` label held the PNG twin for an hour and was retired |
+| downcast | appstore-artwork-split → flat-svg-split, **hand-built** | 1.14 → 0.79 | auto-tint red (was glyph-dark.png) |
+
+**downcast's plate, and a law with no pre-compensation.** The eased
+six-stop red ramp cannot be a canvas fill (ictool: "Linear gradients
+require exactly 2 colors", probed) and a two-stop lerp misses it by up
+to 15/255 (probe A, 6.26 against the old raster render). Shipping the
+ramp as an SVG gradient layer hit the CoreSVG stop law head-on: pure
+reds get the green floor `0.0185·R + 0.0320·B`, the plate rendered
+(203,54,29) where the raster read (202,42,27), drift 1.14 → **13.31**
+with meanΔ G +17.8. A floor cannot be pre-compensated on a stop that is
+already at G = 0. The construction that lands (probe E, **2.21** against
+the old render, column-for-column within 1/255): a solid `#E60000` rect
+under a full-bleed rect whose gradient stops are all `#000` with the
+ramp carried in `stop-opacity` (0 → .0043 → .0348 → .0957 → .1826 →
+.2174, i.e. 1 − stop/E6). Black stops have no green to floor, and
+Chrome's encoded-sRGB lerp of the opacities equals the flat's colour
+lerp exactly, so the two facets agree by construction. `plate.svg`
+(dark-hidden) + bare `glyph.svg` on the old two-stop red canvas (the
+auto-tint samples the canvas, so the dark glyph is unchanged). Drift
+0.79. General rule for any saturated ramp that must ride a layer: put
+the ramp in the opacity of a black (or white) overlay, never in the
+colour stops.
+
+**Not swapped: castro and queue.** Both flats carry `feGaussianBlur`
+filters (castro's shadows, queue's inner shadow); the builder's
+dropped-filter check diverted each to `flat-svg-browser` (castro rmse
+13.63, queue 5.69 — the Chrome raster of the same flat), which is no
+vectorisation at all, and castro would also have lost its shipped dark
+art. Both reverted to their catalog/App Store bundles; they stay on the
+lens as the two remaining candidates, blocked on ictool's filter
+support (or on filter-free redraws of those two flats).
+
+Counts: raster elements 42 → **34**; vector-ready 11 → **2** (castro,
+queue). Three PNG plates and nine PNG glyphs left the repo.
+
+### siriusxm: the shipped dark art is the light glyph under one gradient (2026-09-17)
+
+The PNG twin kept for precedence turned out to be measurable into a
+vector without losing anything. Against the light glyph SVG rendered
+by Chrome at 1024, `dark.png`'s silhouette scores IoU 0.9899 (bboxes
+125/120/897/904 vs 124/118/898/905 — a pixel or two of edge softness),
+and its colour is pure grey (mean R−G and G−B both 0.00), uniform
+across x (per-row std ≤ 0.54/255, mid-band left 204.6 vs right 204.1)
+and linear in y to a max row residual of 0.43/255: 255 at row 119 →
+153.4 at row 904. Mapped into the path's user space that span is
+6.5954 → 25.3975 — the artwork's own 18.81-unit clip box (6.595 →
+25.405), i.e. the developer drew the same mark with a vertical
+white → #999 gradient across its bounding box. `icon-dark.svg` is the
+light glyph file with that one `linearGradient` in place of `#fff`,
+swapped in as the opacity-specializations twin; `dark.png` is gone and
+the source is a plain `flat-svg-split`. Interior samples agree to
+1/255 (rows 140 / 512 / 880: 253/204/157 both ways); the whole-frame
+residual is the same edge-softness band the light side carries:
+old-vs-new at 1024, light 9.96 RMSE with 7,043 px over 24/255 and dark
+9.06 with 6,599 — a one-to-two-pixel rim around the mark in both, the
+PNG's softer edge against the vector's, nothing in the interior.
+Raster elements 34 → **33**.
+
+Rule worth keeping: a shipped dark PNG is not automatically a
+different design. Test its silhouette against the light vector and its
+colour against a one-gradient model before concluding it needs pixels.
+
+## Two Icon Composer forms we had been hand-rolling (measured 2026-09-17)
+
+The maintainer built two bundles in Icon Composer to show what the
+format already does natively (`SiriusXM copy.icon`, `Queue copy.icon`,
+scratch copies). Probed with ictool, 1024² unless noted:
+
+**1. `image-name-specializations` — one layer, one asset per
+appearance.** `[{"value":"light.png"},{"appearance":"dark","value":
+"dark.png"}]` on a single layer renders **pixel-identical** (RMSE 0.000,
+max 0) to our two-layer form (twin at `{0, dark 1}` over a light layer
+at `{1, dark 0}`), for raster and SVG assets alike — 26 of our 31
+twin-pattern bundles collapsed and verified so (castbox/audible with
+their background layer left in place; listennotes' twin sits at a
+different position and is not a swap). One trap: with SVG assets the
+collapsed layer has no opacity-specializations, so a near-white dark
+asset falls back under the auto-tint law — curiocaster (max 40),
+goodpods (38.4, its white strokes tinted yellow), podengine/podstation
+(max 2) all moved until the `{1, dark 1}` pair was added, which is
+exactly what Icon Composer writes on such a layer. Rule: an explicit
+per-appearance asset always carries the `{1, dark 1}` guard.
+
+**2. Layer `fill` / `fill-specializations` — repaint the silhouette.**
+A layer fill repaints EVERY pixel of the asset's alpha with one paint,
+mask-style: a red+green two-path SVG under a dark `solid` orange reads
+(254,128,2) on both paths. `fill` alone applies in every appearance;
+`fill-specializations` with only an unqualified entry applies in every
+appearance too (it is the base); a `dark` entry overrides just dark, and
+it **beats the auto-tint** with no opacity guard (near-white glyph +
+dark fill → the fill, not the canvas colour). The light appearance is
+untouched when no light entry exists (the SVG paints itself). This is
+what decant emits for App Store stacks (sodes' apostrophe: light
+`gray:1`, dark a P3 gradient) and what a monochrome dark twin should
+have been all along: one file, no twin. Measured against the five
+single-colour twins: podengine and podstation **identical**;
+amazonmusic / metacast / curiocaster interior pixels identical (0 px
+over 2/255) and only 95–208 edge pixels over 24/255 at 512² — the fill
+path's own antialiasing against CoreSVG's. Adopted for all five.
+
+A gradient layer fill has two laws of its own, both unlike the canvas:
+it **honours orientation** (a horizontal `orientation` ramps along x;
+the canvas ignores orientation, fill-orientation law), and it ramps as
+a **smoothstep over the layer's alpha bbox**, not a linear lerp:
+white→0.6 grey over a full square reads 251/239/204/168/157 at
+t = .125/.25/.5/.75/.875 (3t²−2t³ predicts 251/239/204/169/157), and the
+same over a 512-px square and over the SiriusXM S (bbox 120→904) fits
+the same curve. Saturated stops additionally carry the CoreSVG stop
+law (red→blue midpoint reads 116,20,124). Consequence: SiriusXM's
+shipped dark gradient is LINEAR to 0.43/255, so the layer-fill form
+would miss it by 10/255 at the quarter points; it keeps its
+`icon-dark.svg` (now swapped by image-name-specializations). A linear
+shipped ramp needs the SVG; a smoothstep-looking one is a layer fill.
+
+**3. Group `blur-material`.** It is a backdrop blur: the layers of the
+groups BEHIND a glass group are blurred as seen through that group's
+glass. A glass disc with `translucency 0.5` over a 64-px checkerboard
+keeps checker contrast (std) 20.0 at `blur-material 0` and **0.0** at
+`1` (RMSE 13.7 between the renders); with translucency 1, 64.0 → 0.0.
+With nothing behind the group (a single-group bundle, or an opaque
+layer) it does nothing, which is why Queue's copy showed no change.
+It is not a filter on the layer's own pixels, so it cannot stand in for
+queue's inner-shadow `feGaussianBlur`; Apple's blur only softens what a
+glass layer looks THROUGH. Not tried: a two-group construction where
+the mark is a glass layer over a blurred copy of itself — a possible
+route to a soft inner shadow, but it would change the mark's material.
+Also seen in Icon Composer's output: `"lighting": "combined"` (vs the
+decanted `"individual"`), default `shadow {kind: neutral, opacity: 0.6}`,
+a two-identical-stop `linear-gradient` for a solid canvas, and the
+mixed-space pair `display-p3:1,1,1` / `srgb:0.6,…` it writes for a
+white→grey gradient.
+
+**Applied.** The 31 twin-pattern bundles: 5 → layer fill
+(amazonmusic, curiocaster, metacast, podengine, podstation; their
+icon-dark.svg deleted), 22 → one layer with image-name-specializations
++ guard, 3 decanted left as decant emitted them (castamatic, overcast,
+pocketcasts — the developer's stack), listennotes left (positioned
+twin). `validate.mjs`, `audit-dark-status.mjs`, `translate_icon.py`
+and `build_recipe.py` read both forms; `split-raster-icons.mjs` and
+`build-svg-icons.mjs` now EMIT them (monochrome glyph → fill
+specialization, mixed → asset specialization + guard) so no future
+build reintroduces the twin layer.
+
+## The canvas-inset law: a canvas gradient spans rows 105→919, not the height (measured 2026-09-17)
+
+Found while chasing rssradio's ±7/255 plate residual. A canvas
+`linear-gradient` white→black (no glyph, single transparent layer)
+rendered by ictool at 1024 reads, down the centre column,
+64:255 128:247 256:207 384:167 512:127 640:87 768:47 896:7 960:0 —
+linear at exactly −0.3133/px between rows **105 and 919** (255 → 0 over
+814 px, t = 0.1025 → 0.8975) and clamped to the end stops outside.
+Neither a full-height lerp (which predicts 239/223/191/…/16) nor a
+smoothstep fits; the ramp is straight, just inset ~10% at each end.
+The fill-orientation law stands (direction is always top→bottom); what
+it said about "the full canvas height" was wrong by that inset.
+
+Consequences, all applied:
+
+- **Lifted plates**: a full-height 2-stop SVG plate lifted into the
+  canvas with its end colours verbatim renders 10% "slower" at each end.
+  Resampling the plate's own line at t = 0.1025 / 0.8975 makes the
+  canvas reproduce the flat's ramp across the central 80% exactly (the
+  outer bands clamp, outside the audit's crop). `resolveGradientFill()`
+  now emits `insetStops()`; the five existing lifted canvases were
+  resampled and re-rendered: amazonmusic 1.67 → **1.39**, rss 1.29 →
+  **0.85**, yoto 1.63 → **1.48**, rssradio 5.23 → **4.90** (over the
+  vector-ready line), antennapod 5.76 → 5.77 (its residual is the
+  glyph). The tint law is unaffected: the auto-tint samples the canvas
+  per pixel, so dark glyphs pick up the same inset ramp the light
+  canvas paints.
+- **Layer fills** ramp differently again (smoothstep over the alpha
+  bbox, previous entry), so the three gradient laws are now: SVG
+  gradient = encoded lerp with the stop-transform floor; canvas fill =
+  straight lerp between 10.25% and 89.75% of the height; layer fill =
+  smoothstep over the layer's bbox. Never assume any of them from
+  another.
+
+## The near-floor and mid-band round: flats registered and recoloured against their masters (2026-09-17)
+
+Instrument: `refine.mjs` (scratch, to be adopted): a local grid search
+of a similarity transform on the flat's glyph group (everything after
+the full-bleed plate; coarse 0.1 unit / 1% → fine 0.008 / 0.1%),
+Chrome-rendered at 256 against the P3→sRGB master, the audit's own
+central crop; seeded from `fit-flat-glyph.mjs` where it could isolate a
+glyph. Plates were refitted separately: per-row MEDIAN colour over the
+glyph-free side bands of the shipped raster (48–96 / 928–976 px, rows
+4–1019, medians because podbean's outer arc crosses one band), greedy
+stops at 2/255, extrapolated to the full height. Every change below is a
+measurement applied to existing geometry; no path was redrawn.
+
+| slug | before | what moved | after | outcome |
+| --- | --- | --- | --- | --- |
+| youtubemusic | 5.36 | the `<mask>` (an alpha circle over a group whose first path IS that circle) was a no-op that double-antialiased the disc rim; dropped, then transform (−.042, −.042, ×1.0025) | **0.92** | vector (flat-svg-split) — the mask had also been diverting the builder to a Chrome raster |
+| deezer | 5.45 | transform (.017, .017, ×.9985) | **0.97** | vector (flat-svg, `--no-split`: native-dark black plate stays black) |
+| rssradio | 5.23 | canvas resampled at the inset rows (canvas-inset law) | **1.08** | vector (flat-svg-split) |
+| truefans | 9.50 | plate refit: 6-stop vertical ramp #4B22A2 → … → #000 off `light.png` (was a 2-stop guess) | **1.06** | vector (flat-svg; 6 stops are unliftable, native dark) |
+| audacy | 11.43 | transform (−.1585, −.148, ×1.00906) | **0.61** | vector (flat-svg-split) |
+| podimo | 14.31 | transform (.0855, .189, ×.98921) | **0.73** | vector (flat-svg-split) |
+| soundcloud | 7.44 | transform (.0585, .0375, ×.9955) | 5.17 | stays raster: the residual is the 0.8% aspect gap the ledger chose not to chase (thin bars bias the height fit) |
+| hark | 5.73 | transform (−.042, −.058, ×1.0025) | 5.26 | stays raster: the arcs are a different cut; its shipped `dark.png` is the same glyph (per-path medians identical to light.png) on a darker plate, so a later swap is a canvas dark fill, not a PNG |
+| iheartradio | 11.92 | flat plate: the horizontal P3 gradient replaced by the bundle's own two stops full-height; canvas resampled at the inset rows; transform (−.0125, −.0165, ×1.00125) | 6.11 | stays raster: the App Store art carries a radial vignette (left/right Δ 20.8) neither a vertical plate nor the canvas can hold |
+| snipd | 13.12 | plate refit; both S-lobe gradients refit by least squares over their own pixels (#7BFFD8→#00E29C, #0ADC9C→#00A370 replacing P3 guesses); transform (−.0978, −.0509, ×1.005) | 8.33 | stays raster: the master's S carries a specular highlight across the centre |
+| podbean | 14.66 | plate refit (10 → 5 stops); transform (.1716, .1655, ×.98949) | 12.51 | stays raster: the arcs' thickness/geometry differ — a redraw |
+| listennotes | 10.59 | transform gain 12.79 → 10.98 on its own metric, near-identity | not applied | stroke geometry, not placement — a redraw |
+| podverse | 13.13 | transform gain 13.44 → 13.24, near-identity | not applied | headphone outline differs everywhere — a redraw |
+| pandora | 5.18 | — | 5.18 | the compressed gradient mesh's texture floor (ledger entry above); left |
+
+Trap recorded: `audit-facet-drift.mjs` scores
+`packages/icons/static/icons/<id>.svg`, the BUILT flat — edit
+`platforms/<id>/icon.svg`, then `pnpm --filter @podlink/icons build`,
+or the audit silently re-scores the old file (it did, twice, before
+this was noticed). And `git checkout -- platforms/<id>` to revert a
+bundle also reverts that platform's icon.svg; revert the bundle dir and
+meta.json by path.
+
+Counts: raster elements 33 → **27**; vector-ready still castro, queue.
+Skipped by instruction: podcastguru (being regenerated from the
+official SVG), and the 18+ band.
+
+### podcastguru: rebuilt from the developer's official SVG; the iOS tile is a 72.93 dp crop of the 108 canvas (2026-09-17)
+
+Podcast Guru sent `podcastguru_app_icon.svg` (viewBox 0 0 108 108: a
+diagonal grey plate `#2E2E2E -> #4B4B4B` (0,2.63)->(108,108), the black
+petal outline, saturated petals at `fill-opacity .8`, a radial shade
+under the mic, a `#DADADA -> #FFFFFF` mic gradient). Sourcing first, per
+the ipatool skill in host mode: the installed app is the iOS wrapper
+(`/Applications/PodcastGuru.app/Wrapper/PodcastGuru.app/Assets.car`,
+1.0.38 build 132, `com.reallybadapps.podcastguru`, App Store id
+1535235039 — the same build the 2026-09-14 entry inspected). `assetutil
+-I`: **no `IconImageStack`**, three 1024 `Icon Image` renditions (light
+`ic_launcher_white_bg.png`, dark `ic_launcher_background-2.png`, tinted),
+plus the pale-petal PDF vectors already mined. Dark and tinted are
+pixel-identical (RGBA RMSE 0.000; the tinted slot is CoreUI's fallback),
+dark is the saturated mark transparent-backed (35.0% coverage), light is
+the same mark on a **white** plate and matches the App Store 1024 at RMSE
+1.86 (JPEG). So the route is the SVG route: no stack to decant; the
+bundle is built from the official vector and the in-app 1024 is the
+cross-check.
+
+**Is the SVG the shipped icon?** Chrome-rasterised at 1024 (never
+sharp), full canvas against the app: whole-frame RMSE 167.85 — because
+it is the wrong FRAMING, not the wrong art. The mark's alpha bbox is
+505x514 px in the SVG's 1024 and 749x762 in the app's, both centred at
+(517, 523.5): the app tile is a 1.48x centre crop, the Android
+adaptive-icon convention (108 dp canvas, launcher shows ~72 dp) carried
+onto iOS. Three registrations of the crop, mark-only render vs the app's
+dark rendition:
+
+| registered on | f | crop (dp) | centre (dp) |
+| --- | --- | --- | --- |
+| saturated-petal centroid + RMS radius | 1.4808 | 72.93 | 53.91, 54.16 |
+| white mic pixels | 1.4832 | 72.81 | 54.76, 54.92 |
+| black outline pixels | 1.4903 | 72.47 | 54.46, 54.68 |
+| whole-frame RGBA RMSE walk | 1.4800 | 72.97 | 54.80, 54.94 |
+
+They disagree by up to 0.85 dp because the app's raster is a **different
+export of the same design**: its mic sits ~12 px left / 11 px up of the
+SVG's (at 1024) and its outline is ~0.6% heavier (the RMSE diff is a
+double rim on every edge). At f = 1.4808 the bbox sizes match exactly
+(749x762 both) and the bbox-registered centre is (54.19, 54.44) — the
+mark's own centre (54.16, 54.38), the radial shade's origin, within a
+pixel. Adopted: **72.93 dp centred on (54.16, 54.38)** — silhouette
+bboxes identical, alpha disagreement 0.085%, petal colour RMSE 5.09
+(saturated in both), whole-mark RGBA 28.25 / interior 55.2 = the mic and
+outline divergence above, not registration. Against the app's light
+rendition the plate cannot agree (white vs the SVG's grey: whole-frame
+156.46; mark-only over white 32.85 vs app, 32.78 vs store) — recorded,
+not chased: the maintainer's brief is the official SVG.
+
+**Flat** (`icon-to-flat-svg`): 18 paths and 3 gradients verbatim, one
+transform `translate(-7.763001 -7.859527) scale(0.438756)` (= 32/72.93,
+origin (17.693, 17.913) dp); the plate is the house `M0 0h32v32H0z`
+carrying the official gradient via `gradientTransform`, the glyph a
+single transformed `<g>` (userSpaceOnUse gradients resolve inside it).
+Hex only — the seven P3 same-triple declarations of the drawn flat left
+`p3-allowlist.json`. flatSource drawn -> **official**. Badge = the same
+under the house squircle; `badge-dark.svg` deleted — the grey plate
+separates from the black pill and the mark reads (sheet). Facet drift
+**13.37 -> 1.25** (meanΔ +0.1/+0.3/+0.3, 0% of the crop > 40), the
+flat-svg noise floor.
+
+**Bundle** (`build-svg-icons --only`): light passes at central RMSE
+4.91; split refused, correctly — `gradient … has a gradientTransform`:
+the plate is diagonal, unliftable (fill-orientation law; podurama
+precedent). Twin hand-built in the podurama form, now as the format's
+own: one layer, `image-name-specializations` icon.svg / icon-dark.svg
+(the flat minus the plate) with the `{1, dark 1}` guard, canvas light =
+the plate's two stops (hidden under the opaque layer), dark = the gray
+pin. Source flat-svg -> **flat-svg-split**, hasDark true. The dark
+rendition is what the app ships as dark art (the transparent mark over
+the system's dark plate), so shipped dark art and the derived twin
+coincide here. ictool (P3->sRGB) vs the Chrome flat: light central
+**2.51**, plate and petals within 1–2/255 (the 9.4 whole-frame is the
+iOS rim highlight on the mask edge); dark mark 2.50 vs the Chrome twin.
+Not lifted into a layer fill or canvas: the mic's grey gradient and the
+radial shade stay in the SVG (stop law is a no-op on greys; the render
+confirms). No filters, so the dropped-filter gate had nothing to divert.
+
+Traps: (1) `scale(32/108)` would have shipped the mark at 47% of the
+tile — a 108 viewBox from an Android developer is the adaptive-icon
+canvas, measure the crop against the shipped tile (antennapod rule).
+(2) A whole-frame RMSE fit walked 8 px off the true centre because the
+export's heavier outline and displaced mic pull it; register on the
+element that is symmetric and outline-independent (the petal mass) and
+confirm with bbox size, which is scale-exact. (3) `flat-icon-extract`
+returns the tinted slot as a copy of dark — dedupe before believing a
+third rendition exists. Review sheet (master light | dark | masked flat
+| badge | both pills), Chrome renders:
+`scratchpad/podcastguru-regen/podcastguru-review.png`.
+
+**Follow-up, white plate adopted (2026-09-18).** Maintainer's call:
+the shipped app's appearance outranks the SVG's grey plate. The plate
+was measured, not assumed: every glyph-free pixel of the in-app 1024
+light `Icon Image` (682,036 px, alpha 0 in the dark rendition) reads
+**(255,255,255)** — pure `#FFFFFF`, no other value — so the flat's
+plate is `fill="#fff"` and the grey gradient def is gone (nothing else
+referenced it; ids renumbered, shade `__a`, mic `__b`). Rebuilt through
+`build-svg-icons --only`: light passes at central 5.65 and the split
+now **lifts** the solid into the canvas (`srgb:1,1,1` / dark
+`gray:0.192 -> 0.078`), as a single bare SVG layer, not the asset-swap
+form — the mark is colourful with a black outline, so it fails the
+near-white gate and never auto-tints (petal mean dark − light
+−0.01/+0.22/+0.25 per channel, measured), which makes one file the
+dark art too. ictool vs the Chrome flat 2.89 central; Dark vs the
+Chrome mark-only twin 2.50 and vs the app's transparent dark mark 55.34
+— identical to the grey-plate build, i.e. the export divergence
+recorded above, untouched by the plate. Light vs the app's own 1024:
+glyph-free area 1.91, mark 55.51 (same divergence). Badge: **bare
+mark**, no plate, no squircle, `viewBox 8 8 24 24`, fitted to the
+24-unit box from its rendered bbox (108-space 27.923–81.211 ×
+28.160–82.371, so `translate(-4.157606 -4.466843) scale(0.442715)`,
+23.59 wide, centred); reads on both pills, `badge-dark.svg` stays
+deleted. Facet drift **1.25 -> 1.51** (meanΔ +0.0/+0.1/+0.0; the frame
+figure 15.00 is the two masks' corners against a white plate). Sheet:
+`scratchpad/podcastguru-regen/podcastguru-review-white.png`.
+
+### rss: rebuilt from the official rssboard mark as glass (2026-09-17)
+
+The RSS bundle and flat had been a drawn glyph lifted into a vertical
+canvas (`flat-svg-split`, drift 0.85 against its own flat — but **38.12**
+central against the official mark, because the glyph was a different
+drawing: rounded-terminal arcs, squircle dot). Rebuilt from rssboard.org's
+`rss-icon.svg` (256 box: outer rounded rect rx 55 `#CC5D15`, inner rx 50
+`#F49C52`, body rx 47 under a 7-stop DIAGONAL gradient E3702D · EA7D31 ·
+F69537 · FB9E3A · EA7C31 · DE642B · D95B29 on the objectBoundingBox line
+0.085→0.915, white dot r 24 at (68,189), two white arcs).
+
+Three format facts fixed the design space, all measured on probe bundles:
+
+- **ictool accepts exactly two colours in any `linear-gradient`** — canvas
+  and layer fill alike fail with "Linear gradients require exactly 2
+  colors". With the fill-orientation law (canvas is always top→bottom) the
+  official body can be neither a canvas nor a layer fill; it rides as an
+  SVG layer or not at all.
+- **A bare white `glass: true` SVG layer auto-tints in Dark** like a flat
+  one (the arc reads 255,180,110 on the gray canvas). `glass` is not a
+  gate of the tint law.
+- **Layer natural size is the viewBox**: a 256-viewBox asset at `scale: 1`
+  fills the central quarter; the official box rides at `scale: 4`.
+
+Twelve candidates, scored Default vs the official mark rendered by
+headless Chrome at 256 — `central` the gate's central-60% RMSE (ictool
+P3→sRGB), `frame` RMSE over pixels opaque in both (so the official rx-55
+corners vs the iOS squircle do not dominate, and the ring band counts):
+
+| candidate | central | frame | construction beyond the official paths |
+| --- | --- | --- | --- |
+| shipped bundle (before) | 38.12 | 37.59 | drawn glyph, vertical canvas |
+| 01 faithful: official file as plate layer + bare mark | **2.79** | **8.29** | canvas fill only as the tint source |
+| 01b: rings rebuilt on the iOS mask | 2.79 | 12.03 | ring outline = Apple mask path, inset |
+| 02a: mark as ONE glass layer, translucency 0.5 | 26.26 | 20.82 | material |
+| 02b: mark as THREE glass layers | 26.26 | 20.82 | vs 02a: RMSE 0.070, max 5/255 |
+| 02c: 02b with `lighting: combined` | 26.26 | 20.82 | vs 02b: 0.009, max 5 |
+| 02d: 02a, Dark translucency 0 | 26.26 | 20.82 | Dark vs 02a: RMSE 14.0, max 106 |
+| 02e: 02a at translucency 0.25 | **10.37** | 11.17 | mark still reads white |
+| 03: rings as a translucent glass ring, mark flat | 2.79 | 15.88 | the bevel as material |
+| 04: no plate layer, 2-stop vertical canvas | 29.11 | 26.08 | the sheen flattened |
+| 05: 03's ring + 02a's mark | 26.26 | 24.85 | |
+| 06: 03's ring + mark at 0.25 / Dark 0 | 10.37 | 17.57 | recommended |
+
+2.79 is the CoreSVG stop-law floor on the saturated ramp ("SVG gradients
+under the flat gate"); 26.26 is the single-glass-layer material band
+(icatcher 26.67 at the same 0.5); the material's cost is roughly linear in
+translucency here. One layer vs three, and individual vs combined lighting,
+are invisible for a mark whose pieces never touch. Dark translucency is what
+turns a tinted glass mark copper; zeroing it in Dark (the sodes-decant form)
+is the right default. The iOS mask's corner cut (110 px) is deeper than the
+official rx-55 rect's (64 px), so verbatim rings thin to nothing on the
+corner diagonals — the only place 01 is not the official picture.
+
+**Decision: 06 without the rim.** No glass ring and no trace of the
+official outer/inner rings, so nothing outlines the plate in either
+appearance. Shipped as `platforms/rss/RSS.icon`, source `official-svg`:
+
+- `Assets/body.svg` — the official 7-stop gradient on a full-bleed 256
+  rect, its line rewritten to `userSpaceOnUse` (30.06,30.06)→(225.94,225.94)
+  so it paints the body pixel-for-pixel; `glass: false`, `scale: 4`,
+  opacity `{1, dark 0}`.
+- `Assets/mark.svg` — dot + arcs verbatim, ONE `glass: true` layer,
+  `fill-specializations` light `gray:1` / dark a 2-stop gradient along the
+  official diagonal (`#e7772f→#db5f2a`, the ramp sampled where the mark's
+  bbox meets the line); group `specular`, `shadow {neutral, 0.6}`,
+  `translucency-specializations` 0.25 / dark 0, `lighting: individual`.
+- Canvas: `#f18a34→#e6742f` vertical — the ramp's centre column resampled
+  at the canvas-inset rows — present only as the tint source and the
+  dark-status composite's plate; invisible under the opaque body in
+  Default.
+
+Flat facet (`flatSource: official`): `icon.svg` is the same gradient with
+its line scaled 32/256 (`3.7575→28.2425`) on a full-bleed plate and the
+mark verbatim under `scale(.125)`, rings dropped — central RMSE **0.16**
+against the official (Chrome vs Chrome); `badge.svg` the same in the house
+clip.
+
+**Final drift** (`audit-facet-drift.mjs --only rss`): central **9.59**,
+frame 13.36, maskΔ 1.8%, meanΔ −3.4/−6.0/−8.1, glass 1/2+s. The earlier
+0.85 was a glass-off pair; this number is the quarter-strength material on
+one layer, where the ledger's band starts. hasDark stayed true from
+build-assets; dark-status audit not run. Scratch artefacts (all candidate
+bundles, sheets, NOTES.md) lived in the session scratchpad `rss-glass/`.
