@@ -10,21 +10,15 @@
       },
       "layers": [
         {
-          "image-name": "dark.png",
-          "name": "dark",
-          "glass": false,
-          "opacity-specializations": [
+          "image-name-specializations": [
             {
-              "value": 0
+              "value": "light.png"
             },
             {
               "appearance": "dark",
-              "value": 1
+              "value": "dark.png"
             }
-          ]
-        },
-        {
-          "image-name": "light.png",
+          ],
           "name": "light",
           "glass": false,
           "opacity-specializations": [
@@ -33,7 +27,7 @@
             },
             {
               "appearance": "dark",
-              "value": 0
+              "value": 1
             }
           ]
         }

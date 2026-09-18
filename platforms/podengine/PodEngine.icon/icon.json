@@ -65,27 +65,6 @@
       },
       "layers": [
         {
-          "image-name": "icon-dark.svg",
-          "name": "icon-dark",
-          "glass": false,
-          "position": {
-            "scale": 32,
-            "translation-in-points": [
-              0,
-              0
-            ]
-          },
-          "opacity-specializations": [
-            {
-              "value": 0
-            },
-            {
-              "appearance": "dark",
-              "value": 1
-            }
-          ]
-        },
-        {
           "image-name": "icon.svg",
           "name": "icon",
           "glass": false,
@@ -96,13 +75,12 @@
               0
             ]
           },
-          "opacity-specializations": [
-            {
-              "value": 1
-            },
+          "fill-specializations": [
             {
               "appearance": "dark",
-              "value": 0
+              "value": {
+                "solid": "srgb:1.00000,1.00000,1.00000,1.00000"
+              }
             }
           ]
         }
