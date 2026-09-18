@@ -33,11 +33,12 @@ export interface GlassBundle {
 }
 
 export type DriftCause =
-  | "material" | "artwork" | "plate" | "registration" | "geometry" | "shading" | "floor";
+  | "material" | "artwork" | "plate" | "registration" | "filter" | "geometry" | "shading" | "floor";
 /** Lens label per cause, in the order the worklist should be read. */
 export const DRIFT_LENSES: Record<Exclude<DriftCause, "floor">, string> = {
   registration: "drift: registration",
   plate: "drift: plate",
+  filter: "drift: filter",
   geometry: "drift: geometry",
   artwork: "drift: artwork",
   shading: "drift: shading",
