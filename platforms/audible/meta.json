@@ -4,6 +4,7 @@
   "guidelinesUrl": "https://www.audible.com/about/newsroom/audible-assets",
   "url": "https://audible.com",
   "added": "2024-01-12",
+  "flatSource": "official",
   "liquidGlass": {
     "bundles": [
       {
@@ -12,7 +13,7 @@
         "variant": null,
         "file": "Audible.icon",
         "hasDark": true,
-        "source": "adaptive-icon-split"
+        "source": "official-svg"
       }
     ]
   }
