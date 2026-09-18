@@ -4,6 +4,7 @@
   "url": "https://soundcloud.com",
   "added": "2023-02-06",
   "guidelinesUrl": "https://press.soundcloud.com/media_kits/228462/",
+  "flatSource": "official",
   "liquidGlass": {
     "bundles": [
       {
@@ -11,7 +12,7 @@
         "title": "Soundcloud",
         "variant": null,
         "file": "Soundcloud.icon",
-        "source": "appstore-artwork-split",
+        "source": "flat-svg-split",
         "appStoreId": 336353151,
         "hasDark": true
       }
