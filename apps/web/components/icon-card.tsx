@@ -236,6 +236,22 @@ export function IconCard({
             {card.drift.toFixed(2)}
           </span>
         )}
+        {/* Material pairs carry a second figure: the same audit against the
+            bundle with its glass material off (--material-off), i.e. what
+            the flat gets wrong once the sheen is out of the picture. */}
+        {lensesEnabled && card.driftMaterialOff !== null && (
+          <span
+            title="Facet drift with the bundle's material off: central RMSE, flat vs the layer stack rendered without glass/specular/translucency/shadow (pipeline/audit-facet-drift.mjs --material-off)"
+            className={cn(
+              "rounded-full border px-2 py-0.5 font-mono text-[11px] tabular-nums",
+              card.driftMaterialOff <= 5
+                ? "border-emerald-300 text-emerald-600 dark:border-emerald-900 dark:text-emerald-500"
+                : "border-neutral-300 text-neutral-400 dark:border-neutral-800 dark:text-neutral-500"
+            )}
+          >
+            off {card.driftMaterialOff.toFixed(2)}
+          </span>
+        )}
         {shown === "flat" && facet === "glass" && (
           <span
             title="No Liquid Glass icon yet — flat vector shown. Contributions welcome!"

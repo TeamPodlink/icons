@@ -24,6 +24,11 @@ export interface GlassBundle {
    *  --write). null when unmeasured (no flat, or snapshot predates the
    *  bundle). Drives the dev-only "Drift" sort. */
   drift: number | null;
+  /** The same audit against the bundle rendered with its material off
+   *  (audit-facet-drift.mjs --material-off): the artwork-only drift of a
+   *  material pair. Null for pairs without material — their master is
+   *  already material-free — and until the audit has run with the flag. */
+  driftMaterialOff: number | null;
   /** What the drift IS, from the committed apps/web/lib/drift-diagnosis.json
    *  snapshot (pipeline/audit-drift-diagnosis.mjs --write): primary cause
    *  plus every cause that fired — material | artwork | plate | registration
@@ -33,7 +38,7 @@ export interface GlassBundle {
 }
 
 export type DriftCause =
-  | "material" | "artwork" | "plate" | "registration" | "filter" | "geometry" | "shading" | "floor";
+  | "material" | "artwork" | "colour" | "plate" | "registration" | "filter" | "geometry" | "shading" | "floor";
 /** Lens label per cause, in the order the worklist should be read. */
 export const DRIFT_LENSES: Record<Exclude<DriftCause, "floor">, string> = {
   registration: "drift: registration",
@@ -41,6 +46,7 @@ export const DRIFT_LENSES: Record<Exclude<DriftCause, "floor">, string> = {
   filter: "drift: filter",
   geometry: "drift: geometry",
   artwork: "drift: artwork",
+  colour: "drift: colour",
   shading: "drift: shading",
   material: "drift: material",
 };
@@ -217,6 +223,8 @@ export interface Card {
   popularityRank: number | null;
   /** Facet drift of the card's bundle — see GlassBundle.drift; null for flat-only cards. */
   drift: number | null;
+  /** See GlassBundle.driftMaterialOff. */
+  driftMaterialOff: number | null;
 }
 
 export const cards: Card[] = platforms.flatMap((p): Card[] => {
@@ -232,6 +240,7 @@ export const cards: Card[] = platforms.flatMap((p): Card[] => {
       popularity: p.popularity,
       popularityRank: p.popularityRank,
       drift: b.drift,
+      driftMaterialOff: b.driftMaterialOff,
     }));
   if (p.hasFlat)
     return [
@@ -246,6 +255,7 @@ export const cards: Card[] = platforms.flatMap((p): Card[] => {
         popularity: p.popularity,
         popularityRank: p.popularityRank,
         drift: null,
+        driftMaterialOff: null,
       },
     ];
   return [];

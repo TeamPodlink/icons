@@ -315,6 +315,7 @@ export function CompareArtwork({
       <p className={cn(cap, "text-center")}>
         4×|glass − vector| · facet drift (central RMSE, light glass vs vector):{" "}
         {bundle.drift === null ? "unmeasured" : bundle.drift.toFixed(2)}
+        {bundle.driftMaterialOff !== null && ` · material off: ${bundle.driftMaterialOff.toFixed(2)}`}
         {" · "}pipeline/audit-facet-drift.mjs --sheets
       </p>
     </div>

@@ -6247,3 +6247,74 @@ raster under the bar") is withdrawn — the rule's "whatever form the
 vector needs to reach Dark" gains a fourth form: a dark-only
 opacity-ramp backing beneath an SVG glass layer. Sheet:
 `scratchpad/moon-q/review-F20.png`; candidates `moon-q/f/F*.icon`.
+
+## Material-off drift: the artwork-only figure of a material pair (2026-09-18)
+
+The drift audit scores the flat against the light Liquid Glass master,
+and for a bundle with material (a glass layer or a specular group) that
+score is the material's cost plus whatever the flat gets wrong, with no
+way to tell the two apart: the diagnosis filed every such pair under
+`material` and stopped. moonfm made the problem concrete. Its 38.6 is
+the glass chevrons' sheen (the blue runs 3,2,219 at the top to
+155,155,245 at the bottom in the glass; the flat paints it solid), and
+the only flat that scores low against that master is one with the sheen
+painted in (a per-row gradient refit: 12.8 against the glass, **50.5**
+against the developer's own layer stack — a glass icon pretending to be
+a flat). Meanwhile the flat's actual defect — blue at 85% opacity, a
+podlink-era drawing choice, where the developer's stack is opaque blue
+over pink — is invisible to the metric, and correcting it makes the
+glass figure WORSE (38.6 → 46.3) because the lighter 85% blue happens to
+sit nearer the sheen's mean.
+
+**The instrument.** `audit-facet-drift.mjs --material-off` renders every
+material bundle a second time through ictool with the material disabled
+(`disableMaterial()`: every layer `glass: false`, every group specular
+off, translucency off, shadow none, `blur-material` dropped; canvas,
+artwork, positions, blend modes and appearance specializations
+untouched), squashes it P3→sRGB like a shipped master, and scores the
+flat against that too — the `off` column, `materialOff` on the row and
+in `facet-drift.json`, `driftMaterialOff` on the site's bundle (a second
+dev-only chip on the card, `off 20.38`). Pairs without material get no
+figure: their master is already the flat stack (ictool passes rasters
+through unchanged). Renders cache under `<work>/material-off` by a hash
+of icon.json and the assets; sheets go to `<work>/sheets-off`.
+`audit-drift-diagnosis.mjs` then classifies a material pair a SECOND
+time on those figures, with the same gates on the material-off sheet:
+at the floor, the entry stays `material` alone; above it, the
+artwork-level causes follow `material` in `causes` and the bundle joins
+those lenses. A new cause came with it, **colour**: the flat's glyph
+pixels (not plate, not edge) agree in shape (< 15% structural) but read
+≥ 8/255 off in some channel — a brand-colour declaration, an opacity the
+stack does not have, a wrong-space transcription; it also fires on
+non-material pairs (podbean: −11 on the glyph, filed `plate` alone
+before).
+
+**The 13 material pairs, glass master vs material-off master:**
+
+| slug | glass | off | second pass | what the off sheet shows |
+| --- | ---: | ---: | --- | --- |
+| apple | 55.32 | 53.41 | artwork, plate | a different generation of the art: the decanted rings are translucent lavender, the flat's are solid white; struct 0.54 |
+| moonfm | 38.62 | 20.38 | colour, plate | the 85% blue (glyph −27 red); plate 248 vs 255 |
+| icatcher | 26.67 | 0.73 | — | its layer IS the flat; 26.67 was all material |
+| sodes | 24.67 | 6.06 | colour, plate | glyph −11 green; plate 4.7 |
+| castamatic | 24.18 | 19.55 | colour, plate, filter | plate 10.9; the crescent's ramp; glyph −8.7 |
+| podcastrepublic | 14.89 | 4.42 | — | at the floor with the material off |
+| podcastparrot | 13.87 | 13.87 | geometry | no material effect (specular on a non-glass group does nothing measurable); the vector's edges vs the painterly PNG |
+| overcast | 10.99 | 2.92 | — | floor |
+| rss | 9.59 | 0.73 | — | floor |
+| pocketcasts | 7.41 | 7.41 | colour | no material effect; the app's 235→255 ramp vs the flat's #fff, −10.6 uniform |
+| audible | 5.81 | 0.89 | — | floor |
+| tunein | 4.97 | 4.97 | (floor) | no material effect |
+| jiosaavn | 3.89 | 0.81 | (floor) | |
+
+Two corrections fall out. pocketcasts' 7.41 and podcastparrot's 13.87 do
+not move with the material off, so "specular + translucency on a
+non-glass layer lifts the plate" (the 4/255 entry) was wrong at the
+diagnosis level: on a group with no glass layer the material has no
+measurable effect, and pocketcasts' figure is the ramp the developer
+paints. And six of the eleven material verdicts hid a real artwork
+finding (apple, moonfm, sodes, castamatic, podcastparrot, pocketcasts)
+that the second pass now names. `facet-drift.json` and
+`drift-diagnosis.json` regenerated from a fresh full audit (71 pairs;
+only moonfm's glass figure moved, 38.91 → 38.62, from the section
+above); validate ✓ 73/73, icons tests 276 ✓, `tsc` clean.

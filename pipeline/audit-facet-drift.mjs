@@ -62,7 +62,23 @@
 // Usage:
 //   node pipeline/audit-facet-drift.mjs                report (worst first)
 //   node pipeline/audit-facet-drift.mjs --only <slug>
-//     [--sheets] [--json <file>] [--floor] [--work <dir>]
+//     [--sheets] [--json <file>] [--floor] [--work <dir>] [--material-off]
+//
+// --material-off (measured 2026-09-18, ledger "Material-off drift"): for
+//   every pair whose bundle has material (a glass layer or a specular
+//   group — the `glass` column), ALSO render the bundle through ictool
+//   with the material disabled (every layer glass off, every group
+//   specular off, translucency off, shadow none, blur-material dropped;
+//   canvas and artwork untouched) and score the flat against THAT. The
+//   `off` column / `materialOff` row field is the artwork-only drift
+//   of a material pair — moonfm reads 38.6 against its glass master and
+//   20.7 with the material off, and the 20.7 is a real finding (the
+//   flat's 85% blue against the developer's opaque stack) that the 38.6
+//   hides. Pairs without material get no `off` figure: their master IS
+//   the material-off render. Renders are cached under <work>/material-off
+//   by a hash of icon.json and the assets; --write carries the figures
+//   into facet-drift.json's `materialOff` map (kept as-is on runs
+//   without the flag).
 //
 // VERDICT (measured 2026-09-13, 67 pairs; full table and per-pair
 // diagnoses in the ledger, "Facet drift: flat vs light Liquid Glass"):
@@ -95,8 +111,10 @@
 import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import {
+  cpSync,
   existsSync,
   mkdirSync,
+  readdirSync,
   readFileSync,
   rmSync,
   writeFileSync,
@@ -125,12 +143,16 @@ const jsonOut = flag("--json");
 // step: the audit needs ictool masters and Chrome, which CI never has.
 const writeSnapshot = args.includes("--write");
 const floor = args.includes("--floor");
+const materialOff = args.includes("--material-off");
+const ICTOOL = "/Applications/Icon Composer.app/Contents/Executables/ictool";
 const work = flag("--work") ?? "/tmp/facet-drift-work";
 const assetsDir = join(root, "packages/refraction/assets");
 const flatDir = join(root, "packages/icons/static/icons");
 
 mkdirSync(join(work, "flat"), { recursive: true });
 if (sheets) mkdirSync(join(work, "sheets"), { recursive: true });
+if (sheets && materialOff) mkdirSync(join(work, "sheets-off"), { recursive: true });
+if (materialOff) mkdirSync(join(work, "material-off"), { recursive: true });
 
 // ------------------------------------------------------------ Chrome
 
@@ -162,6 +184,55 @@ function flatRaster(svgText, id, size) {
   const hash = createHash("sha1").update(svgText).digest("hex").slice(0, 12);
   const out = join(work, "flat", `${id}-${size}-${hash}.png`);
   if (!existsSync(out)) chromeRasterize(svgText, out, size);
+  return out;
+}
+
+/** The bundle's icon.json with its material disabled: glass off on every
+ *  layer, specular off, translucency off, shadow none and blur-material
+ *  dropped on every group. Canvas fill, artwork, positions, blend modes
+ *  and appearance specializations stay — the render is the developer's
+ *  layer stack, flat. */
+function disableMaterial(doc) {
+  for (const grp of doc.groups ?? []) {
+    grp.specular = false;
+    grp.translucency = { enabled: false, value: 0 };
+    grp.shadow = { kind: "none", opacity: 0 };
+    delete grp["blur-material"];
+    for (const l of grp.layers ?? []) {
+      l.glass = false;
+      delete l["glass-specializations"];
+    }
+  }
+  return doc;
+}
+
+/** Light ictool master of the bundle with the material off, squashed to
+ *  8-bit untagged sRGB exactly as build-assets.mjs squashes the shipped
+ *  masters (trap 2). Cached by a hash of icon.json + every asset. */
+async function materialOffMaster(bundlePath, slug) {
+  const h = createHash("sha1").update(readFileSync(join(bundlePath, "icon.json")));
+  const assets = join(bundlePath, "Assets");
+  if (existsSync(assets))
+    for (const a of readdirSync(assets).sort()) {
+      if (a.startsWith(".")) continue;
+      h.update(a).update(readFileSync(join(assets, a)));
+    }
+  const out = join(work, "material-off", `${slug}-${h.digest("hex").slice(0, 12)}.png`);
+  if (existsSync(out)) return out;
+  const tmp = join(work, "material-off", `${slug}.icon`);
+  rmSync(tmp, { recursive: true, force: true });
+  cpSync(bundlePath, tmp, { recursive: true });
+  const doc = disableMaterial(JSON.parse(readFileSync(join(tmp, "icon.json"), "utf8")));
+  writeFileSync(join(tmp, "icon.json"), JSON.stringify(doc, null, 2));
+  const raw = join(work, "material-off", `${slug}-raw.png`);
+  execFileSync(ICTOOL, [
+    tmp, "--export-image", "--output-file", raw, "--platform", "macOS",
+    "--rendition", "Default", "--width", String(MASTER), "--height", String(MASTER), "--scale", "1",
+  ], { stdio: "pipe" });
+  const buf = await sharp(raw).withIccProfile("srgb", { attach: false }).png().toBuffer();
+  writeFileSync(out, buf);
+  rmSync(raw, { force: true });
+  rmSync(tmp, { recursive: true, force: true });
   return out;
 }
 
@@ -246,7 +317,7 @@ function score(flatRgba, glassRgba) {
 }
 
 /** flat | glass | 4x|diff| triptych over gray, 256 each. */
-async function writeSheet(slug, flatRgba, glassRgba) {
+async function writeSheet(slug, flatRgba, glassRgba, dir = "sheets") {
   const f = overGray(flatRgba);
   const g = overGray(glassRgba);
   const d = new Uint8Array(f.length);
@@ -266,7 +337,7 @@ async function writeSheet(slug, flatRgba, glassRgba) {
       { input: td, left: SIZE * 2, top: 0 },
     ])
     .png()
-    .toFile(join(work, "sheets", `${slug}.png`));
+    .toFile(join(work, dir, `${slug}.png`));
 }
 
 /** "<glass layers>/<visible layers>[+s]" from the bundle's icon.json,
@@ -358,9 +429,12 @@ for (const b of readBundles()) {
     skipped.push(`${b.slug} (no ${!have.master ? "light master" : "flat icon"})`);
     continue;
   }
+  const glass = glassLayers(b.bundlePath);
   pairs.push({
-    slug: b.slug, id: b.platformId, source: b.source ?? "?", master, flat,
-    glass: glassLayers(b.bundlePath),
+    slug: b.slug, id: b.platformId, source: b.source ?? "?", master, flat, glass,
+    bundlePath: b.bundlePath,
+    // material = a glass layer or a specular group (the diagnosis's own gate)
+    material: +glass.split("/")[0] > 0 || /\+s/.test(glass),
   });
 }
 
@@ -403,7 +477,13 @@ for (const p of pairs) {
   await assertFlatSane(flatPng, svg, p.id);
   const [f, g] = await Promise.all([rgba256(flatPng), rgba256(p.master)]);
   const s = score(f, g);
-  rows.push({ slug: p.slug, source: p.source, glass: p.glass, ...s });
+  const row = { slug: p.slug, source: p.source, glass: p.glass, ...s, materialOff: null };
+  if (materialOff && p.material) {
+    const o = await rgba256(await materialOffMaster(p.bundlePath, p.slug));
+    row.materialOff = score(f, o);
+    if (sheets) await writeSheet(p.slug, f, o, "sheets-off");
+  }
+  rows.push(row);
   if (sheets) await writeSheet(p.slug, f, g);
 }
 
@@ -431,6 +511,7 @@ console.log(
     "#".padStart(3) + " " +
     "slug".padEnd(18) +
     "central".padStart(8) +
+    (materialOff ? "off".padStart(8) : "") +
     "frame".padStart(8) +
     "  maskΔ" +
     "  cropα f/g" +
@@ -445,6 +526,7 @@ rows.forEach((r, i) =>
     String(i + 1).padStart(3) + " " +
       r.slug.padEnd(18) +
       f2(r.central).padStart(8) +
+      (materialOff ? (r.materialOff ? f2(r.materialOff.central) : "—".padStart(6)).padStart(8) : "") +
       f2(r.frame).padStart(8) +
       "  " + (r.maskDiff * 100).toFixed(1).padStart(4) + "%" +
       "  " + r.cropOpaqueFlat.toFixed(2) + "/" + r.cropOpaqueGlass.toFixed(2) +
@@ -486,10 +568,24 @@ if (expected.length) {
     console.log(`  ${r.slug} (${r.central.toFixed(2)}): ${EXPECTED_DIVERGENCE[r.slug]}`);
 }
 if (sheets) console.log(`sheets: ${join(work, "sheets")}/<slug>.png (flat | glass | 4x|diff|)`);
+if (sheets && materialOff) console.log(`material-off sheets: ${join(work, "sheets-off")}/<slug>.png (flat | material off | 4x|diff|)`);
+if (materialOff) {
+  const m = rows.filter((r) => r.materialOff);
+  console.log(
+    `material-off: ${m.length} material pair(s) — ` +
+      m.map((r) => `${r.slug} ${r.central.toFixed(2)} → ${r.materialOff.central.toFixed(2)}`).join(", ")
+  );
+}
 if (writeSnapshot) {
   const snap = join(root, "apps/web/lib/facet-drift.json");
   const central = Object.fromEntries(rows.map((r) => [r.slug, Math.round(r.central * 100) / 100]));
-  writeFileSync(snap, JSON.stringify({ generated: new Date().toISOString().slice(0, 10), pairs: rows.length, central }, null, 2) + "\n");
+  // materialOff: the artwork-only figure of every material pair. A run
+  // without --material-off keeps the map the snapshot already holds.
+  const prev = existsSync(snap) ? JSON.parse(readFileSync(snap, "utf8")).materialOff ?? {} : {};
+  const off = materialOff
+    ? Object.fromEntries(rows.filter((r) => r.materialOff).map((r) => [r.slug, Math.round(r.materialOff.central * 100) / 100]))
+    : prev;
+  writeFileSync(snap, JSON.stringify({ generated: new Date().toISOString().slice(0, 10), pairs: rows.length, central, materialOff: off }, null, 2) + "\n");
   console.log(`snapshot: ${snap.replace(root + "/", "")} (${rows.length} pairs)`);
 }
 if (jsonOut) {

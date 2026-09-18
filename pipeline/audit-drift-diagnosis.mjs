@@ -9,6 +9,14 @@
 //                 or different element. Method: re-source / redraw the
 //                 flat from the bundle's artwork (icon-to-flat-svg, or a
 //                 measured drawing).
+//   colour        mean signed glass−flat ≥ 8/255 in some channel over the
+//                 flat's GLYPH pixels (not plate, not edge) with < 15%
+//                 structural difference — the same shapes in a different
+//                 colour: a brand-colour declaration, an opacity the
+//                 developer's stack does not have (moonfm's 85% blue reads
+//                 −20.6 red, material off), a wrong-space transcription.
+//                 Method: measure the master's colour on the glyph and
+//                 declare it.
 //   plate         mean signed glass−flat ≥ 3/255 in some channel — a
 //                 plate colour or gradient mismatch. Method: refit the
 //                 plate from the shipped raster (per-row medians) or
@@ -30,6 +38,17 @@
 //                 usually accept; sometimes a gradient refit.
 //   floor         central ≤ 5, nothing to do.
 //
+// Material-off second pass (2026-09-18, ledger "Material-off drift"): a
+// pair filed under material is classified AGAIN on the audit's
+// `materialOff` figures (audit-facet-drift.mjs --material-off: the flat
+// against the bundle rendered with its material disabled) — the same
+// gates, on sheets from <sheets>-off. If that figure is at the floor the
+// material is the whole story and the entry stays `material` alone;
+// otherwise the artwork-level causes follow it in `causes` (moonfm:
+// material + artwork — its 85% blue against the developer's opaque
+// stack) and the bundle joins those lenses too. `primary` stays
+// material; `materialOff` on the entry carries the figure.
+//
 // Inputs (run these first, in this order):
 //   node pipeline/audit-facet-drift.mjs --sheets --json <audit.json>
 //   node pipeline/fit-flat-glyph.mjs > <fit.txt>
@@ -47,10 +66,11 @@ const args = process.argv.slice(2);
 const flag = (n) => { const i = args.indexOf(n); return i < 0 ? null : args[i + 1]; };
 const auditPath = flag("--audit"), fitPath = flag("--fit");
 const sheets = flag("--sheets") ?? "/tmp/facet-drift-work/sheets";
+const sheetsOff = flag("--sheets-off") ?? sheets.replace(/\/?$/, "-off");
 const write = args.includes("--write");
 if (!auditPath || !existsSync(auditPath)) { console.error("need --audit <audit.json> (from audit-facet-drift.mjs --json)"); process.exit(2); }
 
-const FLOOR = 5, ARTWORK = 0.15, PLATE = 3, PLATE_RMSE = 5, REG_T = 0.08, REG_S = 0.008, EDGE = 0.5;
+const FLOOR = 5, ARTWORK = 0.15, COLOUR = 8, PLATE = 3, PLATE_RMSE = 5, REG_T = 0.08, REG_S = 0.008, EDGE = 0.5;
 const SIZE = 256, OFF = 51, W = SIZE - 2 * OFF;
 
 const audit = JSON.parse(readFileSync(auditPath, "utf8"));
@@ -67,8 +87,8 @@ if (fitPath && existsSync(fitPath))
  *  palette colour; everything else is glyph. pocketcasts (2026-09-18):
  *  overall −3.7/−4.1/−4.1 was −10 on the white glyph (material) and +1 on
  *  the plate — a plate verdict must be read off plate pixels. */
-async function sheetSignals(slug) {
-  const p = join(sheets, `${slug}.png`);
+async function sheetSignals(slug, dir = sheets) {
+  const p = join(dir, `${slug}.png`);
   if (!existsSync(p)) return null;
   const { data, info } = await sharp(p).raw().toBuffer({ resolveWithObject: true });
   const C = info.channels, RW = info.width;
@@ -91,7 +111,7 @@ async function sheetSignals(slug) {
       if (!palette.some((q) => Math.abs(q[0] - c[0]) + Math.abs(q[1] - c[1]) + Math.abs(q[2] - c[2]) <= 12)) palette.push(c);
     }
   const isPlate = (x, y) => palette.some((q) => Math.abs(q[0] - px(0, x, y, 0)) <= 24 && Math.abs(q[1] - px(0, x, y, 1)) <= 24 && Math.abs(q[2] - px(0, x, y, 2)) <= 24);
-  let onEdge = 0, total = 0, plateN = 0, cropN = 0, plateSq = 0; const plateSum = [0, 0, 0];
+  let onEdge = 0, total = 0, plateN = 0, cropN = 0, plateSq = 0, glyphN = 0; const plateSum = [0, 0, 0], glyphSum = [0, 0, 0];
   for (let y = OFF; y < OFF + W; y++)
     for (let x = OFF; x < OFF + W; x++) {
       let e = 0;
@@ -99,13 +119,16 @@ async function sheetSignals(slug) {
       total += e;
       if (edge[y * SIZE + x]) onEdge += e;
       cropN++;
-      if (isPlate(x, y) && !edge[y * SIZE + x]) { plateN++; for (let c = 0; c < 3; c++) { const d = px(1, x, y, c) - px(0, x, y, c); plateSum[c] += d; plateSq += d * d; } }
+      if (edge[y * SIZE + x]) continue;
+      if (isPlate(x, y)) { plateN++; for (let c = 0; c < 3; c++) { const d = px(1, x, y, c) - px(0, x, y, c); plateSum[c] += d; plateSq += d * d; } }
+      else { glyphN++; for (let c = 0; c < 3; c++) glyphSum[c] += px(1, x, y, c) - px(0, x, y, c); }
     }
   return {
     edgeShare: total ? onEdge / total : 0,
     plateShare: cropN ? plateN / cropN : 0,
     plateSigned: plateN ? plateSum.map((v) => v / plateN) : null,
     plateRmse: plateN ? Math.sqrt(plateSq / (3 * plateN)) : null,
+    glyphSigned: glyphN ? glyphSum.map((v) => v / glyphN) : null,
   };
 }
 
@@ -129,41 +152,71 @@ for (const r of audit.rows) {
     plateShare: sig ? +sig.plateShare.toFixed(2) : null,
     plateSigned: sig && sig.plateSigned ? sig.plateSigned.map((v) => +v.toFixed(1)) : null,
     plateRmse: sig && sig.plateRmse !== null ? +sig.plateRmse.toFixed(2) : null,
+    glyphSigned: sig && sig.glyphSigned ? sig.glyphSigned.map((v) => +v.toFixed(1)) : null,
     filter: hasFilter,
     fit,
   };
+  /** The artwork-level gates, on one set of figures (`m`: struct/signed of
+   *  a scored pair) and one sheet's signals (`sg`). Material never enters
+   *  here: it is decided before, and the material-off pass feeds this the
+   *  material-free pair. */
+  const classify = (m, sg) => {
+    const c = [];
+    if (m.struct >= ARTWORK) c.push("artwork");
+    // colour: the glyph pixels agree in shape but not in colour (see the header)
+    else if (sg && sg.glyphSigned && Math.max(...sg.glyphSigned.map(Math.abs)) >= COLOUR) c.push("colour");
+    // plate: judged on the flat's plate pixels, not the whole crop (see sheetSignals)
+    const plateMean = sg && sg.plateSigned ? Math.max(...sg.plateSigned.map(Math.abs)) : Math.max(...m.signed.map(Math.abs));
+    const plateRmse = (sg && sg.plateRmse) ?? 0;
+    if (plateMean >= PLATE || plateRmse >= PLATE_RMSE) c.push("plate");
+    // filter: the flat uses an SVG filter (blur/shadow) and ictool renders filters with its own
+    // kernel — antennapod's shadow is dilated 16 px with a wider sigma (ledger "The canvas lerp
+    // and the stop law") — so the residual is renderer disagreement, not artwork
+    if (hasFilter && /^flat-svg/.test(String(r.source))) c.push("filter");
+    if (fit && (Math.abs(fit.tx) >= REG_T || Math.abs(fit.ty) >= REG_T || Math.abs(fit.s - 1) >= REG_S)) c.push("registration");
+    const e = sg ? sg.edgeShare : null;
+    if (!c.length && e !== null && e >= EDGE) c.push("geometry");
+    if (!c.length) c.push("shading");
+    return c;
+  };
   const causes = [];
+  let materialOffEntry = null;
   if (r.central > FLOOR) {
     // Material confounds every other signal (the sheen shifts the means and
-    // scatters > 40 pixels), so a glass pair is filed under material alone.
+    // scatters > 40 pixels), so a glass pair is filed under material first.
     // Material is glass layers OR specular on the group: pocketcasts' bundle
     // has no glass layer but specular + translucency 0.5 lift its white
     // glyph by 10/255 (measured 2026-09-18, ledger "pocketcasts: the
     // plate's 4/255") — the plate gate would have filed it as plate.
     const material = glassLayers > 0 || signals.specular;
-    if (material) causes.push("material");
-    else if (r.struct >= ARTWORK) causes.push("artwork");
-    // plate: judged on the flat's plate pixels, not the whole crop (see sheetSignals)
-    const plateMean = signals.plateSigned ? Math.max(...signals.plateSigned.map(Math.abs)) : Math.max(...r.signed.map(Math.abs));
-    const plateRmse = signals.plateRmse ?? 0;
-    if (!material && (plateMean >= PLATE || plateRmse >= PLATE_RMSE)) causes.push("plate");
-    // filter: the flat uses an SVG filter (blur/shadow) and ictool renders filters with its own
-    // kernel — antennapod's shadow is dilated 16 px with a wider sigma (ledger "The canvas lerp
-    // and the stop law") — so the residual is renderer disagreement, not artwork
-    if (!material && hasFilter && /^flat-svg/.test(String(r.source))) causes.push("filter");
-    if (!material && fit && (Math.abs(fit.tx) >= REG_T || Math.abs(fit.ty) >= REG_T || Math.abs(fit.s - 1) >= REG_S)) causes.push("registration");
-    if (!causes.length && es !== null && es >= EDGE) causes.push("geometry");
-    if (!causes.length) causes.push("shading");
+    if (material) {
+      causes.push("material");
+      // Second pass on the material-off pair, when the audit ran with
+      // --material-off: what is left once the sheen is out of the picture.
+      const mo = r.materialOff;
+      if (mo) {
+        const sgo = await sheetSignals(r.slug, sheetsOff);
+        materialOffEntry = {
+          central: +mo.central.toFixed(2), struct: +mo.struct.toFixed(3),
+          signed: mo.signed.map((v) => +v.toFixed(1)),
+          plateSigned: sgo && sgo.plateSigned ? sgo.plateSigned.map((v) => +v.toFixed(1)) : null,
+          plateRmse: sgo && sgo.plateRmse !== null ? +sgo.plateRmse.toFixed(2) : null,
+          glyphSigned: sgo && sgo.glyphSigned ? sgo.glyphSigned.map((v) => +v.toFixed(1)) : null,
+          edgeShare: sgo ? +sgo.edgeShare.toFixed(2) : null,
+        };
+        if (mo.central > FLOOR) causes.push(...classify(mo, sgo));
+      }
+    } else causes.push(...classify(r, sig));
   }
-  out[r.slug] = { primary: causes[0] ?? "floor", causes, ...signals };
+  out[r.slug] = { primary: causes[0] ?? "floor", causes, ...signals, materialOff: materialOffEntry };
 }
-const order = ["material", "artwork", "plate", "registration", "filter", "geometry", "shading", "floor"];
+const order = ["material", "artwork", "colour", "plate", "registration", "filter", "geometry", "shading", "floor"];
 for (const k of order) {
   const list = Object.entries(out).filter(([, v]) => v.primary === k).sort((a, b) => b[1].central - a[1].central);
   if (list.length) console.log(`${k.padEnd(13)} ${String(list.length).padStart(2)}  ${list.map(([s, v]) => `${s} ${v.central}${v.causes.length > 1 ? " (+" + v.causes.slice(1).join(",") + ")" : ""}`).join(", ")}`);
 }
 if (write) {
-  const snap = { generated: new Date().toISOString().slice(0, 10), thresholds: { FLOOR, ARTWORK, PLATE, PLATE_RMSE, REG_T, REG_S, EDGE }, bundles: out };
+  const snap = { generated: new Date().toISOString().slice(0, 10), thresholds: { FLOOR, ARTWORK, COLOUR, PLATE, PLATE_RMSE, REG_T, REG_S, EDGE }, bundles: out };
   writeFileSync(join(root, "apps/web/lib/drift-diagnosis.json"), JSON.stringify(snap, null, 2) + "\n");
   console.log("wrote apps/web/lib/drift-diagnosis.json");
 }

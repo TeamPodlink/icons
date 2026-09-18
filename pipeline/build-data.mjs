@@ -28,7 +28,11 @@ const popularityRank = Object.fromEntries(measured.map((id, i) => [id, i + 1]));
 // RMSE between the light Liquid Glass master and the flat, per bundle slug.
 // Optional — absent until the audit has been run with --write.
 const driftPath = join(root, "apps/web/lib/facet-drift.json");
-const drift = existsSync(driftPath) ? JSON.parse(readFileSync(driftPath, "utf8")).central ?? {} : {};
+const driftSnap = existsSync(driftPath) ? JSON.parse(readFileSync(driftPath, "utf8")) : {};
+const drift = driftSnap.central ?? {};
+// Same audit with the bundle's material disabled (--material-off): the
+// artwork-only figure of a material pair; absent for pairs without material.
+const driftMaterialOff = driftSnap.materialOff ?? {};
 // Drift-diagnosis snapshot (pipeline/audit-drift-diagnosis.mjs --write):
 // per bundle slug, what the residual is (primary cause + all causes).
 // Drives the dev-only "drift: …" lenses. Optional.
@@ -84,6 +88,7 @@ const out = readPlatforms().map(({ id, dir, meta }) => ({
     darkStatus: b.darkStatus ?? null,
     source: b.source ?? null,
     drift: drift[b.slug] ?? null,
+    driftMaterialOff: driftMaterialOff[b.slug] ?? null,
     diagnosis: diagnosis[b.slug] ? { primary: diagnosis[b.slug].primary, causes: diagnosis[b.slug].causes } : null,
   })),
 }));
