@@ -3,6 +3,7 @@
   "active": true,
   "guidelinesUrl": "https://overcast.fm/podcasterinfo#:~:text=Subscribe%20on%20Overcast",
   "url": "https://overcast.fm",
+  "flatSource": "official",
   "added": "2023-02-06",
   "liquidGlass": {
     "bundles": [
