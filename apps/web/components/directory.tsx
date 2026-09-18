@@ -55,7 +55,7 @@ function useScrollMemory(anchorRef: React.RefObject<HTMLElement | null>) {
   }, [key, anchorRef]);
 }
 
-/** Sort orders: Latest (default, stays out of the URL), A-Z, Popular —
+/** Sort orders: Latest (production default, stays out of the URL), A-Z, Popular —
  *  and, dev-only like the QA lenses, Drift: highest facet drift first
  *  (central RMSE between the light Liquid Glass master and the flat,
  *  from the committed apps/web/lib/facet-drift.json snapshot), the
@@ -67,10 +67,14 @@ const SORTS: readonly Sort[] = lensesEnabled
   ? ALL_SORTS
   : ALL_SORTS.filter((s) => s !== "drift");
 
+/** Dev builds open on the Drift sort (the worklist), production on Latest;
+ *  the default stays out of the URL either way. */
+const DEFAULT_SORT: Sort = lensesEnabled ? "drift" : "latest";
+
 const parseSort = (raw: string): Sort =>
-  raw === "alphabetical" || raw === "popular" || (raw === "drift" && lensesEnabled)
+  raw === "alphabetical" || raw === "popular" || raw === "latest" || (raw === "drift" && lensesEnabled)
     ? raw
-    : "latest";
+    : DEFAULT_SORT;
 
 const SORT_META: Record<Sort, { label: string; Icon: typeof ArrowUpDown }> = {
   latest: { label: "Latest", Icon: ArrowUpDown },
@@ -157,7 +161,7 @@ export function Directory({
   facet?: Facet;
 }) {
   const [query, setQuery] = useUrlState("search", "");
-  const [sortRaw, setSort] = useUrlState("sort", "latest");
+  const [sortRaw, setSort] = useUrlState("sort", DEFAULT_SORT);
   const sort = parseSort(sortRaw);
   const inputRef = useRef<HTMLInputElement>(null);
   // Anchor inside the PageCard viewport, for scroll save/restore.

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   CodeXml,
   Copy,
@@ -244,46 +244,78 @@ export function CompareArtwork({
   platform: Platform;
   bundle: GlassBundle;
 }) {
-  const [mix, setMix] = useState(50);
-  const glass = {
-    src: assetPath(bundle.slug, { size: 512 }),
-    srcSet: `${assetPath(bundle.slug, { size: 512 })} 1x, ${assetPath(bundle.slug)} 2x`,
-  };
+  // The facet-drift audit's diff panel, on screen: |glass − vector| × 4
+  // per channel over the pixels both facets cover (the masks' corner
+  // disagreement is not artwork and stays black), computed on a canvas
+  // from the light Liquid Glass master (512, delivery sRGB) and the
+  // browser's own render of the flat. A thin bright outline is
+  // registration or edge softness, a filled region is colour or shading,
+  // black is agreement. Dev-only, like the audit it mirrors.
+  const SIZE = 512;
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [error, setError] = useState<string | null>(null);
+  const glassSrc = assetPath(bundle.slug, { size: 512 });
+  const flatSrc = flatPath(platform.id);
+  useEffect(() => {
+    let cancelled = false;
+    setError(null);
+    const load = (src: string) =>
+      new Promise<HTMLImageElement>((resolve, reject) => {
+        const img = new Image();
+        if (!src.startsWith("/")) img.crossOrigin = "anonymous";
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error(`could not load ${src}`));
+        img.src = src;
+      });
+    Promise.all([load(glassSrc), load(flatSrc)])
+      .then(([g, v]) => {
+        if (cancelled) return;
+        const draw = (img: HTMLImageElement) => {
+          const c = document.createElement("canvas");
+          c.width = SIZE;
+          c.height = SIZE;
+          const ctx = c.getContext("2d", { willReadFrequently: true })!;
+          ctx.drawImage(img, 0, 0, SIZE, SIZE);
+          return ctx.getImageData(0, 0, SIZE, SIZE).data;
+        };
+        const a = draw(g), b = draw(v);
+        const out = new ImageData(SIZE, SIZE);
+        const o = out.data;
+        for (let i = 0; i < o.length; i += 4) {
+          const both = a[i + 3] >= 250 && b[i + 3] >= 250;
+          o[i] = both ? Math.min(255, Math.abs(a[i] - b[i]) * 4) : 0;
+          o[i + 1] = both ? Math.min(255, Math.abs(a[i + 1] - b[i + 1]) * 4) : 0;
+          o[i + 2] = both ? Math.min(255, Math.abs(a[i + 2] - b[i + 2]) * 4) : 0;
+          o[i + 3] = 255;
+        }
+        canvasRef.current?.getContext("2d")?.putImageData(out, 0, 0);
+      })
+      .catch((e: Error) => !cancelled && setError(e.message));
+    return () => {
+      cancelled = true;
+    };
+  }, [glassSrc, flatSrc]);
   const cap = "font-mono text-xs text-neutral-500 dark:text-neutral-400";
   return (
     <div className="w-full space-y-4 py-2">
-      <div className="relative aspect-square w-full">
-        <img
-          {...glass}
-          alt={`${bundle.title} Liquid Glass, light`}
-          decoding="async"
-          className="absolute inset-0 h-full w-full select-none"
+      <div className="relative aspect-square w-full overflow-hidden rounded-[22%] bg-black">
+        <canvas
+          ref={canvasRef}
+          width={SIZE}
+          height={SIZE}
+          aria-label={`4× absolute difference, ${bundle.title} Liquid Glass (light) vs ${platform.name} vector`}
+          className="h-full w-full select-none"
         />
-        <img
-          src={flatPath(platform.id)}
-          alt={`${platform.name} vector over Liquid Glass at ${mix}%`}
-          decoding="async"
-          style={{ opacity: mix / 100 }}
-          className="absolute inset-0 h-full w-full select-none"
-        />
+        {error && (
+          <p className={cn(cap, "absolute inset-0 flex items-center justify-center p-4 text-center")}>
+            {error}
+          </p>
+        )}
       </div>
-      <label className={cn(cap, "flex w-full items-center space-x-2")}>
-        <span className="shrink-0">glass</span>
-        <input
-          type="range"
-          min={0}
-          max={100}
-          value={mix}
-          onChange={(e) => setMix(Number(e.target.value))}
-          aria-label="Blend between Liquid Glass and vector"
-          className="w-full"
-        />
-        <span className="shrink-0">vector</span>
-      </label>
       <p className={cn(cap, "text-center")}>
-        facet drift (central RMSE, light glass vs vector):{" "}
+        4×|glass − vector| · facet drift (central RMSE, light glass vs vector):{" "}
         {bundle.drift === null ? "unmeasured" : bundle.drift.toFixed(2)}
-        {" · "}pipeline/audit-facet-drift.mjs --write
+        {" · "}pipeline/audit-facet-drift.mjs --sheets
       </p>
     </div>
   );

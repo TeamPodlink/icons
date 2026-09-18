@@ -15,6 +15,7 @@ import {
   assetPath,
   badgePath,
   flatPath,
+  lensesEnabled,
   type Card,
   type Facet,
 } from "@/lib/platforms";
@@ -204,6 +205,22 @@ export function IconCard({
       className="group relative flex flex-col items-center justify-center rounded-md border border-neutral-200 px-3.5 py-3 hover:bg-neutral-100/80 dark:border-neutral-800 dark:hover:bg-neutral-800/20"
     >
       <div className="flex h-6 w-full items-center justify-end space-x-2 pb-0.5">
+        {/* Dev-only facet-drift readout (central RMSE between the light
+            Liquid Glass master and the flat, apps/web/lib/facet-drift.json),
+            gated like the QA lenses so a production build drops it. */}
+        {lensesEnabled && card.drift !== null && (
+          <span
+            title="Facet drift: central RMSE, light Liquid Glass master vs flat icon (pipeline/audit-facet-drift.mjs)"
+            className={cn(
+              "rounded-full border px-2 py-0.5 font-mono text-[11px] tabular-nums",
+              card.drift <= 5
+                ? "border-emerald-300 text-emerald-600 dark:border-emerald-900 dark:text-emerald-500"
+                : "border-neutral-300 text-neutral-400 dark:border-neutral-800 dark:text-neutral-500"
+            )}
+          >
+            {card.drift.toFixed(2)}
+          </span>
+        )}
         {shown === "flat" && facet === "glass" && (
           <span
             title="No Liquid Glass icon yet — flat vector shown. Contributions welcome!"
