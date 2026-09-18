@@ -6178,3 +6178,72 @@ new light | current dark | new dark, ictool at 512):
 `scratchpad/cm-vector/review-moonfm.png`; instruments
 `scratchpad/cm-vector/{seam.py, sheet.py, perlayer.py, diag.mjs}` over
 `scratchpad/pocketcasts-vector/{score512.py, others/{build.py, masks/}}`.
+
+### moonfm: the M template as a vector, and the backing that reaches Dark (2026-09-18)
+
+The "moonfm Dark law" entry above refused every all-vector form because
+the SVG M rendered darker than `Layer_M_Template.png` along a bottom
+ramp in Dark. Re-measured from the PNG outward, both halves of that
+refusal turned out to be a misreading, and the bundle is now all vector.
+
+**What the template is.** Gray+alpha 1024², 198,151 pixels at alpha 255
+and 75,082 at 128–254, all of them interior: alpha is 255 over the blue
+chevron's area and ~214 over the pink-only region (an 8×8 cell mean
+grid shows the diagonal), so the developer built it from the design's
+own two layers, not as a flat white shape. Its silhouette is the UNION
+of the two chevron vectors, but not at the offsets our decanted
+`Vector1/2.svg` carry: fitted per chevron against the alpha (coordinate
+descent on scale/dx/dy, librsvg silhouettes at 1024), the blue chevron
+sits at identity and the pink one at **scale 0.996, +1 px x, −1 px y**;
+mismatch **2,433 → 78 px**. The unfitted union was a half-pixel outside
+the template along the notch edge and one row short at the bottom, and
+in Dark the glass edge highlight turned that into a 22-RMSE rim. An
+RGBA copy of the template renders byte-identical to it (the gray+alpha
+encoding is irrelevant), and an opaque raster of the SVG silhouette has
+a flat interior in Dark (+0.9), so the ramp is SVG-vs-raster, not
+alpha: ictool's glass material reads alpha as a mask (an SVG carrying
+the 214 region at fill-opacity .84 rendered identically to the opaque
+one, in both appearances).
+
+**The ramp, characterised.** Glass SVG M minus glass PNG M, Dark, 8×8
+over the M's bbox: 0 everywhere except the bottom two row-bands, −8 and
+−18, uniform across x. It survives the `{1, dark 1}` guard, a dark
+solid or gradient white fill-specialization, over-white fills
+(`gray:1.15` clamps: byte-identical to white), the alpha structure, and
+native resolutions of 64/512/1024 units (all byte-identical to the
+32-unit form). A non-glass white M in the same slot reads +28 at the
+bottom instead, and a full-opacity non-glass white M in a group BENEATH
+the glass M reads the same +33 — the glass layer passes its backdrop
+through with a bottom-weighted weight, and the response to a backing is
+linear in its opacity. So the form is: the fitted union as a glass SVG
+layer with the guard, over a dark-only (`{0, dark 1}`) non-glass copy
+of the same path filled white with a stop-opacity ramp, 0 to 59% of the
+M's height then 0.032 / 0.089 / 0.125 / 0.149 / 0.169 / 0.183 at
+65.6 / 71.9 / 78.1 / 84.4 / 90.6 / 96.9% (`userSpaceOnUse` on the M's
+bbox rows 259–794; two Newton passes from the bare/full-backing band
+pair). Bands after: 0.0 / 0.0 / 0.0 / 0.1 / 0.1 / 0.2 where the bare
+form read −0.9 … −17.4.
+
+**Scored at 512, ictool vs ictool, against the shipped PNG form:**
+
+| appearance | central | frame | px > 24 | M interior | rim ±3 | mask Δ |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Default | **0.53** | 0.32 | 0 | 0.59 | 0.69 | 0 |
+| Dark | **2.04** | 1.22 | 1 (rim) | 2.20 | 3.17 | 0 |
+
+The residual left is +2 over the pink-only region (the 214-alpha area,
+where the raster form also reads +5–9). PASS on both appearances.
+
+**Shipped.** `Assets/M.svg` (fitted union, glass, guard) and
+`Assets/M-back.svg` (dark-only ramp backing, own non-glass group,
+shadow none) replace `Layer_M_Template.png`; source `decanted` →
+`flat-svg` (all-SVG bundle; as for castamatic, the stack is decant's —
+never `--split-existing` over it). Drift **38.91 → 38.62**, `3/4+s`,
+meanΔ +10.4/+26.1/+6.4, 36% > 40, diagnosis material (the glass
+chevrons against a solid flat; the M was never the drift). Raster-element
+platforms 14 → 13. The Dark-law paragraph stands as a measurement of
+SVG glass layers in Dark; its conclusion ("cannot replace its decanted
+raster under the bar") is withdrawn — the rule's "whatever form the
+vector needs to reach Dark" gains a fourth form: a dark-only
+opacity-ramp backing beneath an SVG glass layer. Sheet:
+`scratchpad/moon-q/review-F20.png`; candidates `moon-q/f/F*.icon`.

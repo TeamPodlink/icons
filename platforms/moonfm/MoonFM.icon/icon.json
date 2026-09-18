@@ -107,9 +107,25 @@
       "hidden": false,
       "layers": [
         {
-          "image-name": "Layer_M_Template.png",
-          "name": "Layer_M_Template",
-          "glass": true
+          "image-name": "M.svg",
+          "name": "M",
+          "glass": true,
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          },
+          "opacity-specializations": [
+            {
+              "value": 1
+            },
+            {
+              "appearance": "dark",
+              "value": 1
+            }
+          ]
         }
       ],
       "shadow": {
@@ -122,6 +138,43 @@
       "translucency": {
         "enabled": true,
         "value": 0.5
+      }
+    },
+    {
+      "hidden": false,
+      "layers": [
+        {
+          "image-name": "M-back.svg",
+          "name": "M back",
+          "glass": false,
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          },
+          "opacity-specializations": [
+            {
+              "value": 0
+            },
+            {
+              "appearance": "dark",
+              "value": 1
+            }
+          ]
+        }
+      ],
+      "shadow": {
+        "kind": "none",
+        "opacity": 0.5
+      },
+      "blend-mode": "normal",
+      "lighting": "individual",
+      "specular": false,
+      "translucency": {
+        "enabled": false,
+        "value": 0
       }
     }
   ],
