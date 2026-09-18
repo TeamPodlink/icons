@@ -10,7 +10,7 @@
         "title": "Podimo",
         "variant": null,
         "file": "Podimo.icon",
-        "source": "appstore-artwork-split",
+        "source": "flat-svg-split",
         "appStoreId": 1476538730,
         "hasDark": true
       }

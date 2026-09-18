@@ -12,7 +12,7 @@
         "title": "Deezer",
         "variant": null,
         "file": "Deezer.icon",
-        "source": "appstore-artwork",
+        "source": "flat-svg",
         "appStoreId": 292738169,
         "hasDark": false,
         "darkStatus": "native"

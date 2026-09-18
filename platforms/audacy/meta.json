@@ -10,7 +10,7 @@
         "title": "Audacy",
         "variant": null,
         "file": "Audacy.icon",
-        "source": "appstore-artwork-split",
+        "source": "flat-svg-split",
         "appStoreId": 323701765,
         "hasDark": true
       }

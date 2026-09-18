@@ -14,8 +14,8 @@
         "title": "RSSRadio",
         "variant": null,
         "file": "RSSRadio.icon",
-        "hasDark": true,
-        "source": "appstore-artwork-split"
+        "source": "flat-svg-split",
+        "hasDark": true
       }
     ]
   }

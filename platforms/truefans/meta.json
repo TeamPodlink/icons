@@ -10,7 +10,7 @@
         "title": "TrueFans",
         "variant": null,
         "file": "TrueFans.icon",
-        "source": "appstore-artwork",
+        "source": "flat-svg",
         "appStoreId": 6747340246,
         "hasDark": false,
         "darkStatus": "native"

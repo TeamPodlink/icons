@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Drawn from measurements of the App Store glyph (pipeline/README.md, "rssradio: drawn from the App Store glyph"): dot r 95 px at (511.5,713.5); three concentric 50 px strokes at mid-radii 205/340/474 with round caps whose tips sit on the 45-degree line; plate = the bundle's canvas gradient. -->
+  
+  <g fill="none" stroke="#fff" stroke-width="1.5625" stroke-linecap="round"><path d="M12.0407 17.2484A6.4062 6.4062 0 0 1 19.928 17.2484"/><path d="M9.0441 14.2518A10.625 10.625 0 0 1 22.9246 14.2518"/><path d="M6.0774 11.285A14.8125 14.8125 0 0 1 25.8914 11.285"/></g><circle cx="15.9844" cy="22.2969" r="2.9688" fill="#fff"/>
+</svg>
