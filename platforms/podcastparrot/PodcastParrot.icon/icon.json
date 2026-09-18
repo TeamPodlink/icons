@@ -1,0 +1,98 @@
+{
+  "fill": {
+    "linear-gradient": [
+      "gray:1.00000,1.00000",
+      "gray:0.92500,1.00000"
+    ],
+    "orientation": {
+      "start": {
+        "x": 0.5,
+        "y": 0
+      },
+      "stop": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "fill-specializations": [
+      {
+        "value": {
+          "linear-gradient": [
+            "gray:1.00000,1.00000",
+            "gray:0.92500,1.00000"
+          ],
+          "orientation": {
+            "start": {
+              "x": 0.5,
+              "y": 0
+            },
+            "stop": {
+              "x": 0.5,
+              "y": 1
+            }
+          }
+        }
+      },
+      {
+        "appearance": "dark",
+        "value": {
+          "linear-gradient": [
+            "gray:0.19200,1.00000",
+            "gray:0.07800,1.00000"
+          ],
+          "orientation": {
+            "start": {
+              "x": 0.5,
+              "y": 0
+            },
+            "stop": {
+              "x": 0.5,
+              "y": 1
+            }
+          }
+        }
+      }
+    ]
+  },
+  "groups": [
+    {
+      "hidden": false,
+      "layers": [
+        {
+          "image-name": "parrot.png",
+          "name": "parrot",
+          "glass-specializations": [
+            {
+              "value": false
+            },
+            {
+              "appearance": "dark",
+              "value": true
+            },
+            {
+              "appearance": "tinted",
+              "value": true
+            }
+          ]
+        }
+      ],
+      "shadow": {
+        "kind": "neutral",
+        "opacity": 0.5
+      },
+      "blend-mode": "normal",
+      "lighting": "individual",
+      "specular": true,
+      "translucency": {
+        "enabled": true,
+        "value": 0.5
+      }
+    }
+  ],
+  "supported-platforms": {
+    "circles": [
+      "watchOS"
+    ],
+    "squares": "shared"
+  }
+}

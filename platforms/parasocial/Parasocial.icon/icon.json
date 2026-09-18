@@ -1,0 +1,30 @@
+{
+  "groups": [
+    {
+      "hidden": false,
+      "blend-mode": "normal",
+      "specular": false,
+      "translucency": {
+        "enabled": false,
+        "value": 0
+      },
+      "layers": [
+        {
+          "image-name": "icon.svg",
+          "name": "icon",
+          "glass": false,
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "supported-platforms": {
+    "squares": "shared"
+  }
+}

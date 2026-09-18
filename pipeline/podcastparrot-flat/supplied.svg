@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024" fill="none">
+  <title>Podcast Parrot</title>
+  <desc>Clean vector rendering of the Podcast Parrot icon.</desc>
+  <defs>
+    <!-- One continuous warm field for head, neck, and chest. -->
+    <radialGradient id="bodyGradient" cx="0" cy="0" r="1" gradientTransform="translate(491 637) rotate(98) scale(532 348)" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#FFB719"/>
+      <stop offset=".32" stop-color="#FF9C14"/>
+      <stop offset=".62" stop-color="#FF761B"/>
+      <stop offset=".82" stop-color="#F64C37"/>
+      <stop offset="1" stop-color="#DF314A"/>
+    </radialGradient>
+    <linearGradient id="headTint" x1="398" y1="136" x2="479" y2="514" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF5D4D"/>
+      <stop offset=".7" stop-color="#FF5043" stop-opacity=".42"/>
+      <stop offset="1" stop-color="#E52D4A" stop-opacity=".08"/>
+    </linearGradient>
+    <linearGradient id="bodyBottomShade" x1="0" y1="650" x2="0" y2="1024" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#E93645" stop-opacity="0"/>
+      <stop offset=".65" stop-color="#E93645" stop-opacity=".28"/>
+      <stop offset="1" stop-color="#E93645" stop-opacity=".58"/>
+    </linearGradient>
+    <linearGradient id="shoulderGradient" x1="260" y1="316" x2="387" y2="428" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF6629"/>
+      <stop offset=".62" stop-color="#FF8C17"/>
+      <stop offset="1" stop-color="#FFAE13"/>
+    </linearGradient>
+
+    <linearGradient id="faceGradient" x1="420" y1="226" x2="578" y2="467" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFE6D4"/>
+      <stop offset=".48" stop-color="#FFD3BE"/>
+      <stop offset="1" stop-color="#FFB795"/>
+    </linearGradient>
+    <radialGradient id="irisGradient" cx="0" cy="0" r="1" gradientTransform="translate(489 276) rotate(50) scale(94)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#F3FBFA"/>
+    </radialGradient>
+    <linearGradient id="pupilGradient" x1="483" y1="271" x2="532" y2="334" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#292C34"/>
+      <stop offset="1" stop-color="#17191E"/>
+    </linearGradient>
+
+    <linearGradient id="beakTopGradient" x1="630" y1="276" x2="735" y2="491" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4B4E55"/>
+      <stop offset=".57" stop-color="#3D4047"/>
+      <stop offset="1" stop-color="#30343A"/>
+    </linearGradient>
+    <linearGradient id="beakBottomGradient" x1="588" y1="369" x2="653" y2="492" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#31343A"/>
+      <stop offset=".45" stop-color="#202329"/>
+      <stop offset="1" stop-color="#2C2F35"/>
+    </linearGradient>
+
+    <!-- Wing base runs from violet at the shoulder into deep blue at the tip. -->
+    <linearGradient id="wingBaseGradient" x1="306" y1="508" x2="150" y2="1024" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7D2FD0"/>
+      <stop offset=".25" stop-color="#6942D2"/>
+      <stop offset=".58" stop-color="#2B4DB7"/>
+      <stop offset="1" stop-color="#2056AD"/>
+    </linearGradient>
+    <linearGradient id="topFeatherGradient" x1="260" y1="508" x2="218" y2="753" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#943BC6"/>
+      <stop offset=".52" stop-color="#7444D1"/>
+      <stop offset="1" stop-color="#5C50D1"/>
+    </linearGradient>
+    <linearGradient id="middleFeatherGradient" x1="210" y1="690" x2="110" y2="902" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#4543BD"/>
+      <stop offset=".5" stop-color="#2A68D0"/>
+      <stop offset="1" stop-color="#2B72D7"/>
+    </linearGradient>
+    <linearGradient id="wingTipGlow" x1="17" y1="825" x2="183" y2="1018" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1E9ED7" stop-opacity=".82"/>
+      <stop offset="1" stop-color="#2155AC" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="wingCyanGlow" cx="0" cy="0" r="1" gradientTransform="translate(35 838) rotate(26) scale(263 310)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#20A5DB" stop-opacity=".92"/>
+      <stop offset=".55" stop-color="#2587D2" stop-opacity=".48"/>
+      <stop offset="1" stop-color="#245CB4" stop-opacity="0"/>
+    </radialGradient>
+
+    <clipPath id="bodyClip">
+      <path d="M90 1024C159 981 236 936 311 855C368 794 401 722 410 662C418 607 398 561 368 530C340 501 300 494 265 499C220 506 185 530 149 562C187 514 213 476 219 437C233 341 266 266 326 211C389 153 456 134 533 138C616 141 671 168 691 207C707 240 698 278 680 317C656 368 617 415 614 465C612 496 632 530 645 568C662 616 663 668 653 716C632 820 569 901 473 968L391 1024H90Z"/>
+    </clipPath>
+    <clipPath id="wingClip">
+      <path d="M12 1024C5 1009 3 989 4 966C6 915 18 847 40 776C54 727 72 674 88 644C108 606 138 576 149 562C154 557 159 552 164 548C197 519 240 499 280 498C332 497 375 522 406 566C427 596 428 636 420 679C411 726 390 774 359 820C325 869 276 914 215 949C176 977 137 1003 115 1024H12Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Combined head, neck, and chest. -->
+  <path d="M90 1024C159 981 236 936 311 855C368 794 401 722 410 662C418 607 398 561 368 530C340 501 300 494 265 499C220 506 185 530 149 562C187 514 213 476 219 437C233 341 266 266 326 211C389 153 456 134 533 138C616 141 671 168 691 207C707 240 698 278 680 317C656 368 617 415 614 465C612 496 632 530 645 568C662 616 663 668 653 716C632 820 569 901 473 968L391 1024H90Z" fill="url(#bodyGradient)"/>
+  <g clip-path="url(#bodyClip)">
+    <path d="M141 600C188 518 212 477 219 437C234 337 269 258 331 205C394 151 462 132 536 138C616 143 669 169 690 205C705 234 702 264 691 293C659 255 617 229 566 218C470 198 376 232 310 298C251 356 218 446 209 534L141 600Z" fill="url(#headTint)"/>
+    <rect x="0" y="650" width="700" height="374" fill="url(#bodyBottomShade)"/>
+    <path d="M244 933C284 904 333 861 369 807C354 882 314 953 253 1024H112C149 1001 196 968 244 933Z" fill="#DF314B" opacity=".24"/>
+  </g>
+
+  <!-- Small shoulder plumage behind the pale facial patch. -->
+  <path d="M274 400C276 361 307 319 349 302C361 297 374 294 386 296L414 391C379 412 338 437 307 438C282 439 269 427 274 400Z" fill="url(#shoulderGradient)"/>
+  <path d="M274 375C291 340 319 313 351 302C363 298 374 295 383 296C334 306 298 333 274 375Z" fill="#F44832" opacity=".38"/>
+
+  <!-- Pale orange area around the eye. -->
+  <path d="M512 206C567 206 609 241 621 286C627 311 614 333 601 360C584 395 573 432 578 472C581 474 583 475 586 476C526 473 474 457 433 427C400 402 381 358 384 308C387 251 440 206 512 206Z" fill="url(#faceGradient)"/>
+  <path d="M595 480C538 477 481 463 433 427C400 402 381 358 384 308C387 251 440 206 512 206C567 206 609 241 621 286" stroke="#FFF7EE" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M396 278C418 234 462 208 513 208C560 208 600 233 616 273C591 239 555 220 512 219C464 219 422 239 396 278Z" fill="#FFF7ED" opacity=".32"/>
+
+  <!-- White iris and dark pupil. -->
+  <circle cx="506" cy="302" r="59" fill="url(#irisGradient)" stroke="#DCEDEC" stroke-width="1"/>
+  <circle cx="506" cy="302" r="36" fill="url(#pupilGradient)" stroke="#0A0B0E" stroke-width="1.3"/>
+  <ellipse cx="494" cy="283" rx="10" ry="7" fill="#3B3F48" opacity=".16"/>
+
+  <!-- Wing outer silhouette and deep-blue lower part. -->
+  <path d="M12 1024C5 1009 3 989 4 966C6 915 18 847 40 776C54 727 72 674 88 644C108 606 138 576 149 562C154 557 159 552 164 548C197 519 240 499 280 498C332 497 375 522 406 566C427 596 428 636 420 679C411 726 390 774 359 820C325 869 276 914 215 949C176 977 137 1003 115 1024H12Z" fill="url(#wingBaseGradient)" stroke="#9434D6" stroke-width="1.1" stroke-opacity=".8"/>
+  <g clip-path="url(#wingClip)">
+    <rect x="0" y="600" width="320" height="424" fill="url(#wingCyanGlow)"/>
+  </g>
+
+  <!-- Three connected light-blue lower feathers. -->
+  <path d="M15 901C22 848 33 786 44 733C116 678 244 611 418 600C425 641 415 701 383 741C366 774 346 807 317 824C299 834 279 834 269 818C258 802 260 772 273 737C236 802 177 869 134 880C120 884 111 874 116 856C121 837 149 790 164 756C126 811 67 878 15 901Z" fill="url(#middleFeatherGradient)" stroke="#2857BC" stroke-width="1" stroke-opacity=".38" clip-path="url(#wingClip)"/>
+
+  <!-- Three connected purple top feathers. -->
+  <path d="M44 733C65 674 103 596 163 544C199 516 241 499 280 498C332 497 375 522 406 566C418 583 423 599 418 613C406 646 392 677 371 694C357 706 342 709 330 696C316 681 314 653 319 625C294 667 269 707 237 726C220 736 205 738 196 723C186 707 194 681 208 642C178 685 143 730 98 746C75 755 54 749 44 733Z" fill="url(#topFeatherGradient)" stroke="#5938BF" stroke-width="1" stroke-opacity=".34" clip-path="url(#wingClip)"/>
+  <!-- Quiet chest feather accents. -->
+  <g clip-path="url(#bodyClip)">
+    <path d="M446 556C490 561 523 601 557 617C573 625 590 620 598 596C607 601 618 604 630 602C642 601 651 597 657 591C657 627 653 666 641 701C634 724 624 737 615 736C604 734 600 722 599 712C591 749 579 786 548 812C568 785 577 747 579 711C582 662 563 625 532 601C508 582 480 568 446 556Z" fill="#FF9610" opacity=".34"/>
+    <path d="M598 719C604 748 615 765 640 781C629 802 614 820 594 835C606 812 607 781 598 757C591 739 591 729 598 719Z" fill="#FF8B12" opacity=".34"/>
+  </g>
+
+  <!-- Dark lower beak, drawn first so the upper bill creates the mouth line. -->
+  <path d="M592 350C578 380 572 414 576 444C577 457 579 469 582 476C587 488 595 494 605 497C617 500 631 494 643 487C663 474 683 456 700 437C687 428 672 425 653 415C627 402 607 380 592 350Z" fill="url(#beakBottomGradient)" stroke="#111318" stroke-width="1.1"/>
+  <path d="M593 352C607 378 629 400 654 411C674 420 693 422 701 436C686 429 668 426 651 418C624 406 604 383 593 352Z" fill="#111318" opacity=".82"/>
+
+  <!-- Dark upper beak and hooked tip. -->
+  <path d="M592 351C603 321 622 289 645 269C660 256 674 250 687 253C728 260 760 299 771 349C784 405 765 465 728 507C718 518 709 522 702 520C709 496 712 471 709 452C708 443 705 438 700 435C688 429 675 428 663 423C630 411 604 386 592 351Z" fill="url(#beakTopGradient)" stroke="#1B1E23" stroke-width="1.1"/>
+  <path d="M594 347C608 314 627 286 649 269C661 259 675 253 688 254C720 260 749 288 765 327C744 294 717 271 687 266C672 264 659 269 647 280C626 298 609 321 594 347Z" fill="#62666E" opacity=".13"/>
+  <path d="M700 435C708 443 711 458 711 475C711 493 708 508 702 520C716 514 731 497 742 480C758 456 768 428 772 401C760 439 738 469 707 486C712 468 711 449 700 435Z" fill="#23272D" opacity=".28"/>
+</svg>

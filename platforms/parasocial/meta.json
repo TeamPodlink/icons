@@ -1,0 +1,25 @@
+{
+  "name": "Parasocial",
+  "active": true,
+  "aliases": [
+    "parasocialfm",
+    "parasocialapodcastplayer"
+  ],
+  "url": "https://parasocial.fm/",
+  "added": "2026-09-17",
+  "flatSource": "drawn",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "parasocial",
+        "title": "Parasocial",
+        "variant": null,
+        "file": "Parasocial.icon",
+        "source": "flat-svg",
+        "appStoreId": 6792017587,
+        "hasDark": false,
+        "darkStatus": "native"
+      }
+    ]
+  }
+}

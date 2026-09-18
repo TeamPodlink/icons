@@ -1,0 +1,23 @@
+{
+  "name": "Podcast Parrot",
+  "active": true,
+  "aliases": [
+    "parrot"
+  ],
+  "url": "https://podcastparrot.app",
+  "added": "2026-09-17",
+  "flatSource": "drawn",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "podcastparrot",
+        "title": "Podcast Parrot",
+        "variant": null,
+        "file": "PodcastParrot.icon",
+        "source": "decanted",
+        "appStoreId": 1451559709,
+        "hasDark": true
+      }
+    ]
+  }
+}
