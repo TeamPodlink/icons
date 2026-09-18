@@ -3,6 +3,7 @@
   "active": true,
   "url": "https://playapod.com",
   "added": "2024-08-12",
+  "flatSource": "drawn",
   "liquidGlass": {
     "bundles": [
       {
@@ -10,7 +11,7 @@
         "title": "Playapod",
         "variant": null,
         "file": "Playapod.icon",
-        "source": "appstore-artwork-split",
+        "source": "flat-svg-split",
         "appStoreId": 1246857049,
         "hasDark": true
       }
