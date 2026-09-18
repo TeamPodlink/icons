@@ -1,48 +1,4 @@
 {
-  "groups": [
-    {
-      "hidden": false,
-      "blend-mode": "normal",
-      "specular": false,
-      "translucency": {
-        "enabled": false,
-        "value": 0
-      },
-      "layers": [
-        {
-          "image-name": "dark.png",
-          "name": "dark",
-          "glass": false,
-          "opacity-specializations": [
-            {
-              "value": 0
-            },
-            {
-              "appearance": "dark",
-              "value": 1
-            }
-          ]
-        },
-        {
-          "image-name": "light.png",
-          "name": "light",
-          "glass": false,
-          "opacity-specializations": [
-            {
-              "value": 1
-            },
-            {
-              "appearance": "dark",
-              "value": 0
-            }
-          ]
-        }
-      ]
-    }
-  ],
-  "supported-platforms": {
-    "squares": "shared"
-  },
   "fill": {
     "linear-gradient": [
       "srgb:1.00000,1.00000,1.00000,1.00000",
@@ -97,5 +53,33 @@
         }
       }
     ]
+  },
+  "groups": [
+    {
+      "hidden": false,
+      "blend-mode": "normal",
+      "specular": false,
+      "translucency": {
+        "enabled": false,
+        "value": 0
+      },
+      "layers": [
+        {
+          "image-name": "icon.svg",
+          "name": "icon",
+          "glass": false,
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "supported-platforms": {
+    "squares": "shared"
   }
 }
