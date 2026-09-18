@@ -71,6 +71,22 @@ NUM = r"[-+]?(?:\d*\.\d+|\d+\.?)(?:[eE][-+]?\d+)?"
 warnings = []
 
 
+def layer_image(l, appearance=None):
+    """A layer's asset: `image-name`, or the entry of
+    `image-name-specializations` for `appearance` (None = the unqualified
+    light entry). Icon Composer's per-appearance asset swap, 2026-09-17."""
+    if "image-name" in l:
+        return l["image-name"]
+    specs = l.get("image-name-specializations") or []
+    for s in specs:
+        if s.get("appearance") == appearance:
+            return s.get("value")
+    for s in specs:
+        if "appearance" not in s:
+            return s.get("value")
+    return None
+
+
 def warn(msg):
     warnings.append(msg)
     print(f"  ! {msg}")
@@ -1390,7 +1406,7 @@ def raster_dark_verdict(doc, bundle_dir):
             if op2 == 0:
                 continue
             op2 = (1.0 if op2 is None else op2) * g_op2
-            nm = l2.get("image-name", "")
+            nm = (layer_image(l2) or "")
             if not nm.lower().endswith(".png"):
                 continue
             im2 = Image.open(os.path.join(bundle_dir, "Assets", nm))
@@ -1478,7 +1494,7 @@ for g in reversed(doc.get("groups", [])):
             continue
         l_op = 1.0 if op is None else op
         op = l_op * g_op
-        name = l["image-name"]
+        name = layer_image(l)
         if name.lower().endswith(".png"):
             if light_value(l, "fill"):
                 warn(f"{name}: fill override on a raster layer ignored")

@@ -281,8 +281,17 @@ function defaultOpacity(layer) {
  *  ("Raster layers", pipeline/README.md — the 2.2 decode is refuted at
  *  6/255). No catalog PNG carries a Display-P3 profile; one that did
  *  would need the p3ToSrgb treatment, like a declared P3 color. */
+/** The asset a layer shows in the light appearance: `image-name`, or the
+ *  unqualified entry of `image-name-specializations`. */
+function layerImage(layer) {
+  return (
+    layer["image-name"] ??
+    layer["image-name-specializations"]?.find((s) => !s.appearance)?.value
+  );
+}
+
 async function layerComposite(bundlePath, layer, opacity) {
-  const file = join(bundlePath, "Assets", layer["image-name"]);
+  const file = join(bundlePath, "Assets", layerImage(layer));
   const scale = layer.position?.scale ?? 1;
   const [tx, ty] = layer.position?.["translation-in-points"] ?? [0, 0];
   let img, w, h;

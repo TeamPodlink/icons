@@ -24,6 +24,22 @@ ap.add_argument("--lightmap", default=None)
 ap.add_argument("--lm-res", type=int, default=128, choices=[64, 128, 256, 512])
 a = ap.parse_args()
 
+def layer_image(l, appearance=None):
+    """A layer's asset: `image-name`, or the entry of
+    `image-name-specializations` for `appearance` (None = the unqualified
+    light entry). Icon Composer's per-appearance asset swap, 2026-09-17."""
+    if "image-name" in l:
+        return l["image-name"]
+    specs = l.get("image-name-specializations") or []
+    for s in specs:
+        if s.get("appearance") == appearance:
+            return s.get("value")
+    for s in specs:
+        if "appearance" not in s:
+            return s.get("value")
+    return None
+
+
 def b64z(u8bytes):
     return base64.b64encode(zlib.compress(u8bytes, 9)).decode()
 
@@ -289,7 +305,7 @@ for g in reversed(groups):
         gl = light_value(l, "glass")
         op = light_value(l, "opacity")
         if op == 0: continue
-        name = l["image-name"]
+        name = layer_image(l)
         assert name.lower().endswith(".svg"), f"non-SVG layer {name} not supported by v1"
         cubics, vb, rule = svg_to_cubics(os.path.join(a.bundle, "Assets", name))
         pos = l.get("position", {})

@@ -378,23 +378,23 @@ function glyphLuma(data) {
   return n ? luma / n : 255;
 }
 
+// One layer whose asset is specialized per appearance — Icon Composer's
+// own form for a light/dark swap, measured pixel-identical to the former
+// two-layer opacity twin on 26 bundles (ledger 2026-09-17). The {1, dark 1}
+// opacity pair is the tint guard Icon Composer writes too: with both
+// assets explicit, the near-white auto-tint must never fire.
 function twinLayers(baseLayer, hasTwin) {
-  return hasTwin
-    ? [
-        {
-          ...baseLayer, "image-name": "glyph-dark.png", name: "glyph-dark",
-          "opacity-specializations": [
-            { value: 0 }, { appearance: "dark", value: 1 },
-          ],
-        },
-        {
-          ...baseLayer,
-          "opacity-specializations": [
-            { value: 1 }, { appearance: "dark", value: 0 },
-          ],
-        },
-      ]
-    : [baseLayer];
+  if (!hasTwin) return [baseLayer];
+  const { "image-name": light, ...rest } = baseLayer;
+  return [
+    {
+      "image-name-specializations": [
+        { value: light }, { appearance: "dark", value: "glyph-dark.png" },
+      ],
+      ...rest,
+      "opacity-specializations": [{ value: 1 }, { appearance: "dark", value: 1 }],
+    },
+  ];
 }
 
 function parseStop(s) {
@@ -553,6 +553,21 @@ for (const b of targets) {
     if (!keyed) {
       console.log(`skip ${b.slug}: non-uniform background`);
       continue;
+    }
+    // Canvas-inset law (measured 2026-09-17, pipeline/README.md): ictool
+    // paints the 2-stop canvas linearly between rows 105 and 919 of 1024
+    // (t 0.1025 → 0.8975) and clamps outside. Sample the raster's own
+    // top→bottom line at those rows for the stops, so the render matches
+    // the artwork across the central 80%; the dark bake then follows the
+    // same clamped inset ramp, which is what the auto-tint would sample.
+    if (!keyed.bg) {
+      const [T0, T1] = [105 / 1024, 919 / 1024];
+      const top0 = keyed.bgTop, bot0 = keyed.bgBottom;
+      const L = (t) => top0.map((v, c) => v + (bot0[c] - v) * t);
+      keyed.bgTop = L(T0).map(Math.round);
+      keyed.bgBottom = L(T1).map(Math.round);
+      const n = info.height;
+      keyed.rowBgFn = (y) => L(Math.min(T1, Math.max(T0, y / (n - 1))));
     }
     const bgImage = keyed.bg ?? null; // layered-background mode
     // Bake the dark twin (raster layers never auto-tint — see header).

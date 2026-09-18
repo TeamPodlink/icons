@@ -486,9 +486,29 @@ function resolveGradientFill(svg, id) {
         `gradient #${id} is not vertical (${geom}); ictool ignores ` +
         `orientation, so only a top->bottom plate can be a canvas fill`,
     };
-  if (near(y1, 0) && near(y2, 1)) return { stops: colors };
-  if (near(y1, 1) && near(y2, 0)) return { stops: [colors[1], colors[0]] };
+  if (near(y1, 0) && near(y2, 1)) return { stops: insetStops(colors) };
+  if (near(y1, 1) && near(y2, 0)) return { stops: insetStops([colors[1], colors[0]]) };
   return { reason: `gradient #${id} is not full-height (${geom})` };
+}
+
+/**
+ * The canvas-inset law (MEASURED 2026-09-17, pipeline/README.md): ictool
+ * paints a two-stop canvas linear-gradient linearly between rows 105 and
+ * 919 of 1024 (t = 0.1025 → 0.8975), clamped to the end stops outside.
+ * A full-height SVG plate lifted with its end colours verbatim therefore
+ * renders ~10% "slower" than the flat at each end (rssradio's plate read
+ * ±7/255 top and bottom). Resampling the plate's own line at those two
+ * rows makes the canvas reproduce the flat's full-height ramp across the
+ * central 80% exactly; only the outer 10% bands (outside the audit's
+ * crop) clamp. Same colour space as the SVG's lerp (encoded).
+ */
+const INSET_T0 = 105 / 1024, INSET_T1 = 919 / 1024;
+function insetStops([top, bottom]) {
+  const parse = (c) => { const m = c.match(/^([a-z0-9-]+):([\d.]+),([\d.]+),([\d.]+),([\d.]+)$/); return m && { space: m[1], v: [+m[2], +m[3], +m[4]], a: +m[5] }; };
+  const A = parse(top), B = parse(bottom);
+  if (!A || !B || A.space !== B.space) return [top, bottom]; // mixed spaces: leave verbatim
+  const at = (t) => `${A.space}:${A.v.map((v, i) => (v + (B.v[i] - v) * t).toFixed(5)).join(",")},${A.a.toFixed(5)}`;
+  return [at(INSET_T0), at(INSET_T1)];
 }
 
 /** Drop a <linearGradient> def no longer referenced by the glyph. */
@@ -637,32 +657,60 @@ async function trySplit(id, dir, meta) {
   const twinBase = top === bottom ? top : meanColor(top, bottom);
   const cm = twinBase.match(/^[a-z0-9-]+:([\d.]+),([\d.]+),([\d.]+)/);
   const bgMax = cm ? Math.max(+cm[1], +cm[2], +cm[3]) : 1;
+  // Dark twin, in the format's own terms (measured 2026-09-17, ledger
+  // "Two Icon Composer forms"): a MONOCHROME glyph gets a layer
+  // `fill-specializations` dark solid — the format repaints the whole
+  // silhouette, no second file, and an explicit dark fill beats the
+  // near-white auto-tint with no opacity guard needed; a MIXED-tone glyph
+  // keeps a retinted icon-dark.svg, swapped in by
+  // `image-name-specializations` on the same layer, with the {1, dark 1}
+  // tint guard Icon Composer writes (a near-white dark asset would
+  // otherwise be auto-tinted — measured on curiocaster/goodpods).
   const layers = [];
-  if (needsWhiteGlyph) {
-    const twinColor = bgMax > 0.2 ? cssColor(twinBase) : "#ffffff";
-    writeFileSync(
-      join(bdir, "Assets/icon-dark.svg"),
-      retintDark(split.glyphSvg, twinColor)
-    );
-    layers.push({
-      "image-name": "icon-dark.svg", name: "icon-dark", glass: false,
-      position: { scale: 32, "translation-in-points": [0, 0] },
-      "opacity-specializations": [
-        { value: 0 }, { appearance: "dark", value: 1 },
-      ],
-    });
-  }
-  layers.push({
+  const base = {
     "image-name": "icon.svg", name: "icon", glass: false,
     position: { scale: 32, "translation-in-points": [0, 0] },
-    ...(needsWhiteGlyph
-      ? {
-          "opacity-specializations": [
-            { value: 1 }, { appearance: "dark", value: 0 },
-          ],
-        }
-      : {}),
-  });
+  };
+  if (needsWhiteGlyph) {
+    const twinColor = bgMax > 0.2 ? cssColor(twinBase) : "#ffffff";
+    // What matters is whether the DARK twin is one paint (a two-tone
+    // light glyph whose dark twin comes out all white — podstation — is
+    // still one repaint), so count paints in retintDark's output.
+    const twinSvg = retintDark(split.glyphSvg, twinColor);
+    const norm = (v) => {
+      const m = v.trim().toLowerCase().match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/);
+      if (!m) return v.trim().toLowerCase();
+      const h = m[1].length === 3 ? [...m[1]].map((c) => c + c).join("") : m[1];
+      return "#" + h;
+    };
+    const paints = new Set(
+      [...twinSvg.matchAll(/(?:fill|stroke|stop-color)="([^"]+)"/g)]
+        .map((m) => norm(m[1]))
+        .filter((v) => v !== "none" && !v.startsWith("url("))
+    );
+    const monochrome = paints.size === 1 && !/<(?:linear|radial)Gradient/.test(twinSvg);
+    if (monochrome) {
+      const [paint] = paints;
+      const twinFill =
+        paint === norm(twinColor) && bgMax > 0.2
+          ? twinBase
+          : "srgb:" + [1, 3, 5].map((i) => (parseInt(paint.slice(i, i + 2), 16) / 255).toFixed(5)).join(",") + ",1.00000";
+      layers.push({
+        ...base,
+        "fill-specializations": [{ appearance: "dark", value: { solid: twinFill } }],
+      });
+    } else {
+      writeFileSync(join(bdir, "Assets/icon-dark.svg"), twinSvg);
+      const { "image-name": light, ...rest } = base;
+      layers.push({
+        "image-name-specializations": [
+          { value: light }, { appearance: "dark", value: "icon-dark.svg" },
+        ],
+        ...rest,
+        "opacity-specializations": [{ value: 1 }, { appearance: "dark", value: 1 }],
+      });
+    }
+  } else layers.push(base);
   // A solid plate is a two-equal-stop gradient; a gradient plate ships
   // its own two stops. Either way the orientation is the only one
   // ictool honors (top->bottom; fill-orientation law).

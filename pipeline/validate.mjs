@@ -93,9 +93,23 @@ for (const { id, dir, meta } of platforms) {
     const assets = new Set(
       existsSync(join(bundle, "Assets")) ? readdirSync(join(bundle, "Assets")) : []
     );
-    const layerFiles = [
-      ...JSON.stringify(doc).matchAll(/"image-name"\s*:\s*"([^"]+)"/g),
-    ].map((m) => m[1]);
+    // A layer names its asset with `image-name`, or per appearance with
+    // `image-name-specializations` [{value}, {appearance:"dark", value}]
+    // (Icon Composer's own form for a light/dark asset swap — measured
+    // pixel-identical to the two-layer opacity twin, ledger 2026-09-17).
+    const layerFiles = (doc.groups ?? []).flatMap((g) =>
+      (g.layers ?? []).flatMap((l) => {
+        const specs = l["image-name-specializations"];
+        if (specs && !specs.some((s) => !s.appearance))
+          err(`${bid}: layer "${l.name}" image-name-specializations lacks an unqualified (light) entry`);
+        if (!l["image-name"] && !specs)
+          err(`${bid}: layer "${l.name}" names no asset (image-name or image-name-specializations)`);
+        return [
+          ...(l["image-name"] ? [l["image-name"]] : []),
+          ...((specs ?? []).map((s) => s.value)),
+        ];
+      })
+    );
     for (const file of layerFiles)
       if (!assets.has(file)) err(`${bid}: layer asset missing: Assets/${file}`);
 
