@@ -10,7 +10,7 @@
         "title": "Hark",
         "variant": null,
         "file": "Hark.icon",
-        "source": "appstore-artwork",
+        "source": "flat-svg-split",
         "appStoreId": 1540109137,
         "hasDark": true
       }
