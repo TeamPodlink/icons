@@ -1,7 +1,7 @@
 // Emit the merged platform dataset the website consumes:
 // apps/web/lib/platforms.gen.json (gitignored). Run before web dev/build.
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { readPlatforms, root } from "./lib.mjs";
 
@@ -30,6 +30,31 @@ const popularityRank = Object.fromEntries(measured.map((id, i) => [id, i + 1]));
 const driftPath = join(root, "apps/web/lib/facet-drift.json");
 const drift = existsSync(driftPath) ? JSON.parse(readFileSync(driftPath, "utf8")).central ?? {} : {};
 
+// Which of a platform's facets carry raster (pixel) assets rather than
+// vectors: a Liquid Glass bundle whose Assets/ holds anything but SVG, or
+// a flat/badge SVG that embeds an <image>. Drives the dev-only "raster
+// elements" lens — the vectorisation backlog.
+const svgHasImage = (file) =>
+  existsSync(file) && /<image\b/i.test(readFileSync(file, "utf8"));
+function rasterFacets(dir, meta) {
+  const facets = [];
+  const bundles = meta.liquidGlass?.bundles ?? [];
+  if (
+    bundles.some((b) => {
+      const assets = join(dir, b.file, "Assets");
+      return (
+        existsSync(assets) &&
+        readdirSync(assets).some((f) => !f.startsWith(".") && !/\.svg$/i.test(f))
+      );
+    })
+  )
+    facets.push("glass");
+  if (svgHasImage(join(dir, "icon.svg"))) facets.push("flat");
+  if (svgHasImage(join(dir, "badge.svg")) || svgHasImage(join(dir, "badge-dark.svg")))
+    facets.push("badge");
+  return facets;
+}
+
 const out = readPlatforms().map(({ id, dir, meta }) => ({
   id,
   name: meta.name,
@@ -43,6 +68,7 @@ const out = readPlatforms().map(({ id, dir, meta }) => ({
   hasFlat: existsSync(join(dir, "icon.svg")),
   hasBadge: existsSync(join(dir, "badge.svg")),
   flatSource: meta.flatSource ?? null,
+  rasterFacets: rasterFacets(dir, meta),
   bundles: (meta.liquidGlass?.bundles ?? []).map((b) => ({
     slug: b.slug,
     title: b.title,

@@ -54,6 +54,11 @@ export interface Platform {
    *  = not yet attested. Provenance only; the bundle's `source` says how
    *  the Liquid Glass bundle was BUILT, which is a different question. */
   flatSource: "official" | "drawn" | null;
+  /** Facets whose assets are pixels rather than vectors: "glass" when a
+   *  bundle's Assets/ holds anything but SVG, "flat" / "badge" when that
+   *  SVG embeds an <image>. Empty = every facet is vector. Derived by
+   *  pipeline/build-data.mjs; drives the dev-only "raster elements" lens. */
+  rasterFacets: ("glass" | "flat" | "badge")[];
   bundles: GlassBundle[];
 }
 
@@ -110,7 +115,7 @@ export function sourceLabel(b: GlassBundle): string | null {
  * by platform in getCategories(); bundle-level lenses count cards.
  */
 const PLATFORM_LENSES = new Set([
-  "hand-drawn art",
+  "raster elements",
   "missing flat",
   "missing badge",
   "missing url",
@@ -123,7 +128,7 @@ export function isPlatformLens(cat: string): boolean {
 
 /**
  * QA lenses are MAINTAINER TOOLING, not visitor-facing navigation: they
- * are worklists of our own gaps ("missing badge", "hand-drawn art"),
+ * are worklists of our own gaps ("missing badge", "raster elements"),
  * and a released site has no use for them — so they are gated to dev by
  * default. `VITE_SHOW_LENSES=1` forces them on for a deployed preview.
  *
@@ -144,13 +149,15 @@ export const lensesEnabled =
  * dark-variant backlog (light artwork whose Apple-darkened rendition we
  * don't have yet; artwork measured as natively dark is correct as-is and
  * not flagged — split: pipeline/audit-dark-status.mjs). Platform-level
- * (see PLATFORM_LENSES for count semantics): "hand-drawn art" is the
- * re-sourcing backlog — flats we drew ourselves (meta.json `flatSource:
- * "drawn"`), to be replaced whenever the brand publishes a vector; it
- * used to key off the bundle's `source` (flat-svg*), which only says the
- * BUNDLE was built from the flat and swept in official vectors like
- * AntennaPod's branding repo alongside marks we drew; "missing flat" /
- * "missing badge"
+ * (see PLATFORM_LENSES for count semantics): "raster elements" is the
+ * vectorisation backlog — platforms with at least one facet built from
+ * pixels (`rasterFacets` non-empty: a bundle with PNG layers, or a flat /
+ * badge SVG that embeds an <image>), to be replaced whenever a vector of
+ * the mark turns up or can be measured off the raster. It replaces the
+ * former "hand-drawn art" lens (flats with `flatSource: "drawn"`), which
+ * flagged provenance rather than a gap — a measured drawing is a finished
+ * facet, not a worklist item, and `flatSource` stays on the card as data;
+ * "missing flat" / "missing badge"
  * are the artwork queues for platforms without a flat icon or badge,
  * "missing url" the meta.json website-link backfill, and "inactive"
  * retired platforms (0 today; kept for future retirements).
@@ -160,7 +167,7 @@ export function debugCategories(p: Platform, b: GlassBundle | null): string[] {
   if (b) {
     if (!b.hasDark && b.darkStatus !== "native") cats.push("missing dark");
   }
-  if (p.flatSource === "drawn") cats.push("hand-drawn art");
+  if (p.rasterFacets.length > 0) cats.push("raster elements");
   if (!p.hasFlat) cats.push("missing flat");
   if (!p.hasBadge) cats.push("missing badge");
   if (!p.url) cats.push("missing url");
