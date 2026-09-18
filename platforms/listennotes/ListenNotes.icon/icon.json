@@ -1,10 +1,36 @@
 {
   "fill": {
-    "solid": "srgb:1.00000,1.00000,1.00000,1.00000",
+    "linear-gradient": [
+      "srgb:1.00000,1.00000,1.00000,1.00000",
+      "srgb:1.00000,1.00000,1.00000,1.00000"
+    ],
+    "orientation": {
+      "start": {
+        "x": 0.5,
+        "y": 0
+      },
+      "stop": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
     "fill-specializations": [
       {
         "value": {
-          "solid": "srgb:1.00000,1.00000,1.00000,1.00000"
+          "linear-gradient": [
+            "srgb:1.00000,1.00000,1.00000,1.00000",
+            "srgb:1.00000,1.00000,1.00000,1.00000"
+          ],
+          "orientation": {
+            "start": {
+              "x": 0.5,
+              "y": 0
+            },
+            "stop": {
+              "x": 0.5,
+              "y": 1
+            }
+          }
         }
       },
       {
@@ -15,8 +41,14 @@
             "gray:0.07800,1.00000"
           ],
           "orientation": {
-            "start": { "x": 0.5, "y": 0 },
-            "stop": { "x": 0.5, "y": 1 }
+            "start": {
+              "x": 0.5,
+              "y": 0
+            },
+            "stop": {
+              "x": 0.5,
+              "y": 1
+            }
           }
         }
       }
@@ -27,30 +59,44 @@
       "hidden": false,
       "blend-mode": "normal",
       "specular": false,
-      "translucency": { "enabled": false, "value": 0 },
+      "translucency": {
+        "enabled": false,
+        "value": 0
+      },
       "layers": [
         {
-          "image-name": "glyph-dark.png",
-          "name": "glyph-dark",
+          "image-name-specializations": [
+            {
+              "value": "icon.svg"
+            },
+            {
+              "appearance": "dark",
+              "value": "icon-dark.svg"
+            }
+          ],
+          "name": "icon",
           "glass": false,
-          "position": { "scale": 0.88781, "translation-in-points": [-30, 10] },
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          },
           "opacity-specializations": [
-            { "value": 0 },
-            { "appearance": "dark", "value": 1 }
-          ]
-        },
-        {
-          "image-name": "glyph.png",
-          "name": "glyph",
-          "glass": false,
-          "position": { "scale": 1.22667, "translation-in-points": [0, 0] },
-          "opacity-specializations": [
-            { "value": 1 },
-            { "appearance": "dark", "value": 0 }
+            {
+              "value": 1
+            },
+            {
+              "appearance": "dark",
+              "value": 1
+            }
           ]
         }
       ]
     }
   ],
-  "supported-platforms": { "squares": "shared" }
+  "supported-platforms": {
+    "squares": "shared"
+  }
 }
