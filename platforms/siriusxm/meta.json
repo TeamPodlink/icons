@@ -10,7 +10,7 @@
         "title": "SiriusXM",
         "variant": null,
         "file": "SiriusXM.icon",
-        "source": "appstore-artwork",
+        "source": "flat-svg-split",
         "appStoreId": 317951436,
         "hasDark": true
       }

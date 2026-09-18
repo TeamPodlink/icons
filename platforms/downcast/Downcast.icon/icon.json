@@ -65,37 +65,28 @@
       },
       "layers": [
         {
-          "image-name": "glyph-dark.png",
-          "name": "glyph-dark",
-          "glass": false,
-          "opacity-specializations": [
-            {
-              "value": 0
-            },
-            {
-              "appearance": "dark",
-              "value": 1
-            }
-          ]
-        },
-        {
-          "image-name": "glyph.png",
+          "image-name": "glyph.svg",
           "name": "glyph",
           "glass": false,
-          "opacity-specializations": [
-            {
-              "value": 1
-            },
-            {
-              "appearance": "dark",
-              "value": 0
-            }
-          ]
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
         },
         {
-          "image-name": "background.png",
-          "name": "background",
+          "image-name": "plate.svg",
+          "name": "plate",
           "glass": false,
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          },
           "opacity-specializations": [
             {
               "value": 1

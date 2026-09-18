@@ -10,8 +10,8 @@
         "title": "Yoto",
         "variant": null,
         "file": "Yoto.icon",
-        "hasDark": true,
-        "source": "appstore-artwork-split"
+        "source": "flat-svg-split",
+        "hasDark": true
       }
     ]
   }

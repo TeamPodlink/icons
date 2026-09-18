@@ -10,7 +10,7 @@
         "title": "Gaana",
         "variant": null,
         "file": "Gaana.icon",
-        "source": "appstore-artwork-split",
+        "source": "flat-svg-split",
         "appStoreId": 585270521,
         "hasDark": true
       }
