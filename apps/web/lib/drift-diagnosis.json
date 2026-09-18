@@ -1,0 +1,1450 @@
+{
+  "generated": "2026-09-18",
+  "thresholds": {
+    "FLOOR": 5,
+    "ARTWORK": 0.15,
+    "PLATE": 3,
+    "REG_T": 0.08,
+    "REG_S": 0.008,
+    "EDGE": 0.5
+  },
+  "bundles": {
+    "apple": {
+      "primary": "material",
+      "causes": [
+        "material"
+      ],
+      "central": 55.32,
+      "glassLayers": 3,
+      "specular": true,
+      "struct": 0.598,
+      "signed": [
+        -21.6,
+        -17.7,
+        -8.9
+      ],
+      "lumaShare": 1,
+      "edgeShare": 0.5,
+      "fit": {
+        "tx": 6.1648,
+        "ty": 6.1648,
+        "s": 0.61433
+      }
+    },
+    "moonfm": {
+      "primary": "material",
+      "causes": [
+        "material"
+      ],
+      "central": 39.1,
+      "glassLayers": 3,
+      "specular": true,
+      "struct": 0.36,
+      "signed": [
+        10.5,
+        26.2,
+        6.5
+      ],
+      "lumaShare": 1,
+      "edgeShare": 0.24,
+      "fit": {
+        "tx": -0.0543,
+        "ty": -0.1184,
+        "s": 1.0034
+      }
+    },
+    "globalplayer": {
+      "primary": "artwork",
+      "causes": [
+        "artwork",
+        "plate",
+        "registration"
+      ],
+      "central": 34.65,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0.388,
+      "signed": [
+        17.4,
+        -1.2,
+        10.8
+      ],
+      "lumaShare": 0.63,
+      "edgeShare": 0.42,
+      "fit": {
+        "tx": -0.0979,
+        "ty": -0.1135,
+        "s": 1.0071
+      }
+    },
+    "icatcher": {
+      "primary": "material",
+      "causes": [
+        "material"
+      ],
+      "central": 26.67,
+      "glassLayers": 1,
+      "specular": false,
+      "struct": 0.226,
+      "signed": [
+        -22,
+        -16.7,
+        -10.6
+      ],
+      "lumaShare": 1,
+      "edgeShare": 0.34,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "playapod": {
+      "primary": "registration",
+      "causes": [
+        "registration"
+      ],
+      "central": 26.03,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0.054,
+      "signed": [
+        -1.2,
+        -1.3,
+        -0.4
+      ],
+      "lumaShare": 1,
+      "edgeShare": 0.99,
+      "fit": {
+        "tx": 0.2286,
+        "ty": 0.1973,
+        "s": 0.98765
+      }
+    },
+    "castamatic": {
+      "primary": "material",
+      "causes": [
+        "material"
+      ],
+      "central": 25.67,
+      "glassLayers": 3,
+      "specular": true,
+      "struct": 0.086,
+      "signed": [
+        -10.9,
+        -17.3,
+        -12.1
+      ],
+      "lumaShare": 1,
+      "edgeShare": 0.29,
+      "fit": {
+        "tx": 0.125,
+        "ty": -0.8438,
+        "s": 1
+      }
+    },
+    "sodes": {
+      "primary": "material",
+      "causes": [
+        "material"
+      ],
+      "central": 24.67,
+      "glassLayers": 1,
+      "specular": true,
+      "struct": 0.293,
+      "signed": [
+        -11.2,
+        -30.5,
+        -5.8
+      ],
+      "lumaShare": 1,
+      "edgeShare": 0.13,
+      "fit": {
+        "tx": 0.0134,
+        "ty": 0.0291,
+        "s": 0.99819
+      }
+    },
+    "playerfm": {
+      "primary": "plate",
+      "causes": [
+        "plate",
+        "registration"
+      ],
+      "central": 23.28,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0.047,
+      "signed": [
+        8.2,
+        -0.6,
+        8.3
+      ],
+      "lumaShare": 0.9,
+      "edgeShare": 0.64,
+      "fit": {
+        "tx": 0.101,
+        "ty": -0.0729,
+        "s": 0.99863
+      }
+    },
+    "podcastapp": {
+      "primary": "geometry",
+      "causes": [
+        "geometry"
+      ],
+      "central": 22.7,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0.06,
+      "signed": [
+        -2,
+        -1.6,
+        0.4
+      ],
+      "lumaShare": 1,
+      "edgeShare": 0.93,
+      "fit": {
+        "tx": 0.0429,
+        "ty": 0.059,
+        "s": 0.99829
+      }
+    },
+    "castbox": {
+      "primary": "plate",
+      "causes": [
+        "plate",
+        "registration"
+      ],
+      "central": 22.62,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0.051,
+      "signed": [
+        0,
+        3.7,
+        4.6
+      ],
+      "lumaShare": 0.65,
+      "edgeShare": 1,
+      "fit": {
+        "tx": -0.5881,
+        "ty": -0.5724,
+        "s": 1.03679
+      }
+    },
+    "audible": {
+      "primary": "plate",
+      "causes": [
+        "plate"
+      ],
+      "central": 20.68,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0.05,
+      "signed": [
+        -1.5,
+        -9.3,
+        -13.5
+      ],
+      "lumaShare": 0.59,
+      "edgeShare": 0.56,
+      "fit": null
+    },
+    "anytimeplayer": {
+      "primary": "geometry",
+      "causes": [
+        "geometry"
+      ],
+      "central": 19.19,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0.051,
+      "signed": [
+        0,
+        0.4,
+        0.7
+      ],
+      "lumaShare": 0.34,
+      "edgeShare": 1,
+      "fit": null
+    },
+    "fountain": {
+      "primary": "geometry",
+      "causes": [
+        "geometry"
+      ],
+      "central": 17.95,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0.032,
+      "signed": [
+        1,
+        1.1,
+        2.7
+      ],
+      "lumaShare": 0.99,
+      "edgeShare": 0.92,
+      "fit": null
+    },
+    "spreaker": {
+      "primary": "plate",
+      "causes": [
+        "plate",
+        "registration"
+      ],
+      "central": 16.42,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0.03,
+      "signed": [
+        1.2,
+        9.1,
+        15.7
+      ],
+      "lumaShare": 0.5,
+      "edgeShare": 0.3,
+      "fit": {
+        "tx": 0.1857,
+        "ty": 0.1638,
+        "s": 0.98782
+      }
+    },
+    "podcastrepublic": {
+      "primary": "material",
+      "causes": [
+        "material"
+      ],
+      "central": 14.89,
+      "glassLayers": 1,
+      "specular": true,
+      "struct": 0.077,
+      "signed": [
+        -10,
+        -7.4,
+        -3.3
+      ],
+      "lumaShare": 0.96,
+      "edgeShare": 0.41,
+      "fit": null
+    },
+    "podcastparrot": {
+      "primary": "registration",
+      "causes": [
+        "registration"
+      ],
+      "central": 13.87,
+      "glassLayers": 0,
+      "specular": true,
+      "struct": 0.038,
+      "signed": [
+        1.4,
+        2,
+        -0.4
+      ],
+      "lumaShare": 0.82,
+      "edgeShare": 0.71,
+      "fit": {
+        "tx": -0.2451,
+        "ty": 1.5232,
+        "s": 1.01015
+      }
+    },
+    "podverse": {
+      "primary": "geometry",
+      "causes": [
+        "geometry"
+      ],
+      "central": 13.13,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0.041,
+      "signed": [
+        0.9,
+        0.6,
+        0.9
+      ],
+      "lumaShare": 0.68,
+      "edgeShare": 0.99,
+      "fit": {
+        "tx": -0.0526,
+        "ty": -0.0681,
+        "s": 1.00329
+      }
+    },
+    "podbean": {
+      "primary": "plate",
+      "causes": [
+        "plate"
+      ],
+      "central": 12.51,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0.006,
+      "signed": [
+        -2.1,
+        -4.2,
+        -1.8
+      ],
+      "lumaShare": 1,
+      "edgeShare": 0.38,
+      "fit": {
+        "tx": 0,
+        "ty": -0.0156,
+        "s": 1
+      }
+    },
+    "overcast": {
+      "primary": "material",
+      "causes": [
+        "material"
+      ],
+      "central": 10.99,
+      "glassLayers": 3,
+      "specular": true,
+      "struct": 0.031,
+      "signed": [
+        -1,
+        -2.1,
+        -3.4
+      ],
+      "lumaShare": 0.97,
+      "edgeShare": 0.93,
+      "fit": {
+        "tx": 0,
+        "ty": -0.0156,
+        "s": 1
+      }
+    },
+    "listennotes": {
+      "primary": "registration",
+      "causes": [
+        "registration"
+      ],
+      "central": 10.59,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0.016,
+      "signed": [
+        -0.6,
+        -1,
+        -1.1
+      ],
+      "lumaShare": 0.95,
+      "edgeShare": 1,
+      "fit": {
+        "tx": -0.0562,
+        "ty": -0.1033,
+        "s": 1.00549
+      }
+    },
+    "rss": {
+      "primary": "material",
+      "causes": [
+        "material"
+      ],
+      "central": 9.59,
+      "glassLayers": 1,
+      "specular": true,
+      "struct": 0.007,
+      "signed": [
+        -3.4,
+        -6,
+        -8.1
+      ],
+      "lumaShare": 0.76,
+      "edgeShare": 0.4,
+      "fit": {
+        "tx": -0.0313,
+        "ty": -0.0896,
+        "s": 1.00571
+      }
+    },
+    "snipd": {
+      "primary": "geometry",
+      "causes": [
+        "geometry"
+      ],
+      "central": 8.33,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0.015,
+      "signed": [
+        -1.5,
+        0.4,
+        -0.6
+      ],
+      "lumaShare": 1,
+      "edgeShare": 0.84,
+      "fit": {
+        "tx": 0.0762,
+        "ty": 0.0764,
+        "s": 0.99523
+      }
+    },
+    "pocketcasts": {
+      "primary": "plate",
+      "causes": [
+        "plate"
+      ],
+      "central": 7.56,
+      "glassLayers": 0,
+      "specular": true,
+      "struct": 0,
+      "signed": [
+        -3.7,
+        -4.1,
+        -4.1
+      ],
+      "lumaShare": 0.98,
+      "edgeShare": 0.34,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "iheartradio": {
+      "primary": "geometry",
+      "causes": [
+        "geometry"
+      ],
+      "central": 6.11,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0.009,
+      "signed": [
+        1.7,
+        0.5,
+        0.6
+      ],
+      "lumaShare": 1,
+      "edgeShare": 0.97,
+      "fit": null
+    },
+    "antennapod": {
+      "primary": "plate",
+      "causes": [
+        "plate"
+      ],
+      "central": 5.77,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        -0.9,
+        -2.7,
+        -4.9
+      ],
+      "lumaShare": 0.59,
+      "edgeShare": 0.13,
+      "fit": null
+    },
+    "hark": {
+      "primary": "geometry",
+      "causes": [
+        "geometry"
+      ],
+      "central": 5.26,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0.006,
+      "signed": [
+        0.5,
+        -0.3,
+        -0.7
+      ],
+      "lumaShare": 0.74,
+      "edgeShare": 0.97,
+      "fit": {
+        "tx": 0.0583,
+        "ty": 0.0561,
+        "s": 0.99749
+      }
+    },
+    "pandora": {
+      "primary": "geometry",
+      "causes": [
+        "geometry"
+      ],
+      "central": 5.18,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        -0.2,
+        -0.1,
+        0.3
+      ],
+      "lumaShare": 0.68,
+      "edgeShare": 0.77,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "soundcloud": {
+      "primary": "geometry",
+      "causes": [
+        "geometry"
+      ],
+      "central": 5.17,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0.01,
+      "signed": [
+        0.7,
+        0.1,
+        -0.1
+      ],
+      "lumaShare": 0.47,
+      "edgeShare": 1,
+      "fit": {
+        "tx": -0.0446,
+        "ty": -0.0144,
+        "s": 1.00377
+      }
+    },
+    "tunein": {
+      "primary": "floor",
+      "causes": [],
+      "central": 4.97,
+      "glassLayers": 0,
+      "specular": true,
+      "struct": 0,
+      "signed": [
+        3.2,
+        4.2,
+        3.9
+      ],
+      "lumaShare": 1,
+      "edgeShare": 0.21,
+      "fit": null
+    },
+    "jiosaavn": {
+      "primary": "floor",
+      "causes": [],
+      "central": 3.89,
+      "glassLayers": 1,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        -0.9,
+        -0.5,
+        -0.9
+      ],
+      "lumaShare": 0.63,
+      "edgeShare": 0.55,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "spotify": {
+      "primary": "floor",
+      "causes": [],
+      "central": 2.9,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        1.4,
+        0.5,
+        0.6
+      ],
+      "lumaShare": 0.99,
+      "edgeShare": 0.42,
+      "fit": null
+    },
+    "queue": {
+      "primary": "floor",
+      "causes": [],
+      "central": 2.72,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0.1,
+        0.5,
+        0.4
+      ],
+      "lumaShare": 1,
+      "edgeShare": 0.76,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "curiocaster": {
+      "primary": "floor",
+      "causes": [],
+      "central": 1.68,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0,
+        0,
+        0
+      ],
+      "lumaShare": 1,
+      "edgeShare": 1,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "castro": {
+      "primary": "floor",
+      "causes": [],
+      "central": 1.57,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0.4,
+        0.5,
+        0.8
+      ],
+      "lumaShare": 0.81,
+      "edgeShare": 0.53,
+      "fit": {
+        "tx": 0,
+        "ty": 0.0156,
+        "s": 1
+      }
+    },
+    "podcastguru": {
+      "primary": "floor",
+      "causes": [],
+      "central": 1.51,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0,
+        0.1,
+        0
+      ],
+      "lumaShare": 0.81,
+      "edgeShare": 0.83,
+      "fit": {
+        "tx": 0,
+        "ty": -0.0156,
+        "s": 1
+      }
+    },
+    "yoto": {
+      "primary": "floor",
+      "causes": [],
+      "central": 1.48,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        1,
+        0.8,
+        1.6
+      ],
+      "lumaShare": 0.6,
+      "edgeShare": 0.33,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "amazonmusic": {
+      "primary": "floor",
+      "causes": [],
+      "central": 1.39,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        -1.1,
+        0.7,
+        0.4
+      ],
+      "lumaShare": 0.54,
+      "edgeShare": 0.58,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "goodpods": {
+      "primary": "floor",
+      "causes": [],
+      "central": 1.29,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        1,
+        0.9,
+        0
+      ],
+      "lumaShare": 1,
+      "edgeShare": 0.45,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "podurama": {
+      "primary": "floor",
+      "causes": [],
+      "central": 1.22,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0,
+        -0.5,
+        -0.1
+      ],
+      "lumaShare": 0.95,
+      "edgeShare": 0.51,
+      "fit": {
+        "tx": 0,
+        "ty": -0.0156,
+        "s": 1
+      }
+    },
+    "podfriend": {
+      "primary": "floor",
+      "causes": [],
+      "central": 1.21,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        -0.1,
+        0.2,
+        0.1
+      ],
+      "lumaShare": 0.69,
+      "edgeShare": 0.95,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "greatpods": {
+      "primary": "floor",
+      "causes": [],
+      "central": 1.21,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0.8,
+        0.5,
+        0.9
+      ],
+      "lumaShare": 0.87,
+      "edgeShare": 0.62,
+      "fit": {
+        "tx": 0,
+        "ty": -0.0156,
+        "s": 1
+      }
+    },
+    "rssradio": {
+      "primary": "floor",
+      "causes": [],
+      "central": 1.08,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0,
+        -0.3,
+        -0.6
+      ],
+      "lumaShare": 0.54,
+      "edgeShare": 0.71,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "podcastindex": {
+      "primary": "floor",
+      "causes": [],
+      "central": 1.08,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0,
+        -0.2,
+        -0.1
+      ],
+      "lumaShare": 1,
+      "edgeShare": 1,
+      "fit": null
+    },
+    "truefans": {
+      "primary": "floor",
+      "causes": [],
+      "central": 1.06,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        -0.3,
+        -0.4,
+        0.3
+      ],
+      "lumaShare": 0.88,
+      "edgeShare": 0.71,
+      "fit": null
+    },
+    "deezer": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.97,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0.1,
+        0.5,
+        0
+      ],
+      "lumaShare": 0.53,
+      "edgeShare": 0.78,
+      "fit": {
+        "tx": 0.0413,
+        "ty": 0.0267,
+        "s": 0.99839
+      }
+    },
+    "podhome": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.97,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0.5,
+        0.4,
+        0.5
+      ],
+      "lumaShare": 0.95,
+      "edgeShare": 0.54,
+      "fit": {
+        "tx": 0,
+        "ty": -0.0156,
+        "s": 1
+      }
+    },
+    "podkicker": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.97,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0.3,
+        0.3,
+        0.4
+      ],
+      "lumaShare": 0.99,
+      "edgeShare": 0.6,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "podstation": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.94,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0,
+        0,
+        0
+      ],
+      "lumaShare": 1,
+      "edgeShare": 1,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "youtubemusic": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.92,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0,
+        0,
+        -0.8
+      ],
+      "lumaShare": 0.72,
+      "edgeShare": 0.73,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "podcastaddict": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.91,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0.2,
+        0.1,
+        -0.2
+      ],
+      "lumaShare": 0.74,
+      "edgeShare": 0.86,
+      "fit": {
+        "tx": 0.0486,
+        "ty": 0.0486,
+        "s": 0.99696
+      }
+    },
+    "stenofm": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.89,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0,
+        0,
+        -0.8
+      ],
+      "lumaShare": 0.56,
+      "edgeShare": 0.73,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "rephonic": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.87,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0.4,
+        0,
+        0.1
+      ],
+      "lumaShare": 0.15,
+      "edgeShare": 0.6,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "parasocial": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.85,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0.2,
+        0,
+        0.3
+      ],
+      "lumaShare": 0.41,
+      "edgeShare": 0.71,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "metacast": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.82,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0,
+        -0.5,
+        0.6
+      ],
+      "lumaShare": 0.83,
+      "edgeShare": 0.53,
+      "fit": null
+    },
+    "gaana": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.81,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0.7,
+        0,
+        -0.1
+      ],
+      "lumaShare": 0.69,
+      "edgeShare": 0.65,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "subscribebyemail": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.79,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        -0.2,
+        0,
+        0
+      ],
+      "lumaShare": 0.54,
+      "edgeShare": 1,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "downcast": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.79,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0,
+        0,
+        0
+      ],
+      "lumaShare": 0.9,
+      "edgeShare": 0.92,
+      "fit": {
+        "tx": 0.0409,
+        "ty": 0.0247,
+        "s": 0.99845
+      }
+    },
+    "ivoox": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.76,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0,
+        0,
+        0.1
+      ],
+      "lumaShare": 0.72,
+      "edgeShare": 0.95,
+      "fit": {
+        "tx": 0.0445,
+        "ty": 0.0404,
+        "s": 0.99721
+      }
+    },
+    "gpodder": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.75,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        -0.1,
+        0,
+        0.6
+      ],
+      "lumaShare": 0.58,
+      "edgeShare": 0.53,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "podimo": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.73,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0.4,
+        0,
+        0.5
+      ],
+      "lumaShare": 0.42,
+      "edgeShare": 0.42,
+      "fit": {
+        "tx": 0.0151,
+        "ty": 0.0291,
+        "s": 0.99818
+      }
+    },
+    "youtube": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.73,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0,
+        0,
+        -0.8
+      ],
+      "lumaShare": 0.53,
+      "edgeShare": 0.53,
+      "fit": {
+        "tx": 0.6132,
+        "ty": 0.6132,
+        "s": 0.96164
+      }
+    },
+    "podchaser": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.71,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0,
+        0,
+        0
+      ],
+      "lumaShare": 1,
+      "edgeShare": 1,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "podnews": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.71,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0,
+        -0.1,
+        0
+      ],
+      "lumaShare": 1,
+      "edgeShare": 1,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "siriusxm": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.68,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0.2,
+        0,
+        0
+      ],
+      "lumaShare": 1,
+      "edgeShare": 0.87,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "podengine": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.62,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0,
+        0,
+        0
+      ],
+      "lumaShare": 1,
+      "edgeShare": 1,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "podlp": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.62,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        -0.1,
+        0,
+        0
+      ],
+      "lumaShare": 0.86,
+      "edgeShare": 0.99,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "audacy": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.61,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0.3,
+        0.2,
+        0
+      ],
+      "lumaShare": 0.87,
+      "edgeShare": 0.57,
+      "fit": {
+        "tx": 0.0049,
+        "ty": 0.0205,
+        "s": 0.99872
+      }
+    },
+    "netflix": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.6,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0.1,
+        0.6,
+        0.3
+      ],
+      "lumaShare": 1,
+      "edgeShare": 0.23,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "tunestr": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.6,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0,
+        0,
+        0.2
+      ],
+      "lumaShare": 0.45,
+      "edgeShare": 0.38,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    },
+    "subscribeonandroid": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.47,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        -0.1,
+        0,
+        0
+      ],
+      "lumaShare": 0.34,
+      "edgeShare": 1,
+      "fit": {
+        "tx": 0,
+        "ty": -0.0156,
+        "s": 1
+      }
+    },
+    "neuecast": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.41,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0.1,
+        0,
+        0.1
+      ],
+      "lumaShare": 0.66,
+      "edgeShare": 0.08,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      }
+    }
+  }
+}

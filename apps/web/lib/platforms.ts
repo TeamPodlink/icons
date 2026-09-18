@@ -24,7 +24,25 @@ export interface GlassBundle {
    *  --write). null when unmeasured (no flat, or snapshot predates the
    *  bundle). Drives the dev-only "Drift" sort. */
   drift: number | null;
+  /** What the drift IS, from the committed apps/web/lib/drift-diagnosis.json
+   *  snapshot (pipeline/audit-drift-diagnosis.mjs --write): primary cause
+   *  plus every cause that fired — material | artwork | plate | registration
+   *  | geometry | shading, or floor when central <= 5. null when
+   *  undiagnosed. Drives the dev-only "drift: …" lenses. */
+  diagnosis: { primary: DriftCause; causes: DriftCause[] } | null;
 }
+
+export type DriftCause =
+  | "material" | "artwork" | "plate" | "registration" | "geometry" | "shading" | "floor";
+/** Lens label per cause, in the order the worklist should be read. */
+export const DRIFT_LENSES: Record<Exclude<DriftCause, "floor">, string> = {
+  registration: "drift: registration",
+  plate: "drift: plate",
+  geometry: "drift: geometry",
+  artwork: "drift: artwork",
+  shading: "drift: shading",
+  material: "drift: material",
+};
 
 export interface Platform {
   id: string;
@@ -166,6 +184,10 @@ export function debugCategories(p: Platform, b: GlassBundle | null): string[] {
   const cats: string[] = [];
   if (b) {
     if (!b.hasDark && b.darkStatus !== "native") cats.push("missing dark");
+    // Drift worklists by method (bundle-level): every cause that fired,
+    // so a pair that is both mis-registered and off-plate shows in both.
+    for (const cause of b.diagnosis?.causes ?? [])
+      if (cause !== "floor") cats.push(DRIFT_LENSES[cause]);
   }
   if (p.rasterFacets.length > 0) cats.push("raster elements");
   if (!p.hasFlat) cats.push("missing flat");

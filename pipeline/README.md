@@ -4294,3 +4294,46 @@ frame 13.36, maskΔ 1.8%, meanΔ −3.4/−6.0/−8.1, glass 1/2+s. The earlier
 one layer, where the ledger's band starts. hasDark stayed true from
 build-assets; dark-status audit not run. Scratch artefacts (all candidate
 bundles, sheets, NOTES.md) lived in the session scratchpad `rss-glass/`.
+
+## Drift diagnosis: the worklist split by method (2026-09-18)
+
+`pipeline/audit-drift-diagnosis.mjs` reads the audit's `--json` rows, the
+`--sheets` triptychs and `fit-flat-glyph.mjs`'s transforms, and files every
+pair above the 5 floor under the method that would move it, into the
+committed `apps/web/lib/drift-diagnosis.json` (build-data merges it; six
+dev-only lenses `drift: registration | plate | geometry | artwork | shading
+| material` read it). Signals and thresholds: glass layers > 0 → material
+(and nothing else — the sheen confounds every other signal); ≥ 15% of crop
+pixels over 40 → artwork; a channel mean ≥ 3/255 → plate; a fit offset
+≥ 0.08 units or scale ≥ 0.8% → registration; ≥ 50% of the residual energy
+within 2 px of the flat's own colour edges, with none of the above →
+geometry; the rest → shading. A pair can carry several causes; the lens
+shows it under each.
+
+Today (73 pairs; 43 at the floor):
+
+| method | pairs | members (central) |
+| --- | --- | --- |
+| registration | 3 (+4 secondary) | playapod 26.03, podcastparrot 13.87, listennotes 10.59; also globalplayer, playerfm, castbox, spreaker |
+| plate | 7 | playerfm 23.28, castbox 22.62, audible 20.68, spreaker 16.42, podbean 12.51, pocketcasts 7.56, antennapod 5.77 |
+| geometry | 9 | podcastapp 22.70, anytimeplayer 19.19, fountain 17.95, podverse 13.13, snipd 8.33, iheartradio 6.11, hark 5.26, pandora 5.18, soundcloud 5.17 |
+| artwork | 1 | globalplayer 34.65 |
+| shading | 0 | — |
+| material | 8 | apple 55.32, moonfm 39.10, icatcher 26.67, castamatic 25.67, sodes 24.67, podcastrepublic 14.89, overcast 10.99, rss 9.59 |
+
+Two readings to keep in mind. `fit-flat-glyph` could not isolate a glyph
+for audible, anytimeplayer, fountain, podcastrepublic and iheartradio
+(their marks touch the plate palette), so their registration is
+unmeasured, not zero — run `refine.mjs` on them before trusting
+"geometry". And podcastparrot's 1.52-unit fit is the instrument reading
+the bird's plate-coloured chest as glyph; its flat is already registered
+(ledger, "Vector flat facet").
+
+Priority, by expected drift removed per unit of work: registration first
+(a measured transform, minutes each, and it unlocks vector swaps —
+playapod alone is 26), then plate (a per-row median refit off the shipped
+raster; playerfm/castbox/spreaker carry both), then geometry (primitive
+measurement, downcast-style, an hour each), then globalplayer (a redraw
+from its glossy artwork), and material last — it is the metric, not the
+flats: the right move there is a material-off score, the same bundles
+rendered with glass/specular disabled, so the lens measures artwork alone.
