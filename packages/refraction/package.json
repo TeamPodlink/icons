@@ -1,6 +1,6 @@
 {
   "name": "@podlink/refraction",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "Render staging + release-tag holder for the Liquid Glass rasters. build-assets.mjs renders into assets/; upload-assets.mjs publishes them to R2 (assets.icons.podlink.com) under this version as an immutable release prefix. Not published to npm.",
   "license": "MIT",
