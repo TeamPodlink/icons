@@ -4,6 +4,7 @@
   "url": "https://www.iheart.com",
   "added": "2023-02-06",
   "guidelinesUrl": "https://brand.iheart.com/podcastlogo",
+  "flatSource": "official",
   "liquidGlass": {
     "bundles": [
       {
@@ -11,7 +12,7 @@
         "title": "iHeartRadio",
         "variant": null,
         "file": "iHeartRadio.icon",
-        "source": "appstore-artwork-split",
+        "source": "official-svg",
         "appStoreId": 290638154,
         "hasDark": true
       }

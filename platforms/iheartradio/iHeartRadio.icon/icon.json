@@ -65,26 +65,9 @@
       },
       "layers": [
         {
-          "image-name-specializations": [
-            {
-              "value": "glyph.png"
-            },
-            {
-              "appearance": "dark",
-              "value": "glyph-dark.png"
-            }
-          ],
+          "image-name": "glyph.svg",
           "name": "glyph",
-          "glass": false,
-          "opacity-specializations": [
-            {
-              "value": 1
-            },
-            {
-              "appearance": "dark",
-              "value": 1
-            }
-          ]
+          "glass": false
         }
       ]
     }
