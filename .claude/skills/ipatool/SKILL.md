@@ -7,7 +7,11 @@ description: Source a platform's icon artwork from the real shipped app — iOS 
 
 House rule: platform artwork comes from **decanted `.icon` bundles or
 official App Store artwork mined from the app's own asset catalog** —
-never from agent-authored SVG recreations. The app itself is the
+never from agent-authored SVG recreations. A shipped RASTER layer may
+still be replaced by a vector (an official vector, or a measured drawing)
+when ictool renders the two within the same-artwork band in both
+appearances — "no measurable loss", pipeline/README.md rule entry of
+2026-09-18; the raster is the reference, the vector ships. The app itself is the
 ground truth for what its icon "really" is; always inspect it before
 assuming a platform is flat.
 

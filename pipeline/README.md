@@ -944,7 +944,8 @@ dark). hasDark 53→57 of 70; the "missing dark" lens falls 10→6
 
 The six light-only bundles worked through, in the order genuine
 shipped dark art > derived split > official vector rebuild > bounded
-verdict. Fresh IPA mining first (ipatool): Castbox 10.31.0 and iHeart
+verdict (amended 2026-09-18: a vector that reproduces a shipped raster
+with no measurable loss — see the rule entry — replaces it). Fresh IPA mining first (ipatool): Castbox 10.31.0 and iHeart
 10.66.0 both ship no IconImageStack and no UIAppearanceDark rendition
 — their 1024 marketing icons are pixel-identical (maxdiff 0) to the
 committed appstore artwork, and "tinted" renditions are byte-identical
@@ -5681,3 +5682,25 @@ diagnosis `floor`. validate ✓ 73/73, icons tests 276 ✓. Sheet
 arcs with a concentric fit per primitive and never mix a radius with a
 centre it was not fitted with; validate the instrument on a render of
 known geometry before believing a decomposition.
+
+## Rule: a raster layer may be replaced by a vector when the loss is not measurable (2026-09-18)
+
+Amends the precedence "shipped dark art > derived split > official vector
+rebuild" and the raster-elements lens's reading of decanted bundles. The
+developer's shipped layers are the reference, not the deliverable: when
+a vector reproduces a shipped raster layer with no measurable loss, the
+vector ships and the raster stays in git history. "No measurable loss"
+is a bar, not a judgement — render both bundles through ictool at 512 in
+Default and Dark (same group material, same canvas), score the central
+60% crop RMSE and the share of pixels over 24/255, and the vector passes
+when it sits inside the same-artwork band the ledger measured for
+raster-recreated marks (central ≤ 5) with an edge-only residual (the
+>24 pixels confined to a 1–2 px rim, no interior region). Colour is read
+per pixel class (plate / mark / highlight) before deciding, so a gloss or
+a painterly texture that the vector cannot carry is a measured fail, not
+an assumption. Applies to decanted PNG layers (pocketcasts, castamatic,
+moonfm, podcastparrot) as much as to store artwork; official vectors and
+measured drawings both qualify as the replacement, tracing by eye does
+not. Dark is scored against the developer's dark rendition, whatever
+form the vector needs to reach it (auto-tint, layer fill, dark-only
+plate layer).
