@@ -5816,3 +5816,224 @@ current dark | candidate dark | 4×diff, ictool at 512):
 The other three decanted PNG bundles (castamatic, moonfm, podcastparrot)
 were assessed the same way; their verdicts are in "castamatic and
 moonfm: decanted PNG layers replaced under the loss bar" below.
+
+### globalplayer: the official mark from the site sprite (2026-09-18)
+
+The 2026-09-14 line above ("globalplayer.com's sprite is loaded
+externally — no vector to swap in") was wrong on both counts: the sprite
+is inline, and the maintainer extracted two marks from it —
+`global-player-icon-white.svg` (viewBox 0 0 38 40, three white paths:
+the body with the g knocked out of the play triangle, the g's counter
+dot, the right wedge — the App Store form) and `global-player-icon.svg`
+(30×30, a Sketch export: the triangle in `#19C6FC → #1D69F1` with a
+white g, the colour reference). And the line's other premise, the
+"glossy triangle", was a misreading: **`light.png`'s mark is
+(255,255,255) at every pixel** (p1/p10/p50/p90/max = 255 in all three
+channels over 50,698 sampled mark pixels; rmse vs pure white 0.00). The
+34.65 was the plate — the old flat's `display-p3 .098 .894 .992` cyan
+converts to sRGB with R clipped to 0 against a raster whose R runs
+15–55 (`plateSigned` +34.3) — plus registration. The master is
+`light.png` pixel for pixel in the central crop (rmse 0.51, max 3): the
+layer sat at scale 1.
+
+**Same cut.** The sprite Chrome-rendered at 2560 in a 40-unit frame and
+box-filtered (summed-area table) against the raster's silhouette at
+1024 (R ≥ 128 on `light.png`): bbox seed `scale 0.60057`, aspectD
+**0.01%**; IoU hill-climb (0.1/1% → 0.002/0.025%) **0.9989** (soft
+0.9953) at **`translate(4.649 4.014) scale(0.60057)`**, 249 raster-only
+/ 11 mark-only pixels (the raster's half-covered edge pixels along the
+left and top edges — 3×3 cells 60/32/1, 40/57/5, 33/21/0); a
+non-uniform fit moves nothing (aspectD 0.00%). `dark.png`'s alpha
+silhouette: IoU **0.9996** at `translate(4.647 4.014) scale(0.60057)` —
+the same mark at the same placement (56 / 30 px). So the official vector
+IS the App Store cut, to the pixel.
+
+**Plate: a two-lobe vignette, not a ramp.** `light.png` has B = 255
+everywhere; R and G are a cyan plateau (55,175,255) over the top-left
+quadrant (rows 4–256 of the left band, cols 4–256 of the top band are
+constant), deep blue at the top-right (15,120,255, constant down rows
+4–256 of the right band), a second, smaller cyan lobe at the
+bottom-right (42,159 at col 864 of the bottom band, the right band
+rising to 36,158 by row 919) and a dark trough at bottom-centre-left
+(37,94 at col 384 of the bottom band). Per-row medians, left band
+48–96 / right band 928–976: rows 4/512/1019 read 55,175 / 45,151 /
+38,107 and 15,120 / 21,132 / 35,154 — the two sides move in OPPOSITE
+directions, so no vertical model exists. Least-squares planes: R rms
+8.3, G rms 21.3; the 1-D profile along the plane's own direction has a
+within-iso-line sd of up to 27/255. Best 1-D models (LS K-stop on the
+hat basis, angle search 0–180°, scored on the audit's central-crop
+plate pixels; "all" = every plate pixel):
+
+| model | central | all |
+| --- | --- | --- |
+| solid mean `#258CFF` | 10.70 | 14.91 |
+| vertical 2-stop `#229AFF → #277DFF` (greedy@2: 20 stops, 9.10) | 10.72 | 13.89 |
+| horizontal 2-stop / 45° 2-stop | 10.49 / 11.15 | 13.99 / 13.77 |
+| best 2-stop at any angle (142°) `#1496FF → #3985FF` | 9.72 | 14.17 |
+| K = 3 at 126° | 5.55 | 9.40 |
+| **K = 5 at 127°** | **4.59** | 9.04 |
+| K = 8 at 131° | 4.32 | 8.82 |
+| greedy@2 on bin medians at 134° (16 zig-zag stops) | 3.78 | 9.54 |
+
+Adopted the K = 5 fit — `#096EFF → #1987FF → #2FA9FF → #266CFF →
+#276CFF` on `userSpaceOnUse (11.59,−15.38) → (−15.38,20.41)` (the
+corner-to-corner extent along 127°; the iso-lines run TL → BR, so the
+two cyan lobes become one diagonal band with deep blue in the TR and BL
+corners). The greedy stops were not taken: they chase the lobes'
+projection through the g's holes (`#2662FF | #2762FF | #2776FF` within
+16 px). Stop law: no-op (green floor ≈ 50/255 against G 108–169). What
+would close the rest is a two-centre radial, which is neither vertical
+nor diagonal — recorded, not built.
+
+**`dark.png` is a different composition.** Transparent canvas (820,308
+px α = 0, 224,682 α = 255, 3,586 partial) with the same silhouette
+painted by a 2-D glow: per-path medians through Chrome masks (eroded
+4 px) body **(117,192,255)**, counter (124,192,254), wedge
+**(86,176,250)** — against (255,255,255) for all three in `light.png`.
+The paint is not a gradient: best 1-D line at 108° rms 16.3 (max 73),
+K = 3 at 39° 13.4, within-bin sd 18–31; it runs 63,113,255 at the
+top-left of the mark to 169,233,254 at the bottom-right tip, which is
+not the brand file's `#19C6FC → #1D69F1` either. No vector carries it.
+
+**Flat.** `icon.svg` in the house format, hex only: the 5-stop plate and
+the sprite's three paths verbatim under one
+`<g fill="#fff" fill-rule="evenodd" clip-rule="evenodd"
+transform="translate(4.649 4.014) scale(0.60057)">`; `flatSource:
+"official"`; the `globalplayer/icon.svg` block left `p3-allowlist.json`
+(no P3 triple remains). `fit-flat-glyph`: identity — 709 × 760 @
+(512.0, 511.5) on both sides, aspectD 0.00%. Drift against the App
+Store master: **34.65 → 3.50** (frame 14.35, meanΔ −1.1/−2.2/+0.0, luma
+100%, 0% > 40). Decomposed at 256 by the flat's mark coverage: mark
+45.1% of the crop, rmse **0.12**, 0% of the energy; edge 3.6%, 3.64, 4%;
+plate 51.3%, **4.80, 96%** (quadrants TL 4.4 mean +2.4/+0.6, TR 5.1
+−4.4/−4.4, BL 5.1 −1.4/−7.0, BR 4.4 −2.9/−4.8). The residual above the
+floor is entirely the vignette against the diagonal; there is no gloss
+term.
+
+**Badge.** The old badge was bare (a hand-drawn gradient triangle +
+white g on nothing, viewBox `8 8 24 24` — the colour file's form). Kept
+bare, now the colour file's two paths verbatim with its own
+objectBoundingBox gradient (`#19C6FC → #1D69F1`), registered to the
+icon's mark: the colour triangle against the white mark's OUTER
+silhouette (a 44-px morphological closing fills the knock-out, which
+opens to the triangle's edge and leaks a flood fill — IoU read 0.73
+before the closing) gives **IoU 0.9726**, aspectD 2.02%, at
+`translate(.726 .879) scale(1.00644)` around its own `translate(4 3)`;
+its white g vs the sprite's knock-out IoU 0.845 — a coarser
+two-decimal cut of the same mark, fine for a 24-px pill, not for the
+icon. viewBox = bbox + 2% = `4.515 3.532 22.792 24.925`; the def id is
+`globalplayer-unmasked__a` (the parity test re-prefixes on that pattern
+— `-badge__a` failed it).
+
+**Bundle.** `build-svg-icons --only globalplayer`: `flat-svg` at 2.40
+against Chrome, split refused ("5 stops (need 2)"). Hand-built in the
+castbox form with the shipped dark kept the hark way: `Assets/plate.svg`
+(the 5-stop diagonal on a full 32 rect, scale 32, `glass: false`,
+opacity `{1, dark 0}`) under `Assets/icon.svg` — the bare white mark
+authored in a **1024 viewBox** (`<g transform="scale(32)">` around the
+flat's wrapper) so that it shares `dark.png`'s natural size on ONE layer:
+`image-name-specializations [{icon.svg}, {dark: dark.png}]` with the
+`{1, dark 1}` guard, no position; canvas default
+`srgb:0.14510,0.54902,1.00000` (the raster plate's mean 37,140,255) with
+the gray dark pin; `appStoreId 1142951331` restored, `hasDark` true;
+`light.png` gone. Source **`flat-svg-split+appstore-dark`**: the
+validator's `SVG_LAYER_SOURCES` rule rightly refuses `flat-svg-split` on
+a bundle holding a PNG, and the label keeps `--split-existing` from
+regenerating it (which would drop the dark asset). Probed at 512 against
+the old bundle's own ictool renders:
+
+| form | Light vs old Default | Dark vs old Dark |
+| --- | --- | --- |
+| **A** one layer, SVG@1024 + dark.png specialization | central 3.28 (plate 4.03, mark 0.10; frame 6.69, 88 px > 24) | **0.00** (byte-identical) |
+| B twin layers, `icon.svg`@32 `{1, dark 0}` + `dark.png` `{0, dark 1}` | identical to A (0.00) | identical to A (0.00) |
+| C no dark asset (the castbox form verbatim, auto-tint) | as A | central **32.21** (mark 47.1): a solid `#258CFF` mark where the app ships a glow |
+
+A ≡ B settles a small law: an SVG whose viewBox equals the raster's
+pixel size renders at natural size exactly as the scale-32 form, so
+mixed SVG/PNG per-appearance assets can share a layer.
+
+**After `build-assets --only globalplayer`.** Drift vs the rebuilt
+master **0.78** (frame 11.69, meanΔ −0.4/+0.1/+0.0, luma 60%, 0% > 40,
+0/2 glass); zones: mark 0.11, edge 3.16 (59% of the energy — the
+flat-svg floor's antialiasing term), plate 0.69; fit identity;
+diagnosis **floor** (edgeShare 0.70, plateRmse 0.66). `facet-drift.json`
+34.65 → 0.78 and the `drift-diagnosis.json` entry replaced in place
+(another session's concurrent pocketcasts edits in both files left
+untouched). validate ✓ 73/73; icons suite 276 ✓. Files:
+`platforms/globalplayer/{icon.svg, badge.svg, meta.json,
+GlobalPlayer.icon/{icon.json, Assets/{plate.svg, icon.svg, dark.png}}}`,
+`pipeline/p3-allowlist.json`. Sheet (old light | new light | old dark |
+new dark | flat under the house mask | badge pills):
+`scratchpad/globalplayer-work/globalplayer-review.png`; instruments
+`globalplayer-work/{samecut,plate,platemodel,kstops,darkpaint,badgereg,
+gen-flat,zones,build-bundle,sheet}.mjs`.
+
+Rules worth keeping: (1) measure the mark's own pixels before filing a
+residual under material — a "gloss" that is 255 everywhere is a plate
+problem; (2) a white official mark still satisfies a bare badge form
+when the developer also publishes the coloured form — use that file,
+not a plate; (3) an "outer silhouette" flood fill leaks through any
+knock-out that reaches the edge — close it morphologically (exact on a
+convex mark); (4) a plate that reads differently at the two sides of
+the same row is a vignette, and the best 1-D model is a K-stop least
+squares at a fitted angle, never greedy stops on projected medians.
+
+**Follow-up, same day: fully vector, Dark included.** The maintainer's
+reading — both appearances are the one knocked-out play mark, Dark
+paints it with a blue glow instead of white — was taken to the loss bar
+("a raster layer may be replaced by a vector when the loss is not
+measurable"): `dark.png`'s 224,682 opaque mark pixels at 1024 (2×2
+subsample, 56,224) fitted by least squares over stop colours with the
+geometry searched, each model then written as an `icon-dark.svg` twin
+(image-name-specializations on the mark layer, `{1, dark 1}` guard,
+the canvas's gray dark pin), rendered by ictool at 512 and scored
+against the shipped `dark.png` rendition (both ictool, same coding):
+
+| model | fit rms (mark px) | central | frame | >24 px | ictool vs Chrome on the twin |
+| --- | --- | --- | --- | --- | --- |
+| (a) linear 2-stop, 107.5° `#4080FD → #AFFFFE` | 16.27 (max 73) | 12.18 | 7.77 | 7,987 | 1.03 |
+| (a) linear 3-stop, 31.5° | 14.55 | 10.19 | 7.01 | 5,818 | 0.96 |
+| (b) radial 2-stop, c (324,818) R 691 | 13.31 | 10.26 | 6.46 | 3,814 | 1.02 |
+| (b) radial 3-stop, c (330,835) R 686 | 13.05 | 10.13 | 6.34 | 3,772 | 1.02 |
+| (c) linear + one radial highlight | 6.97 (max 32) | 11.91 | 7.64 | 9,851 | **3.28** (Δ G +2.7: its `#0000E9` stop hits the CoreSVG green floor) |
+| (c) linear + two lobes (seeded BL corner / right tip) | 7.00 (max 31) | 6.18 | 4.09 | 676 (all edge) | 1.03 |
+| **(c) linear + three lobes** | **3.80 (max 23)** | **4.58** | **3.05** | 819 (**all edge**, 0 interior) | 1.06 |
+
+The paint is not one glow: a deep-blue band across the top of the body,
+a cyan lobe at the triangle's bottom-left corner, a second bright lobe
+at the right tip and a darker pocket right of the g — which is why the
+single-family models sit at 13–16 and a single highlight degenerates
+into a darkening blob (the (c) row: the LS put its "highlight" at
+(1143,883) in `#0000E9`). Adopted **linear 73.5° `#4969FF → #3ABFFA`
++ lobe `#C1F6FF` c (326,906) R 694 + lobe `#2A88F5` c (853,489) R 386
++ lobe `#9FD6FF` c (572,374) R 200** (each lobe a `radialGradient`
+with the same colour at both stops, `stop-opacity` 1 → 0, the mark
+painted four times in that order; all coordinates ÷32 and unwrapped
+through the registration into path units). Bar: central **4.58 ≤ 5**;
+the 819 px over 24 are every one within 2 px of the mark's silhouette —
+the raster's soft alpha against the vector edge, the same edge term
+castbox recorded — and on the interior paint the residual is rmse
+3.82, max 15.4, 96% of pixels within 8/255. ictool reproduces the SVG
+(1.06 vs Chrome on the mark, Δ 0.0/0.1/0.2): the stop law is a no-op on
+these stops (lowest green `#2A88F5` = 0.24 linear against a floor of
+0.03), which the single-highlight row confirms by contrast. A layer
+`fill-specializations` gradient was not used: it ramps as a smoothstep
+over the alpha bbox and could not hold the three lobes; the SVG
+gradient is the orientation-true form. Visually the new Dark is the
+old Dark (4× |diff| faint, edge-only).
+
+Shipped: `GlobalPlayer.icon` = `plate.svg` `{1, dark 0}` + one mark
+layer `icon.svg` (the bare white mark, 32 viewBox at scale 32) /
+dark `icon-dark.svg` with the guard; `dark.png` deleted; source
+**`flat-svg-split`**; `appStoreId` and `hasDark` kept. `badge-dark.svg`
+= the same knocked-out mark with the same four paints on `badge.svg`'s
+viewBox (`4.515 3.532 22.792 24.925`), so the dark pill shows the g
+open onto the black pill; `badge.svg` stays bare with the official
+light gradient; both pills render through the static generator and the
+parity test (276 ✓). `build-assets --only`, audit vs the rebuilt master
+**0.78** (Light unchanged; frame 11.69, fit identity), diagnosis
+**floor**, both JSON entries replaced in place again; validate ✓ 73/73.
+Sheet (old dark | new dark | 4× |diff| | badge light | badge dark):
+`scratchpad/globalplayer-work/globalplayer-review-dark.png`;
+instruments `globalplayer-work/{darkfit,render-cands,ship-vector,
+sheet-dark}.mjs`, candidates `cand-*.svg` / `cand-*-Dark-512.png`.
