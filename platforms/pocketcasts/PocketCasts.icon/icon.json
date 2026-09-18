@@ -51,22 +51,6 @@
   "groups": [
     {
       "hidden": false,
-      "layers": [
-        {
-          "image-name": "Group 1.png",
-          "name": "Group 1",
-          "opacity-specializations": [
-            {
-              "value": 1
-            },
-            {
-              "appearance": "dark",
-              "value": 0
-            }
-          ],
-          "glass": false
-        }
-      ],
       "shadow": {
         "kind": "neutral",
         "opacity": 0.5
@@ -77,37 +61,38 @@
       "translucency": {
         "enabled": true,
         "value": 0.5
-      }
-    },
-    {
-      "hidden": false,
+      },
       "layers": [
         {
-          "image-name": "dark 3.png",
-          "name": "dark 3",
+          "image-name-specializations": [
+            {
+              "value": "icon.svg"
+            },
+            {
+              "appearance": "dark",
+              "value": "icon-dark.svg"
+            }
+          ],
+          "name": "icon",
+          "glass": false,
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          },
           "opacity-specializations": [
             {
-              "value": 0
+              "value": 1
             },
             {
               "appearance": "dark",
               "value": 1
             }
-          ],
-          "glass": false
+          ]
         }
-      ],
-      "shadow": {
-        "kind": "neutral",
-        "opacity": 0.5
-      },
-      "blend-mode": "normal",
-      "lighting": "individual",
-      "specular": true,
-      "translucency": {
-        "enabled": true,
-        "value": 0.5
-      }
+      ]
     }
   ],
   "supported-platforms": {

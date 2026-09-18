@@ -5704,3 +5704,115 @@ measured drawings both qualify as the replacement, tracing by eye does
 not. Dark is scored against the developer's dark rendition, whatever
 form the vector needs to reach it (auto-tint, layer fill, dark-only
 plate layer).
+
+
+### pocketcasts: PNG layers vs the official vector under the loss bar (2026-09-18)
+
+First application of the rule above. The decanted `PocketCasts.icon`
+carried two rasters in two identical groups (specular on, translucency
+0.5, neutral shadow 0.5, `glass: false`, opacity-specialized `{1, dark
+0}` / `{0, dark 1}`), over the untouched default `srgb:0,0.533,1` canvas.
+Measured before anything was built:
+
+**What the PNGs hold.** `Group 1.png` (1024², RGBA, untagged) is plate
+AND mark in one raster: every plate pixel outside the mark (dilated
+2–6 px) is exactly 244,62,55 = `#F43E37` (0 off-colour pixels of
+817,747); the silhouette is a rounded square, corner radius 95.75 px
+(r = 3 at 32, circle fit rms 1.9 px), 0.71% of the frame transparent at
+the corners — all of it outside ictool's 311-px superellipse mask.
+`dark 3.png` (gray+alpha) is the SAME mark on a solid `#000000` plate:
+alpha channels byte-identical, mark pixels byte-identical (max |Δ| 0 over
+188,019 core pixels), plate 0 on every pixel outside the mark's own
+antialiasing. Bbox-registered silhouette IoU light-mark vs dark-mark is
+therefore 1.0 by construction; the earlier per-plate-colour read of
+0.39 was the instrument reading alpha on a file whose plate is opaque
+black. **The mark is not white.** Through a Chrome mask of the flat's
+glyph (eroded 3 px) it reads median 242, min 235, max 255, only 1% of
+pixels at 255 — and the shading is a single vertical line,
+`gray = 230.93 + 0.02779·y` at 1024 (least squares over 188k pixels,
+rms residual 0.47 against a raw std of 5.39; the x coefficient is
+−0.00002). 235 at the top of the mark (row 145), 255 from row 866 down.
+So the 4/255 entry's "neutral light gray on the master (235 at the top
+of the ring, 239 mid, 246 left)" was the PNG's own ramp, not the
+material's doing; the material's whole contribution on the mark is the
++1 it also lifts the plate by.
+
+**Two official vectors, one drawing.** The flat's glyph (the tiny badge's
+"Glyph" group, 10.8333 box) and the web player's large badge
+(`https://static.pocketcasts.com/webplayer/assets/pocketcasts_large_light-CWxmettN.svg`,
+220 × 80, roundel `Fill-23` #F43E37 + `Glyph---White`, 37 box) are the
+same path at scale 3.41538: every ratio matches (outer inner-radius
+0.875, disc 0.8, hole 0.6909, stroke 0.125, inner-ring hole 0.3818) and
+the two rendered at the flat's placement by Chrome at 1024 differ by
+**0 pixels** (XOR). Both score silhouette IoU **0.9943** against
+`Group 1.png`'s mark (bbox 145–878 on both, the flat's placement
+`translate(4.5319 4.5319) scale(2.11730)` already the fit), so the
+badge adds provenance, not geometry: the flat and `badge.svg` are
+unchanged.
+
+**The candidate.** `Assets/icon.svg` = the r-3 rounded square in
+`#F43E37` + the official path at the flat's placement, filled with
+`linearGradient` objectBoundingBox `#EBEBEB → #FFFFFF @ .9839` (the fitted
+line sampled at the mark's bbox: 234.96 at row 145, 255 at row 866;
+neutral stops are untouched by the CoreSVG stop law, whose floor and
+span act on green relative to R and B). `Assets/icon-dark.svg` = the
+same with a `#000000` plate — the shipped dark plate is not a canvas
+value (hark: the Dark canvas cannot be set) and not the standard ramp,
+so it rides the dark layer. One layer, image-name-specializations +
+the `{1, dark 1}` guard, in the decanted group with its material
+verbatim; the canvas is untouched (still covered). The two-group
+decanted form with the same SVGs renders **byte-identical** to it in
+both appearances (A1 vs A2, 512²), so the house form ships.
+
+**Scored at 512, ictool vs ictool, both sides the same coding** (central
+= rows/cols 102–409 over gray, classes from a Chrome mask of the flat's
+glyph: mark = eroded 2 px, edge = ±2 px band, plate = the rest):
+
+| appearance | central | frame | px > 24 in crop | plate RMSE | mark RMSE (max) | edge±2 RMSE | >24 beyond ±1 px |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Default | **1.70** | 1.31 | 132 (0.14%) | **0.00** | 0.67 (2) | 5.25 | **0** |
+| Dark | **2.72** | 2.12 | 334 (0.35%) | **0.00** | 0.72 (3) | 8.54 | **0** |
+
+Signed means 0.00/0.01/0.02 (Default) and −0.03 ×3 (Dark); plate exact
+to the byte, mark within 3/255 everywhere, every pixel over 24 inside
+one pixel of the mark's boundary (CoreSVG's antialiasing against the
+PNG's). PASS on both appearances. For the record, the coordinator's
+literal form (plate lifted into the canvas as `srgb:.95686,.24314,.21569`,
+mark on its own layer, black plate on a dark-only layer) also passes —
+central **1.79** / 2.72 — with the same mark and edge, but its light
+plate loses the material's +1 (plate RMSE 0.74, signed −0.93 R) where
+the full-bleed layer is exact: that layer IS the PNG's silhouette, so
+the group's material lands on it identically. Dark is the same render
+either way (the black plate is a layer in both).
+
+**Trap on the way (measured, not to be redone).** A `userSpaceOnUse`
+gradient's coordinates live in the user space of the element that
+references it — under the glyph's `<g transform="translate(4.5319
+4.5319) scale(2.1173)">`, root-space `y1=0 y2=27.069` is read as glyph
+space, and the mark rendered a uniform **−8.6/255** (RMSE 8.99, central
+6.10 / 6.54 — an interior fail, not an edge one). CoreSVG and Chrome
+agree on this; it is the spec. Divide root coordinates through the
+placement (`y1=−2.1404 y2=10.6444`) or use objectBoundingBox — both
+score 0.67 on the mark. A solid `#F2F2F2` mark scores 5.18 (max 12), a
+`#fff` one 12.06 (+10.9 signed): the ramp is the difference between
+passing and not, and only the measured line passes.
+
+**Shipped.** `Group 1.png` and `dark 3.png` left the repo; source
+`decanted` → `official-svg` (the layer is the official vector; the
+decanted stack is this bundle's git history). `build-assets --only
+pocketcasts` (+dark), icons build, `validate.mjs` 73/73.
+`audit-facet-drift --only pocketcasts --sheets`: **7.56 → 7.41**
+central, frame 12.33, maskΔ 1.8%, meanΔ −3.8/−4.2/−4.2, luma 99%, 0%
+over 40, `0/1+s`; `fit-flat-glyph` 734 × 734 @ (511.5, 511.5) on both
+sides, `translate(0 0) scale(1.0)`, aspectD 0.00%. The 4/255 remains
+the flat's `#fff` against the ramp the app paints (mean 243.5) plus the
+material's +1 on the plate; diagnosis stays `material` (the tool now
+derives it itself: edgeShare 0.31, plateRmse 0.58). `facet-drift.json`
+and `drift-diagnosis.json` updated in place; icons suite green on every
+pocketcasts case. Sheet (current light | candidate light | 4×diff |
+current dark | candidate dark | 4×diff, ictool at 512):
+`scratchpad/pocketcasts-vector/review-sheet.png`.
+
+The other three decanted PNG bundles (castamatic, moonfm, podcastparrot)
+were assessed the same way; their verdicts are in "castamatic and
+moonfm: decanted PNG layers replaced under the loss bar" below.
