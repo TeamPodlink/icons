@@ -1,36 +1,10 @@
 {
   "fill": {
-    "linear-gradient": [
-      "srgb:1.00000,0.56471,0.30196,1.00000",
-      "srgb:1.00000,0.38824,0.17647,1.00000"
-    ],
-    "orientation": {
-      "start": {
-        "x": 0.5,
-        "y": 0
-      },
-      "stop": {
-        "x": 0.5,
-        "y": 1
-      }
-    },
+    "solid": "srgb:1.00000,0.47647,0.23725,1.00000",
     "fill-specializations": [
       {
         "value": {
-          "linear-gradient": [
-            "srgb:1.00000,0.56471,0.30196,1.00000",
-            "srgb:1.00000,0.38824,0.17647,1.00000"
-          ],
-          "orientation": {
-            "start": {
-              "x": 0.5,
-              "y": 0
-            },
-            "stop": {
-              "x": 0.5,
-              "y": 1
-            }
-          }
+          "solid": "srgb:1.00000,0.47647,0.23725,1.00000"
         }
       },
       {
@@ -65,31 +39,28 @@
       },
       "layers": [
         {
-          "image-name-specializations": [
-            {
-              "value": "glyph.png"
-            },
-            {
-              "appearance": "dark",
-              "value": "glyph-dark.png"
-            }
-          ],
-          "name": "glyph",
+          "image-name": "icon.svg",
+          "name": "icon",
           "glass": false,
-          "opacity-specializations": [
-            {
-              "value": 1
-            },
-            {
-              "appearance": "dark",
-              "value": 1
-            }
-          ]
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
         },
         {
-          "image-name": "background.png",
-          "name": "background",
+          "image-name": "plate.svg",
+          "name": "plate",
           "glass": false,
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          },
           "opacity-specializations": [
             {
               "value": 1

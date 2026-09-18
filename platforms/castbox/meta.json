@@ -12,7 +12,7 @@
         "variant": null,
         "file": "Castbox.icon",
         "hasDark": true,
-        "source": "appstore-artwork-split"
+        "source": "flat-svg-split"
       }
     ]
   }
