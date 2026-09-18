@@ -59,13 +59,13 @@
       "hidden": false,
       "layers": [
         {
-          "image-name": "top.png",
+          "image-name": "top.svg",
           "name": "top",
           "position": {
-            "scale": 1.0,
+            "scale": 32,
             "translation-in-points": [
-              30.0,
-              -211.0
+              0,
+              0
             ]
           },
           "opacity-specializations": [
@@ -88,13 +88,13 @@
           ]
         },
         {
-          "image-name": "top_red.png",
+          "image-name": "top_red.svg",
           "name": "top_red",
           "position": {
-            "scale": 1.0,
+            "scale": 32,
             "translation-in-points": [
-              30.0,
-              -211.0
+              0,
+              0
             ]
           },
           "fill-specializations": [
@@ -153,13 +153,13 @@
       "hidden": false,
       "layers": [
         {
-          "image-name": "bottom.png",
+          "image-name": "bottom.svg",
           "name": "bottom",
           "position": {
-            "scale": 1.0,
+            "scale": 32,
             "translation-in-points": [
-              33.0,
-              209.0
+              0,
+              0
             ]
           },
           "opacity-specializations": [
@@ -182,13 +182,13 @@
           ]
         },
         {
-          "image-name": "bottom_red.png",
+          "image-name": "bottom_red.svg",
           "name": "bottom_red",
           "position": {
-            "scale": 1.0,
+            "scale": 32,
             "translation-in-points": [
-              33.0,
-              209.0
+              0,
+              0
             ]
           },
           "fill-specializations": [
@@ -247,13 +247,13 @@
       "hidden": false,
       "layers": [
         {
-          "image-name": "center.png",
+          "image-name": "center.svg",
           "name": "center",
           "position": {
-            "scale": 1.0,
+            "scale": 32,
             "translation-in-points": [
-              -106.5,
-              -2.0
+              0,
+              0
             ]
           },
           "opacity-specializations": [
@@ -268,13 +268,13 @@
           "glass": true
         },
         {
-          "image-name": "middle_red.png",
+          "image-name": "middle_red.svg",
           "name": "middle_red",
           "position": {
-            "scale": 1.0,
+            "scale": 32,
             "translation-in-points": [
-              -106.5,
-              -2.0
+              0,
+              0
             ]
           },
           "fill-specializations": [

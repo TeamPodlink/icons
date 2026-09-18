@@ -59,25 +59,25 @@
       "hidden": false,
       "layers": [
         {
-          "image-name": "Vector1.png",
+          "image-name": "Vector1.svg",
           "name": "Vector1",
           "position": {
-            "scale": 0.57466,
+            "scale": 32,
             "translation-in-points": [
-              -1.0,
-              14.0
+              0,
+              0
             ]
           },
           "glass": true
         },
         {
-          "image-name": "Vector2.png",
+          "image-name": "Vector2.svg",
           "name": "Vector2",
           "position": {
-            "scale": 0.57261,
+            "scale": 32,
             "translation-in-points": [
-              2.0,
-              13.0
+              0,
+              0
             ]
           },
           "glass": true

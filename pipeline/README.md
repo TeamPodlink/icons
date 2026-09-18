@@ -6037,3 +6037,144 @@ Sheet (old dark | new dark | 4× |diff| | badge light | badge dark):
 `scratchpad/globalplayer-work/globalplayer-review-dark.png`;
 instruments `globalplayer-work/{darkfit,render-cands,ship-vector,
 sheet-dark}.mjs`, candidates `cand-*.svg` / `cand-*-Dark-512.png`.
+
+### castamatic and moonfm: decanted PNG layers replaced under the loss bar (2026-09-18)
+
+Second and third applications of the rule; podcastparrot measured in the
+same pass and refused. Method as for pocketcasts: ictool at 512 of the
+decanted bundle (the reference) and the candidate, Default and Dark,
+same groups / materials / specializations / canvas, both composited over
+128 gray; central = rows/cols 102–409; classes from Chrome masks of the
+REGISTERED layer paths (mark = eroded 2 px, edge = ±2 px, plate = the
+rest), per-layer cores eroded 2 px; ">24 beyond ±k" counts residual
+pixels outside a ±k band around EVERY layer's own boundary, because a
+seam where one layer overlaps another is a layer edge the union mask
+does not see. The two decanted references re-rendered here are
+byte-identical (max |Δ| 0) to the earlier pass's, and the installed
+bundles render byte-identical to the scored candidates.
+
+**Registration** (`masks/registration.json`, the flat's paths against
+each PNG's silhouette at 1024, IoU hill-climb; px are 1024ths): castamatic
+top +2,+2; bottom +5,−4; center scale 1.005 with +4,−2 about (389.5,
+511.5) — carried as `translate(.0625 .0625)`, `translate(.15625 −.125)`
+and `translate(12.29688 15.92188) scale(1.005) translate(−12.17188
+−15.98438)` on a 32 viewBox at layer scale 32. moonfm Vector1 −1,−1;
+Vector2 +2,−2; the M 0,0.
+
+**castamatic — form R, shipped.** Six SVG layers in the decanted stack's
+three groups, every group material (specular, translucency 0.3,
+`blur-material 0.5`, neutral shadow 1 / 0.5), every opacity / glass /
+fill specialization and the canvas exactly as decant emitted them; only
+`image-name` and `position` changed (checked structurally before the
+copy). What each PNG measured as, and what replaced it:
+
+| layer | the PNG | the vector | core RMSE Default (max) | core RMSE Dark (max) |
+| --- | --- | --- | ---: | ---: |
+| top | flat (230,230,230) | `#E6E6E6` | 0.29 (2) | 0.67 (3) |
+| bottom | one plane, 255 clipping at the top-left to 231 at the tip | 2-stop `#FFFFFF → #E7E7E7` on the fitted line (10.5854,20.365) → (19.8144,28.5938) | 0.69 (6) | 0.69 (8) |
+| center | a horizontal ramp with a vertical darkening at both ends | 9-stop horizontal base `#FFFFFF F2 E7 E0 DD DD E1 E9 → #F5F5F5` over x 7.2745 → 17.7844 under a black overlay whose opacity ramps .2616 → .0004 (mid) → .2226 over y 9.1591 → 22.8096 | 1.85 (6) | 0.56 (3) |
+| top_red / bottom_red / middle_red | the dark twins, `#FFC2C4` / `#FFC2C4` / `#F7C2C5` | the same paths in those flats — decant's `fill-specializations` repaint them in Dark anyway | (in the Dark column) | |
+
+Whole-frame verdict, candidate vs decanted (px counts inside the crop):
+
+| appearance | central | frame | plate | mark | edge±2 | > 24 in crop | > 24 beyond ±2 / ±3 of any layer edge |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Default | **4.71** | 3.62 | 0.40 | 3.04 | 16.31 | 866 (0.91%) | 3 / **0** |
+| Dark | **4.26** | 3.51 | 0.32 | 2.40 | 15.26 | 977 (1.03%) | 1 / **0** |
+
+Signed means −0.06/−0.13/−0.13 and −0.13/−0.06/−0.10. PASS. Form L — the
+same bundle with the centre as ONE least-squares plane (`#EEEEEE →
+#9D9D9D` along (6.5535,9.2196) → (16.5829,8.3784)) — FAILS in Default at
+**7.34**: mark 8.06 (max 109), centre-only core **12.79** (max 32, 507 px
+over 24 — an interior fail, not a rim): the PNG's crescent brightens
+again toward its right tip and darkens toward both cusps, a gloss one
+linear gradient cannot hold. Dark passes either way (L 4.38, centre-only
+core 2.34, max 7, 0 px over 24: the centre layer sits at opacity 0.2
+under the red twin). Rule: a measured
+layer is a measured layer — fit the ramp the PNG actually carries, not
+the first plane that looks close.
+
+**moonfm — form C, shipped.** `Vector1.svg` (`#0000DA`) and `Vector2.svg`
+(`#FE1A86`) replace the two rasters in the glass group (material,
+`blend-mode-specializations` with the tinted `soft-light`, shadow 0.5
+verbatim); **`Layer_M_Template.png` stays a PNG** in its own group
+(`shadow kind: none`). Central **2.22 / 2.22**, frame 1.34 / 1.33, plate
+0.27 / 0.08, mark 1.06 / 1.10, edge±2 8.65 / 8.57, 344 / 356 px > 24 in
+the crop and **0 beyond ±2** of either vector's boundary; regions
+blue-only 0.21 / 0.21, pink-only 0.61 / 0.21, overlap 0.25 / 0.22. PASS.
+
+**The moonfm Dark law (measured, all-vector forms refused).** Four
+all-vector forms were rendered against the same references: A (the M as
+an SVG, no specializations), B (A + the `{1, dark 1}` opacity guard), D
+(rasters kept for the vectors, the M alone as a guarded SVG), E (B + a
+white `fill-specializations` pair). Default is fine in every form (A
+2.29; the M core reads −0.3 signed). Dark fails in every form — A
+**9.10**, B 6.65, D 6.22, E 7.41 — and the failure is the same object
+each time: over the M's core (eroded 3 px), the SVG M minus the PNG M in
+Dark is a straight vertical ramp, 32-row bands reading 0.0 / +0.2 / +0.6
+/ +0.7 / −0.1 / −2.2 / −6.1 / −12.5 / **−18.1** from the top of the M
+(row 133) to its bottom (row 394) at 512 — least squares luma Δ =
+15.45 − 0.0682·y, rms residual 3.0 against a raw std of 5.5 (form D; E
+reads 17.03 − 0.0711·y). Form C reads 0.0 in every band (rms 0.64). So
+ictool applies a top-to-bottom darkening to a near-white SVG layer in
+Dark that a raster layer never receives — it is not the auto-tint (the
+guard is on in B/D/E and the tint would recolour, not shade; the
+tint-law gate 2 says a guarded layer is exempt), and a white layer fill
+does not remove it (E) — a per-appearance shading on SVG content the
+tint law did not cover. Until that ramp is modelled, an M-style
+near-white SVG layer cannot replace its decanted raster under the bar,
+and the rule's "whatever form the vector needs to reach Dark" stops at a
+PNG for it.
+
+**podcastparrot — refused.** The flat's mark as an SVG layer in the
+decanted group: central **15.18 / 14.06**, mark core 12.90 / 11.85 with
+5,382 / 3,031 mark pixels over 24 (max 240 / 230) and edge±2 56 / 52 —
+an interior fail, not a rim: `parrot.png` is painterly (the ledger's
+decant entry), and no vector carries it. Stays `decanted` with its PNG.
+
+**Labels.** castamatic → `source: "flat-svg"`: every layer is an SVG and
+the validator's `SVG_LAYER_SOURCES` rule accepts it (✓ 73/73); the canvas
+and stack are decant's, not `build-svg-icons`'s, so read the label as
+"all-vector bundle" only. A plain `build-svg-icons` run skips it (it
+only builds platforms with no bundle), but **`--split-existing` would
+regenerate it from icon.svg and drop the six-layer stack** — do not run
+that flag over castamatic. moonfm keeps `decanted` (a PNG layer remains;
+the SVG-source labels would be refused). No P3 declaration touched;
+`audit-declared-colors` not run.
+
+**castamatic flat.** The centre ribbon carried `#FCFCFC → #8C8C8C`
+horizontal (x 7.28 → 17.387), which against the PNG's crescent reads
++12.8 R at the left third and 165 at the far right where the master
+plateaus at 179. `icon.svg` and `badge.svg` now carry the bundle's own
+two-gradient stack on the same path (the 9-stop base as `#e`, the
+opacity overlay as `#h`, coordinates verbatim since the flat's path is
+the bundle's inner user space). Crescent core (Chrome at 1024, eroded 3
+px, against the rebuilt master): **27.92 → 15.99**; left / mid / right
+thirds 31.50 / 24.49 / 21.91 → 16.66 / 14.57 / 20.89; signed R +12.8 /
++2.9 / +5.2 → +1.3 / +0.2 / +5.7. What remains is the glass's red tint
+(G/B −14 to −24 on a neutral ribbon: the layer is `glass: true` over the
+red plate, material) and the far-right end, where the master flattens
+at 179 under the glass while the base ramp rises to 190 (old −14 under,
+new +11 over). `fit-flat-glyph`: translate(0.1130 −0.8873) scale(1.00166),
+aspectD −4.36% — the outer C's cut, unchanged by this round.
+
+**After the builds** (`build-assets --only castamatic|moonfm`, icons
+build, both under the lock): facet drift castamatic **25.67 → 24.18**
+(frame 22.62, meanΔ −9.6/−16.1/−11.0, luma 100%, 5% > 40, `3/6+s`),
+moonfm **39.10 → 38.91** (meanΔ +10.5/+26.2/+6.5, 36% > 40, `3/3+s`);
+both diagnoses stay `material` (castamatic edgeShare 0.34, plateRmse
+12.75, filter true; moonfm 0.24, 12.52) — these are glass-material
+pairs and the swap was never going to move them: the vectors reproduce
+the rasters, and the rasters were never the drift. `facet-drift.json`
+and `drift-diagnosis.json` entries replaced in place (other sessions'
+concurrent globalplayer / pocketcasts edits untouched). validate ✓
+73/73; icons suite 276 ✓. Files: `platforms/castamatic/{icon.svg,
+badge.svg, meta.json, Castamatic.icon/{icon.json, Assets/{top, top_red,
+bottom, bottom_red, center, middle_red}.svg}}` (six PNGs gone),
+`platforms/moonfm/MoonFM.icon/{icon.json, Assets/{Vector1, Vector2}.svg}`
+(two PNGs gone, `Layer_M_Template.png` kept). Sheets (current light |
+new light | current dark | new dark, ictool at 512):
+`scratchpad/cm-vector/review-castamatic.png`,
+`scratchpad/cm-vector/review-moonfm.png`; instruments
+`scratchpad/cm-vector/{seam.py, sheet.py, perlayer.py, diag.mjs}` over
+`scratchpad/pocketcasts-vector/{score512.py, others/{build.py, masks/}}`.
