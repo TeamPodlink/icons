@@ -14,55 +14,57 @@
     "apple": {
       "primary": "material",
       "causes": [
-        "material",
-        "artwork",
-        "plate"
+        "material"
       ],
-      "central": 55.32,
+      "central": 12.03,
       "glassLayers": 3,
       "specular": true,
-      "struct": 0.598,
+      "struct": 0.013,
       "signed": [
-        -21.6,
-        -17.7,
-        -8.9
+        -8.8,
+        -9.6,
+        -6.8
       ],
       "lumaShare": 1,
-      "edgeShare": 0.5,
-      "plateShare": 0.37,
+      "edgeShare": 0.46,
+      "plateShare": 0.4,
       "plateSigned": [
-        -5.3,
-        39.7,
-        -1.5
+        -5.8,
+        -5.4,
+        -5.8
       ],
-      "plateRmse": 33.63,
+      "plateRmse": 7.19,
       "glyphSigned": [
-        -35.5,
-        -80.2,
-        -14.8
+        -10.6,
+        -12.3,
+        -6.2
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 6.4023,
+        "ty": 6.4023,
+        "s": 0.59946
+      },
       "materialOff": {
-        "central": 53.41,
-        "struct": 0.536,
+        "central": 0.93,
+        "struct": 0,
         "signed": [
-          -12.8,
-          -8.1,
-          -2
+          0,
+          0,
+          0.2
         ],
         "plateSigned": [
-          2,
-          46.2,
-          4
+          -0.2,
+          -0.1,
+          0.2
         ],
-        "plateRmse": 38.22,
+        "plateRmse": 0.58,
         "glyphSigned": [
-          -24.7,
-          -65.6,
-          -7.2
+          0.2,
+          0.2,
+          0.2
         ],
-        "edgeShare": 0.51
+        "edgeShare": 0.21
       }
     },
     "moonfm": {

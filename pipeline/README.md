@@ -6318,3 +6318,55 @@ that the second pass now names. `facet-drift.json` and
 `drift-diagnosis.json` regenerated from a fresh full audit (71 pairs;
 only moonfm's glass figure moved, 38.91 → 38.62, from the section
 above); validate ✓ 73/73, icons tests 276 ✓, `tsc` clean.
+
+### apple: the flat assembled from the bundle's own layers, scored material-off (2026-09-18)
+
+The material-off pass filed apple's 55.32 as artwork + plate (off 53.41,
+struct 0.54): the flat was the previous generation of the mark — the
+`#F452FF → #832BC1` plate and a solid white ring-with-gap glyph — while
+the decanted `ApplePodcasts.icon` is three translucent layers (circle1
+at opacity .17 and circle2 at .18, both `plus-lighter`; the person under
+a white .881 → .86 layer fill at .95) over the `srgb:.573,.225,.760 →
+.478,.187,.634` canvas. First flat built against the material-off
+master rather than the glass one.
+
+**Measured, not composited.** The three layer paths are Apple's own
+(1024-unit CoreSVG, used verbatim under `scale(.03125)`); the colours
+are the material-off render read per region and per row, regions from
+the paths themselves (plate / circle1-only / circle2-only / person,
+interior pixels only). Every region but the person is linear in y to
+the row (rms 0.08–0.37/255, within-row sd ≤ 0.6), so each carries a
+two-stop gradient evaluated at the canvas law's rows 105 and 919:
+
+| region | @105 | @919 |
+| --- | --- | --- |
+| plate (fit over rows 130–900, away from the rim) | 147,58,194 | 122,47,162 |
+| circle1 | 190,101,237 | 165,91,205 |
+| circle2 | 236,147,255 | 212,137,255 (blue pinned: plus-lighter saturates) |
+
+The plate reads the declared canvas +1–3/255. The person is not linear
+(its own smoothstep layer fill over its bbox: 251,237,255 flat from row
+369 to 620, then down to 231,217,239 at 920; linear rms 2.9) and takes
+an 8-stop gradient of 9-row means over its bbox. Trap hit on the way,
+the Pocket Casts one again: a `userSpaceOnUse` gradient referenced from
+inside the `scale(.03125)` group is read in that group's 1024-unit
+space — with 32-unit y's the rings painted their end stop everywhere
+(central 12.6, ring1 −14/−6/−19 signed); the ring and person gradients
+carry 1024-unit y's, the plate's 32-unit ones.
+
+**Scored.** librsvg candidate vs material-off at 256: central **1.01**,
+0 px > 24; per region at 1024, plate 0.84, circle1 0.75, circle2 0.53,
+person 2.22, edge 4.68. The audit (Chrome, --material-off):
+**55.32 → 12.03** against the glass master, **53.41 → 0.93** with the
+material off; diagnosis material alone (the 12.03 is now entirely the
+three glass layers' sheen — the same construction as icatcher's 26.67
+/ 0.73). `flatSource` set to `official` (spreaker's reading: the
+developer's own layer artwork, measured). `fit-flat-glyph` reads
+−40% scale on this pair — its colour-isolated "glyph" is the disc
+stack, not a mark — and is not a registration finding; the second
+pass never consults it at the floor. `badge.svg` followed: the same
+plate and three layer paths with the same gradients (ids `apple-badge-*`)
+under the house-squircle `clipPath`, the plate-badge form the file already
+had (viewBox 0 0 32 32 + its own clip; ledger "PlatformBadge vs the
+static badge generator"). Both generated badges re-rendered; icons tests
+276 ✓.

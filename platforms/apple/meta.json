@@ -4,6 +4,7 @@
   "guidelinesUrl": "https://marketing.services.apple/apple-podcasts-identity-guidelines",
   "url": "https://www.apple.com/apple-podcasts/",
   "added": "2023-02-06",
+  "flatSource": "official",
   "liquidGlass": {
     "bundles": [
       {
