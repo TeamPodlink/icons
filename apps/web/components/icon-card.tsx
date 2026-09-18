@@ -2,6 +2,7 @@ import { useLayoutEffect, useState } from "react";
 import {
   Copy,
   Download,
+  FolderOpen,
   Maximize2,
   SquareArrowOutUpRight,
 } from "lucide-react";
@@ -193,6 +194,20 @@ export function IconCard({
         children: downloadItemsFor(shown, p, b, darkTheme),
       }
     );
+  }
+  // Dev server only: reveal the facet's source in Finder through the
+  // vite.config.ts /__reveal middleware. import.meta.env.DEV folds at
+  // build time, so a production build drops the row and its fetch.
+  if (import.meta.env.DEV) {
+    menuItems.push({
+      label: "Open in Finder",
+      icon: FolderOpen,
+      onSelect: () => {
+        const q = new URLSearchParams({ platform: p.id, facet: shown });
+        if (b) q.set("slug", b.slug);
+        void fetch(`/__reveal?${q}`);
+      },
+    });
   }
 
   return (
