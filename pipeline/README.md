@@ -4337,3 +4337,1347 @@ measurement, downcast-style, an hour each), then globalplayer (a redraw
 from its glossy artwork), and material last — it is the metric, not the
 flats: the right move there is a material-off score, the same bundles
 rendered with glass/specular disabled, so the lens measures artwork alone.
+
+### playapod: the maintainer's redrawn reel becomes the bundle (2026-09-18)
+
+**A chosen departure from the App Store raster, not a drift fix.** The
+maintainer redrew Playapod's glyph by hand (`icon.svg`: a `#4352B7`
+plate, a white disc, three stadium spokes with dots, a hub ring, an axle
+and three rim notches — the radially symmetric reel the official raster
+only attempts) and wants that glyph in the Liquid Glass bundle. The
+raster bundle (`appstore-artwork-split`, `Assets/glyph.png` +
+`glyph-dark.png`, drift 26.03, diagnosed "registration" the same
+morning) was dropped and the bundle rebuilt from the flat; the flat was
+NOT registered to the raster and must not be — the 27.88 (light) /
+18.13 (dark) central difference between the old and new renders at 512
+is the redraw, by design. `flatSource: "drawn"`.
+
+Builder: `build-svg-icons --only playapod` → `flat-svg` (gate 2.29 vs
+Chrome, no dropped-filter diversion), split → `flat-svg-split` (solid
+plate lifted into the canvas, single bare `Assets/icon.svg` layer). But
+the Dark rendition came out UNTINTED: white reel on the gray canvas
+(254,254,254 where the old baked `glyph-dark.png` read 66,81,182). The
+flat paints its spokes/hub/axle/notches in the plate colour, so the
+layer fails the tint law's near-white gate; and the builder's
+`needsWhiteGlyph` (mean luma < 110) sees a mostly-white glyph, so it
+emits no twin either — the mixed-tone gap of 2026-09-14 again, from the
+white-dominant side. A retint twin cannot fix it: those details must be
+HOLES (as the old bake knocked them out), not paint.
+
+Fix in the SVG's feature use, same numbers, no redraw: the
+plate-coloured elements moved out of the paint and into `clipPath`s
+applied to the white disc (spokes + dots + notches; the hub circle) and
+to an uncut white ring circle on top (the axle) — the flat renders
+identically and the layer is one white paint, so ictool tints it.
+Three probes to get there, each ictool-rendered against the painted
+bundle's Light (the pass criterion) and Chrome-rendered against the
+original flat:
+
+- clip-rule="evenodd" on a `<clipPath>` with a full rect + hole
+  elements: ictool 44.56 (no holes at all), and per spec a clipPath is
+  the UNION of its children — librsvg's toggling across children
+  (0.09) is the non-standard reading, so this would also have broken
+  in browsers. Rejected.
+- one `<path clip-rule="evenodd">` per clip (rect + holes as
+  subpaths, rotated stadiums converted to absolute path data): Chrome
+  0.73 (identity), ictool still 44.56 — **ictool ignores `clip-rule`
+  (and `fill-rule`) evenodd inside a clip; it fills nonzero.**
+- nonzero with the outer rect wound COUNTER-clockwise and every hole
+  clockwise (the maintainer's verbatim notch paths are already
+  clockwise, so nothing of theirs was reversed): Chrome 0.73 / max 71 /
+  266 px over 8 at 512², ictool Light 0.63 / max 35 / 290 px — edge
+  antialiasing only. Adopted; the built bundle is byte-identical to the
+  probe (0.00) in both appearances. Law: **a hole in an ictool clip is
+  a subpath wound opposite to its outer contour; evenodd is not
+  honoured.** (`clip-rule="nonzero"` is written explicitly as a marker.)
+
+Dark now reads 67,81,183 on the reel (the canvas default, per the tint
+law) with 22,23,24 through the holes; `build-assets --only playapod`
+re-measured `hasDark: true`. Facet drift **26.03 → 0.59** (meanΔ 0.0 /
+0.0 / +0.2, 0% over 40); diagnosis moved to the floor (`primary:
+floor`, no causes); registration worklist −1 (podcastparrot and
+listennotes remain). Files: `platforms/playapod/icon.svg`
+(construction only), `Playapod.icon` (two PNGs → one SVG layer),
+`meta.json` (`source`, `flatSource`, `hasDark`, `appStoreId` kept),
+`facet-drift.json`, `drift-diagnosis.json`. Badge untouched (browser
+only, painted form is fine). Review sheet old-light | new-light |
+old-dark | new-dark and the retired bundle live in the session scratch
+(`playapod-work/`).
+
+### iheartradio: the official heart from the brand EPS (2026-09-18)
+
+Source: iHeartMedia's brand kit (`002—iHeartMedia/EPS/`, March 2025),
+`iHeartMedia_Vertical_Logo_red.eps` plus the `_white`, `_black` and
+`_color_*` siblings. Converted the pandora way (`gs -sDEVICE=pdfwrite
+-dEPSCrop` → `pdftocairo -svg`): a 268.66 × 360 pt box, 17 paths, one
+flat fill `rgb(77.734%, 0%, 16.869%)` = **#C6002B** (the plate's own top
+stop). Paths 5–15 are the wordmark (y ≥ 206); path 16, under `clip-4`
+(x 1–268.32, y 0.227–198), is the heart: ONE compound path, five
+subpaths, 3,555 chars, nonzero. The clip is a no-op (rendered bbox
+identical with and without it), so the path rides without it. The mark's
+`d` is byte-identical across the red, white and black variants (md5
+f088cfc2…); the white file adds only the colour, so the red EPS is the
+source and `#fff` the fill. Isolation was deletion of paths 5–15, nothing
+redrawn.
+
+**Same cut?** The shipped `glyph.png` is not an alpha silhouette of the
+mark: it is the white heart with the arcs and dot PAINTED red — a flat
+(198,0,43), 58,088 px, the App Store art's brighter centre baked into the
+split asset — and its dark twin the red heart with those holes cut out.
+Registering on alpha reads IoU 0.83 (the holes); registering on the
+WHITE pixels is the mark. Official bbox 1.20–268.30 × 0.20–197.70
+(267.1 × 197.5, aspect 1.3524) vs the asset's white bbox 96–928 ×
+203–820 at 1024 (833 × 618, 1.3479, bbox-centred (512.5, 512.0)): an
+aspect gap of 0.33%, two rows. Seed = bbox centres + geometric-mean
+scale (0.097622): IoU 0.9945 against the master's white. Hill-climb on
+IoU against `glyph.png`'s white (1/32-unit steps down to 1/128, scale
+0.3% → 0.05%): **`translate(2.868916 6.340335) scale(.097573)`**, IoU
+**0.9954** against both the asset and the master, 661 official-only /
+691 asset-only px of 290,521 — a one-pixel fringe on every edge, no
+128-row band above 369 px. Verdict: the same heart. The official path
+ships in every facet.
+
+**Flat.** Plate untouched (`#C6002B → #AD0026` full height; the canvas
+carries its inset resample from the 09-17 round). The mark verbatim
+(pdftocairo's separator spaces removed, no coordinate touched), `#fff`,
+the transform above. Hex only; the `p3-allowlist.json` block (two
+triples left over from the old badge gradient, no longer declared
+anywhere) removed; flatSource → **official**. Chrome vs the OLD master at
+1024: central 5.98, and every central row's plate within 1/255 of the
+canvas — the whole red residual was the asset's flat-red arcs (199) over
+rows where the plate reads 191 → 184. So the 09-17 entry's "radial
+vignette" was never in the master; the split asset's arcs were. Audit:
+**6.11 → 3.65** (meanΔ +1.7/+0.3/+0.4, 0% > 40), floor.
+
+**Badge.** Bare mark, `viewBox 8 8 24 24`, fitted to the 24-unit box
+from the rendered bbox (`translate(7.892175 11.108948)
+scale(.089854)`, 17.75 tall, centred), fill `#C6002B` — the EPS's red
+replacing the old horizontal `#C90025 → #AA001F` guess. Reads on both
+pills; no `badge-dark.svg`.
+
+**Bundle** (3.65 ≤ 5, so the gate opened). `Assets/glyph.svg`: a 1024
+viewBox, the same path at the transform × 32 (`translate(91.805327
+202.890721) scale(3.122332)`), white. One layer, `image-name`
+glyph.svg, `glass: false`, NO opacity- or image-name-specializations;
+`glyph.png` / `glyph-dark.png` deleted; canvas untouched; source
+`appstore-artwork-split` → **official-svg**. `build-assets --only`: ok
+(+dark). Light: white bbox 96–928 × 204–819, IoU 0.9952 against the old
+asset. Dark, by the tint law alone: the white mark auto-tints to median
+**(188,0,41)** where the App Store's own dark asset read (187,0,41) —
+RMSE **1.80** over 264,081 interior px. The developer's dark art is the
+tint law's output within 2/255; no dark file needed. Audit **1.19**
+(meanΔ +0.1/−0.0/−0.2, edgeShare 0.95), diagnosis geometry → **floor**.
+`validate.mjs` green.
+
+Traps: (1) a split asset's alpha is the art's silhouette, not the
+mark's — register on the mark's colour, not on alpha (0.83 vs 0.995).
+(2) `audit-declared-colors.mjs --only <slug>` on a flat with no
+`display-p3` declaration filters every target away and then hangs in
+its Chrome swatch step (killed after 6½ minutes; a zero-declaration
+early exit is missing). (3) `--sheets` without `--work` writes to the
+shared `/tmp/facet-drift-work`; with four sessions auditing at once,
+point it at the session scratch.
+Review sheet (master light | dark | flat, house squircle @256 | @32 |
+old glyph.png | official mark registered; pills; audit triptych):
+`scratchpad/iheartradio-work/iheartradio-review.png`.
+
+### listennotes: the maintainer's vector scored against the brand mark (2026-09-18)
+
+The flat (`platforms/listennotes/icon.svg`, the maintainer's own drawing of
+the mark, `flatSource: drawn`) was scored against the brand's PNGs and
+registered against the bundle's master. Path data untouched throughout.
+
+**Sources.** brand-assets.listennotes.com ships PNG only: "Logo only with
+Transparent Background" 610×610 RGBA, "Logo only with White Background"
+610×610 RGB, "Logo with Circle" 2520×2520 (white disc in a red ring, the
+mark inside at 2.5664× the 610 art — outer ring 636.263/247.915, inner
+503.176/196.072 px, agreeing to 0.01%). Every opaque pixel of all three is
+#000000 or #B82F00, the brand page's values. The bundle's `glyph.png` IS
+the transparent PNG: same 610, same bbox (6,4)–(601,603), same alpha
+histogram, silhouette IoU 1.000; today's CDN copy has a different sha256
+(1,078 of 1.49 M bytes differ, all sub-LSB on partial-alpha pixels — a
+re-encode). The bundle draws it at scale 1.22667 (748.27 pt centred), so
+610-px p → 32-unit q = p·0.0383334 + 4.30830.
+
+**The mark measured** (half-coverage crossings, least-squares circles and
+5-parameter ellipses, on the 610 art; the 2520 art reproduces every number
+within 0.1 px after the registration scale): ring centre (254.002,
+252.002), inner r 196.072, outer r 247.915 (thickness 51.843; edge rmse
+0.05 px, centres coincident to 0.001 px); handle = a rotated ELLIPSE, not a
+capsule (its width runs 191 → 245 → 0 px): centre (495.969, 489.970),
+semi-axes 139.972 × 47.519, major axis 43.999°, passing 3.1 px off the ring
+centre, inner end under the ring band, tip at r 479.35 (rmse 0.045 px);
+shadow: axis-aligned ellipse centre (239.000, 591.001), 122.713 × 13.016
+(rmse 0.037); dot (171.000, 337.000) r 31.733; three quarter-annuli with
+flat on-axis ends and their OWN centres — (152.45, 351.83) r 74.66/108.75,
+(153.09, 355.41) r 135.04/171.38, (156.68, 346.89) r 194.86/231.40, strokes
+34.09 / 36.33 / 36.54, none centred on the dot. Integer-valued centres and
+radii throughout: the 610 PNG was exported from a vector on that grid. A
+primitives-only SVG at these numbers scores silhouette IoU 0.9975 black /
+0.9847 red / 0.9947 ink against the PNG (the residual a 1-px antialiased
+rim). Instruments and every fit: the session scratchpad `listennotes-work/`
+(`lib.mjs`, `fitmark.mjs`, `iou.mjs`, `NOTES.md`).
+
+**The maintainer's drawing vs the brand mark**, same fits on a 2048 Chrome
+render of icon.svg, mapped to the 610 frame at the bundle framing (before
+registration):
+
+| primitive | quantity | brand PNG (px @610) | maintainer SVG (px @610, bundle framing) | Δ px | Δ 32-units |
+| --- | --- | --- | --- | --- | --- |
+| ring | centre x | 254.00 | 254.20 | +0.20 | +0.0078 |
+| ring | centre y | 252.00 | 252.31 | +0.30 | +0.0117 |
+| ring | inner r | 196.07 | 195.80 | -0.27 | -0.0103 |
+| ring | outer r | 247.91 | 247.57 | -0.35 | -0.0133 |
+| ring | thickness | 51.84 | 51.77 | -0.08 | -0.0030 |
+| handle ellipse | centre x | 495.97 | 495.90 | -0.07 | -0.0026 |
+| handle ellipse | centre y | 489.97 | 489.94 | -0.03 | -0.0013 |
+| handle ellipse | semi-major a | 139.97 | 137.90 | -2.08 | -0.0796 |
+| handle ellipse | semi-minor b | 47.52 | 45.94 | -1.58 | -0.0606 |
+| handle ellipse | axis angle | 44.00 | 43.97 | -0.03° | — |
+| handle ellipse | tip r from ring centre | 479.35 | 476.58 | -2.77 | -0.1060 |
+| shadow ellipse | centre x | 239.00 | 238.86 | -0.14 | -0.0052 |
+| shadow ellipse | centre y | 591.00 | 591.01 | +0.01 | +0.0004 |
+| shadow ellipse | semi-axis a | 122.71 | 123.25 | +0.53 | +0.0204 |
+| shadow ellipse | semi-axis b | 13.02 | 12.94 | -0.08 | -0.0030 |
+| dot | centre x | 171.00 | 171.34 | +0.34 | +0.0130 |
+| dot | centre y | 337.00 | 337.31 | +0.31 | +0.0119 |
+| dot | r | 31.73 | 31.72 | -0.01 | -0.0006 |
+| arc 0 | centre x | 152.45 | 152.89 | +0.44 | +0.0168 |
+| arc 0 | centre y | 351.83 | 352.21 | +0.38 | +0.0147 |
+| arc 0 | inner r | 74.66 | 74.89 | +0.23 | +0.0087 |
+| arc 0 | outer r | 108.75 | 108.43 | -0.32 | -0.0124 |
+| arc 0 | stroke | 34.09 | 33.54 | -0.55 | -0.0211 |
+| arc 0 | top end x | 152.02 | 152.50 | +0.48 | +0.0185 |
+| arc 0 | right end y | 351.00 | 351.45 | +0.45 | +0.0171 |
+| arc 1 | centre x | 153.09 | 153.40 | +0.31 | +0.0117 |
+| arc 1 | centre y | 355.41 | 355.93 | +0.52 | +0.0201 |
+| arc 1 | inner r | 135.04 | 136.24 | +1.20 | +0.0458 |
+| arc 1 | outer r | 171.38 | 170.17 | -1.21 | -0.0465 |
+| arc 1 | stroke | 36.33 | 33.93 | -2.40 | -0.0919 |
+| arc 1 | top end x | 152.02 | 152.54 | +0.52 | +0.0199 |
+| arc 1 | right end y | 353.98 | 354.38 | +0.40 | +0.0155 |
+| arc 2 | centre x | 156.68 | 156.74 | +0.06 | +0.0024 |
+| arc 2 | centre y | 346.89 | 347.66 | +0.77 | +0.0296 |
+| arc 2 | inner r | 194.86 | 194.89 | +0.03 | +0.0011 |
+| arc 2 | outer r | 231.40 | 231.83 | +0.43 | +0.0164 |
+| arc 2 | stroke | 36.54 | 36.94 | +0.40 | +0.0152 |
+| arc 2 | top end x | 158.04 | 158.38 | +0.34 | +0.0130 |
+| arc 2 | right end y | 347.95 | 348.26 | +0.31 | +0.0118 |
+
+Silhouette IoU vs the brand PNG 0.9805 black / 0.9624 red / 0.9762 ink
+(94,841 vs 95,870 black px, 28,263 vs 29,006 red) — the deficit is a
+~0.3 px rim on every edge (the +0.2/+0.3 px centre and the 0.3-px-small
+radii), not a shape error, except the handle (2.1 / 1.6 px short on its
+semi-axes: tip 2.8 px short, 3.2 px thinner at the widest) and arc 1
+(stroke 2.4 px light: inner radius +1.2, outer −1.2).
+
+**Registration** (transform wrapper only, `<g transform="translate(-.034
+-.034) scale(1.0015)">` around everything after the plate): local grid
+search scored the audit's way (Chrome @1024 → lanczos 256 → central
+51..204 RGB RMSE vs the P3→sRGB master), identity 10.593 (= the audit's
+10.59, so the instrument agrees), `fit-flat-glyph`'s seed translate(−.0562
+−.1033) scale(1.00549) scored WORSE at 16.548 (its width-ratio scale is
+biased by the handle), coarse 0.1 / 1% → identity, 0.025 / .25% →
+(−.05, −.05, 1.0025) 9.629, 0.008 / .1% → (−.034, −.034, 1.0015) **9.477**.
+The +0.15% is the ring's outer radius (247.57 → 247.94 vs the brand's
+247.92); the shift is the centre. Facet drift **10.59 → 9.45** (frame
+16.37, maskΔ 1.8%, meanΔ −0.8/−1.2/−1.3, 1% of the crop > 40).
+`fit-flat-glyph` now reads translate(−.0124 −.0437) scale(1.00274), under
+the diagnosis thresholds; the entry moves registration → **geometry**
+(edgeShare 1.00).
+
+**What carries the 9.45** (residual energy of the central crop by region,
+regions = the brand fits ±1.5 px): arc 1 **47.9%** (region RMSE 30.6),
+handle **45.6%** (26.0), ring 4.9% (4.2), arc 2 1.0%, arc 0 0.3%, dot 0.2%,
+plate 0.0%. Floors measured alongside: the brand PNG itself placed at the
+framing through Chrome scores 0.68 against the ictool master (the master
+is the PNG; no raster-softness tax), and a flat drawn at the brand fits
+above scores **3.34** (its residual: the three arcs' antialiased edges,
+92% of a small number). So the drawing is two primitives away from the
+5 gate: the handle ellipse (a → 139.97, b → 47.52 at 610, i.e. +0.080 /
++0.061 units) and arc 1 (inner r 135.04, outer 171.38: −0.046 / +0.047
+units). Maintainer's call.
+
+**Bundle left as is** (central > 5): `official-artwork`, the positioned
+two-layer twin; Dark rendition byte-identical before/after (RMSE 0.00).
+Not touched: badge.svg (its own coordinates, not the audit's subject).
+`meta.json` gains `flatSource: "drawn"`. Sheet (master | registered flat
+under the house mask | old dark | dark now | the brand-fit flat, not
+shipped): scratchpad `listennotes-work/listennotes-review.png`.
+
+### audible: the official Solar chevron (2026-09-18)
+
+Audible's press kit (`Audible_Logos`, Illustrator 27.4, 2023-04-25) ships
+the chevron as `8_Chevron/Vectors/Audible_Chevron_Solar_RGB.eps`. Converted
+without redrawing — `gs -dEPSCrop -sDEVICE=pdfwrite`, then `pdftocairo
+-svg` — it is ONE `evenodd` path of four subpaths (outer arc, chevron band,
+middle arc, inner arc), 1.6 KB, artboard 408 × 249.46 pt, on-curve extents
+0.4414–407.5586 × 0.0039–248.9219 (407.117 × 248.918, aspect 1.6356; a
+10× Chrome render reads 0.4–407.6 × 0–248.9). No gradients, no clips
+beyond the artboard rect. The White EPS converts to the same single path
+in white. Colour trap: the "RGB" EPS is CMYK inside — its only fill
+operator is `0 0.43457 1 0 k` (`%%DocumentProcessColors: Magenta
+Yellow`), so pdftocairo's `rgb(96.93%, 58.43%, 6.14%)` ≈ (247,149,16) is
+poppler's CMYK→RGB conversion, not a brand number. The kit's RGB rasters
+are sRGB-tagged and unanimous: `Audible_Chevron_Solar_RGB.png` modal
+(255,159,0) over 555,881 px, SolaronWhite/WhiteonSolar JPGs (255,159,0) /
+(254,160,0). **Solar = #FF9F00** (CMYK 0/43/100/0); recorded, and used on
+the badge.
+
+**How the shipped artwork places the chevron.** The bundle's Android
+foreground `glyph.png` (1024², white, modal 255,255,255) has α≥128 bbox
+109–930 × 265–771 (822 × 507, centroid 548.4, 501.8) but α>0 bbox
+42–995 × 203–830 (954 × 628): the 60–70 px surplus is a baked drop
+shadow (alpha left of the α≥128 edge 146, 66, 43, 24, 12, 5, 1 at
+0…60 px; max α 91 anywhere beyond 6 px of the silhouette). The master
+`packages/refraction/assets/audible.png` is already build-assets'
+P3→sRGB squash (no ICC; `withIccProfile("srgb")` is a no-op on it, pixels
+identical), and its white region (α>200, min(r,g,b)>200, rows 100–923;
+row 0 carries ictool's rim and pollutes an unbounded read) is 111–927 ×
+269–768 = 817 × 500. Threshold-corrected (the B channel crosses 200 at
+coverage 0.747, so each edge sits ±0.5 px inside the read) the box is
+110.75–928.25 × 268.75–769.25 = 817.5 × 500.5, aspect 1.6334 — 0.13%
+from the official path's; the height ratio 1.0013 is the V tip and arc
+apex biasing the vertical read and was not chased.
+
+**Registration, not drawing.** Scale from the vertical-edge width,
+817.5 / 407.117 = 2.008021 px/pt = 0.062751 per 32-unit; translation from
+the bbox centres (519.5, 519.0 px ↔ 204.0, 124.463 pt):
+`translate(3.4332 8.4086) scale(0.062751)`, path verbatim. A first pass
+took the path's numeric minimum (−0.836, an off-curve control point) as
+the top and sat 0.85 px low; the on-curve extents fixed it. The Chrome
+render at 1024 under the house mask reads white bbox 111,269,927,768 =
+817 × 500, identical to the master's. `refine.mjs` (SMALL) offers 17.93 →
+16.03 at `translate(−.0165 .046) scale(.9955)` — a 0.45% shrink against
+an exact silhouette match is fitting the shadow's edge darkening, not the
+artwork (the soundcloud rule); not applied.
+
+**The plate, refitted from the layer itself.** `background.png` is the
+plate alone (α 255 everywhere). It is NOT x-uniform: TL (255,137,9), TR
+(255,156,38), BL (255,157,39), BR (255,183,80); the anti-diagonal
+(k, 1023−k) is constant at 156–157 / 38–39, so it is a 45° ramp, and the
+diagonal profile is a plateau (137,9) from k = 0 to ~152 then linear to
+(183,79) at k = 1016 with no far-end clamp. Model over pixel centres,
+s = x + y: R 255; G = 128.9886 + 0.026572·s; B = −3.2211 + 0.040517·s;
+clamped to the plateau below s0 = 301.6 px — both channels give the same
+s0, = 4.7125 per axis at 32. Residual rms 0.31 (3 ch) whole / 0.27 in the
+central crop, max 1.23. The best vertical fit (per-row medians 142/17 →
+156/38 → 170/59) leaves max 13 and rms 4.88 (3 ch) inside the central
+crop, max 21 whole — measured and rejected by the number, so the flat
+carries the diagonal: `linearGradient` (4.7125, 4.7125) → (32, 32)
+userSpaceOnUse, **#FF8909 → #FFB750** (fit 183.41 / 79.76 at the corner).
+The old flat's (3.367,3.367)→(28.633,28.633) #FF8909→#FFC565 was the Play
+export's gradient — (255,197,101) at BR where the shipped layer reads
+(255,183,80), the "slightly different gradient" the adaptive-icon round
+recorded. Master vs `background.png` on shadow-free plate pixels: ≤ 1.5
+RMSE in every 128-px cell of the central rows; the 15–23 in the top and
+bottom 128-px bands is ictool's rim highlight in rows 0–30 / 1000–1023
+(col 512 row 0 reads 255/208 against 142/17), outside the crop. The
+canvas solid `srgb:1,0.61255,0.15039` = (255,156.2,38.4) is the field's
+mean; `glyph-dark.png`'s tint over α≥128 averages (255.0,156.9,39.3).
+
+**Files.** `icon.svg` (1.6 KB): the plate above plus the chevron in
+#fff (the glyph's own colour), no P3 triple — nothing for the allowlist.
+`badge.svg`: a bare Solar mark, viewBox `8 8 24 24`, 24 wide
+(`translate(7.974 12.6628) scale(.058951)`, mark box y 12.663–27.337);
+the kit ships SolaronWhite and SolaronBlack, the brand's own statement
+that the Solar chevron reads on both pills (verified on the built
+light/dark pills), so no plate. meta `flatSource: "official"`.
+
+**Numbers.** Facet drift 20.68 → **18.23** (frame 16.98; mean
+−6.8/−4.9/−2.4; luma 55%; >40 5%). Decomposed at 256 inside the central
+crop by `glyph.png`'s alpha: glyph (α≥128, 31% of the crop) zone RMSE
+25.7 and 59% of the error energy; halo (0<α<128, 53.5%) 16.2 and 41%;
+plate (α=0, 15.4%) **0.78** and 0%. Master − `background.png` in the
+halo by α bucket: 16–31 → (−5.3,−4.0,−2.2) … 96–111 → (−26.2,−18.1,−7.7).
+The residual is the developer's baked drop shadow, which a flat does not
+carry; diagnosis plate → **shading** (the mechanical rule would still
+fire "plate" on the −6.8 R mean, but the plate zone measures 0.78 — the
+mean is the shadow's).
+
+**Candidate measured, not adopted.** The same chevron as a bare SVG
+layer (`position.scale 32`, the flat's transform verbatim,
+`fill-specializations` dark solid `srgb:1,0.61517,0.15408` = the
+glyph-dark tint mean, `{1, dark 1}` guard) over the existing
+`background.png` and canvas, rendered by ictool: central **1.09** (frame
+12.27, mean +0.0/−0.3/−0.8, luma 37%, >40 0%) — the same-artwork floor,
+and exactly the shadow's cost (18.23 − 1.09). The gate for the swap was
+≤ 5 against the shipped master, not met, so the developer's raster
+layers stay (`adaptive-icon-split`, dark via `glyph-dark.png`); bundle
+and master restored byte-identical. The swap is one `icon.json` edit if
+the maintainer prefers the official vector to the shadow.
+
+**Follow-up, same day: shipped as glass (maintainer's decision).** Before
+the swap, one more measurement corrected the paragraph above: the
+developer's `glyph.png` is not the official cut. White run lengths at
+1024 agree on the band (66–68 px in master and flat at every column) but
+not on the arcs — at column 700 the middle arc is 56 px thick in the
+master and 70 px in the official path; row 400 spans the arcs over
+152 vs 178 px, row 330 over 153 vs 166. So the 18.23 was the baked
+shadow AND a different arc drawing, which is why the 59% glyph-zone
+share could not have been registration. Probed in scratch (`variants/`,
+ictool at 512, both appearances, against the developer's raster):
+translucency 0.25 turns the white mark cream (252,239,222 at the band;
+the developer's and the brand's chevron is 255,255,255) while 0 keeps it
+white; shadow 0.5 reads R 238–241 in the first 8 px below the V tip
+against the developer's 239–244, 0.6 reads 234–238 — Apple's shadow is
+longer (gone by +36 px at 512 vs +20) but 0.5 matches its near-edge
+depth, 0.6 overshoots. A bare white glass chevron with no fill
+specialization auto-tints in Dark to (255,155,38) — the canvas's own
+(255,156,38), and the old `glyph-dark.png` convention (255,163,48) —
+so no dark fill is declared (an explicit `srgb:1,0.61517,0.15408` read
+255,157,40, indistinguishable). **Chosen: translucency 0, shadow neutral
+0.5, group `specular`, `lighting: individual`, auto-tinted Dark.**
+Bundle (`Audible.icon`, source `adaptive-icon-split` → `official-svg`):
+`Assets/chevron.svg` (the flat's chevron alone on a 32 box, official path
+verbatim, `translate(3.4332 8.4086) scale(.062751)`, ONE `glass: true`
+layer at `scale: 32`); `Assets/plate.svg` (the measured 45° ramp
+(4.7125,4.7125)→(32,32) #FF8909→#FFB750 on a full 32 rect, `glass: false`,
+own group, opacity `{1, dark 0}`) over the unchanged canvas
+(`srgb:1,0.61255,0.15039` = the plate's mean, the tint source; gray
+dark pin); `background.png`, `glyph.png`, `glyph-dark.png` deleted.
+build-assets: light + dark rendered, `hasDark` true. Facet drift
+18.23 → **5.81** (frame 12.84, meanΔ −4.0/−2.9/−1.8, luma 96%, >40 0%,
+glass 1/2+s) — the flat and the bundle now draw the same path, and the
+residual is the material (shadow + specular on one layer) at the bottom
+of the band where rss sits at 9.59; recorded as `material` in
+drift-diagnosis.json. validate ✓, 276 tests ✓. Sheet:
+scratch `audible-work/audible-final-review.png` (old raster light | new
+glass light | old dark | new dark | flat | badge pills).
+
+**Follow-up, the measured flat shipped (2026-09-18).** Maintainer's
+decision: ship the brand-fit drawing instead of theirs (kept as scratchpad
+`listennotes-work/icon-maintainer.svg`). Generator
+`pipeline/listennotes-flat/gen.mjs` — every fitted constant above with its
+provenance, `node pipeline/listennotes-flat/gen.mjs` rewrites icon.svg,
+badge.svg and badge-dark.svg (house format, full-bleed `#fff` plate, one
+`#000` path + one `#B82F00` path, the 610 frame placed at the bundle's
+framing q = p·0.0383334 + 4.30830). Trap recorded in the generator: an
+ellipse emitted as two 180° `A` arcs between its major-axis ends rendered
+the handle **0.5 px smaller on both semi-axes** at 610 (Chrome; the SVG
+centre solve takes a square root of a near-zero radicand there and
+amplifies the 3-decimal rounding of the endpoints) — read back by the same
+fitter as a 139.47 × 46.93 vs the constants' 139.972 × 47.519; four quarter
+arcs read back 140.02 × 47.49 and every other primitive within 0.05 px.
+Silhouette IoU vs the brand PNG 0.9979 black / 0.9950 ink. Registration
+(same wrapper search): identity is the optimum at all three grid levels
+(3.320; nearest 0.008-unit neighbours ≥ 3.83), so `REG` stays zero — the
+bundle framing was the registered placement. Facet drift vs the
+official-artwork master **9.45 → 3.33** (meanΔ 0.0/0.0/0.0, 0% > 40).
+
+Bundle rebuilt through `build-svg-icons --only` (flat-svg central 4.15,
+split lifts the white plate: canvas `srgb:1,1,1`, dark the gray pin).
+The builder emitted ONE bare layer — its `needsWhiteGlyph` gate wants
+saturation < 0.18 and the red arcs push this black+red mark over it — and
+that Dark shows a black magnifier on the dark plate with only the arcs
+reading (dark-old-new.png in scratch): a regression against the brand's
+own dark treatment (the White Logo the old twin carried). Hand-built the
+builder's own mixed-tone form: `gen.mjs --twin` writes
+`Assets/icon-dark.svg` (the mark alone, every paint white — what
+`retintDark(…, "#ffffff")` would emit), the layer swapped to
+`image-name-specializations` icon.svg / icon-dark.svg with the `{1, dark 1}`
+guard. Source `flat-svg-split`, `hasDark` true from build-assets; light
+rendition unchanged by the guard (RMSE 0.00). New Dark vs the old
+positioned `glyph-dark.png` twin (scale 0.88781, translation −30,10): RMSE
+36.08 over opaque pixels, white-mark x-extent 146–879 → 146–875 px,
+centroid (498.1, 515.7) → (494.1, 508.0) — the old twin had been placed to
+coincide with the light framing, so the new Dark keeps the app's dark
+placement AND the light placement; the 36 is the White Logo export's own
+geometry (a different cut: shorter shadow, fatter handle) against the
+measured mark. Final drift against the rebuilt bundle **0.98** (frame
+14.98, the flat-svg floor; diagnosis → floor, fit identity). Badge: the
+bare-mark form this platform already used, `viewBox 8 8 24 24`, the mark's
+analytic ink bbox fitted to the box (k 0.040005, the 599.93-px height →
+24, centred), `badge-dark.svg` the same in white (black cannot read on the
+dark pill; the brand's dark logo is white). `flatSource: drawn`
+(measured). validate green; `@podlink/icons` tests 276/276. Sheet (master
+| new flat under the house mask | old dark | new dark | badge on both
+pills): scratchpad `listennotes-work/listennotes-review-final.png`.
+
+### soundcloud: the official mark from the brand SVG (2026-09-18)
+
+The maintainer supplied SoundCloud's mark as a real vector
+(`soundcloud-logo.svg`, viewBox `0 0 75 33.51`, one compound path — the
+cloud and the seven bars — with no fill, so it inherits black). Until
+now the flat was a drawn mark registered against the App Store raster
+(5.17 after the near-floor round, diagnosed `geometry` with a 0.8%
+aspect gap the ledger chose not to chase). The official vector settles
+that question: its proportions are the truth, and the gap belongs to the
+raster.
+
+**Measured.** The path's `getBBox` is 0.0174→75.0044 × −0.0000→33.5689,
+i.e. 74.987 × 33.569 units, centre (37.511, 16.784). The bundle's
+`glyph.png` at 1024 (alpha > 127): bbox 113–910 × 344–697 = **798 × 354**,
+centre (511.5, 520.5), alpha-weighted centroid (573.1, 551.2); 97.5% of
+its fully opaque pixels are exactly (18,18,18) = `#121212`, the rest the
+split's orange fringe — so the mark ships near-black, not black.
+`glyph-dark.png` is the same silhouette (798 × 352) in pure (255,85,0).
+The master (`packages/refraction/assets/soundcloud.png`, P3→sRGB via
+`withIccProfile("srgb", {attach: false})`) puts the dark mark at the same
+798 × 352 / (511.5, 520.5), and every glyph-free row and side band reads
+median (255,84,0) — the declared `#FF5500` within 1/255, so the plate
+stays.
+
+**Placed by width** (fit-flat-glyph's rule): s = 24.9375/74.987 =
+0.332558, `translate(3.509826 10.683836)`. Chrome-rendered at 1024 that
+lands the mark at 797 × 357 @ (511, 520) against the shipped 798 × 354 @
+(511.5, 520.5): width within a pixel, height 3 px taller — an aspect gap
+of **0.91%** by direct alpha bbox, 1.23% by fit-flat-glyph's palette
+method (795 × 356 vs 798 × 353). Under the ~1% bar, and the official
+proportions are kept either way. Central RMSE at that placement: 7.16
+(refine metric).
+
+**Grid search** (`refine.mjs`, coarse 0.1 unit / 1% → fine 0.008 /
+0.1%, 275 renders, central-60% crop at 256 vs the P3→sRGB master):
+7.16 → **5.27** at `translate(.058 .042) scale(.9965)` on top of the
+width placement, composed into the single shipped transform
+`translate(3.555542 10.688443) scale(0.331394)` (795.2 × 356.0 px at
+1024; the composed file re-scores 5.27). The search gives up 0.35% of
+width to buy height — what a similarity fit does across an aspect
+mismatch. Diagnostic only, never shipped: a y-only ×0.99 on the grid
+optimum reads **3.91** (×0.995: 4.50; the width placement with y ×0.985:
+4.85), so the residual is the App Store raster's mark being ~1% squatter
+than the brand's own vector, not the cloud's cut or the bars.
+
+**Flat.** `icon.svg` in the house form: full-bleed `#FF5500` plate, the
+official path verbatim in `#121212` under the one transform, no defs, hex
+only (no P3 declared; `p3-allowlist.json` has no soundcloud block and
+gains none; `audit-declared-colors` not run — it hangs on flats without
+P3). `flatSource` → **official**. `badge.svg` keeps the form the old
+badge used — the bare mark, no plate, no squircle, `viewBox 8 8 24 24`,
+`#FF5500` — fitted to the 24-unit box by width
+(`translate(7.994419 14.628052) scale(0.320056)`: x 8→32, 10.74 tall,
+centred on y 20); reads on both pills, no `badge-dark.svg`.
+
+**Facet drift** (`audit-facet-drift --only soundcloud --sheets`, on the
+built static): 5.17 → **5.45** central, frame 12.87, maskΔ 1.8%, meanΔ
++0.9/+0.1/−0.1, luma 47%, 1% of the crop > 40, 0/1 glass. Diagnosis
+stays `geometry` (edgeShare 1.00, struct 0.009; fit-flat-glyph's own
+width fit `translate(−.0446 −.0144) scale(1.00377)` is the pure width
+placement the grid search already scored worse). Note the instrument
+gap: refine renders `platforms/…/icon.svg` at 256 directly (5.27); the
+audit scores the house-masked static resampled from a larger render
+(5.45) — the audit's number is the one recorded.
+
+**Bundle: left as is.** 5.45 is over the ≤ 5 rebuild gate, so
+`Soundcloud.icon` stays `appstore-artwork-split` (`glyph.png` /
+`glyph-dark.png`, canvas `#FF5500`, `appStoreId 336353151`) and the
+residual is carried by its `glyph.png` — the App Store artwork's
+rendition of the mark, 798 × 354 where the official vector at matched
+width is 795 × 356. A rebuild from the flat would give the builder's
+`fill-specializations` dark solid (the mark recoloured `#FF5500` on the
+gray canvas), which is what `glyph-dark.png` already is — a maintainer
+call, since it would replace the shipped rendition with the brand
+vector and put the glass facet on the official proportions too. Sheet
+(master | flat @256 under the house mask | old dark | dark, unchanged |
+badge on both pills): `scratchpad/soundcloud-work/soundcloud-review.png`.
+
+**Follow-up, bundle rebuilt from the official flat (2026-09-18).**
+Maintainer's position, taken the same day for Playapod and Podcast App:
+the brand's own vector outranks the App Store raster's 1% squash. So the
+gate above was overruled and `Soundcloud.icon` was rebuilt through
+`build-svg-icons --only soundcloud` (old bundle removed, bundles cleared,
+`appStoreId 336353151` restored into the bundle entry, where the other
+rebuilt `flat-svg-split` bundles keep it). The flat passed as `flat-svg`
+at central 2.44 and the split lifted the solid: canvas `srgb:1,.3333,0`
+/ dark `gray:0.192 → 0.078`, one bare SVG layer (`Assets/icon.svg`, the
+flat minus its plate, scale 32) carrying the predicted
+`fill-specializations` dark solid `srgb:1,.3333,0` — the one-file form,
+no twin PNG. Source `appstore-artwork-split` → **flat-svg-split**,
+hasDark true from build-assets.
+
+Against the old renditions at 512 (both sides P3→sRGB): Dark vs the
+`glyph-dark.png` rendition frame RMSE **4.96**, central 6.81, mark median
+(254,85,1) vs (255,84,1), plate identical (median 24,25,24; centre
+column 28/23/19 at the quarter rows), 2.79% of pixels over 2/255 and
+0.84% over 24/255 — the edge band of the mark going 398 × 175 → 397 × 178,
+i.e. the raster's aspect residual retired with the raster. Light vs the
+old master: frame 5.09, central 7.00, mark (18,18,18) and plate
+(255,85,0) in both, bbox 398 × 176 → 397 × 178, same story. Facet drift
+after the locked package build: **5.45 → 0.64** central (frame 12.31 is
+the two masks' corners, maskΔ 1.8%, meanΔ +0.1/−0.1/−0.0, 0% of the crop
+over 40); `fit-flat-glyph` reads identity (795 × 356 @ (511.0, 519.5) on
+both sides, 0.00%). Diagnosis entry → `floor`; the `geometry` residual
+that the near-floor round declined to chase is gone because both facets
+now draw the official proportions. Snapshots patched in place, validate
+73/73, tests 276. Sheet (master | flat @256 under the house mask | old
+dark from glyph-dark.png | new dark | badge on both pills) regenerated at
+the same path.
+
+### pocketcasts: the plate's 4/255 (2026-09-18)
+
+The diagnosis filed pocketcasts (7.56, `glass 0/2+s`, signed
+−3.7/−4.1/−4.1) under `plate`. Measured, the plate is not where the
+4/255 lives. The bundle's canvas is the untouched default
+`srgb:0,0.533,1` blue, fully covered by the opaque `Group 1.png`; that
+PNG (untagged, 8-bit) paints 244,62,55 on every plate pixel, which is
+`#F43E37` — the flat's declaration, and Pocket Casts' own roundel red.
+On glyph-free margins (rows 30–140 / 884–994, cols 250–774, and the
+mirror columns) the Chrome render of the flat reads 244.00/62.00/55.00
+and the master (P3→sRGB squashed, already untagged, so
+`withIccProfile("srgb")` is a no-op) reads 245.0/62.0/55.0, flat from
+row 64 to row 940, +1 in red only. The sRGB→P3 8-bit→sRGB round trip
+of 244,62,55 lands at 244.04/61.70/55.64 → 244,62,56, so the +1 is not
+quantisation and not a wrong-space transcription (a P3-coded 245,62,55
+would decode to 255,28,39); it is the layer's material lifting the
+plate by one code (specular on, translucency 0.5). The rim brightens
+above that only in the outer 32 rows (row 32: 247,65,57; row 16:
+255,76,70).
+
+Where the mean comes from — the central crop split by the FLAT's own
+pixel class at the audit's 256:
+
+| class | share of crop | glass−flat mean |
+| --- | --- | --- |
+| plate (red) | 55.8% | **+1.02 / +0.02 / +0.02** |
+| glyph (white) | 39.6% | **−10.36 / −9.91 / −9.89** |
+| edge (mixed) | 4.6% | −4.70 / −5.57 / −5.60 |
+
+The white P renders as a neutral light gray on the master (235 at the
+top of the ring, 239 mid, 246 at the left; the flat paints 255), and
+0.40 × −10 ≈ −4 is the whole signed mean; luma share 98% says the same.
+That is the layer's material on a non-glass layer (`glass: false`,
+`specular: true`, `translucency 0.5`, neutral shadow 0.5), which the
+diagnosis's plate gate (`glassLayers === 0 && |signed| ≥ 3`) cannot
+tell from a plate offset because it keys material on glass layers only.
+Counterfactual, in scratch: a `#F53E37` plate (matching the master's
+245) moves central 7.59 → 7.58 and worsens the red mean −3.75 → −4.33.
+So the flat is unchanged — `#F43E37` is the developer's own value,
+transcribed in the correct function (an sRGB PNG pixel → hex), and the
+badge carries the same plate. Facet drift **7.56 → 7.56**; the
+diagnosis entry is refiled `primary: material` by hand (the tool's own
+definition is "glass layers/specular", and this bundle is specular).
+No P3 declaration, so `audit-declared-colors` was not run and the
+allowlist is untouched. Rule for the next reader: **before recolouring
+a `plate` pair, split the signed mean by the flat's pixel classes — a
+mean that lives on the glyph pixels is material, whatever the layer's
+`glass` flag says.** Sheet (master | flat @256 under the house mask |
+4×|diff|, the plate reads black):
+`scratchpad/pocketcasts-work/review-sheet.png`.
+
+### spreaker: the flat assembled from the bundle's own layers (2026-09-18)
+
+The drift diagnosis filed spreaker under plate (+registration) at
+**16.42**: glass−flat means +1.2/+9.1/+15.7 and a fit of
+`translate(0.1857 0.1638) scale(0.98782)`. The bundle needed nothing —
+it is the round's first all-vector Android adoption (`adaptive-icon`,
+`Assets/background.svg` + `Assets/star.svg`, the APK's VectorDrawables
+path-for-path). The flat was a drawn approximation of both layers: an
+11-vertex star under an inner-shadow filter, on a white →
+`display-p3 .9059 .8745 .7647` ramp that reached full strength at row
+32, with a cream radial (`.9882 .9451 .8627` at .97 → `#EB9A00` at 0,
+r 16) for the glow. The developer's plate is a different object: the
+launcher tile is a 61.63-dp crop of the 108-dp canvas, so the icon sees
+only the middle of a gradient that holds white to 57% of the 448 tile
+and, at the icon's bottom edge, is only t = 0.785 of the way to
+`#e7dec2` — half the cream the old flat painted there (the +9 G / +16 B
+signature). The glow is `#eb9a00` → transparent at `fill-opacity .2`,
+r 171.73 of 448, centred on the tile, not on the icon.
+
+Rebuilt per the icon-to-flat-svg route with zero drawn geometry. Both
+layers are 1024-native with no `position`, so the placement is
+`scale(.03125)` and nothing else:
+
+- **plate** — background.svg's two gradients pushed through its own
+  `scale(16.616633) translate(-23.75,-23.1875) scale(0.24107143)` chain
+  into the 32 box (448-space → 32-space is k = 0.12518111, origin
+  (−12.3327, −12.0406)) and painted on the house full-bleed path:
+  linear x 15.7079, y −12.0406 → 44.0406, stops `#fff` / `#fff` @ .57 /
+  `#e7dec2`; radial centre (15.7079, 16), r 21.4974, `#eb9a00` →
+  `#eb9a00` @ 0, `fill-opacity=".2"`. The white hold ends at row 19.93.
+- **mark** — star.svg's fill path (`#cc6e00` → `#ffc107` @ .73 →
+  `#f4c73f`, userSpaceOnUse in the path's own space) and its glow
+  stroke (`stroke-width 8.53333`, radial `#ffc107` @ .24706 → 0)
+  **verbatim**, inside the asset's own nested group chain. The
+  VectorDrawable's two non-uniform scales, `scale(0.29110512,0.26470588)`
+  × `scale(0.4091912,0.45)`, compose with the 16.616633 crop to a
+  uniform 1.979334 in both axes (equal to 1e−7), so the stroke stays
+  round and no coordinate was rewritten. The star lands at x 5.11–27.97,
+  y 3.39–28.61 — the old drawing was 1.2% larger and 0.19 units off, as
+  the fit said.
+
+Same instrument, `--only spreaker`, before and after on the same day:
+
+| flat | central | frame | meanΔ R/G/B | luma% | >40 | fit-flat-glyph |
+| --- | --- | --- | --- | --- | --- | --- |
+| old (drawn star, drawn plate) | 16.42 | 20.95 | +1.2 +9.1 +15.7 | 50% | 3% | translate(0.1857 0.1638) scale(0.98782) |
+| **bundle layers verbatim** | **0.95** | 15.10 | +0.5 +0.4 −0.5 | 45% | 0% | **translate(0 0) scale(1.00000)** |
+
+0.95 is the vector-for-vector floor (the flat-svg family scores
+0.47–1.68), so the registration step reduced to a measurement: the
+fit returns the identity, and no wrapper transform was applied. The
+`4x|diff|` sheet is faint concentric rings on the plate and nothing at
+the star — the CoreSVG stop law on the two ramps (ictool transforms the
+saturated `#eb9a00` and `#cc6e00` stops before lerping; Chrome lerps the
+declared stops), the expected residual, measured and left. `frame`
+15.10 is the two masks' corners (maskΔ 1.8%). Diagnosis entry:
+plate(+registration) → **floor** (struct 0, edgeShare 0.20). The badge
+keeps its form — the bare mark, no plate, no clip — but is now star.svg's
+two paths verbatim, fitted by the fill path's bbox (369.56 × 407.6 in
+the asset's space) to the 24-unit box: `translate(9.063984 7.988224)
+scale(.058881256)`; the drawn star and its inner-shadow filter go.
+`flatSource: "official"`. Every colour is now the APK's own hex, so the
+four `display-p3` declarations leave with the old file; spreaker never
+had a `p3-allowlist.json` block and does not gain one. Snapshot:
+spreaker 16.42 → 0.95.
+
+## The canvas lerp and the stop law (measured 2026-09-18)
+
+Chasing antennapod's "plate" diagnosis (5.77, meanΔ −0.9/−2.7/−4.9,
+edgeShare 0.13, `flat-svg-split` with the flat's `#0AB2F9 → #2C66F4`
+lifted into the canvas and inset-resampled). The canvas-inset law was
+measured on a grey ramp, which cannot show a colour transform; the
+hypothesis was that ictool's CANVAS gradient carries the CoreSVG stop
+law (green floor `0.0185·R + 0.0320·B` in linear light) or lerps in
+another space for saturated stops. **It does not. The canvas cell is a
+plain encoded-sRGB lerp of the declared stops with NO stop transform
+— the stop law lives only in the SVG-layer gradient cell.** And
+antennapod's residual is not its plate at all: it is ictool's
+shadow-blur kernel, measured below as a dilation + widening law.
+
+Instrument (scratch `antennapod-work/{gen,measure}.mjs`): bundles with
+antennapod's `icon.json` structure, one fully transparent SVG layer,
+canvas fill under test; ictool at 1024 (`--platform iOS --rendition
+Default --scale 1`), P3→sRGB via sharp `withIccProfile("srgb")`, centre
+column and central-25% row median at rows 105…919 (t = 0…1 per the
+inset law), scored against (1) the encoded-sRGB lerp of the declared
+stops and (2) the extended stop law (`gradient_stop_ext`, re-implemented
+with its gceil table) lerped in extended encoded sRGB, plus a
+linear-light lerp for completeness. Solid endpoints rendered both as
+`"solid"` and as identical-stop gradients (the catalogue's form): the
+two are byte-identical.
+
+| pair (declared, 0–255) | vs (1) declared lerp | vs (2) stop law | linear-light | mean rend−(1) R/G/B |
+| --- | --- | --- | --- | --- |
+| (a) antennapod `13.5,170.2,248.5 → 40.5,109.8,244.5` | **1.15** (max 4.9) | 1.15 (floor unbound: identical) | 2.75 | −1.23 / +0.12 / +0.60 |
+| (b) red → blue `255,0,0 → 0,0,255` | **0.49** (max 2.2) | 25.23 (max 50.1; G predicted 37→50) | 43.42 | −0.21 / +0.05 / −0.08 |
+| (c) `#FF9F00 → #EF006B` (the stop-law pair) | **0.92** (max 4.2) | 13.51 (max 40.9; G predicted 39 at t=1) | 21.95 | +0.58 / −0.52 / −0.88 |
+
+Row for row, (b) renders G = 0 down the whole ramp and (c) reaches
+`240,0,107` at t=1 — exactly where the SVG-layer cell ("SVG gradients
+under the flat gate") renders `241,54,93` at t=0.875. Same stops, two
+cells, one carries the law and one does not. Solids: every endpoint
+renders within 1.0/255 of its declaration (worst: red→blue's blue
+endpoint R +1.0, antennapod's bottom stop B +0.86), and the ramp's end
+rows (105, 919) equal the solids within 1 — so the canvas has neither a
+stop transform nor a solid soft-knee for in-gamut sRGB.
+
+**The residual that remains is 8-bit P3 quantization, not a law.**
+antennapod's raw 16-bit master steps in exact 1/255 quanta of P3-coded
+value, and the P3→sRGB matrix amplifies a quantum into ±2 in a small
+channel: the canvas's red wobbles 14, 17, 14, 16 at rows 105/142/179/216
+(declared 13.5→17.2), non-monotone. A compensated stop pair (both stops
+shifted by the measured mean, +1.23/−0.12/−0.60 per 255) moved the
+rendered red by only ~+0.6 — sub-quantum — and read −1.86 against its
+own declaration; the full bundle went 5.77 → **5.87**. Rejected; the
+canvas cannot be steered below ~1/255 in a small channel, and it does
+not need to be.
+
+**Every lifted canvas, measured.** The same probe on each lifted or
+split canvas's own light stops, with what the stop law WOULD have
+predicted (this is the "predicted plate residual" if the canvas carried
+the law; where the floor does not bind the two models coincide):
+
+| bundle | source | stops (0–255) | measured vs declared lerp | mean R/G/B | if the stop law applied |
+| --- | --- | --- | --- | --- | --- |
+| amazonmusic | flat-svg-split | `65,231,240 → 40,212,221` | 1.14 | −1.44 / +0.88 / +0.57 | 1.14 (unbound) |
+| antennapod | flat-svg-split | `14,170,249 → 41,110,245` | 1.15 | −1.23 / +0.12 / +0.60 | 1.15 (unbound) |
+| rss | official-svg | `241,138,52 → 230,117,47` | 0.60 | +0.33 / −0.17 / −0.49 | 0.60 (unbound) |
+| yoto | flat-svg-split | `252,98,68 → 231,70,37` | 0.81 | +1.08 / −0.30 / −0.46 | 0.81 (unbound) |
+| rssradio | flat-svg-split | `255,130,7 → 255,80,44` | 0.78 | −0.02 / −0.35 / −0.96 | 0.78 (unbound) |
+| iheartradio | official-svg | `195,0,43 → 176,0,39` | **0.43** | +0.21 / 0.00 / −0.33 | **14.46** (G +25 predicted) |
+| castbox | appstore-artwork-split | `255,144,77 → 255,99,45` | 0.47 | 0.00 / +0.12 / −0.50 | 0.47 (unbound) |
+| playerfm | appstore-artwork-split | `222,47,73 → 190,13,39` | **0.81** | +0.62 / −0.88 / −0.23 | **4.65** (G +7 at the bottom stop) |
+| airshow | appstore-artwork-split | `12,7,21 → 38,20,68` | 0.51 | +0.10 / +0.04 / +0.06 | 0.51 (unbound) |
+
+iheartradio's zero-green plate is the independent refutation: the law
+predicts a 25/255 green lift and the canvas renders G = 0.0–0.2. No
+lifted canvas needs compensating; `resolveGradientFill()`'s
+`insetStops()` output is already what ictool paints, to the
+quantization floor. (Solids on the saturated cyan and the near-zero
+blue read up to 2–3/255 off for the same quantization reason —
+amazonmusic R −1.6/−2.1, rssradio's top stop B −2.9 — not a law.)
+
+**So what IS antennapod's −0.9/−2.7/−4.9?** The signed means are
+proportional to the plate colour itself (25:140:247 ≈ 0.10:0.57:1
+against the residual's 0.18:0.55:1): a 35% black darkening the plate,
+i.e. the official drop shadow. Splitting the audit's central crop by
+pixel class read off the FLAT (plate = within 3/255 of the flat's own
+ramp; glyph = the white mark and light-blue rings; shadow band = the
+rest; `split.mjs` reproduces the audit's 5.77 exactly):
+
+| class | crop share | RMSE | mean master−flat R/G/B | share of central² |
+| --- | --- | --- | --- | --- |
+| plate | 9.8% | 8.57 | −2.05 / −6.65 / −12.31 | 22% |
+| glyph | 41.8% | 0.95 | +0.14 / +0.15 / +0.30 | 1% |
+| shadow band | 48.4% | 7.29 | −1.65 / −4.37 / −7.95 | 77% |
+
+And the "plate" class residual is a function of distance to the flat's
+nearest shadow pixel (1024 px; the declared σ is 22.6 px): d<4:
+−10.1 B; 8–16: −3.8; 24–32: −0.7; 32–64: −0.3…+0.8 — the plate agrees
+within 1/255 once past ~1.5σ of any shadow, and the diagnosis lens's
+"channel mean ≥ 3 → plate" rule read the shadow's tail as a plate.
+Beyond ~64 px (i.e. near the squircle edge, outside the crop) the sign
+flips to +2…+4: ictool's edge rim, also not the plate.
+
+**ictool's shadow kernel: dilated by 0.5 units, σ + 0.26 units, and a
+plateau clip under a tight filter region (`kernel.mjs`,
+`kernel-fit.mjs`).** A white bar (x 4–28, y 12–20 of 32) with a black
+`fill-opacity=".35"` copy under `feGaussianBlur stdDeviation=S` +
+`feOffset dy=D` on the `<path>`, over a gray-0.8 canvas, rendered by
+ictool (bundle) and Chrome (same SVG with the gray painted), 1024. The
+darkening profile above and below the bar probit-fitted to
+`71.4·Φ(±(y−c)/σ)` (full amplitude 204×0.35; fit RMSE ≤ 0.6/255 on
+every row set):
+
+| declared σ, dy (px) | region | Chrome c above / below | Chrome σ | ictool c above / below | ictool σ |
+| --- | --- | --- | --- | --- | --- |
+| 11.2, 0 | wide | 383.3 / 639.8 | 10.6 / 10.5 | **367.7 / 655.4** | **19.3 / 19.2** |
+| 22.6, 0 | wide | 383.2 / 639.8 | 21.4 / 21.4 | **367.8 / 655.1** | **30.5 / 30.7** |
+| 44.8, 0 | wide | 383.1 / 639.9 | 42.9 / 42.9 | **367.9 / 655.1** | **53.3 / 53.3** |
+| 22.6, 11.3 | wide | 393.6 / 650.5 | 21.0 / 21.8 | 380.3 / 667.6 | 34.9 / 35.7 |
+| 22.6, 11.3 | antennapod's (−8.3%/−7.5% bbox) | 390.7 / 650.4 (clipped) | 16.2 / 22.5 | 399.0 / 683.1 | 26.4 / 59.8 (not an erf) |
+
+The bar's edges are rows 384 and 640. Chrome centres the shadow's 50%
+crossing on the edge and blurs at the declared σ (−5%, its triple-box
+Gaussian). ictool centres it **16 px outside the bar on both sides at
+every σ** — a constant dilation of 0.5 root units (1/64 of the icon) —
+and blurs at **σ + ~8 px** (19.3/30.5/53.3 for 11.2/22.6/44.8: additive,
+not a ratio and not in quadrature). The 35% amplitude is honoured
+(edge value 49 ≈ 71.4·Φ(16/30.5) = 50); the offset is honoured (12.5 px
+for 11.3), and a horizontal `dx` shifts the row profile the same way,
+with the same dilation and widening. Under antennapod's tight
+filter region Chrome hard-clips the tail at the region boundary (below:
+49, 38, 29, 0) while ictool holds a plateau (57, 52, 47, 42, 41, 40) —
+an edge-clamped blur — and clips ~25 px further out. Quantified on the
+antennapod bundle itself (scratch renders, audit method): scaling the
+declared σ by k with the shipped region gives 5.77 → 5.11 / 4.88 / 4.71
+/ **4.66** / 4.67 / 4.72 (k = 0.8…0.35, minimum at 0.5); a wide region
+gives 5.74 → 4.98 at best; the shadow band never drops below 6.4 RMSE
+because the dilation and the plateau are not σ.
+
+**Verdicts and proposals (measurement only; nothing applied).**
+
+- Canvas lerp ≠ stop law. The three gradient laws stand as written
+  in the canvas-inset entry; add: the canvas transforms no stops and
+  soft-knees no solids for sRGB declarations. Nothing to compensate on
+  any lifted canvas, and a compensating stop shift is sub-quantum
+  (rejected on antennapod, 5.77 → 5.87).
+- antennapod's 5.77 is `shadow`, a cause the diagnosis lens does not
+  have. Its "plate" label is the rule reading a plate-proportional
+  shadow tail as a channel mean; `audit-drift-diagnosis.mjs` could add
+  a `shadow` signal — the plate-class residual decaying with distance
+  to the flat's own shadow pixels — before "plate". Not implemented;
+  the committed entry is left as the script wrote it.
+- The fix for the shadow is not a filter parameter (the dilation and
+  the plateau clip survive any σ/dy/region). Two honest routes, neither
+  taken here: (1) bake the shadow alone as a raster layer under the
+  vector glyph (Chrome-rendered, exact by the raster-layer law; the
+  gpodder precedent), or (2) inset the shadow path by 0.5 root units
+  and declare σ − 0.26 units under a wide region — a computed path
+  offset, not a redraw, and only worth it if (1)'s raster is unwanted.
+  Either should take the pair to the ~2.4 the no-shadow ablation
+  measured for the mark itself.
+- `platforms/antennapod` untouched; `facet-drift.json` (5.77) and
+  `drift-diagnosis.json` (antennapod: plate) unchanged. Scratch:
+  `antennapod-work/` (probe bundles, renders, `gen/measure/split/
+  shadow/probe-sigma/kernel/kernel-fit.mjs`, diff images).
+
+### podcastapp: the official vector vs the store raster (2026-09-18)
+
+The flat is `flatSource: official`: the mic is subpaths 2–5 of the
+`Combined-Shape` path in `https://podcast.app/images/logo.svg` (the
+header lockup, `#354FEE`, evenodd; commit 0fe63da dropped the plate
+subpath and filled the rest white), byte-identical to the logo's `d`
+modulo whitespace, under `translate(-1.5226 -.0746) scale(1.04644)`.
+The bundle was `appstore-artwork-split` (`Assets/glyph.png` +
+`glyph-dark.png` on the solid canvas), drift 22.70, diagnosed
+`geometry` (edgeShare 0.93, fit near identity). The 09-13 diagnosis
+"glyph scale, −8%" predates bbfa494/0fe63da and was stale: by the 22.70
+reading the scale was already matched.
+
+**Same cut?** No. The split asset is the iheartradio trap again:
+`glyph.png` is not an alpha silhouette but the white mic with its holes
+painted plate-blue (178,460 opaque px = 95,155 white + 79,196 of
+(53,79,238)), so alpha registration reads IoU 0.51 and means nothing;
+`glyph-dark.png` is the same mic in (53,79,238), 95,440 px. Registered
+on WHITE: the asset's white bbox 220–803 × 218–823 (584 × 606, centre
+(512, 521), 97,605 px) is the master's white bbox to the pixel, IoU
+**1.0000** (the layer has no position scale, so the asset is safe to
+measure here). The official mark in its own units spans 8.000–25.469 ×
+6.563–24.688 (17.469 × 18.125, aspect 1.0376 vs the raster's 1.0377:
+**aspect gap 0.01%**). Bbox seed: scale 1.044775 (width 1.044723 /
+height 1.044828), and it lands on 220 217 803 823 — the shipped
+transform's envelope exactly, so placement and scale were never the
+residual. IoU seed 0.8870 (the file's transform: 0.8783); hill-climb
+(1/32 → 1/128 unit, 0.3 → 0.05% scale) best **0.8937** at
+`translate(-1.4602 -0.0824) scale(1.044775)`, bbox 221 216 803 822:
+7,262 official-only / 3,887 raster-only px of a 104,867 union. Per
+element (official at the best transform | raster, 1024²):
+
+| element | official | raster | IoU | what differs |
+| --- | --- | --- | --- | --- |
+| capsule ring | 340 × 485 (342–681 × 216–700) | 332 × 480 (346–677 × 218–697) | 0.910 | walls **47/46 px vs 44** on rows 418/458/498; cap 47 vs 44 |
+| cradle arc | 583 × 316 (y 507–822) | 584 × 348 (y 476–823) | 0.854 | stroke 47 vs 44 at column 511; the raster's tips rise **31 px higher** |
+| dot | 68 × 68 @ (475.8, 344.7) | 64 × 64 @ (479.5, 347.5) | 0.823 | smaller, 3.7 px right / 2.8 px down |
+
+Same design, same envelope, a different drawing: the App Store art's
+strokes are ~7% thinner, its cradle arc sweeps further up, its dot is
+smaller and sits lower-right (0fe63da's 46 vs 44 wall reading was this,
+seen from one scanline). Not the official vector at another scale.
+
+**Decision: the brand's current vector outranks a store raster of an
+older cut.** The flat is untouched (no path or transform edit — the
+IoU optimum trades placement against the raster's arc tips, which is
+not registration). The bundle was rebuilt from it: `PodcastApp.icon`
+removed, `liquidGlass.bundles` cleared, `build-svg-icons --only
+podcastapp` → `flat-svg` (gate 3.34 vs Chrome) → **`flat-svg-split`**:
+the canvas keeps the same `srgb:0.20784,0.30980,0.93333` two-stop solid
+and the gray dark gradient the raster bundle declared, one bare
+`Assets/icon.svg` layer at scale 32 (the flat verbatim), no fill- or
+image-name-specializations, no dark file; the two PNGs are gone. meta:
+`source` → `flat-svg-split`, `hasDark: true` re-measured by
+`build-assets --only podcastapp` (`ok +dark`); no `appStoreId` existed
+to restore.
+
+**Light.** New vs old master central RMSE 25.28 @512 (max 218) — the
+cut, by design (playapod's 27.88 is the same kind of number).
+
+**Dark.** By the tint law alone the white mic renders median
+**(53,79,239)** over the 74,738-px interior where both silhouettes
+agree; `glyph-dark.png` read (53,79,238) and the old dark master
+(53,79,238): RMSE 0.92 (max 3) against the asset, 0.81 against the old
+master, dark canvas byte-identical at (40,512)/(512,40)/(512,984) =
+(22,22,24)/(32,31,32)/(16,17,14). The developer's baked dark twin was
+the tint law's output within 1/255; the silhouette IoU old-vs-new dark
+is 0.8714, the light cut difference again. New vs old dark master
+central 21.63 @512.
+
+**Audit** (`--only podcastapp --sheets`, session `--work`): **22.70 →
+1.17** central, frame 11.00, maskΔ 1.8%, cropα 1.00/1.00, meanΔ
++0.2/+0.4/+0.7, luma 100%, 0% > 40, 0/1 glass. `fit-flat-glyph`:
+585 × 608 @ (511.0, 519.5) vs 584 × 607 @ (511.5, 520.0), −0.17% /
+−0.01%, `translate(0.0429 0.0434) scale(0.99829)`. Diagnosis geometry →
+**floor** (no causes, struct 0, edgeShare 0.75); geometry worklist −1.
+`validate.mjs` 73/73, 276 tests. Files: `PodcastApp.icon` (icon.json +
+`Assets/icon.svg`), `meta.json`, `facet-drift.json`,
+`drift-diagnosis.json` (entry in place); `icon.svg`, `badge.svg` and
+`p3-allowlist.json` (no block, no P3 declared) untouched.
+
+Trap, restated: a split asset's alpha is the ART's silhouette — holes
+painted in the plate colour — so register on the mark's colour (alpha
+IoU 0.51 vs white 0.89 here). And a diagnosis line written against one
+flat does not survive that flat's rebuild; re-measure before believing
+"scale".
+Review sheet (old light | new light | old dark | new dark | flat under
+the house mask @256 | @32 | xor official/raster; audit triptych):
+`scratchpad/podcastapp-work/podcastapp-review.png`.
+
+### hark: vector bundle with the app's own dark plate (2026-09-18)
+
+The maintainer took hark's 5.26 (edgeShare 0.97 — the raster's soft
+arcs against the vector's) as within the same-artwork band, so the
+`appstore-artwork` bundle (`light.png` + `dark.png` on one
+image-name-specializations layer) was swapped for the flat, with the
+brief to keep the app's shipped dark look. Three things were measured
+before the swap, and two of them overturned the brief's premises.
+
+**The dark plate is a solid.** `dark.png`'s glyph-free side bands
+(48–96 / 928–976, rows 4–1019) read per-row median **(34,34,34) =
+`#222222`** on every row — std 0.00 in all three channels, left band =
+right band, linear slope 0.00000/px over rows 105–919. Not a gradient.
+(`light.png`'s bands read (242,232,223), the flat's `#F2E8E0`; that file
+also carries a 1-px foreign border — (102,98,93) along the left and top
+edges, (157,149,144) on the right, 1024 px each — which any
+whole-frame silhouette read must inset past.)
+
+**The dark glyph is the light glyph in two of three colours, and at a
+different placement.** Per-path medians through Chrome masks of the
+flat's three paths (eroded 4 px): `#D15437` → (209,84,55) and
+`#D88E3D` → (216,142,61) in both PNGs; the outer arc `#9A3127` reads
+(154,49,39) in `light.png` — the flat's colour exactly — but
+**(158,50,24) = `#9E3218`** in `dark.png` (Δ +4/+1/−15). The earlier
+"per-path medians identical" line was wrong about that one path. And
+the silhouettes (> 40/255 from each plate, 2-px inset): light
+346–742 × 230–802 (397 × 573, centroid 535.6/515.8), dark
+321–702 × 235–788 (382 × 554, centroid 503.3/511.5), IoU **0.785**. The
+developer's dark artwork is the same mark drawn ~4% smaller and ~30 px
+further left. A grid search of a similarity transform on the flat's
+glyph group (Chrome at 1024, silhouette IoU against `dark.png`, coarse
+0.25 unit / 1% → 0.025 / 0.1%) lands at
+**`translate(−0.945 −0.125) scale(0.968)`** about the canvas centre:
+IoU 0.993, fitted bbox 321/236/704/787 against the PNG's
+321/235/702/788. So the shipped dark art is a pure vector similarity of
+the light mark — no pixels needed, but not the light placement either.
+
+**The Dark canvas fill cannot be set — at all.** The brief asked for the
+plate as the canvas's dark specialization. Probed with the built bundle
+at 256: `srgb`/`gray` values 0.078 through 0.30, a solid red, a
+two-stop red gradient, and red on the top-level `fill` all render the
+identical standard ramp (side-band medians at rows 26/64/128/192/230:
+39/28/23/18/21, rim highlights included). The tint-law entry's first
+bullet — "canvas darkening is unconditional" — means exactly this: no
+declaration reaches the Dark canvas, and the old bundle only showed
+`#222` because it was baked into a raster layer, which ictool never
+touches. What does work is a **layer**: a full-bleed `#222222` rect on
+`plate-dark.svg` at `{0, dark 1}` (the inverse of downcast's
+dark-hidden `plate.svg`) renders a flat (34,34,34) body with the rim
+rows byte-identical to the old raster rendition's (52: 42,42,41; 64: 37;
+448: 36; 460: 38 at 512). One trap on the way: the `layers` array is
+**top-to-bottom** (first = topmost — downcast lists `glyph` before
+`plate`); with the plate first, Dark rendered nothing but plate.
+
+**Shipped.** `build-svg-icons --only hark`: SVG layer at central 2.33
+against the Chrome reference, split lifted the solid plate into the
+canvas (two equal `srgb:0.94902,0.90980,0.87843` stops); the mark is
+three warm colours, so the builder emitted a bare layer — no twin, no
+fill specialization, `flat-svg-split`. Then hand-set to three layers on
+**one glyph file**: `icon.svg` at scale 32 `{1, dark 0}`; `icon.svg`
+again at scale 30.976, translation (−30.24, −4) pt `{0, dark 1}` (the
+fitted transform in points); `plate-dark.svg` `{0, dark 1}` underneath.
+The canvas keeps the builder's standard gray pin on its dark
+specialization (inert, but it is the form every split carries).
+`appStoreId 1540109137` restored; `hasDark` true. `light.png` and
+`dark.png` left the repo.
+
+**Measured at 512 against the old ictool renditions** (both sides
+ictool, same coding): Dark whole-frame **3.01** RMSE, 674 px over
+24/255 (the vector-vs-raster rim), central-60% 4.85; plate (34,34,34)
+exact; dark glyph bbox 160/118/352/393 vs 160/117/351/394; the glyph
+paints verbatim in Dark — (154,49,39) / (209,84,55) / (216,142,61), no
+vibrancy shift. Light whole-frame 4.34 (1,481 px over 24), central
+5.98 — the known edge residual. For the record, the literal brief (one
+layer at the light placement) scored 22.11 / 16,640 px over 24 against
+the old Dark on the same plate that the shipped placement scored
+11.68 / 689 on, and a recoloured `icon-dark.svg` twin (outer arc
+`#9E3218`, everything else identical) on the dark layer would read
+**1.91** / central 3.07 in place of 3.01 / 4.85 — the outer arc's
+15/255 is worth 1.1 RMSE frame-wide. Not shipped: it needs a second
+glyph file, and the brief asked for one; it is a one-line change if the
+shipped colour matters more than the single file.
+
+**Facet drift** (`audit-facet-drift --only hark --sheets`, on the built
+static): 5.26 → **1.12** central, frame 14.98, maskΔ 1.8%, meanΔ
++0.8/+0.4/+0.2, luma 90%, 0% of the crop over 40, 0/3 glass.
+`fit-flat-glyph`: 398 × 572 @ (543.5,515.5) vs 398 × 571 @ (543.5,515.0),
+`translate(0 −0.0156) scale(1.0)`, aspectD 0.18%. Diagnosis → **floor**
+(edgeShare 0.30); `facet-drift.json` and `drift-diagnosis.json` updated
+in place. `validate.mjs` 73/73; icons suite 276 green. No P3 declared,
+no `p3-allowlist` block. Sheet (old light | new light | old dark | new
+dark, ictool at 512): `scratchpad/hark-work/hark-review.png`.
+
+Rule worth keeping, alongside siriusxm's: when a shipped dark PNG
+passes the same-mark test, fit its **placement** as well as its colour
+before assuming the light layer serves both appearances — and put a
+shipped dark plate on a dark-only layer, never on the canvas.
+
+### castbox: registered and re-plated (2026-09-18)
+
+Diagnosis had castbox at **22.62** under plate + registration (fit
+`translate(−0.588 −0.572) scale(1.037)`, glass−flat means 0/3.7/4.6).
+Both were measured and applied to the flat; the bundle
+(`appstore-artwork-split`, the App Store artwork's `background.png` +
+`glyph.png` + `glyph-dark.png`) is unchanged.
+
+**Registration.** fit-flat-glyph's transform applied verbatim as a
+`<g transform="translate(-0.5881 -0.5724) scale(1.03679)">` wrapper
+around the glyph path (no path edits). The local search around it —
+Chrome at 256 hung on most launches this session (49 headless Chromes
+from concurrent sessions on the box), so the coarse-to-fine grid ran on
+an analytic twin of the audit's metric: ONE Chrome render of the mark
+alone at 2048, box-filtered through a summed-area table for each
+candidate similarity, over the plate computed as Chrome's own
+encoded-sRGB lerp — identity 22.50 (Chrome reads 22.71), the seed 6.15
+(Chrome 6.85), and neither the 0.1-unit/1% nor the 0.025/0.25% grid
+finds anything better than the seed; the 0.008/0.1% and 0.002/0.025%
+stages move ≤ 0.012 unit / 0.025% for 0.07, noise, not applied. Scale
+is sharply determined (±0.1% costs 0.55). A non-uniform (aspect) fit
+gains 0.11 — not aspect. fit-flat-glyph re-run on the registered flat:
+identity (`translate(0 0.0156) scale(1)`, glyph bbox 620×398 vs the
+master's 620×397 at the same centre).
+
+**Plate, measured from `background.png` (1024², α 255 everywhere).**
+R is 255 at every pixel. Row means and column means are the same
+sequence (144.3/76.7 at 0 → 121.5/60.5 at 512 → 98.8/44.5 at 1023,
+G/B), the anti-diagonal (k, 1023−k) is constant at 121–122 / 60 and the
+diagonal (k, k) runs 168/93 → 76/28 — a 45° ramp with no plateau at
+either end (audible's clamps below s0; this one does not). Least-squares
+plane over pixel centres: G = 167.74 − 0.045006·x − 0.045251·y, B =
+93.22 − 0.031745·x − 0.031955·y (by/bx 1.005 / 1.007, i.e. 45.0°), rms
+0.32, max 1.06; within-diagonal spread ≤ 2/255. Greedy stops along
+s = x + y at 2/255: **two** (max err 0.89). Line over s extrapolated to
+the box corners (s = 0 and 2048): G 167.70 → 75.14, B 93.19 → 27.81, so
+the flat's plate is `linearGradient (0,0) → (32,32) userSpaceOnUse,
+#FFA85D → #FF4B1C`. The old plate was the same axis with the wrong
+stops: `(−9.267,16) → (16,41.267) #FF9E57 → #FF5321` is t = 0 at
+x + y = 6.73 and t = 1 at 57.27, clamped to (255,158,87) at the TL
+corner where the layer reads (255,168,93) and to (255,83,33) at BR
+against (255,76,28); it agreed only at the centre. Master vs
+`background.png` on plate pixels ≥ 24 px from the mark inside the
+central crop: rmse 0.44, max 1; master vs the 2-stop model: 0.53, max 2;
+no halo or shadow at any distance from the glyph (Δ ≤ 0.5 in every
+1–24 px band). The stop law is a no-op on these stops (both greens sit
+far above the floor: 0.392 / 0.070 vs 0.022 / 0.019 linear).
+
+**Numbers.** Facet drift 22.62 → **6.19** (frame 11.99; meanΔ
++0.0/+0.7/+1.0; luma 64%; >40 2%; edgeShare 0.99). Diagnosis
+plate + registration → **geometry**, and the geometry is measured: the
+App Store `glyph.png` is a hard-edged raster (0.04 partial-alpha pixels
+per edge over five rows) whose bars are **70 px wide at 1024 where the
+flat's path draws 66** (row 420: 312–381 / 422–491 / 532–601 vs
+313–378 / 424–489 / 534–599; the wide bar on row 512 181 vs 179), at
+the same pitch (346 / 456 / 566) — a 6% stroke-weight gap, not
+placement. Decomposed at 256 by the flat's coverage: edge pixels (1.8%
+of the crop) carry 62% of the energy at rmse 36 (master +28.7 G /
++41.8 B there — the wider bars), the mark interior 5.1, the plate 3.3
+(the pixels one 256-px from the mark; the plate proper is at 0.5).
+
+**Vector candidate measured, not adopted (gate: central ≤ 5, read
+6.19).** Hand-built in scratch the audible/downcast way: `plate.svg`
+(the measured 45° ramp on a full 32 rect, non-glass, opacity `{1, dark
+0}`) + the flat's mark as one bare SVG layer (`position.scale 32`, the
+wrapper verbatim, no opacity-specializations so it auto-tints), canvas
+default `srgb:1,0.47647,0.23725` (= the plate's mean 255/121.5/60.5,
+the tint source) with the gray dark pin. ictool at 512 against the
+shipped bundle's own renders (both sides P3→sRGB): Light central
+**9.18** (mark zone 17.7, meanΔ −4.1/−5.8 — the thinner bars; plate
+zone **0.64**, max 3 — the SVG plate through ictool reproduces the
+raster layer, stop law confirmed no-op); Dark central **9.69** (plate
+0.02, the same gray pin; mark 18.8). What differs in Dark besides the
+bars: the old `glyph-dark.png` carries the field's per-row mean
+(interior 255/128/65 at row 160 → 255/114/55 at row 320 of 512, mean
+121.7/60.7) while the auto-tint of the solid canvas is a uniform
+255/120.7/60.6. A vertical-ramp canvas (the row-mean line resampled at
+the inset rows, 139.9/73.5 → 103.0/47.5) was tried for that and reads
+WORSE on the mark (19.03 vs 18.75; interior 139 → 105, it overshoots),
+so the solid mean is the tint source if the swap is ever taken. The
+shipped bundle is byte-identical; source stays `appstore-artwork-split`
+(no `appStoreId` in this meta to keep). The swap is one `icon.json` +
+two SVGs if the maintainer prefers the flat's cut to the artwork's, and
+the flat's bars would need +4 px at 1024 (+0.125 unit) to close the
+geometry gap the other way.
+
+**Files.** `platforms/castbox/icon.svg` (plate stops + wrapper; the
+badge, its own 5-stop plate and hexagonal frame, untouched);
+`apps/web/lib/facet-drift.json` castbox 22.62 → 6.19;
+`apps/web/lib/drift-diagnosis.json` castbox → geometry (fit identity);
+nothing for the P3 allowlist (no P3 triple). validate ✓ (73/73),
+276 tests ✓. Sheet: scratch `castbox-work/castbox-review.png` (old
+light | candidate light | old dark | candidate dark | flat under the
+house mask); instruments `castbox-work/{plate,stops,fastsearch,zones,
+edges,build-bundle,verify512}.mjs`.
+
+### Diagnosis rule: plate is judged on plate pixels; specular is material; filters are their own cause (2026-09-18)
+
+Two of today's investigations were the classifier misfiling, not artwork:
+pocketcasts' `plate` was its white glyph's material on a non-glass but
+specular group (+1/255 on the plate, −10/255 on the glyph — "pocketcasts:
+the plate's 4/255"), and antennapod's `plate` was ictool's shadow-filter
+kernel ("The canvas lerp and the stop law"). `audit-drift-diagnosis.mjs`
+now: (1) files a pair under **material** when the bundle has glass layers
+OR a specular group (the audit's `+s`), and under nothing else; (2) reads
+the **plate** verdict off the flat's own plate pixels — the palette of the
+flat panel's inset ring (6–10% in), a pixel counting as plate within
+24/255 of the nearest palette colour — and fires on a plate-pixel mean
+≥ 3/255 OR a plate-pixel RMSE ≥ 5 (a gradient plate can be wrong
+antisymmetrically and average to nothing: castbox's old plate was +10 at
+one corner and −7 at the other); (3) adds **filter**: the flat carries an
+SVG `<filter>` and the bundle is built from it, so the residual is
+ictool's kernel against Chrome's, not the drawing. New lens "drift:
+filter". On the pre-round audit rows the rule change alone moves
+pocketcasts and podcastparrot plate/registration → material, antennapod
+plate → plate+filter, and nothing at the floor. The snapshot is
+regenerated from a fresh audit once the day's platform work lands (the
+agents' in-place entries are authoritative until then).
+
+### playerfm: the supplied "SVG" is a PNG; plate and registration refit (2026-09-18)
+
+**What the maintainer's `playerfm-logo.svg` is.** A Sketch 63.1 export
+(420×420 viewBox, `<title>PlayerFM logo</title>`) whose only drawable
+element is one `<image>` carrying a base64 PNG — no `<path>`, `<rect>`
+or `<circle>` at all (element census: svg, title, desc, g, image). The
+embedded PNG is **476×476 RGBA, 36,086 bytes**: the white mark on a
+solid `#BC1F29` (188,31,41) disc of 474 px diameter, the round-logo form
+rather than the app tile. Bbox-matched against the mark we already hold
+(the mark's white pixels, uniform scale on the bbox, 512-box IoU):
+supplied vs App Store 1024 **IoU 0.981** (mask RMSE 14.9/255) — the same
+mark; supplied vs the bundle's `glyph.png` 0.954 (the split's alpha is
+~3 px fatter per side at 1024 than a whiteness threshold, a property of
+the split, not a different drawing). Resolution: the supplied mark spans
+**365 px** (76.7% of its 476 frame); the App Store 1024 already gives it
+at 727 px and `glyph.png` at 733 — the supplied file is **half the
+resolution we ship** and adds nothing. Not adopted; the flat stays drawn.
+
+**Plate (was `plate`, +8.2/−0.6/+8.3).** The flat's plate was a solid
+`#BD1C24` (189,28,36) plus a same-colour full disc path — a round-logo
+leftover, a no-op on the solid plate. The App Store 1024 (iTunes lookup,
+id 940568467) has, per-row medians over the glyph-free side columns
+48–96/928–976, rows 4–1019, an **exact full-height linear ramp
+226,51,77 → 186,9,35** (line-fit RMSE 0.33/255; greedy 2/255 stops
+collapse to the two ends) — the bundle's own two canvas colours. The
+master, by contrast, read 233/223/217/212/206/200/194/190 at rows
+105/160/256/384/512/640/768/864 with `x=` 226→186 verbatim in the
+canvas: the canvas-inset law, the ramp squeezed into rows 105–919.
+Applied: flat plate = that ramp full-height (`#E2334D → #BA0923`,
+userSpaceOnUse 16,0 → 16,32), disc path dropped (it would have painted a
+solid disc over the gradient); bundle light canvas resampled at the inset
+rows with `insetStops()`'s exact output, `srgb:0.87019,0.18311,0.28507`
+→ `srgb:0.74549,0.05218,0.15414` (222,47,73 → 190,13,39), both the
+top-level fill and the light specialization; dark canvas and
+`glyph-dark.png` untouched. Re-rendered (`build-assets --only`): the
+master's side columns now read 221,44,71 / 207,30,56 / 193,15,42 at rows
+160/512/864 against the App Store's 220,44,70 / 206,30,56 / 192,16,42 —
+within 1/255 across the central band.
+
+**Registration (was `registration`, fit translate(0.101 −0.0729)
+scale(0.99863)).** `refine.mjs` (scratch, the near-floor round's
+instrument, reproducing the audit's metric: Chrome at 1024, the same
+sharp resize to 256, over gray, central 60%; calibrated — the old flat
+reads 23.279 through it, the audit says 23.28). Against the old master:
+identity on the new plate 19.37, the fit seed 11.67, coarse 0.1/1% →
+11.67, fine 0.025/0.25% → 11.04, finest 0.008/0.1% → **10.96** at
+`translate(.067 −.0819) scale(1.00013)`. A second search against the
+re-rendered master was cut by the coordinator (Chrome launches were
+being starved by hung processes from another session); single-render
+evals against the new master: identity 19.34, seed 11.60, adopted
+transform **10.90**. Residual fit on the new flat: translate(0.0386
+0.0051) scale(0.99863) — under the 0.08-unit threshold, so the cause
+clears.
+
+**Result** (`audit-facet-drift --only playerfm`, Chrome-only): central
+**23.28 → 10.90**, frame 13.45, maskΔ 1.8%, meanΔ **−0.1/−2.2/−1.7**,
+luma 100%, 3% of the crop > 40, 0/1 glass. Above the 5 gate, so the
+bundle stays `appstore-artwork-split` (no rebuild from the flat).
+Diagnosis entry now `geometry` alone (edgeShare 1.00, struct 0.027):
+measured at 1024, the flat's C ring is 156 px wide where the App Store's
+is 151–152 (row 512: 145 vs 143, ~3% heavier) and its round-cap
+terminals sit at different angles (row 512 right run 741–804 vs
+752–795; column 512 top 225–276 vs 231–270), while the three arcs match
+to a pixel (diagonal runs 42/43/43 vs 43/43/43, positions ±1). The rest
+is a redraw of the ring from measured primitives (downcast-style), not a
+transform. Badge: same plate + transform under the house clip.
+`p3-allowlist.json` has no playerfm block (hex only) — unchanged.
+validate ✓ (73/73), icons tests 276 ✓. Review sheet (supplied PNG | App
+Store | master | old flat | new flat | badge on white | on black | 4×
+|diff|): `scratchpad/playerfm-work/playerfm-review.png`; audit triptych
+`scratchpad/playerfm-work/audit-work/sheets/playerfm.png`.
+
+Traps: (1) a "logo.svg" can be a bitmap in a vector envelope — count
+`<path>` before trusting the extension; (2) `timeout` does not exist on
+macOS (`gtimeout` or none) — two steps silently skipped until re-run;
+(3) never run `audit-declared-colors.mjs` on a flat without P3
+declarations (it hangs, and its Chromes starve every other session's).
+
+**Follow-up, same day: the bars set to the artwork's width, then the
+vector bundle shipped.** The flat is our own drawing (`flatSource`
+unattested), so the App Store raster is the reference and a measured
+stroke width is registration (the youtubemusic ring precedent). Measured
+on `glyph.png` at 1024 by half-coverage crossings in the registered
+frame (px = (1.03679·u − 0.5881)·32): six bars, width **70.0 px** (D, E
+exact; A/B/C read 70.3–70.9 only where bridge rows contaminate the inner
+edge; F 69), centrelines 237.4 / 347.0 / 456.8 / 567.0 / 677.0 / 787.5
+— a least-squares **uniform pitch of 110.02 px** (intercept 237.07,
+residuals ≤ 0.42 px) against the flat's 110.58, so the 1.037 scale had
+been splitting the difference between wider bars and a tighter pitch.
+Caps are semicircles of r = w/2 (profile within ±1 px of a 35-px
+semicircle on B, C, E); apexes/bottoms A 433/605, B 369/712, C 314/632,
+D 342/636.9, E 431/627, F 497/595 — the flat's within a pixel except
+A's bottom (+2.4). The three bridges (the bands joining A–B, B–C, C–D)
+are all **50 px tall** at the gap centre (valley/arch 493/544, 451/501,
+472/522; the flat had 49/40/39) with a semicircular fillet of radius
+g/2 across the 40-px gap (rise 1–3 px at ±10 px, 4.5–8 at ±16 vs a
+semicircle's 2.7 / 8.0). The old outline (`evenodd`, hand-tweaked r .68
+/ .613 arcs and one cubic) was replaced by a generator
+(`castbox-work/gen-mark.mjs`): one nonzero path, every subpath
+clockwise — six stadiums (w 2.1099 pre-wrapper units = 70/32/1.03679,
+pitch 3.3161, first centre 7.7128) and three bridge bands whose top is a
+semicircular valley and bottom a semicircular arch of r 0.6031 =
+(pitch − w)/2, tangent to the bar edges — the wrapper untouched.
+Re-measured with the same instrument on a Chrome 1024 render: bars
+70.00, pitches 109.9/110.2/110.0/110.0 (A and F within the ±0.5-px
+quantisation the artwork itself shows), apexes within 0.1 px, valleys
+and arches within 1 px, row runs identical to ±1 px, silhouette IoU
+**0.992** (517 artwork-only / 287 flat-only pixels).
+
+Gate: facet drift vs the shipped raster master **6.19 → 3.57** (frame
+11.60; meanΔ +0.0/−0.7/−1.1; >40 0%) — under 5, so the scratch
+candidate shipped: `Castbox.icon` = `Assets/plate.svg` (the 45° ramp on
+a full 32 rect, `glass: false`, opacity `{1, dark 0}`) + `Assets/icon.svg`
+(the flat's mark with its wrapper, one bare `glass: false` layer at
+`scale: 32`, no opacity-specializations so it auto-tints) over canvas
+`srgb:1,0.47647,0.23725` (the old plate's mean) with the gray dark pin;
+`background.png`, `glyph.png`, `glyph-dark.png` deleted; source
+`appstore-artwork-split` → `flat-svg-split`, `hasDark` true from
+build-assets. ictool at 512 against the old bundle's own renders:
+Light central **5.00** (plate 0.91; mark 7.9, edge zone 16.5 — the
+raster's hard-aliased edges against the vector's antialiasing), Dark
+central **5.75** (plate 0.72, the same pin; mark 9.4 with R +1.9 — the
+uniform 255/120.7/60.6 tint against the old twin's 128→114 row ramp).
+Final drift against the rebuilt master **0.50** (frame 11.40, the
+flat-svg floor; fit identity, bbox 620×398 both sides); diagnosis →
+floor. validate ✓ (73/73), 276 tests ✓. Sheet: scratch
+`castbox-work/castbox-review-final.png` (old light | new light | old
+dark | new dark | flat under the house mask).
+
+**Follow-up, the ring and arcs measured (2026-09-18).** Maintainer's
+call: the flat is our own drawing (no `flatSource`), so the App Store
+raster is the reference and a measured primitive is registration, not a
+redraw (youtubemusic's ring precedent). The C is a simple primitive in
+the path — an annulus sector with round caps (inner r 6.078, outer
+10.65, cap r 2.286 = half the width, centred on (16,16), terminals at
+254.9°/15.1° y-down from +x); the three arcs are the same construction
+(width 1.905, cap r .952). Measured on the App Store 1024 by
+half-coverage crossings (coverage from the green channel against the
+plate ramp 51→9) on radial scans, least-squares circles:
+
+- **Ring**: 86 scans 50°–220°; inner circle r **196.66** (Kåsa rms 0.105
+  px), outer **339.47** (0.155), centres agreeing to 0.6 px → centre
+  **(513.70, 508.82)**, width 142.81 (the drawing had 146.3 at 1024, 3.5
+  px too heavy); terminal extremes on the mid-circle 270.27° / −0.11° →
+  cap centres **254.96° / 15.20°** (the drawing's 254.9°/15.1°, already
+  right), gap 120.24° bisected at −44.92°; radial width at each cap
+  centre 142.75 / 143.00 vs 142.81 for a round cap. The master measures
+  identically (196.66/339.47, same centre to 0.01 px): ictool composites
+  the split's soft alpha back to the App Store's edges.
+- **Arcs**: per-edge circle fits over a 34° span are degenerate between
+  centre and radius (six edges scattered ±2 px in centre; on a render of
+  KNOWN geometry every radius came back 0.9 px low with the centre 1.1 px
+  high, widths exact) — and a first candidate that took each edge's
+  radius from its own fit and forced a shared centre scored **worse**
+  (7.49 vs 5.99; arcs region 14.11 vs 9.36), because a radius is only
+  valid with the centre it was fitted with. The arcs are also not
+  concentric to the instrument's floor (one centre for all six edges:
+  rms 0.165; per arc: 0.064/0.068/0.205). Adopted: **per-arc concentric
+  fits**, each arc with its own centre and radii, caps about that centre:
+  arc 1 c(489.95, 528.78) r 164.67/226.48, caps −63.73°/−25.35°; arc 2
+  c(489.16, 529.68) r 267.54/329.33, −69.42°/−20.06°; arc 3 c(489.44,
+  531.10) r 370.00/431.83, −72.08°/−17.52°; widths 61.81/61.79/61.83.
+  The drawing's arc 1 was centred 11 px away (500.9, 520.0) with r
+  152.1/213.1; arcs 2–3 were within 1–4 px.
+
+All numbers ÷32 and unwrapped through the registration wrapper
+(p = (p₃₂ − t)/s) so the wrapper stays; the arc subpath's relative
+`m2.159-2.835` became absolute `M18.184 4.495` since it chained off the
+ring's start point. Cap sweep flags verified on the render (coverage 0
+beyond each tip, 1 two degrees inside). Ring-only: 5.99 at the old
+wrapper, small grid 5.16 (its floor; a re-centred pass returned the
+same). Ring + arcs: 4.62, small grid **2.46** at `translate(.083 −.0659)
+scale(1.00013)`; audit vs the raster master **2.46**, frame 11.48, meanΔ
++0.4/−0.1/+0.2, 0% > 40 — under the gate, so the bundle was rebuilt from
+the flat: `build-svg-icons --only` passed at 4.01 and **split** it
+(source `appstore-artwork-split` → **flat-svg-split**, `glyph.png` /
+`glyph-dark.png` gone, one bare `Assets/icon.svg` at scale 32; the
+lifted canvas stops are byte-identical to the hand-resampled pair above,
+dark canvas gray 0.192→0.078 as before; appStoreId restored, hasDark
+true from build-assets). The white mark auto-tints in Dark: new Dark vs
+the old glyph-dark.png rendition central 3.19, whole-frame RGBA 1.90
+(plate 30,30,30 / 16,16,15 identical; mark 205,29,54 vs 206,32,56) —
+the same picture, now derived. Final drift vs the rebuilt master:
+central **0.88**, frame 11.31, meanΔ +0.3/−0.4/−0.1; fit identity;
+diagnosis `floor`. validate ✓ 73/73, icons tests 276 ✓. Sheet
+(supplied | App Store | master | old flat | new flat | badge light/dark
+| 4× diff | Dark new | Dark old):
+`scratchpad/playerfm-work/playerfm-review.png`. Rule recorded: measure
+arcs with a concentric fit per primitive and never mix a radius with a
+centre it was not fitted with; validate the instrument on a render of
+known geometry before believing a decomposition.
