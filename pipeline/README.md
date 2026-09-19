@@ -6507,3 +6507,79 @@ Nothing to adopt.
 **anytimeplayer.** Already answered in "registered off the inner
 features": the open repo's only VectorDrawable is the launcher
 background. Not re-opened.
+
+### moonfm: the flat as the developer's opaque stack, material-off (2026-09-18)
+
+The material-off pass filed moonfm's 38.62 as colour + plate (off 20.38):
+the flat painted `#0000DA` at opacity .85 over `#FE1A86` on a white
+square, a podlink-era drawing, where `MoonFM.icon` is opaque blue over
+pink on the declared gray 1.0 → 0.925 canvas. The apple/castamatic
+method again: the bundle's own layer paths verbatim, colours and plate
+read from the material-off render, scored against that render.
+
+**Measured.** Region masks from the layer files themselves (librsvg at
+1024; no P3 fills in these assets), interior pixels eroded 3 px. The
+two chevrons are perfectly flat with the material off — blue
+**1,0,218** and pink-only **255,25,134**, sd 0.00 on every row (the
+declared `#0000DA` / `#FE1A86` after ictool's P3→sRGB squash, ±1). The
+plate, fitted linearly over rows 130–900 on opaque pixels only (the
+first fit swept the transparent squircle corners in and read rms 3.9),
+is **255.45 → 236.06** at the canvas law's rows 105/919, rms 0.22–0.24
+per channel — the declared 255 → 236 to within half a level, with a
+within-row sd of ~1 that is ictool's own plate noise. The M template
+(`Assets/M.svg`, white, beneath the chevrons in the material-off stack)
+DOES show: 596 px where M > .5 and the chevron union < .5, 478 of them
+on row 794 — the M's fitted pink chevron sits −1 px in y, so the
+union's bottom edge is one row lower than the blue chevron's, and that
+row reads 250 against the plate's 239. Nothing else of the M is visible
+(666 px at > 0.2 coverage in total).
+
+**What the 20.38 was**, one change at a time, librsvg candidate vs the
+material-off render at 256 (per-region RMSE at 1024 in brackets):
+
+| candidate | central | plate | blue | pink | M rim | edge |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| shipped flat (85% blue, white plate, no offsets) | 20.38 | 11.06 | 25.94 | 0.82 | 170 | 40.7 |
+| opaque declared colours, white plate, no offsets | 8.51 | 11.06 | 0.58 | 0.82 | 200 | 37.8 |
+| + fitted plate | 0.83 | 2.56 | 0.58 | 0.82 | 16.1 | 6.3 |
+| + measured colours (1,0,218 / 255,25,134) | 0.62 | 2.56 | 0.00 | 0.00 | 16.1 | 6.3 |
+| + the M layer beneath | **0.51** | 2.56 | 0.00 | 0.00 | 4.8 | 6.2 |
+| the same with the two layer translates stripped | 7.39 | 2.56 | 0.00 | 0.00 | 200 | 35.6 |
+
+So the "about 8" that the estimate could not place was the two layer
+offsets — Vector1 at `translate(-0.03125 -0.03125)`, Vector2 at
+`translate(0.0625 -0.0625)` (1 and 2 px at 1024): the blue's edge
+against the pink and the union's edge against the plate are each a
+pixel or two off without them, and that alone costs 7.4 central and
+35 on the edge band. The M's one white row is worth 0.1 central; the
+plate's 2.56 is the rows outside the crop (band 960+ reads 2.9 where
+the clamp and the resize meet) plus the ~1 within-row noise — inside
+the crop every 64-row band reads 0.6–1.05. The edge's remaining 6.2 is
+librsvg vs CoreSVG antialiasing on a 1–2 px band and does not reach the
+256 figure. Trap not hit this time but checked for: the plate gradient
+is `userSpaceOnUse` on the ROOT (32-unit y 3.28125 → 28.71875), and the
+layer groups carry only translates, so nothing scales the gradient
+space (the apple/pocketcasts trap).
+
+**Shipped.** `icon.svg`: full-bleed plate under the fitted two-stop
+gradient (`rgb(255,255,255)` → `rgb(236,236,236)`, id `moonfm-plate`),
+then in the bundle's draw order (groups and layers list top-to-bottom
+in icon.json, so drawn last-first): `M.svg`'s two fitted paths in
+white, `Vector2.svg`'s group and path verbatim in `rgb(255,25,134)`,
+`Vector1.svg`'s verbatim in `rgb(1,0,218)`. The audit (Chrome,
+--material-off): **38.62 → 44.36** against the glass master, **20.38 →
+0.49** with the material off — the glass figure rises, as the
+material-off entry predicted, because the opaque blue sits further from
+the sheen's mean than the 85% blue did, and the 44.36 is now entirely
+the three glass layers' sheen (signed +31/+37/+6, the same construction
+as apple's 12.03 / 0.93 and icatcher's 26.67 / 0.73). `flatSource`
+official (the developer's own layer artwork, measured). `badge.svg`
+stays the bare-mark form it had (viewBox 8 8 24 24, no clip, no plate)
+with the same three layers under one `translate(20 20.35)
+scale(1.3036) translate(-16.0125 -16.45)`, sized to the previous
+badge's measured ink box at 960 px: 8–32 × 9.4–31.3 (h 21.9) before and
+after, to the pixel. Validate ✓ 73/73, icons tests 276 ✓.
+`facet-drift.json` / `drift-diagnosis.json` not regenerated here; the
+material row will read `off 0.49` on the next full audit. Candidates
+and scorer in `scratchpad/agent-moonfm/` (`build.mjs`, `badge.mjs`,
+`cand-*.svg`).
