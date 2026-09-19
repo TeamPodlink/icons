@@ -7393,3 +7393,35 @@ a vector against a Chrome raster of the same art — a measurable loss
 under the 2026-09-18 rule, accepted here for the vectorisation.
 Source `flat-svg-split`. Raster elements 12 → **10** (queue and
 tunestr remain, both inner-shadow filters).
+
+### netflix: the diagonal's shadow, and ictool's mask law (2026-09-19)
+
+The flat drew the diagonal's shadow three times too strong. Across
+the diagonal's edges on the stems (row 512, R): the App Store render
+dips 185 → 168, the ictool master 178 → 163, the flat 178 → 136. The
+shipped `Shadow Mid Layer 4.svg` is a rotated rect under a gradient
+whose stop-opacities run 0 → .09 → 1 → 1 → .09 → 0, masked to the
+stems by a `mask-type:alpha` mask whose paths are painted the stems'
+own `#B20710`. Browsers honour the alpha mask (full strength);
+**ictool ignores `mask-type:alpha` — as a style and as an attribute —
+and reads every mask as luminance**, and its luminance of `#B20710`
+is **0.353** (probe: a black square under that mask over white reads
+165, the same under a plain luminance mask, 0 under a white alpha
+mask). The attenuation the flat needed, fitted against the master
+over 37k shadowed stem pixels, is **k = 0.353** — the same number —
+and Apple's own compositor evidently agrees, since the store render
+carries the weak shadow too (k .21 against the store, whose glass
+lifts the stems 6). The value is neither Rec.709 (.173) nor Rec.601
+(.232) encoded luminance; it is close to linear-light luminance
+re-encoded (.097 → .34).
+
+The flat's gradient now carries the shipped stop-opacities × 0.353
+(the bundle is the decanted stack and renders as shipped; only the
+flat changes). Row 512 flat vs master: 163/162 at both diagonal
+edges. Against the glass master **4.16 → 2.45**, material-off 3.71 →
+**0.89**, against the store 13.65 → 12.69 (what remains there is the
+store's flat 11,11,11 canvas against ictool's 20 → 10 ramp, and its
+glass). Rule for flats built from decanted layers: any mask painted
+in a colour is a luminance mask under ictool, whatever it declares —
+scale the masked content by ictool's luminance of that colour, or
+repaint the mask white.
