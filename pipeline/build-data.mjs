@@ -33,6 +33,9 @@ const drift = driftSnap.central ?? {};
 // Same audit with the bundle's material disabled (--material-off): the
 // artwork-only figure of a material pair; absent for pairs without material.
 const driftMaterialOff = driftSnap.materialOff ?? {};
+// Same audit against the STORE's own raster (--reference store): the
+// developer's icon as the App Store / Google Play shows it.
+const driftStore = driftSnap.store ?? {};
 // Drift-diagnosis snapshot (pipeline/audit-drift-diagnosis.mjs --write):
 // per bundle slug, what the residual is (primary cause + all causes).
 // Drives the dev-only "drift: …" lenses. Optional.
@@ -93,6 +96,7 @@ const out = readPlatforms().map(({ id, dir, meta }) => ({
     playStoreId: b.playStoreId ?? null,
     drift: drift[b.slug] ?? null,
     driftMaterialOff: driftMaterialOff[b.slug] ?? null,
+    driftStore: driftStore[b.slug] ?? null,
     diagnosis: diagnosis[b.slug] ? { primary: diagnosis[b.slug].primary, causes: diagnosis[b.slug].causes } : null,
   })),
 }));

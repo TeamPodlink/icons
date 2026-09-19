@@ -29,6 +29,11 @@ export interface GlassBundle {
    *  material pair. Null for pairs without material — their master is
    *  already material-free — and until the audit has run with the flag. */
   driftMaterialOff: number | null;
+  /** The same audit against the store's own raster (audit-facet-drift.mjs
+   *  --reference store): the developer's icon as the store shows it,
+   *  which Apple renders with its own pipeline. Null without a store
+   *  raster or until that audit has run. */
+  driftStore: number | null;
   /** App Store id from meta.json, when the platform ships an iOS app we
    *  have identified. Drives the dev-only "Raster" facet: the store's own
    *  1024 marketing icon (pipeline/fetch-appstore-artwork.mjs →
@@ -233,6 +238,8 @@ export interface Card {
   drift: number | null;
   /** See GlassBundle.driftMaterialOff. */
   driftMaterialOff: number | null;
+  /** See GlassBundle.driftStore. */
+  driftStore: number | null;
 }
 
 export const cards: Card[] = platforms.flatMap((p): Card[] => {
@@ -249,6 +256,7 @@ export const cards: Card[] = platforms.flatMap((p): Card[] => {
       popularityRank: p.popularityRank,
       drift: b.drift,
       driftMaterialOff: b.driftMaterialOff,
+      driftStore: b.driftStore,
     }));
   if (p.hasFlat)
     return [
@@ -264,6 +272,7 @@ export const cards: Card[] = platforms.flatMap((p): Card[] => {
         popularityRank: p.popularityRank,
         drift: null,
         driftMaterialOff: null,
+        driftStore: null,
       },
     ];
   return [];
@@ -380,6 +389,12 @@ export const assetFacetOf = (facet: GridFacet): AssetFacet =>
 export function rasterPath(slug: string): string {
   return `/raster/${slug}.png`;
 }
+
+/** The Compare facet's reference: the ictool master or the store raster.
+ *  URL state (?ref=store) on /compare and on the detail's compare segment. */
+export type CompareReference = "glass" | "store";
+export const parseCompareReference = (raw: string | null): CompareReference =>
+  raw === "store" ? "store" : "glass";
 
 /** Which store the Raster facet's image came from, for captions. */
 export function rasterSource(b: GlassBundle): string | null {

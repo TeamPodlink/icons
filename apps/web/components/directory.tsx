@@ -162,6 +162,10 @@ export function Directory({
 }) {
   const [query, setQuery] = useUrlState("search", "");
   const [sortRaw, setSort] = useUrlState("sort", DEFAULT_SORT);
+  // Compare facet: what the vector is diffed against (ictool master or the
+  // store raster) — URL state so the choice is shareable and the cards
+  // read it themselves.
+  const [refRaw, setRef] = useUrlState("ref", "glass");
   const sort = parseSort(sortRaw);
   const inputRef = useRef<HTMLInputElement>(null);
   // Anchor inside the PageCard viewport, for scroll save/restore.
@@ -238,7 +242,34 @@ export function Directory({
           <p className="font-mono text-sm text-neutral-600 dark:text-neutral-400">
             {`${shown.length} ${shown.length === 1 ? "result" : "results"}`}
           </p>
-          <SortMenu sort={sort} onChange={setSort} />
+          <div className="flex items-center space-x-2">
+            {facet === "compare" && (
+              <div
+                role="group"
+                aria-label="Compare against"
+                className="flex items-center rounded-md border border-neutral-200 p-0.5 font-mono text-xs dark:border-neutral-800"
+              >
+                {(["glass", "store"] as const).map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    aria-pressed={refRaw === r}
+                    title={r === "glass" ? "Diff against the light Liquid Glass master (ictool)" : "Diff against the store's own raster (App Store / Google Play); cards without one keep the glass master"}
+                    onClick={() => setRef(r)}
+                    className={
+                      "cursor-pointer rounded px-2 py-0.5 " +
+                      (refRaw === r
+                        ? "bg-neutral-200 text-black dark:bg-neutral-800 dark:text-white"
+                        : "text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white")
+                    }
+                  >
+                    vs {r}
+                  </button>
+                ))}
+              </div>
+            )}
+            <SortMenu sort={sort} onChange={setSort} />
+          </div>
         </div>
         <WarningBanner />
         <div className="container mx-auto my-6 px-6 lg:px-4">

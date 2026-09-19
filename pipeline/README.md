@@ -6953,3 +6953,52 @@ normalised to PNG on disk). antennapod `de.danoeh.antennapod`,
 podcastaddict `com.bambuna.podcastaddict`, podkicker `ait.podka` (its
 site url). 56 artworks in the facet; captions and menus say which
 store.
+
+## The store raster as a drift reference (tested 2026-09-19)
+
+iOS 26 and iOS 27 do not render Liquid Glass alike, and neither is the
+App Store's own render, so the question was what the vector measures
+against the STORE's raster rather than one ictool build.
+`audit-facet-drift.mjs --reference store` scores the flat against
+apps/web/public/raster/<slug>.png (the fetched store artwork), writes
+facet-drift.json's `store` map and leaves `central` alone; the site
+shows it as a third chip ("store 3.42") and the Compare facet takes
+`?ref=store` (a "vs glass / vs store" switch on the grid toolbar and
+under the detail's compare hero) to diff against it. 54 pairs have a
+store raster; 23 sit at the floor against it where 43 of the same 54
+do against the ictool master.
+
+**What the store reference measures, three things at once:**
+
+1. *Marketing artwork that is not the shipped icon.* The largest gaps
+   are different images: metacast 145.7 (the store shows the dark
+   variant, red mark on a near-black plate), deezer 106 (the wordmark
+   variant with "DEEZER" set under the heart), podurama 71 (the iOS
+   store icon; the bundle is the Android adaptive icon, as the ledger
+   already says), podcastguru 50 (the store shows the uncropped 108
+   canvas where the bundle carries the iOS tile's 72.93 dp crop),
+   netflix 30, playapod 26 (the developer's flat marketing icon, no
+   glass), pocketcasts 55 (the store's glyph is drawn markedly larger
+   than the shipped .icon's 734 px — Apple's store render frames the
+   canvas differently). None of these is a defect in the vector.
+2. *Apple's render of the same .icon.* For the vector bundles the store
+   image agrees with the ictool master on plate and glyph colour to
+   within a point and differs only at edges: castbox 3.57 (plate 0.5,
+   edge 12.7), siriusxm 3.92 (plate 0.7, glyph 0.2, edge 13.9),
+   globalplayer 3.42, hark 5.37, soundcloud 5.29, fountain 5.57 — a
+   softer, slightly shifted edge and, on some, a different glyph
+   scale (youtube 13.7 with edge 59.9, goodpods 16.9 with edge 47.1).
+   That is the iOS-version question, measured: the colours are the
+   same, the antialiasing and framing are Apple's own, and it puts a
+   3–5 floor under every pair that no vector can pass.
+3. *Google Play's framing.* podkicker 14.4 and podcastaddict 14.0 are
+   the flat registered to the iOS/our framing against the Play
+   listing's crop of the adaptive icon; antennapod, whose flat came
+   from the adaptive icon, reads 1.01.
+
+**Verdict.** As the ranking metric the store raster is a worse
+instrument than the ictool master: it mixes artwork variants and the
+store's framing into the number and floors at 3–5 on antialiasing. It
+stays as a second figure and as a Compare reference, where it is useful
+for exactly the first kind of finding — a bundle whose shipped icon is
+not what the store shows. Not swapped in as `central`.

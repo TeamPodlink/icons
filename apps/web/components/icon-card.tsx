@@ -1,4 +1,5 @@
 import { useLayoutEffect, useState } from "react";
+import { useSearchParams } from "react-router";
 import { Maximize2, SquareArrowOutUpRight } from "lucide-react";
 import {
   ContextMenu,
@@ -13,6 +14,7 @@ import {
   badgePath,
   flatPath,
   lensesEnabled,
+  parseCompareReference,
   rasterPath,
   type Card,
   type GridFacet,
@@ -104,9 +106,13 @@ function BadgePreview({ card }: { card: Card }) {
 /** Dev-only compare tile: the drift audit's 4×|glass − vector| panel in
  *  the glass card's box (CompareArtwork in its compact form). */
 function ComparePreview({ card }: { card: Card }) {
+  // ?ref=store diffs against the store raster (when the bundle has one)
+  const [params] = useSearchParams();
+  const wanted = parseCompareReference(params.get("ref"));
+  const reference = wanted === "store" && card.driftStore !== null ? "store" : "glass";
   return (
     <div className={previewCls}>
-      <CompareArtwork platform={card.platform} bundle={card.bundle!} compact />
+      <CompareArtwork platform={card.platform} bundle={card.bundle!} compact reference={reference} />
     </div>
   );
 }
@@ -248,6 +254,22 @@ export function IconCard({
             )}
           >
             off {card.driftMaterialOff.toFixed(2)}
+          </span>
+        )}
+        {/* Against the store's own raster (--reference store): the icon as
+            the App Store / Google Play shows it, rendered by Apple's own
+            pipeline — a different reference from the ictool master. */}
+        {lensesEnabled && card.driftStore !== null && (
+          <span
+            title="Facet drift against the store's own raster: central RMSE, flat vs the App Store / Google Play artwork (pipeline/audit-facet-drift.mjs --reference store)"
+            className={cn(
+              "rounded-full border px-2 py-0.5 font-mono text-[11px] tabular-nums",
+              card.driftStore <= 5
+                ? "border-emerald-300 text-emerald-600 dark:border-emerald-900 dark:text-emerald-500"
+                : "border-neutral-300 text-neutral-400 dark:border-neutral-800 dark:text-neutral-500"
+            )}
+          >
+            store {card.driftStore.toFixed(2)}
           </span>
         )}
         {shown === "flat" && facet === "glass" && (

@@ -27,7 +27,7 @@ import {
 import { MaterialsIcon } from "@/components/materials-icon";
 import { PageCard } from "@/components/page-card";
 import { copyItemsFor, downloadItemsFor, menuItemsFor } from "@/lib/asset-menus";
-import { lensesEnabled, rasterPath, rasterSource, resolvePlatform, type AssetFacet, type Facet, type Platform } from "@/lib/platforms";
+import { lensesEnabled, parseCompareReference, rasterPath, rasterSource, resolvePlatform, type AssetFacet, type Facet, type Platform } from "@/lib/platforms";
 import { useTheme } from "@/lib/theme";
 import { useTitle } from "@/lib/use-title";
 import {
@@ -201,6 +201,14 @@ export function IconDetailPage() {
     ? requested
     : segments[0]?.facet ?? "glass";
 
+  // Compare segment: ?ref=store diffs against the store raster when there is one.
+  const compareRef = parseCompareReference(params.get("ref")) === "store" && p.bundles[0]?.driftStore !== null ? "store" : "glass";
+  const setCompareRef = (r: "glass" | "store") => {
+    const next = new URLSearchParams(params);
+    if (r === "glass") next.delete("ref"); else next.set("ref", r);
+    setParams(next, { replace: true, preventScrollReset: true });
+  };
+
   const setFacet = (f: DetailFacet) => {
     const next = new URLSearchParams(params);
     if (f === "glass") next.delete("facet");
@@ -338,8 +346,30 @@ export function IconDetailPage() {
             <BadgeArtwork platform={p} transitionKey={panelKey(p)} />
           </div>
         ) : facet === "compare" && p.bundles[0] ? (
-          <div style={{ width: SQUARE_HERO_WIDTH }}>
-            <CompareArtwork platform={p} bundle={p.bundles[0]} />
+          <div style={{ width: SQUARE_HERO_WIDTH }} className="space-y-3">
+            <CompareArtwork platform={p} bundle={p.bundles[0]} reference={compareRef} />
+            {p.bundles[0].driftStore !== null && (
+              <div role="group" aria-label="Compare against" className="flex justify-center">
+                <div className="flex items-center rounded-md border border-neutral-200 p-0.5 font-mono text-xs dark:border-neutral-800">
+                  {(["glass", "store"] as const).map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      aria-pressed={compareRef === r}
+                      onClick={() => setCompareRef(r)}
+                      className={
+                        "cursor-pointer rounded px-2 py-0.5 " +
+                        (compareRef === r
+                          ? "bg-neutral-200 text-black dark:bg-neutral-800 dark:text-white"
+                          : "text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white")
+                      }
+                    >
+                      vs {r}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         ) : lensesEnabled && facet === "raster" && p.bundles[0] ? (
           <div style={{ width: SQUARE_HERO_WIDTH }} className="py-2">

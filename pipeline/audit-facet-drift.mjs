@@ -63,6 +63,18 @@
 //   node pipeline/audit-facet-drift.mjs                report (worst first)
 //   node pipeline/audit-facet-drift.mjs --only <slug>
 //     [--sheets] [--json <file>] [--floor] [--work <dir>] [--material-off]
+//     [--reference glass|store]
+//
+// --reference store (2026-09-19): score the flat against the STORE's own
+//   raster instead of the ictool master — apps/web/public/raster/<slug>.png
+//   (pipeline/fetch-appstore-artwork.mjs: the App Store's 1024 marketing
+//   icon, or Google Play's 512 for an Android-only platform). Apple renders
+//   the store artwork with its own pipeline and iOS 26 and 27 do not render
+//   Liquid Glass alike, so this is the developer's icon as the store shows
+//   it rather than as one ictool build renders it. Pairs without a store
+//   raster are skipped; --material-off does not apply (the store raster has
+//   no material to switch off); --write fills facet-drift.json's `store`
+//   map and leaves `central` alone. Sheets go to <work>/sheets-store.
 //
 // --material-off (measured 2026-09-18, ledger "Material-off drift"): for
 //   every pair whose bundle has material (a glass layer or a specular
@@ -144,13 +156,17 @@ const jsonOut = flag("--json");
 const writeSnapshot = args.includes("--write");
 const floor = args.includes("--floor");
 const materialOff = args.includes("--material-off");
+const reference = flag("--reference") ?? "glass";
+if (reference !== "glass" && reference !== "store") { console.error("--reference glass|store"); process.exit(2); }
+const storeDir = join(root, "apps/web/public/raster");
+const sheetsDir = reference === "store" ? "sheets-store" : "sheets";
 const ICTOOL = "/Applications/Icon Composer.app/Contents/Executables/ictool";
 const work = flag("--work") ?? "/tmp/facet-drift-work";
 const assetsDir = join(root, "packages/refraction/assets");
 const flatDir = join(root, "packages/icons/static/icons");
 
 mkdirSync(join(work, "flat"), { recursive: true });
-if (sheets) mkdirSync(join(work, "sheets"), { recursive: true });
+if (sheets) mkdirSync(join(work, sheetsDir), { recursive: true });
 if (sheets && materialOff) mkdirSync(join(work, "sheets-off"), { recursive: true });
 if (materialOff) mkdirSync(join(work, "material-off"), { recursive: true });
 
@@ -422,11 +438,11 @@ const pairs = [];
 const skipped = [];
 for (const b of readBundles()) {
   if (only && b.slug !== only) continue;
-  const master = join(assetsDir, `${b.slug}.png`);
+  const master = reference === "store" ? join(storeDir, `${b.slug}.png`) : join(assetsDir, `${b.slug}.png`);
   const flat = join(flatDir, `${b.platformId}.svg`);
   const have = { master: existsSync(master), flat: existsSync(flat) };
   if (!have.master || !have.flat) {
-    skipped.push(`${b.slug} (no ${!have.master ? "light master" : "flat icon"})`);
+    skipped.push(`${b.slug} (no ${!have.master ? (reference === "store" ? "store raster" : "light master") : "flat icon"})`);
     continue;
   }
   const glass = glassLayers(b.bundlePath);
@@ -482,13 +498,13 @@ for (const p of pairs) {
   // ids "<id>-material-…") is scored against the glass master only — the
   // material-off render is no longer its reference.
   const materialised = /-material-/.test(svg);
-  if (materialOff && p.material && !materialised) {
+  if (materialOff && reference === "glass" && p.material && !materialised) {
     const o = await rgba256(await materialOffMaster(p.bundlePath, p.slug));
     row.materialOff = score(f, o);
     if (sheets) await writeSheet(p.slug, f, o, "sheets-off");
   }
   rows.push(row);
-  if (sheets) await writeSheet(p.slug, f, g);
+  if (sheets) await writeSheet(p.slug, f, g, sheetsDir);
 }
 
 // Pairs whose facets are MEANT to differ. A high score here is the
@@ -571,7 +587,7 @@ if (expected.length) {
   for (const r of expected)
     console.log(`  ${r.slug} (${r.central.toFixed(2)}): ${EXPECTED_DIVERGENCE[r.slug]}`);
 }
-if (sheets) console.log(`sheets: ${join(work, "sheets")}/<slug>.png (flat | glass | 4x|diff|)`);
+if (sheets) console.log(`sheets: ${join(work, sheetsDir)}/<slug>.png (flat | ${reference === "store" ? "store raster" : "glass"} | 4x|diff|)`);
 if (sheets && materialOff) console.log(`material-off sheets: ${join(work, "sheets-off")}/<slug>.png (flat | material off | 4x|diff|)`);
 if (materialOff) {
   const m = rows.filter((r) => r.materialOff);
@@ -582,14 +598,18 @@ if (materialOff) {
 }
 if (writeSnapshot) {
   const snap = join(root, "apps/web/lib/facet-drift.json");
-  const central = Object.fromEntries(rows.map((r) => [r.slug, Math.round(r.central * 100) / 100]));
-  // materialOff: the artwork-only figure of every material pair. A run
-  // without --material-off keeps the map the snapshot already holds.
-  const prev = existsSync(snap) ? JSON.parse(readFileSync(snap, "utf8")).materialOff ?? {} : {};
-  const off = materialOff
+  const prevSnap = existsSync(snap) ? JSON.parse(readFileSync(snap, "utf8")) : {};
+  const scored = Object.fromEntries(rows.map((r) => [r.slug, Math.round(r.central * 100) / 100]));
+  // Each map is owned by the run that measures it; a run leaves the others
+  // as the snapshot holds them: central (glass reference), materialOff
+  // (--material-off), store (--reference store).
+  const central = reference === "store" ? prevSnap.central ?? {} : scored;
+  const off = materialOff && reference === "glass"
     ? Object.fromEntries(rows.filter((r) => r.materialOff).map((r) => [r.slug, Math.round(r.materialOff.central * 100) / 100]))
-    : prev;
-  writeFileSync(snap, JSON.stringify({ generated: new Date().toISOString().slice(0, 10), pairs: rows.length, central, materialOff: off }, null, 2) + "\n");
+    : prevSnap.materialOff ?? {};
+  const store = reference === "store" ? scored : prevSnap.store ?? {};
+  const pairs = reference === "store" ? prevSnap.pairs ?? rows.length : rows.length;
+  writeFileSync(snap, JSON.stringify({ generated: new Date().toISOString().slice(0, 10), pairs, central, materialOff: off, store }, null, 2) + "\n");
   console.log(`snapshot: ${snap.replace(root + "/", "")} (${rows.length} pairs)`);
 }
 if (jsonOut) {

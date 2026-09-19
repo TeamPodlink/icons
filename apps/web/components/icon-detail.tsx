@@ -13,6 +13,8 @@ import {
   sourceLabel,
   type GlassBundle,
   type Platform,
+  rasterPath,
+  type CompareReference,
 } from "@/lib/platforms";
 import {
   copyImage,
@@ -241,12 +243,17 @@ export function CompareArtwork({
   platform,
   bundle,
   compact = false,
+  reference = "glass",
 }: {
   platform: Platform;
   bundle: GlassBundle;
   /** Grid-tile form: 256² canvas, no caption, no padding — the card
    *  already carries the drift chip. */
   compact?: boolean;
+  /** What the vector is diffed against: the light Liquid Glass master
+   *  (ictool), or the store's own raster (App Store / Google Play) —
+   *  the audit's --reference store. */
+  reference?: CompareReference;
 }) {
   // The facet-drift audit's diff panel, on screen: |glass − vector| × 4
   // per channel over the pixels both facets cover (the masks' corner
@@ -258,7 +265,7 @@ export function CompareArtwork({
   const SIZE = compact ? 256 : 512;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [error, setError] = useState<string | null>(null);
-  const glassSrc = assetPath(bundle.slug, { size: SIZE });
+  const glassSrc = reference === "store" ? rasterPath(bundle.slug) : assetPath(bundle.slug, { size: SIZE });
   const flatSrc = flatPath(platform.id);
   useEffect(() => {
     let cancelled = false;
@@ -307,7 +314,7 @@ export function CompareArtwork({
           ref={canvasRef}
           width={SIZE}
           height={SIZE}
-          aria-label={`4× absolute difference, ${bundle.title} Liquid Glass (light) vs ${platform.name} vector`}
+          aria-label={`4× absolute difference, ${bundle.title} ${reference === "store" ? "store raster" : "Liquid Glass (light)"} vs ${platform.name} vector`}
           className="h-full w-full select-none"
         />
         {error && (
@@ -317,10 +324,12 @@ export function CompareArtwork({
         )}
       </div>
       {!compact && <p className={cn(cap, "text-center")}>
-        4×|glass − vector| · facet drift (central RMSE, light glass vs vector):{" "}
-        {bundle.drift === null ? "unmeasured" : bundle.drift.toFixed(2)}
-        {bundle.driftMaterialOff !== null && ` · material off: ${bundle.driftMaterialOff.toFixed(2)}`}
-        {" · "}pipeline/audit-facet-drift.mjs --sheets
+        {reference === "store" ? "4×|store − vector| · facet drift (central RMSE, store raster vs vector): " : "4×|glass − vector| · facet drift (central RMSE, light glass vs vector): "}
+        {reference === "store"
+          ? (bundle.driftStore === null ? "unmeasured" : bundle.driftStore.toFixed(2))
+          : (bundle.drift === null ? "unmeasured" : bundle.drift.toFixed(2))}
+        {reference === "glass" && bundle.driftMaterialOff !== null && ` · material off: ${bundle.driftMaterialOff.toFixed(2)}`}
+        {" · "}pipeline/audit-facet-drift.mjs --sheets{reference === "store" ? " --reference store" : ""}
       </p>}
     </div>
   );
