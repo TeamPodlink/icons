@@ -7453,3 +7453,19 @@ material tool built without them (it measures translucency and shadow,
 not specular), the glass figure rises **2.56 → 5.26**; the store figure
 is the flat's and stays 14.68. Material-off is not measured for a
 materialised flat.
+
+### goodpods: the glyph's position, confirmed (2026-09-19)
+
+Asked to confirm the placement against the App Store icon. Dark-ink
+bounding boxes at 1024: store x 103–937, y 220–764 (835×545,
+centroid 496.4, 496.0); master x 103–937, y 216–768 (835×553,
+centroid 495.6, 496.6). Same width to the pixel, centroid within 1 px;
+the height differs by 8 px (1.5%). Registering our ink mask to the
+store's by scale and offset agrees: sx 1.001, sy 0.984, offsets
+±0.5 px. So the position is right; what the 17.05 store figure
+carries is the drawing itself — the store's ink reads 34 (≈#222)
+where the official badge SVG paints #333, its lines are drawn
+slightly differently (our ink covers 158k px to its 95k at the same
+threshold, with run widths within 2 px on the rows sampled), and the
+1.6% vertical squeeze. Nothing changed: the flat is the official
+vector, and a non-uniform scale on it would be a guess.
