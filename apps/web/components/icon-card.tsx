@@ -172,10 +172,14 @@ export function IconCard({
   // the transition window; the data attributes are the lookup handles.
   // The detail opens on the facet the grid was showing: /vector and
   // /badges carry ?facet= so tapping through never snaps back to glass.
+  // The Compare facet's reference (?ref=store) travels with the card link,
+  // so the detail's compare segment opens against the same reference.
+  const [params] = useSearchParams();
+  const ref = facet === "compare" ? parseCompareReference(params.get("ref")) : "glass";
   const detailHref =
     facet === "glass"
       ? `/icon/${p.id}`
-      : `/icon/${p.id}?facet=${facet === "flat" ? "vector" : facet}`;
+      : `/icon/${p.id}?facet=${facet === "flat" ? "vector" : facet}${ref === "store" ? "&ref=store" : ""}`;
 
   const openDetails = () => {
     nameCardForTransition(card.key);

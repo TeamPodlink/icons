@@ -198,12 +198,17 @@ export function Directory({
           (a.popularityRank ?? Infinity) - (b.popularityRank ?? Infinity) ||
           byTitle(a.title, b.title)
       );
-    else if (sort === "drift")
+    else if (sort === "drift") {
       // "drift": worst facet agreement first; unmeasured (flat-only
-      // cards, bundles newer than the snapshot) sink to the bottom.
+      // cards, bundles newer than the snapshot) sink to the bottom. On the
+      // Compare facet the figure follows the reference switch: against the
+      // store raster when ?ref=store.
+      const figure = (c: Card) =>
+        facet === "compare" && refRaw === "store" ? c.driftStore : c.drift;
       list.sort(
-        (a, b) => (b.drift ?? -1) - (a.drift ?? -1) || byTitle(a.title, b.title)
+        (a, b) => (figure(b) ?? -1) - (figure(a) ?? -1) || byTitle(a.title, b.title)
       );
+    }
     else
       // "latest": newest first-addition date first (meta.json "added",
       // mined from git history); undated sink to the bottom; ties A-Z.
@@ -213,7 +218,7 @@ export function Directory({
           byTitle(a.title, b.title)
       );
     return list;
-  }, [base, fuse, query, sort]);
+  }, [base, fuse, query, sort, facet, refRaw]);
 
   const noun = facet === "badge" ? "badges" : "icons";
 
@@ -237,12 +242,13 @@ export function Directory({
       <PageCard withSearch>
         <div
           ref={toolbarRef}
-          className="sticky top-0 z-40 flex h-12 items-center justify-between border-b border-neutral-200 bg-white/80 px-4 py-1.5 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/40"
+          className="sticky top-0 z-40 grid h-12 grid-cols-[1fr_auto_1fr] items-center border-b border-neutral-200 bg-white/80 px-4 py-1.5 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/40"
         >
           <p className="font-mono text-sm text-neutral-600 dark:text-neutral-400">
             {`${shown.length} ${shown.length === 1 ? "result" : "results"}`}
           </p>
-          <div className="flex items-center space-x-2">
+          {/* Centre column: the Compare facet's reference switch (empty otherwise). */}
+          <div className="flex items-center justify-center">
             {facet === "compare" && (
               <div
                 role="group"
@@ -268,6 +274,8 @@ export function Directory({
                 ))}
               </div>
             )}
+          </div>
+          <div className="flex items-center justify-end">
             <SortMenu sort={sort} onChange={setSort} />
           </div>
         </div>
