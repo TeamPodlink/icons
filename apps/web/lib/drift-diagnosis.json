@@ -1088,17 +1088,17 @@
     "pocketcasts": {
       "primary": "floor",
       "causes": [],
-      "central": 1.12,
+      "central": 1.17,
       "glassLayers": 0,
       "specular": true,
       "struct": 0,
       "signed": [
         0.8,
-        0.1,
+        0.2,
         0.2
       ],
-      "lumaShare": 0.77,
-      "edgeShare": 0.78,
+      "lumaShare": 0.8,
+      "edgeShare": 0.8,
       "plateShare": 0.44,
       "plateSigned": [
         1,

@@ -7062,3 +7062,23 @@ bundle's own render against it 3.73 (was 10.04); flat vs glass 0.92.
 Source label stays `adaptive-icon` (the geometry is the Android
 layers'; the colours are now the iOS icon's). Badge: the star's
 gradient carried over, ink box unchanged.
+
+### pocketcasts: the glyph sized to the iOS app (2026-09-19)
+
+The bundle was decanted from Pocket Casts' native Mac app, which ships
+outside the App Store; the maintainer wants the iOS app's sizing. Pocket
+Casts 8.20 for iOS (`au.com.shiftyjelly.podcasts`, ipatool) ships no
+stack — a flat 1024 `AppIcon`, byte-identical to the fetched App Store
+artwork — with the official glyph **690 px** wide, centred (rows/cols
+167–856), where the Mac decant draws it at 734. The layer placement in
+`Assets/icon.svg`, `icon-dark.svg` and the flat moved from
+`translate(4.5319 4.5319) scale(2.11730)` to `translate(5.2188 5.2188)
+scale(1.99039)` (690/32 ÷ the glyph's 10.8333 box); the flat's white
+bbox now reads 167–856 exactly. Against the store artwork **55.21 →
+7.96**; against the glass master 1.17 (the bundle and the flat moved
+together). Two differences the iOS icon also shows, left as they are
+pending a decision: its glyph is flat white (255 at the top row) where
+the bundle and flat carry the Mac layer's 235 → 255 ramp — the +4.6
+uniform that remains against the store — and it has no dark variant
+where the bundle carries the Mac app's black plate. The badge (the
+brand's roundel) is untouched.
