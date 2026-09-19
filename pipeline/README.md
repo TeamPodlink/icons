@@ -7425,3 +7425,21 @@ glass). Rule for flats built from decanted layers: any mask painted
 in a colour is a luminance mask under ictool, whatever it declares —
 scale the masked content by ictool's luminance of that colour, or
 repaint the mask white.
+
+### youtube: the clip that cut the plate, and ictool's clipPath law (2026-09-19)
+
+The master's red plate rendered 752 px wide where the App Store icon's
+is 782 (both 546–550 tall); the flat rendered 782 in Chrome and
+librsvg alike. The layer scales the official artwork by 1.03989 about
+the centre — the fit that matched the store — under the artwork's own
+`clipPath` (its 4.25–27.75 viewport box). **ictool reads clipPath
+coordinates in root viewBox units regardless of the ancestor
+transform**, as it does filter primitives (2026-09-14): 4.25–27.75
+root units is 136–888 px, exactly the master's red extent. The clip
+did no work in browsers (nothing in the artwork leaves its box), so it
+is gone from both the layer and the flat; the master's plate now reads
+x 121–902, the store's exactly. The red is the store's to the unit
+(255,0,51). The glass figure stays 0.73 (the snapshot had been taken
+with both facets in step); against the store 13.62, which the sheet
+shows is the plate's 4 px of height and the triangle's 5 px of width —
+the store renders a slightly different cut of the same mark.
