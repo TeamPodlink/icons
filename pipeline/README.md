@@ -7163,3 +7163,47 @@ the face, so the number moves less than the plate did.
 **globalplayer.** Within 9 by row band and the same vignette shape;
 the only gap is the top-left lobe, 15–20 brighter in the store over a
 small region. Left as it is (store figure 3.42).
+
+### The Yoto shadow, recreated (2026-09-19)
+
+The iOS icon's dark band under the face (row 880: 218 at the centre
+against 238 at the sides) is the developer's own drop shadow, baked
+into the artwork. It was left out of the plate refit above; this
+section puts it back, in the bundle and the flat, from measurement.
+
+**Measured.** Store raster minus the side-column plate model, outside
+the face: an offset copy of the face's OUTER silhouette (the eye and
+smile holes show the plate at full brightness — 249,94,63 in the
+smile against 246,92,61 on the plate beside it — so the shadow is
+knocked out by the face, not seen through it), offset **−8 / +96 px**
+at 1024, gaussian edge **σ 18 px**, plateau **12.1/255** in luma
+(fit rms 2.08). Per channel the store darkens 21,9,8 where a black
+multiply on that plate gives 23,8,5 — black it is. The opacity is the
+plateau over the plate's luma under the band (121), **0.0996**; the
+first build divided by 255 and came out at half strength.
+
+**Bundle.** `Assets/shadow.svg`, a non-glass light-only layer between
+the face and the plate: the face's outer subpath with its own
+transform baked in, under a `<mask>` knockout of the same shape
+(ictool honours it). ictool drops filters, and stroke shells cannot
+soften the INSIDE of an edge (the fill is full right up to the
+outline: 12.0 at 8 px inside the silhouette where the store reads
+8.0), so the blur is **twelve copies of the silhouette scaled about
+its centre** from +2.5σ to −2.5σ, opacities stacking to the gaussian
+CDF (the face is round to 1.3%, so the scale is an offset). Edge
+profile below the face per 8 px, store `11.3 10.3 8.0 6.3 5.0 3.7`
+against ictool `11.0 9.0 7.3 6.3 3.7 3.3`.
+
+**Flat.** One `feGaussianBlur` filter (`yoto-baked-shadow`, σ .5625,
+dx −.25, dy 3, flood .0996) on the outer face path, under the same
+knockout mask. A shell stack was tried first and Chrome over-darkened
+it by half: each faint layer rounds up on composite (a 0.0178 shell
+reads 6/255 over white, not 4.5; the six layers summed to 31 against
+25.4 expected) while librsvg rounds down — a filter composites once.
+The diagnosis' filter cause now also ignores `-baked-` filters.
+
+**Numbers.** Shadow field rmse against the store outside the face, no
+shadow 5.81 → ictool **1.31**, flat **1.18**, flat vs ictool 0.60.
+Against the store artwork **3.31 → 1.28** (signed +0.4/0.0/−0.1);
+against the glass master 1.45 → 1.56 (the two blurs differ by 0.6 in
+the band). The face itself is unchanged.

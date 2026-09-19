@@ -141,7 +141,7 @@ for (const r of audit.rows) {
   const flatSvgPath = join(root, "platforms", r.slug.replace(/-.*$/, ""), "icon.svg");
   const flatSvg = existsSync(flatSvgPath) ? readFileSync(flatSvgPath, "utf8") : "";
   // a filter that is the material's shadow (material-flat.mjs) is not renderer disagreement
-  const hasFilter = /<filter\b(?![^>]*-material-)/.test(flatSvg);
+  const hasFilter = /<filter\b(?![^>]*-(?:material|baked)-)/.test(flatSvg);
   const signals = {
     central: +r.central.toFixed(2),
     glassLayers,
