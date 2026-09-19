@@ -3,93 +3,29 @@
     "linear-gradient": [
       "display-p3:0.92500,0.38400,0.38400,1.00000",
       "display-p3:0.83100,0.20000,0.22700,1.00000"
-    ],
-    "orientation": {
-      "start": {
-        "x": 0.5,
-        "y": 0
-      },
-      "stop": {
-        "x": 0.5,
-        "y": 1
-      }
-    },
-    "fill-specializations": [
-      {
-        "value": {
-          "linear-gradient": [
-            "display-p3:0.92500,0.38400,0.38400,1.00000",
-            "display-p3:0.83100,0.20000,0.22700,1.00000"
-          ],
-          "orientation": {
-            "start": {
-              "x": 0.5,
-              "y": 0
-            },
-            "stop": {
-              "x": 0.5,
-              "y": 1
-            }
-          }
-        }
-      },
-      {
-        "appearance": "dark",
-        "value": {
-          "linear-gradient": [
-            "gray:0.19200,1.00000",
-            "gray:0.07800,1.00000"
-          ],
-          "orientation": {
-            "start": {
-              "x": 0.5,
-              "y": 0
-            },
-            "stop": {
-              "x": 0.5,
-              "y": 1
-            }
-          }
-        }
-      }
     ]
   },
   "groups": [
     {
+      "blend-mode": "normal",
+      "blur-material": 0.5,
       "hidden": false,
       "layers": [
         {
-          "image-name": "top.svg",
-          "name": "top",
-          "position": {
-            "scale": 32,
-            "translation-in-points": [
-              0,
-              0
-            ]
-          },
-          "opacity-specializations": [
+          "image-name-specializations": [
             {
-              "value": 1
+              "value": "top.svg"
             },
             {
               "appearance": "dark",
-              "value": 0
+              "value": "top_red.svg"
+            },
+            {
+              "appearance": "tinted",
+              "value": "top.svg"
             }
           ],
-          "glass-specializations": [
-            {
-              "value": true
-            },
-            {
-              "appearance": "dark",
-              "value": false
-            }
-          ]
-        },
-        {
-          "image-name": "top_red.svg",
-          "name": "top_red",
+          "name": "top",
           "position": {
             "scale": 32,
             "translation-in-points": [
@@ -110,7 +46,7 @@
           ],
           "opacity-specializations": [
             {
-              "value": 0
+              "value": 1
             },
             {
               "appearance": "dark",
@@ -119,71 +55,41 @@
             {
               "appearance": "tinted",
               "value": 1
-            }
-          ],
-          "glass-specializations": [
-            {
-              "value": false
-            },
-            {
-              "appearance": "dark",
-              "value": true
-            },
-            {
-              "appearance": "tinted",
-              "value": true
             }
           ]
         }
       ],
+      "lighting": "individual",
       "shadow": {
         "kind": "neutral",
         "opacity": 1
       },
-      "blend-mode": "normal",
-      "lighting": "individual",
       "specular": true,
       "translucency": {
         "enabled": true,
         "value": 0.3
-      },
-      "blur-material": 0.5
+      }
     },
     {
+      "blend-mode": "normal",
+      "blur-material": 0.5,
       "hidden": false,
       "layers": [
         {
-          "image-name": "bottom.svg",
-          "name": "bottom",
-          "position": {
-            "scale": 32,
-            "translation-in-points": [
-              0,
-              0
-            ]
-          },
-          "opacity-specializations": [
+          "image-name-specializations": [
             {
-              "value": 1
+              "value": "bottom.svg"
             },
             {
               "appearance": "dark",
-              "value": 0
+              "value": "bottom_red.svg"
+            },
+            {
+              "appearance": "tinted",
+              "value": "bottom.svg"
             }
           ],
-          "glass-specializations": [
-            {
-              "value": true
-            },
-            {
-              "appearance": "dark",
-              "value": false
-            }
-          ]
-        },
-        {
-          "image-name": "bottom_red.svg",
-          "name": "bottom_red",
+          "name": "bottom",
           "position": {
             "scale": 32,
             "translation-in-points": [
@@ -204,7 +110,7 @@
           ],
           "opacity-specializations": [
             {
-              "value": 0
+              "value": 1
             },
             {
               "appearance": "dark",
@@ -213,41 +119,39 @@
             {
               "appearance": "tinted",
               "value": 1
-            }
-          ],
-          "glass-specializations": [
-            {
-              "value": false
-            },
-            {
-              "appearance": "dark",
-              "value": true
-            },
-            {
-              "appearance": "tinted",
-              "value": true
             }
           ]
         }
       ],
+      "lighting": "individual",
       "shadow": {
         "kind": "neutral",
         "opacity": 1
       },
-      "blend-mode": "normal",
-      "lighting": "individual",
       "specular": true,
       "translucency": {
         "enabled": true,
         "value": 0.3
-      },
-      "blur-material": 0.5
+      }
     },
     {
+      "blend-mode": "normal",
       "hidden": false,
       "layers": [
         {
-          "image-name": "center.svg",
+          "image-name-specializations": [
+            {
+              "value": "center.svg"
+            },
+            {
+              "appearance": "dark",
+              "value": "center-dark.svg"
+            },
+            {
+              "appearance": "tinted",
+              "value": "center.svg"
+            }
+          ],
           "name": "center",
           "position": {
             "scale": 32,
@@ -256,38 +160,10 @@
               0
             ]
           },
+          "glass": true,
           "opacity-specializations": [
             {
               "value": 1
-            },
-            {
-              "appearance": "dark",
-              "value": 0.2
-            }
-          ],
-          "glass": true
-        },
-        {
-          "image-name": "middle_red.svg",
-          "name": "middle_red",
-          "position": {
-            "scale": 32,
-            "translation-in-points": [
-              0,
-              0
-            ]
-          },
-          "fill-specializations": [
-            {
-              "appearance": "dark",
-              "value": {
-                "solid": "display-p3:0.83900,0.18800,0.19200,1.00000"
-              }
-            }
-          ],
-          "opacity-specializations": [
-            {
-              "value": 0
             },
             {
               "appearance": "dark",
@@ -296,29 +172,15 @@
             {
               "appearance": "tinted",
               "value": 1
-            }
-          ],
-          "glass-specializations": [
-            {
-              "value": false
-            },
-            {
-              "appearance": "dark",
-              "value": true
-            },
-            {
-              "appearance": "tinted",
-              "value": true
             }
           ]
         }
       ],
+      "lighting": "individual",
       "shadow": {
         "kind": "neutral",
         "opacity": 0.5
       },
-      "blend-mode": "normal",
-      "lighting": "individual",
       "specular": false,
       "translucency": {
         "enabled": true,

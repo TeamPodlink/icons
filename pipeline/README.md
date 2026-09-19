@@ -6370,3 +6370,56 @@ under the house-squircle `clipPath`, the plate-badge form the file already
 had (viewBox 0 0 32 32 + its own clip; ledger "PlatformBadge vs the
 static badge generator"). Both generated badges re-rendered; icons tests
 276 ✓.
+
+### castamatic: three layers, and the flat assembled from them material-off (2026-09-18)
+
+**The bundle.** The decanted six layers were three shapes twice over —
+`top` / `bottom` / `center` for Light at opacity {1, dark 0}, and
+`top_red` / `bottom_red` / `middle_red` for Dark and Tinted at {0, dark 1,
+tinted 1}, the twins repainted by `fill-specializations` (two dark
+gradients and a dark solid). Collapsed to one layer per group with
+`image-name-specializations`, measured against the six-layer form
+through ictool at 1024, all six renditions:
+
+| form | Default | Dark | TintedLight | TintedDark | ClearLight | ClearDark |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| plain collapse (twin for dark + tinted) | identical | 4.27, max 35 | 4.95 | 4.07 | 4.86 | 7.59 |
+| + Dark centre baked | identical | **0.12, max 9** | 4.95 | 4.07 | 4.86 | 7.59 |
+| + tinted → the Light file | identical | 0.12, max 9 | 1.73, max 29 | 0.84 | 1.74 | 2.18 |
+
+Two things the plain collapse lost. The centre's Light layer does not
+switch off in Dark — it sits at 0.2 over the red twin — so one file
+cannot carry Dark by swapping alone: `center-dark.svg` is the
+`middle_red` silhouette in the dark solid (`color(display-p3 .839 .188
+.192)`, the fill-specialization moved into the file) with center.svg's
+own art at `opacity=".2"` on top, and the layer's dark fill
+specialization dropped so the format does not repaint it; Dark then
+reads 0.12 RMSE, max 9. And in Tinted the developer's stack shows BOTH
+layers — the Light file at 1 on top, the twin at 1 beneath — so the
+tinted specialization points at the Light file; what remains (1.7–2.2
+RMSE, max 29–37) is the twin showing through the Light layer's 30%
+translucency, which two files in one layer cannot express. Tinted and
+Clear renditions are neither shipped nor scored (build-assets renders
+Default and Dark); the residual is recorded, not hidden. `middle_red.svg`
+left the repo; the shipped light master is byte-identical to the
+six-layer form and dark within 10/255.
+
+**The flat.** Assembled like apple's: the plate a two-stop gradient
+from the material-off render's per-row means (fit over rows 130–900,
+rms ≤ 0.43; `rgb(255,85,92)` at row 105 → `rgb(231,19,49)` at 919 —
+the declared display-p3 canvas as ictool paints it), and the three
+Light layer files verbatim, ids prefixed. Two measured corrections on
+the way: (1) the group order — top is the topmost group and center the
+lowest, so the crescents paint OVER the centre's tips; drawn the other
+way round the centre region read 9.6 RMSE and the edge 8.3; (2) an
+attempt to refit the centre's vertical overlay from the render was
+chasing that same error (the "brightening toward the bottom" was the
+bottom crescent), and center.svg's own `vy` overlay is right as it
+stands. Candidate vs material-off at 256: central **0.72**, 0 px > 24;
+per region plate 0.70, top 0.11, centre 0.85, bottom 0.76. The audit:
+**24.18 → 11.73** against the glass master, **19.55 → 0.76** with the
+material off; diagnosis material alone (the 11.73 is the centre's glass
+and the groups' specular). The previous flat's plate (`#FF5960 .964 →
+#FF3A42 → #E51231`) and the refit crescent are gone with it. Badge
+regenerated from the flat under the house-squircle clip; `flatSource`
+official.
