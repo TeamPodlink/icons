@@ -19,6 +19,7 @@ import {
   type Card,
   type GridFacet,
 } from "@/lib/platforms";
+import type { GridOrder } from "@/lib/grid-order";
 import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/cn";
 import {
@@ -153,10 +154,13 @@ function MissingPreview({ label }: { label: string }) {
 export function IconCard({
   card,
   facet = "glass",
+  gridOrder,
 }: {
   card: Card;
   /** The directory-level facet view; the card adapts artwork + actions. */
   facet?: GridFacet;
+  /** The grid's order, carried to the detail so ← / → step through it. */
+  gridOrder?: GridOrder;
 }) {
   const navigate = useTransitionNavigate();
   // Menu actions resolve to the rendition on screen (theme-scoped).
@@ -181,9 +185,10 @@ export function IconCard({
       ? `/icon/${p.id}`
       : `/icon/${p.id}?facet=${facet === "flat" ? "vector" : facet}${ref === "store" ? "&ref=store" : ""}`;
 
+  const navState = gridOrder ? { grid: gridOrder } : undefined;
   const openDetails = () => {
     nameCardForTransition(card.key);
-    navigate(detailHref);
+    navigate(detailHref, { state: navState });
   };
 
   // Return morph: the detail's back handler records this card's key
@@ -336,6 +341,7 @@ export function IconCard({
           working (right-click bubbles to the cell's context menu). */}
       <TransitionLink
         to={detailHref}
+        state={navState}
         aria-label={`${p.name} details`}
         title={`${p.name} details`}
         onClick={(e) => {

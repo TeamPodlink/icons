@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Navigate,
   useLocation,
@@ -36,6 +36,7 @@ import {
   useTransitionNavigate,
 } from "@/lib/view-transition";
 import { cn } from "@/lib/cn";
+import { defaultGridOrder, readGridOrder } from "@/lib/grid-order";
 import { NotFound } from "@/src/pages/not-found";
 
 /** The grid-card key this platform's detail pairs with: its first
@@ -163,6 +164,35 @@ export function IconDetailPage() {
   );
   const platform = resolvePlatform(id);
   useTitle(platform ? `${platform.name} · refraction` : "Not found · refraction");
+
+  // ← / → step to the previous / next platform of the grid this detail
+  // was opened from (router state from the card; the home grid's Latest
+  // order on a direct load). The step replaces the history entry, so
+  // Back still returns to the grid in one hop, and carries the order on.
+  // Whatever segment, reference or theme the detail is showing travels
+  // with it (the query string is kept). Editable targets, modified keys
+  // and an open context menu are left alone.
+  useEffect(() => {
+    const grid = readGridOrder(location.state) ?? defaultGridOrder();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+      if (e.metaKey || e.ctrlKey || e.altKey || e.shiftKey || e.defaultPrevented) return;
+      const t = e.target as HTMLElement | null;
+      if (t && (t.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName))) return;
+      if (document.querySelector('[role="menu"]')) return;
+      const i = grid.ids.indexOf(id);
+      if (i < 0) return;
+      const next = grid.ids[i + (e.key === "ArrowRight" ? 1 : -1)];
+      if (!next) return;
+      e.preventDefault();
+      navigate(
+        { pathname: `/icon/${next}`, search: location.search },
+        { state: { grid }, replace: true }
+      );
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [id, location.state, location.search, navigate]);
   if (!platform) return <NotFound />;
   if (platform.id !== id)
     return (

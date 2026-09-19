@@ -8,6 +8,7 @@ import { IconCard } from "@/components/icon-card";
 import { WarningBanner } from "@/components/warning-banner";
 import { PageCard } from "@/components/page-card";
 import { facetCards, lensesEnabled, type Card, type GridFacet } from "@/lib/platforms";
+import { gridOrderOf } from "@/lib/grid-order";
 
 /** Alphabetical compare that ignores punctuation, so "’sodes" sorts
  *  under S instead of leading the list on its apostrophe. */
@@ -234,6 +235,12 @@ export function Directory({
 
   const noun = facet === "badge" ? "badges" : "icons";
 
+  // The detail's ← / → walk this exact order (see lib/grid-order.ts).
+  const gridOrder = useMemo(
+    () => gridOrderOf(shown, window.location.pathname + window.location.search),
+    [shown]
+  );
+
   return (
     <>
       <div className="relative mb-2">
@@ -330,7 +337,7 @@ export function Directory({
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
               {shown.map((card) => (
-                <IconCard key={card.key} card={card} facet={facet} />
+                <IconCard key={card.key} card={card} facet={facet} gridOrder={gridOrder} />
               ))}
             </div>
           )}
