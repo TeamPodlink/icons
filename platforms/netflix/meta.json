@@ -10,10 +10,9 @@
         "title": "Netflix",
         "variant": null,
         "file": "Netflix.icon",
-        "source": "flat-svg",
+        "source": "decanted",
         "appStoreId": 363590051,
-        "hasDark": false,
-        "darkStatus": "native"
+        "hasDark": true
       }
     ]
   }

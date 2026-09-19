@@ -7002,3 +7002,31 @@ store's framing into the number and floors at 3–5 on antialiasing. It
 stays as a second figure and as a Compare reference, where it is useful
 for exactly the first kind of finding — a bundle whose shipped icon is
 not what the store shows. Not swapped in as `central`.
+
+### netflix: the shipped Liquid Glass stack, decanted (2026-09-19)
+
+The store-reference test put netflix at 30.5 against the App Store
+artwork with the glass figure at 0.60 — because the bundle had been
+BUILT from our flat (`flat-svg`) and never measured against the app.
+Netflix 18.49.0 (`com.netflix.Netflix`, ipatool) ships a genuine
+`IconImageStack` "AppIcon": three SVG layers — `top-layer.svg` (the
+diagonal, fill `srgb:.898,.035,.078`), `Shadow Mid Layer 4.svg` (the
+diagonal's shadow gradient), `bottom-layer.svg` (the stems, fill
+`srgb:.698,.027,.063`), 220×400 natural at scale 1.76432 / 1.78568,
+translation −1 / −0.5 pt — over an `automatic-gradient` display-p3
+0.043 canvas, glass on the two colour layers, translucency 0 and shadow
+0 on every group. Decanted with the recipe (decant host mode,
+build-icon.py), rendered: against the store artwork 13.0 (the store
+renders the near-black automatic-gradient canvas flat at 11,11,11 where
+ictool lightens it to 20 → 10 per row — the renderer difference the
+store test recorded), against our former master 27.3. Dark differs from
+Default by 4.7 (the tinted fills), so hasDark is true. Installed as the
+bundle (`source: decanted`; the EPS-built stack leaves).
+
+**The flat** is those three layers verbatim at the bundle's placement
+over the plate as ictool paints the canvas (per-row fit of the master:
+20,20,20 at row 105 → 10,10,10 at 919, rms 0.2). No translucency or
+shadow to carry (material-flat.mjs measure: T 0, shadow none). Against
+the master **4.16** (the red N's bbox within 2–4 px of the render's, the
+rest its specular edge), material-off 3.71, against the store 30.5 →
+**13.7**. The badge keeps the brand's divided-N EPS mark, untouched.

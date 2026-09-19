@@ -1,9 +1,31 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" fill="#221f1f"/>
-  <g>
-    <path d="M14.1128,15.5089l-3.963-11.2048-.711-.2881-.0379,23.9838c1.5611-.2037,3.1299-.3087,4.7001-.3672l.0118-.0317v-12.092Z" fill="#b20710"/>
-    <polyline points="17.8872 16.4911 17.8872 4 22.6011 4 22.6009 27.9999 21.8502 27.6958 17.8872 16.4911" fill="#b20710"/>
-    <path id="Netflix_Symbol_Diagonal" d="M14.1128,4h-4.7139l8.3471,23.6009c2.3457.0592,4.855.3991,4.855.3991L14.1128,4Z" fill="#e50914"/>
-  </g>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Netflix 18.49.0 ships a Liquid Glass stack (Assets.car IconImageStack "AppIcon", decanted 2026-09-19): three SVG layers over an automatic-gradient display-p3 0.043 canvas — top-layer (the diagonal, fill srgb .898,.035,.078), Shadow Mid Layer 4 (the diagonal's shadow gradient), bottom-layer (the stems, fill srgb .698,.027,.063). This flat is those layers at the bundle's placement (220×400 natural, scale 1.76432 / 1.78568, translation −1 / −0.5 pt) over the plate as ictool paints the canvas (per-row fit of the master). No translucency or shadow in the stack; what the glass adds is specular only. -->
+  <defs><linearGradient id="netflix-plate" x1="0" y1="3.28125" x2="0" y2="28.71875" gradientUnits="userSpaceOnUse"><stop stop-color="rgb(20,20,20)"/><stop offset="1" stop-color="rgb(10,10,10)"/></linearGradient></defs>
+  <path fill="url(#netflix-plate)" d="M0 0h32v32H0z"/>
+  <g transform="translate(9.90390 4.97300) scale(0.055135)">
+ <path clip-rule="evenodd" d="M143.12 0V208.2L157.96 251.08C162.76 264.96 189.84 343.12 191.96 349.4L206.04 390.08L207.76 394.92L219.36 399.72L219.56 399.8L219.72 399.88L220 400V0H143.12Z" fill="#B20710" fill-rule="evenodd"/>
+ <path clip-rule="evenodd" d="M0 27.8V400C30.56 396.24 45.84 394.8 76.88 393.36V191.8L13.92 9.92L12.24 5.08L0.64 0.28L0.24 0.12L0 0V12.12V27.8Z" fill="#B20710" fill-rule="evenodd"/>
+</g>
+  <g transform="translate(9.84610 4.83950) scale(0.055802)">
+ <defs>
+  <linearGradient id="netflix-shadow-paint0_linear_82_78" x1="83.8525" y1="240.247" x2="-56.1475" y2="240.247" gradientUnits="userSpaceOnUse">
+   <stop offset="0.00480769" stop-color="#7c020d" stop-opacity="0"/>
+   <stop offset="0.05" stop-color="#7c020d" stop-opacity="0.09"/>
+   <stop offset="0.25" stop-color="#7c020d" stop-opacity="1"/>
+   <stop offset="0.75" stop-color="#7c020d" stop-opacity="1"/>
+   <stop offset="0.95" stop-color="#7c020d" stop-opacity="0.09"/>
+   <stop offset="1" stop-color="#7c020d" stop-opacity="0"/>
+  </linearGradient>
+  <mask height="400" id="netflix-shadow-mask0_82_78" style="mask-type:alpha" width="221" x="0" y="0" maskUnits="userSpaceOnUse">
+   <path clip-rule="evenodd" d="M143.12 0V208.2L157.96 251.08C162.76 264.96 189.84 343.12 191.96 349.4L206.04 390.08L207.76 394.92L219.36 399.72L219.56 399.8L219.72 399.88L220 400V0H143.12Z" fill="#B20710" fill-rule="evenodd"/>
+   <path clip-rule="evenodd" d="M0 27.8V400C30.56 396.24 45.84 394.8 76.88 393.36V191.8L13.92 9.92L12.24 5.08L0.64 0.28L0.24 0.12L0 0V12.12V27.8Z" fill="#B20710" fill-rule="evenodd"/>
+  </mask>
+ </defs>
+ <g mask="url(#netflix-shadow-mask0_82_78)">
+  <rect fill="url(#netflix-shadow-paint0_linear_82_78)" height="600" transform="rotate(-19.5 -56.1475 -59.7528)" width="140" x="-56.1475" y="-59.7528"/>
+ </g>
+</g>
+  <g transform="translate(9.90390 4.97300) scale(0.055135)">
+ <path clip-rule="evenodd" d="M78.56 0H0L139.08 393.36C166.144 394.286 193.148 396.502 220 400L78.56 0Z" fill="#E50914" fill-rule="evenodd"/>
+</g>
 </svg>
