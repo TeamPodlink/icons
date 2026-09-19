@@ -1,34 +1,83 @@
 ---
 name: icon-to-flat-svg
-description: Assemble a platform's flat facet (icon.svg + badge.svg, 32×32) mechanically from its Liquid Glass .icon bundle or other official vector material — declared fills, verbatim glyph paths, measured placement — never drawing or tracing. Use when a platform is missing its flat icon, when asked to build icon.svg from a bundle, to convert a .icon to the flat facet, or to add a badge for a bundle-only platform.
+description: Assemble a platform's flat facet (icon.svg + badge.svg, 32×32) mechanically from its Liquid Glass .icon bundle or other official vector material — declared fills, verbatim glyph paths, measured placement. Tracing is a documented last resort, taken only after every official vector source is ruled out. Use when a platform is missing its flat icon, when asked to build icon.svg from a bundle, to convert a .icon to the flat facet, or to add a badge for a bundle-only platform.
 ---
 
 # .icon → flat facet: mechanical assembly
 
 Build `platforms/<id>/icon.svg` (and `badge.svg`) from a `.icon` bundle
-with **zero drawn geometry**: every path traces to the developer's own
-SVG assets, every color to a declared value in `icon.json`, every
-placement to the bundle's stated layer geometry. The output is an
-assembly, not an artwork.
+by **assembly, not authorship**: wherever official vector material
+exists, every path comes from the developer's own SVG assets, every
+color from a declared value in `icon.json`, and every placement from
+the bundle's stated layer geometry. The output is an assembly, not an
+artwork.
 
-## When this applies — and when it does not
+Assembly is always the preferred path. When no official vector
+material can be obtained, a traced flat is permitted as a last resort
+— see "Falling back to a trace" below.
 
-Sanctioned ONLY when official vector material exists:
+## When this applies
+
+Mechanical assembly is sanctioned whenever official vector material
+exists:
 
 - the decanted bundle ships vector layers (`Assets/*.svg`), or
 - the developer publishes official vector assets (press kit, guidelines).
 
-NEVER:
-
-- raster tracing (auto or manual) of screenshots, App Store art, or the
-  ictool render;
-- drawing "close enough" geometry by eye;
-- inventing colors — if a fill is not declared in `icon.json` (e.g. an
-  `automatic-gradient`, or a raster-only layer), this skill does not
-  apply; stop and say so.
-
 The worked example is `platforms/sodes/` (commit "sodes: flat icon +
 badge, mechanically assembled from the decanted bundle").
+
+## Exhaust the official sources first
+
+Before concluding that no official vector exists, check all of these
+and record what you found. The `ipatool` skill covers the first two.
+
+1. **iOS** — the decanted `.icon` bundle's own `Assets/*.svg`, and any
+   vector in the IPA's asset catalog.
+2. **Android** — the official APK's adaptive-icon layers. Developer
+   foreground/background layers are frequently true VectorDrawables,
+   which convert to SVG losslessly; this is the most commonly missed
+   source.
+3. **Web** — the app's own site: inline SVG in the markup, sprite
+   sheets, an `.svg` favicon, `icons` entries in the web manifest.
+4. **Press kit / brand guidelines** — the `guidelinesUrl` in
+   `meta.json` when set, or the developer's press, brand, or media
+   page.
+5. **Ask the developer** — email, support, or their GitHub. Many will
+   send the source SVG on request. A pending request is a reason to
+   wait, not a reason to trace.
+
+Only when all five come up empty is the fallback open.
+
+## Falling back to a trace
+
+A traced flat is a last resort, not a shortcut, and it ships labeled as
+one:
+
+- Say up front, in your reply, which of the five sources you checked
+  and what each returned. An unchecked source is not an exhausted one.
+- Set `"flatSource": "drawn"` in `meta.json`. Never label a traced flat
+  `"official"`.
+- Fit **parametrically against the highest-resolution official raster**
+  — App Store artwork or the ictool master — rather than eyeballing
+  shapes freehand. Prefer geometry you can state in parameters (radii,
+  centers, stroke widths) over a bag of digitized points.
+- Measure colors off that raster. Do not invent them.
+- Report the fit error (e.g. central-crop RMSE against the raster at
+  1024) so the next person can judge whether to replace it.
+- Leave a comment in `icon.svg` recording what it was fit against, the
+  method, the date, and that measured error.
+
+Still out of bounds:
+
+- inventing colors that are neither declared in `icon.json` nor
+  measured from official artwork;
+- passing a traced flat off as `official`;
+- tracing because looking for the vector was inconvenient.
+
+If a fill is not declared in `icon.json` (e.g. an `automatic-gradient`,
+or a raster-only layer) and cannot be measured from official artwork,
+stop and say so.
 
 ## House flat-icon format
 

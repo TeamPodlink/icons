@@ -1,19 +1,29 @@
 ---
 name: ipatool
-description: Source a platform's icon artwork from the real shipped app — iOS via ipatool (IPA asset catalog, decant for genuine Liquid Glass .icon stacks, marketing artwork for flat apps) or Android via the official APK's adaptive-icon layers (apktool decode, developer foreground/background separation). Use whenever adding a platform, sourcing or updating icon artwork, building a bundle for an Android-only app, or wondering what an app's icon "really" ships — NEVER hand-author or recreate artwork by eye.
+description: Source a platform's icon artwork from the real shipped app — iOS via ipatool (IPA asset catalog, decant for genuine Liquid Glass .icon stacks, marketing artwork for flat apps) or Android via the official APK's adaptive-icon layers (apktool decode, developer foreground/background separation). Use whenever adding a platform, sourcing or updating icon artwork, building a bundle for an Android-only app, or wondering what an app's icon "really" ships. The shipped app is always the reference; a vector — including our own flat facet — may ship in place of a shipped raster layer once it clears the no-measurable-loss bar, but never a freehand recreation by eye.
 ---
 
 # Sourcing icon artwork from the shipped app
 
-House rule: platform artwork comes from **decanted `.icon` bundles or
-official App Store artwork mined from the app's own asset catalog** —
-never from agent-authored SVG recreations. A shipped RASTER layer may
-still be replaced by a vector (an official vector, or a measured drawing)
-when ictool renders the two within the same-artwork band in both
-appearances — "no measurable loss", pipeline/README.md rule entry of
-2026-09-18; the raster is the reference, the vector ships. The app itself is the
-ground truth for what its icon "really" is; always inspect it before
-assuming a platform is flat.
+House rule: platform artwork is **sourced** from decanted `.icon`
+bundles or official App Store artwork mined from the app's own asset
+catalog. The app itself is the ground truth for what its icon "really"
+is; always inspect it before assuming a platform is flat.
+
+But the developer's shipped layers are the **reference, not the
+deliverable**. A shipped RASTER layer may be replaced by a vector — an
+official vector, or a measured drawing, including our own
+`platforms/<id>/icon.svg` — once the two render within the same-artwork
+band in both appearances. That is the "no measurable loss" bar
+(pipeline/README.md rule entry of 2026-09-18): the raster is the
+reference, the vector ships, and the raster stays in git history.
+
+Reconstructing a bundle from our vector flat is therefore normal and
+expected, not a fallback — it is already how most of the library is
+built (`source: "flat-svg"` / `"flat-svg-split"`, the most common
+source values in `platforms/*/meta.json`). What the rule excludes is
+tracing by eye; a measured drawing that passes the bar qualifies, and
+an unmeasured one does not, regardless of how it was made.
 
 ## Tooling (all already on this Mac)
 
@@ -69,8 +79,16 @@ assuming a platform is flat.
 
 Android-only apps get bundles built from the **official APK's
 adaptive-icon layers** — the developer's own foreground/background
-separation — never from our hand-drawn flat SVGs. Pilot + worked
-example: antennapod (commit `d64ded5`).
+separation. Prefer that separation whenever the APK carries it: it is
+the developer's own decomposition, and it resolves plate-vs-mark
+questions that our flat has already collapsed into one image. Pilot +
+worked example: antennapod (commit `d64ded5`).
+
+When no official APK can be obtained, or its layers turn out to be
+bare rasters, our own `platforms/<id>/icon.svg` is a legitimate basis
+for the layers under the same no-measurable-loss bar as any other
+vector replacement — scored against the official artwork, not against
+our flat. Say which applied.
 
 ### Official APK sources, in order
 
