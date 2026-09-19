@@ -564,24 +564,24 @@
     "audible": {
       "primary": "floor",
       "causes": [],
-      "central": 3.79,
+      "central": 3.1,
       "glassLayers": 1,
       "specular": true,
       "struct": 0,
       "signed": [
-        -2,
-        -1.5,
-        -1.4
+        0,
+        -0.5,
+        -1.1
       ],
-      "lumaShare": 0.9,
-      "edgeShare": 0.75,
+      "lumaShare": 0.79,
+      "edgeShare": 0.81,
       "plateShare": 0.66,
       "plateSigned": [
-        -1.5,
-        -1,
-        -0.9
+        0.1,
+        -0.2,
+        -0.6
       ],
-      "plateRmse": 2.33,
+      "plateRmse": 1.65,
       "glyphSigned": null,
       "filter": false,
       "fit": null,

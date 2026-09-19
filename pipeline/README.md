@@ -7086,3 +7086,30 @@ render is byte-identical to Default, which is what iOS shows for an
 app without a dark icon. Against the store artwork **7.96 → 2.13**
 (signed 0.0/0.0/0.0), against the glass master 1.12. The badge (the
 brand's roundel) is untouched.
+
+### audible: the plate from the iOS icon, the shadow from Liquid Glass (2026-09-19)
+
+Three shadows measured around the chevron (luma darkening vs the plate,
+by distance): ictool's, 5.8/255 at the edge holding to 20 px and gone
+by 55, none above the top edge; the store artwork's baked one, 13 at
+9 px below, and 18 → 3 ABOVE the top edge over 64 px — the older
+icon's all-round drop shadow; and the flat's filter as the material
+tool had fitted it (dy 32 σ 26 a .057 from a joint least squares that
+undershot: 2.8–3.2 at the edge, half of ictool's). The vector wants the
+Liquid Glass shadow, not the raster's, so the filter was refit directly
+against ictool's ring profile by rendering variants: **σ 36 px, dy 24,
+opacity .112**, rms 0.36 over 2–72 px (the flat now reads 6.4 → 0 where
+ictool reads 5.8 → 0).
+
+The plate we carried was the Android export's diagonal (`#FF8909 →
+#FFB750`, from the adaptive-icon round). The iOS icon's plate, read
+away from the chevron and its baked shadow (96 px dilation, inside rows
+105–919, 47,215 samples), runs the same 45° diagonal (G slope 36.0/px
+in x, 38.5 in y) with a wider ramp: **255,131,0 → 255,195,98**, rms
+0/2.0/3.1 with a residual of ±3 by decile (a slight curve the two-stop
+form does not carry). Written into `plate.svg` and the flat.
+
+Against the glass master **3.79 → 3.10**; against the store artwork
+18.27 → 17.81 — by design: the 17 is the store's baked shadow and the
+plate's difference under it, which the vector is not meant to chase.
+Badge (the official mark on its plate) untouched.
