@@ -6583,3 +6583,112 @@ after, to the pixel. Validate ✓ 73/73, icons tests 276 ✓.
 material row will read `off 0.49` on the next full audit. Candidates
 and scorer in `scratchpad/agent-moonfm/` (`build.mjs`, `badge.mjs`,
 `cand-*.svg`).
+
+### podbean: recoloured from the store raster (2026-09-18)
+
+Diagnosis had podbean at **12.51** under colour + plate (glyph −11/−11/−10,
+plate RMSE 11.7, struct 0.6%). The bundle is `appstore-artwork` — one
+raster layer, `Assets/light.png` 1024² RGB — and the master
+(`packages/refraction/assets/podbean.png`) IS that raster inside the
+squircle: master − artwork on the central crop reads 0.03/0.03/−0.03 mean,
+rmse 0.64 on plate, 0.79 on glyph. The only thing ictool adds is a rim
+light within 24 px of the mask edge (+16.6/255 mean there, rmse 31.6;
+nothing beyond 48 px), all outside the crop. So the whole 12.51 was
+artwork drift, and every number below was read off the master with masks
+rendered from the flat's own paths (librsvg at 1024, hex fills so no P3
+trap; eroded 3 px; the two-subpath green path split into ring and outer
+arc — exact split, 0 differing alpha pixels).
+
+**Glyph (was one `#8DC742` = 141,199,66 for all three greens, `#fff`
+dot).** The artwork paints a fading wifi: three greens, each flat to
+< 1/255 across its rows and columns — outer arc **119.1/165.6/54.9**
+(`#77A637`), inner arc **129.1/180.4/58.4** (`#81B43A`), ring
+**141.5/198.2/63.1** (`#8EC63F`; the old green was the ring's colour applied
+to all), dot **243.6/243.6/244.3** (`#F4F4F4`, not white). All in sRGB
+gamut; no P3 declaration, and the stale `podbean/icon.svg` allowlist key
+(`0.1451 0.1255 0.1529`, a plate triple from a flat that no longer
+exists) was removed.
+
+**Plate (was a 5-stop vertical `#29222C → #1D181F`, plate RMSE 6.72 in
+the crop at 256).** Not a vertical gradient: per-32-px-cell medians show
+an ambient ramp plus a broad glow around the mark. Decomposed at 1024:
+(1) ambient = per-row medians of plate pixels ≥ 120 px from the glyph
+and ≥ 48 px from the rim (read from the artwork, which has no rim):
+46/39/49 at row 0 falling ~1/255 per 16 rows to 31/26/33 at row 288,
+**29/24/31** from row ~330 to the bottom (rows 256–544 have no ambient
+pixel — the mark spans the width — and were interpolated linearly);
+greedy 1.5/255 stops → five: `#2E2731` (0) · `#2D2530` (.046) · `#251F27`
+(.157) · `#1F1A21` (.319) · `#1D181F` (1). (2) glow = residual over the
+ambient as a function of distance to the mark (chamfer transform of the
+flat's own coverage): on pixels outside the mark's convex parts it is one
+clean kernel — 12.3/17.1/6.4 at 4 px, 8.9/12.2/4.6 at 16, 3.7/5.4/1.9 at
+40, 0 by 72 px, and the same curve above the arc, beside and below the
+ring; between the arcs it reads the SUM of the two nearest bands
+(5.9/8.3/2.8 at 44 px ≈ 2 × 2.9/4.4/1.4) — an additive outer glow. Plate
+model ambient + glow(d) scores 2.95 on the crop's plate pixels at 1024
+(per-row medians alone 5.0; the old gradient 7.0).
+
+**The glow without a filter.** House format allows no `<filter>`, so the
+distance function is built from stroke dilations: `<g id="podbean-mark">`
+(the three parts via `<use>`) stroked nine times beneath the fills,
+widths 0.5 … 4.5 units in 0.5 steps (= 8 px bands at 1024, out to 72 px),
+`stroke-linejoin="round"` (a round-joined stroke of a closed outline is
+the exact Minkowski dilation, so each band IS a distance shell), one
+colour `#3E4631` = ambient 31/26/33 + 2.5 × the 0–8 px residual, and
+per-band `stroke-opacity` solved sequentially from the outside in so the
+composited stack reproduces the band means (0.015 at 4.5 → 0.12 at 0.5).
+The three parts' stacks overlap between the arcs and compose
+normal-over, which at these alphas is nearly additive — the analytic
+alphas still underpaint (plate signed +2.8/+3.0 at gain 1), and a global
+gain on the alphas swept on the audit-method scorer is flat between 1.2
+and 1.3 (3.64 / 3.65); **1.25** adopted (plate signed 0/−0.2/+0.9).
+Colour λ 1.8 / 2.5 / 4 and 6-px bands change nothing beyond 0.1.
+
+**Registration.** Untouched: the wrapper
+`translate(0.1716 0.1655) scale(0.98949)` stays. fit-flat-glyph isolates
+only the white dot here (168 × 168 at 511.5,705.5 both sides) and reads
+`translate(0 −0.0156) scale(1)`; a coarse-to-fine grid on the librsvg
+scorer (0.1 unit / 0.5% then 0.025 / 0.125%) finds 3.46 vs 3.64 at
+translate(0.1466 0.1405) scale(0.99074) — −0.025 unit and +0.125%, under
+the 0.08 / 0.8% thresholds, not applied. Band widths at 1024: the
+master's arcs are 102 px on column 512 where the flat's are 100–101, 180
+vs 176 on row 300 — the raster's ~1-px soft edge (one 126-valued pixel
+between 165 and 40 on column 512), not placement.
+
+**Numbers** (`audit-facet-drift --only podbean`, Chrome): central
+**12.51 → 3.92**, frame 14.25 → 10.90, meanΔ −2.1/−4.2/−1.8 →
++1.2/+1.0/+1.3, struct 0.6% → 0.4%, maskΔ 1.8% (unchanged, the house vs
+iOS squircle). Per region on the Chrome raster at 256 (old → new): green
+15.97 → **0.77** (signed −11.3/−18.1/−7.0 → +0.4/+0.5/+0.6); white 10.69 →
+**0.59**; plate 6.72 → **2.62** (far plate 4.02 → 2.06, plate within 30 px
+of the mark 9.11 → 3.21); edge 16.37 → 9.91 on 2,916 px, now 79% of the
+remaining energy and all of it the raster's soft edge over the glow.
+librsvg reads the same flat at 3.66 (Chrome vs librsvg 1.3 rmse on this
+flat, edge antialiasing). Diagnosis colour + plate → floor.
+
+**Badge.** Bare mark (viewBox `8 8 24 24`, no clip) kept in that form;
+the compound path split the same way and the three greens + `#F4F4F4`
+applied; no glow (there is no plate to glow over). Geometry 0 differing
+pixels; ink box 8.000–31.977 × 10.227–29.938 before and after.
+`flatSource` unchanged (no key in this meta).
+
+**Traps.** Read the plate from the master, not `light.png`, only inside
+48 px of the rim — beyond that they are the same pixels and the artwork
+is the cleaner read for the ambient rows (no rim light). A stroke stack
+is a max-of-distance model; the artwork's glow is a sum — per-part
+stacks composited normally recover most of it, the rest is the gain. The
+gap rows' ambient is an interpolation (nothing in the master measures
+it), so the between-arc profile carries that assumption; its ≈ 2 ×
+outside reading is the check that it holds. Codegen prefixes `<use
+href>` ids (`podbean_podbean-mark`) and keeps `stroke-opacity`; the
+static flat under the house mask renders the stack as written.
+
+**Files.** `platforms/podbean/icon.svg` (gradient stops, part colours,
+glow stack — paths and wrapper verbatim), `platforms/podbean/badge.svg`
+(colours, split path), `pipeline/p3-allowlist.json` (stale key
+removed). Not touched: `facet-drift.json`, `drift-diagnosis.json`,
+README, meta.json, the bundle. validate ✓ 73/73, icons tests 276 ✓.
+Instruments in the session scratch `agent-podbean/`: `measure.mjs`,
+`plate2d.mjs`, `platemodel.mjs`, `ambient.mjs`, `glowprofile.mjs`,
+`build.mjs` (OPT gain/step/kmax/lam), `score.mjs`, `chrome-score.mjs`,
+`grid.mjs`, `region-chrome.mjs`, `verify-geom.mjs`, `audit0/1.json`.
