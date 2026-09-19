@@ -166,6 +166,10 @@ export function Directory({
   // store raster) — URL state so the choice is shareable and the cards
   // read it themselves.
   const [refRaw, setRef] = useUrlState("ref", "glass");
+  // Liquid Glass facet, Drift sort: which drift figure ranks the grid —
+  // the full comparison (material on) or the artwork-only one measured
+  // with the glass material disabled (material off). URL state like ?ref.
+  const [materialRaw, setMaterial] = useUrlState("material", "on");
   const sort = parseSort(sortRaw);
   const inputRef = useRef<HTMLInputElement>(null);
   // Anchor inside the PageCard viewport, for scroll save/restore.
@@ -202,9 +206,17 @@ export function Directory({
       // "drift": worst facet agreement first; unmeasured (flat-only
       // cards, bundles newer than the snapshot) sink to the bottom. On the
       // Compare facet the figure follows the reference switch: against the
-      // store raster when ?ref=store.
+      // store raster when ?ref=store. On the Liquid Glass facet it follows
+      // the material switch: ?material=off ranks by the artwork-only figure.
+      // A flat that carries the material itself has no material-off
+      // measurement (the audit skips it) — its full figure is already the
+      // artwork comparison, so it ranks by that rather than sinking.
       const figure = (c: Card) =>
-        facet === "compare" && refRaw === "store" ? c.driftStore : c.drift;
+        facet === "compare" && refRaw === "store"
+          ? c.driftStore
+          : facet === "glass" && materialRaw === "off"
+            ? (c.driftMaterialOff ?? c.drift)
+            : c.drift;
       list.sort(
         (a, b) => (figure(b) ?? -1) - (figure(a) ?? -1) || byTitle(a.title, b.title)
       );
@@ -218,7 +230,7 @@ export function Directory({
           byTitle(a.title, b.title)
       );
     return list;
-  }, [base, fuse, query, sort, facet, refRaw]);
+  }, [base, fuse, query, sort, facet, refRaw, materialRaw]);
 
   const noun = facet === "badge" ? "badges" : "icons";
 
@@ -247,8 +259,35 @@ export function Directory({
           <p className="font-mono text-sm text-neutral-600 dark:text-neutral-400">
             {`${shown.length} ${shown.length === 1 ? "result" : "results"}`}
           </p>
-          {/* Centre column: the Compare facet's reference switch (empty otherwise). */}
+          {/* Centre column: the Compare facet's reference switch, or the
+              Liquid Glass facet's material switch under the Drift sort
+              (empty otherwise). */}
           <div className="flex items-center justify-center">
+            {facet === "glass" && sort === "drift" && (
+              <div
+                role="group"
+                aria-label="Drift figure"
+                className="flex items-center rounded-md border border-neutral-200 p-0.5 font-mono text-xs dark:border-neutral-800"
+              >
+                {(["on", "off"] as const).map((m) => (
+                  <button
+                    key={m}
+                    type="button"
+                    aria-pressed={materialRaw === m}
+                    title={m === "on" ? "Rank by the full drift figure: the light Liquid Glass master against the flat" : "Rank by the artwork-only figure: the master rendered with the glass material disabled (audit-facet-drift.mjs --material-off); flats that carry the material rank by their full figure"}
+                    onClick={() => setMaterial(m)}
+                    className={
+                      "cursor-pointer rounded px-2 py-0.5 " +
+                      (materialRaw === m
+                        ? "bg-neutral-200 text-black dark:bg-neutral-800 dark:text-white"
+                        : "text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white")
+                    }
+                  >
+                    material {m}
+                  </button>
+                ))}
+              </div>
+            )}
             {facet === "compare" && (
               <div
                 role="group"
