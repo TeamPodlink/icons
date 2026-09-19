@@ -1404,28 +1404,28 @@
     "spreaker": {
       "primary": "floor",
       "causes": [],
-      "central": 0.95,
+      "central": 0.92,
       "glassLayers": 0,
       "specular": false,
       "struct": 0,
       "signed": [
-        0.5,
-        0.4,
+        0.6,
+        0.2,
         -0.5
       ],
-      "lumaShare": 0.45,
-      "edgeShare": 0.2,
-      "plateShare": 0.43,
+      "lumaShare": 0.33,
+      "edgeShare": 0.21,
+      "plateShare": 0.42,
       "plateSigned": [
-        0.6,
-        0.6,
-        0.2
-      ],
-      "plateRmse": 0.74,
-      "glyphSigned": [
         0.4,
+        0.4,
+        0.3
+      ],
+      "plateRmse": 0.64,
+      "glyphSigned": [
+        0.7,
         0.1,
-        -1.3
+        -1.2
       ],
       "filter": false,
       "fit": {
@@ -2212,34 +2212,34 @@
     "netflix": {
       "primary": "floor",
       "causes": [],
-      "central": 0.6,
-      "glassLayers": 0,
-      "specular": false,
+      "central": 4.16,
+      "glassLayers": 2,
+      "specular": true,
       "struct": 0,
       "signed": [
-        0.1,
-        0.6,
-        0.3
+        1.4,
+        -0.2,
+        -0.9
       ],
-      "lumaShare": 1,
-      "edgeShare": 0.23,
-      "plateShare": 0.3,
+      "lumaShare": 0.43,
+      "edgeShare": 0.74,
+      "plateShare": 0.37,
       "plateSigned": [
-        0.3,
-        0.7,
-        0.5
+        0.1,
+        0.1,
+        0.1
       ],
-      "plateRmse": 0.72,
+      "plateRmse": 0.36,
       "glyphSigned": [
-        0,
-        0.5,
-        0.2
+        1.9,
+        0.1,
+        -0.9
       ],
       "filter": false,
       "fit": {
-        "tx": 0,
-        "ty": 0,
-        "s": 1
+        "tx": 0.1875,
+        "ty": 0.2034,
+        "s": 0.98728
       },
       "materialOff": null
     },
