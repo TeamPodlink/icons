@@ -140,7 +140,8 @@ for (const r of audit.rows) {
   const es = sig ? sig.edgeShare : null;
   const flatSvgPath = join(root, "platforms", r.slug.replace(/-.*$/, ""), "icon.svg");
   const flatSvg = existsSync(flatSvgPath) ? readFileSync(flatSvgPath, "utf8") : "";
-  const hasFilter = /<filter\b/.test(flatSvg);
+  // a filter that is the material's shadow (material-flat.mjs) is not renderer disagreement
+  const hasFilter = /<filter\b(?![^>]*-material-)/.test(flatSvg);
   const signals = {
     central: +r.central.toFixed(2),
     glassLayers,

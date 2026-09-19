@@ -6825,3 +6825,95 @@ diagnosis reads `geometry` at the floor's doorstep. The store raster
 stays in the bundle. Badge in its bare-mark form, the same two paths
 and gradients to the previous ink box (w 18.15 → 17.97, h 24 both).
 validate ✓ 73/73, icons tests 276 ✓.
+
+## Translucency and shadow in the flats (measured 2026-09-19)
+
+The material pairs' whole figure was the glass material, and the vector
+facet stayed flat by decision. The maintainer reversed that decision on
+2026-09-19: the material's vector-expressible parts go INTO the flats.
+What those parts are, measured by ablation through ictool (central RMSE
+of the flat against the render with one part removed):
+
+| pair | full | no translucency | no shadow | no specular | no refraction | all off |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| icatcher | 26.8 | 3.5 | 25.4 | 26.8 | 26.8 | 1.3 |
+| moonfm | 44.3 | 5.8 | 44.3 | 43.3 | 44.3 | 1.1 |
+| apple | 12.3 | 6.6 | 9.8 | 10.9 | 12.4 | 1.1 |
+
+Translucency is nearly the whole material; shadow ~4; specular 0–5;
+refraction nothing at 256.
+
+**The translucency law.** Per row, a glass layer blends toward the
+backdrop with a weight that rises from 0 at the top of its bounding box
+to about the group's `translucency.value` at the bottom — read exactly
+against the render with the layer hidden (the true backdrop), per row
+decile: icatcher T .5 → 0.01 0.02 0.05 0.09 0.13 0.19 0.26 0.33 0.39
+0.47; sodes T .45 → 0.02 … 0.40; castamatic T .3 → 0.02 … 0.20; rss
+T .25 → 0.01 … 0.14; audible T 0 → 0 throughout; roughly T·f² over
+the box. Two things the per-layer read got wrong before the law was
+right: (1) a lower layer must not read pixels where a layer above it
+paints (each layer's footprint is what its hiding changes with
+translucency off, minus the footprints of the layers above); (2) the
+blend is toward what lies beneath the layer's GROUP, not toward
+sibling layers in the same group — moonfm's blue chevron fades to the
+white M beneath the group, not to the pink chevron under it inside the
+group (per-layer masks scored 23.8; the group mask 6.8). So the weight
+curve is read over the union footprint of a group's glass layers and
+applied to the group. Layers whose visible footprint is under 0.5% of
+the canvas (moonfm's M, a one-row rim) carry no material.
+
+**The shadow.** luma(no-shadow − full) outside every footprint, fitted
+jointly as Σ a_k·blur_σ(silhouette_k shifted down by dy) with one (dy,
+σ) per bundle and an opacity per group: icatcher dy 32 σ 32 a .043
+(peak 10/255 measured, 5 modelled — the real shadow is denser near the
+edge than a gaussian of the silhouette), moonfm dy 48 σ 32 a .084
+(20.7 / 20.6), apple dy 40 σ 32 a .052/.018/.004, sodes dy 32 σ 32 a
+.075, rss dy 40 σ 32 a .046, audible dy 32 σ 26 a .057. An absent
+shadow key is Icon Composer's DEFAULT shadow, not none (icatcher).
+
+**The SVG form** (`pipeline/material-flat.mjs`: `measure` renders the
+ablations and hides through ictool, cached under /tmp/material-flat-
+work; `apply` rewrites icon.svg through jsdom, one `--map
+"<layer file>=<css selector>"` per glass layer file). Per glass group:
+the matched elements move into `<g id="<id>-material-n-layer">` under
+`<g mask="url(#…-mask)">`, the mask a white rect under a userSpaceOnUse
+vertical gradient from the group's top row to its bottom row with
+stop-opacity 1 − weight(decile); before it, `<use href="#…-layer"
+filter="url(#…-shadow)">` where the filter is feGaussianBlur(SourceAlpha,
+σ/32) → feOffset(dy/32) → feFlood(#000, a) composited `in` — a shadow
+of the layer's full silhouette, never merged with the source. Root
+units throughout: an element nested under transformed groups is LIFTED
+to the top level under a replica of its ancestor transforms (the
+userSpaceOnUse trap, again) — in the flat's own paint order, since the
+bundle's group order put apple's person beneath its rings once (35.4)
+and the pink chevron over the blue once (58.6). The plate and every
+non-glass element are untouched; a flat already carrying the material
+is refused.
+
+**Results** (audit, glass master, before → after; badges unchanged —
+they are bare marks or brand plates, not renditions):
+
+| pair | before | after | left |
+| --- | ---: | ---: | --- |
+| icatcher | 26.67 | 2.56 | |
+| moonfm | 44.36 | 6.80 | specular (no-specular ablation 43.3 → the ~5 it is worth) |
+| sodes | 24.67 | 3.63 | |
+| castamatic | 11.73 | 9.94 | top/bottom crescents are not glass layers: specular only |
+| apple | 12.03 | 5.72 | specular on three groups |
+| podcastrepublic | 14.89 | 6.52 | specular |
+| rss | 9.59 | 4.71 | |
+| audible | 5.81 | 3.79 | shadow only (T 0) |
+
+overcast (T .1, weights ≤ 0.03) and pocketcasts/tunein/jiosaavn (no
+glass layer) were left as they are.
+
+**The instrument, adjusted.** A flat that carries the material (ids
+`<id>-material-…`) is scored against the glass master only:
+`audit-facet-drift.mjs --material-off` skips its material-off figure
+(that render is no longer the flat's reference — scored against it the
+materialised flats read 7–41, which is the material they now carry, not
+a defect), and the diagnosis's `filter` cause ignores a material
+shadow filter. Catalogue after: 60 of 71 pairs at the floor against the
+glass master; the material lens holds six (podcastparrot, overcast,
+castamatic, moonfm, podcastrepublic, apple), every one of them the
+specular the vector cannot carry, or a raster.

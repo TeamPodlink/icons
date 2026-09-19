@@ -478,7 +478,11 @@ for (const p of pairs) {
   const [f, g] = await Promise.all([rgba256(flatPng), rgba256(p.master)]);
   const s = score(f, g);
   const row = { slug: p.slug, source: p.source, glass: p.glass, ...s, materialOff: null };
-  if (materialOff && p.material) {
+  // A flat that carries the material itself (pipeline/material-flat.mjs:
+  // ids "<id>-material-…") is scored against the glass master only — the
+  // material-off render is no longer its reference.
+  const materialised = /-material-/.test(svg);
+  if (materialOff && p.material && !materialised) {
     const o = await rgba256(await materialOffMaster(p.bundlePath, p.slug));
     row.materialOff = score(f, o);
     if (sheets) await writeSheet(p.slug, f, o, "sheets-off");
