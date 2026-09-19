@@ -168,24 +168,24 @@ function badgeDownloadItems(
   ];
 }
 
-/** Dev-only Raster facet: the App Store's 1024 artwork as one PNG. */
+/** Dev-only Raster facet: the store's own icon (App Store 1024 or Google Play 512) as one PNG. */
 function rasterCopyItems(bundle: GlassBundle): ContextMenuItem[] {
   return [
     {
-      label: "PNG 1024 (App Store)",
+      label: "Store PNG",
       icon: ImageIcon,
       onSelect: () =>
-        copyImage(rasterPath(bundle.slug), `${bundle.title} — App Store 1024px PNG`),
+        copyImage(rasterPath(bundle.slug), `${bundle.title} — store PNG`),
     },
   ];
 }
 function rasterDownloadItems(bundle: GlassBundle): ContextMenuItem[] {
   return [
     {
-      label: "PNG 1024 (App Store)",
+      label: "Store PNG",
       icon: ImageIcon,
       onSelect: () =>
-        downloadAsset(rasterPath(bundle.slug), `${bundle.slug}-appstore.png`),
+        downloadAsset(rasterPath(bundle.slug), `${bundle.slug}-store.png`),
     },
   ];
 }
@@ -197,7 +197,7 @@ export function copyItemsFor(
   bundle: GlassBundle | null,
   darkTheme: boolean
 ): ContextMenuItem[] {
-  if (facet === "raster") return bundle?.appStoreId != null ? rasterCopyItems(bundle) : [];
+  if (facet === "raster") return bundle && (bundle.appStoreId != null || bundle.playStoreId != null) ? rasterCopyItems(bundle) : [];
   if (facet === "glass") return bundle ? glassCopyItems(bundle, darkTheme) : [];
   if (facet === "badge") return badgeCopyItems(platform, darkTheme);
   return vectorCopyItems(platform);
@@ -253,7 +253,7 @@ export function downloadItemsFor(
   bundle: GlassBundle | null,
   darkTheme: boolean
 ): ContextMenuItem[] {
-  if (facet === "raster") return bundle?.appStoreId != null ? rasterDownloadItems(bundle) : [];
+  if (facet === "raster") return bundle && (bundle.appStoreId != null || bundle.playStoreId != null) ? rasterDownloadItems(bundle) : [];
   if (facet === "glass")
     return bundle ? glassDownloadItems(bundle, darkTheme) : [];
   if (facet === "badge") return badgeDownloadItems(platform, darkTheme);

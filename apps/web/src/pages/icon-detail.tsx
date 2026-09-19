@@ -27,7 +27,7 @@ import {
 import { MaterialsIcon } from "@/components/materials-icon";
 import { PageCard } from "@/components/page-card";
 import { copyItemsFor, downloadItemsFor, menuItemsFor } from "@/lib/asset-menus";
-import { lensesEnabled, rasterPath, resolvePlatform, type AssetFacet, type Facet, type Platform } from "@/lib/platforms";
+import { lensesEnabled, rasterPath, rasterSource, resolvePlatform, type AssetFacet, type Facet, type Platform } from "@/lib/platforms";
 import { useTheme } from "@/lib/theme";
 import { useTitle } from "@/lib/use-title";
 import {
@@ -191,8 +191,8 @@ export function IconDetailPage() {
     ...(lensesEnabled && p.bundles.length > 0 && p.hasFlat
       ? [{ facet: "compare" as const, label: "Compare glass vs vector (dev)", icon: ScanEye }]
       : []),
-    ...(lensesEnabled && p.bundles[0]?.appStoreId != null
-      ? [{ facet: "raster" as const, label: "App Store artwork (dev)", icon: ImageIcon }]
+    ...(lensesEnabled && p.bundles[0] && rasterSource(p.bundles[0]) !== null
+      ? [{ facet: "raster" as const, label: "Store artwork (dev)", icon: ImageIcon }]
       : []),
   ];
   const requested = parseDetailFacet(params.get("facet"));
@@ -345,12 +345,12 @@ export function IconDetailPage() {
           <div style={{ width: SQUARE_HERO_WIDTH }} className="py-2">
             <img
               src={rasterPath(p.bundles[0].slug)}
-              alt={`${p.bundles[0].title} App Store icon`}
+              alt={`${p.bundles[0].title} store icon`}
               decoding="async"
               className="aspect-square w-full select-none rounded-[22.5%]"
             />
             <p className="mt-4 text-center font-mono text-xs text-neutral-500 dark:text-neutral-400">
-              App Store artwork · id {p.bundles[0].appStoreId} · pipeline/fetch-appstore-artwork.mjs
+              {rasterSource(p.bundles[0])} · pipeline/fetch-appstore-artwork.mjs
             </p>
           </div>
         ) : null}

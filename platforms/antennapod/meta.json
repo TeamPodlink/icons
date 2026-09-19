@@ -13,6 +13,7 @@
         "variant": null,
         "file": "Antennapod.icon",
         "source": "flat-svg-split",
+        "playStoreId": "de.danoeh.antennapod",
         "hasDark": true
       }
     ]

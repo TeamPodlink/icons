@@ -111,13 +111,14 @@ function ComparePreview({ card }: { card: Card }) {
   );
 }
 
-/** Dev-only raster tile: the App Store's own 1024 artwork, under the
- *  iOS corner radius so it reads beside the glass renditions. */
+/** Dev-only raster tile: the store's own artwork (App Store 1024, or
+ *  Google Play 512 for an Android-only platform), under the iOS corner
+ *  radius so it reads beside the glass renditions. */
 function RasterPreview({ card }: { card: Card }) {
   return (
     <img
       src={rasterPath(card.bundle!.slug)}
-      alt={`${card.title} App Store icon`}
+      alt={`${card.title} store icon`}
       {...previewCommon}
       width={96}
       height={96}

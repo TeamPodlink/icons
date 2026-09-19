@@ -6944,3 +6944,12 @@ podcastindex, podnews, rss, subscribebyemail, subscribeonandroid (web
 or no app), gpodder, greatpods, podchaser, podengine, podfriend, podlp,
 podstation, rephonic, stenofm, tunestr (the search returned other
 apps). 53 artworks fetched.
+
+**Android-only platforms (2026-09-19).** The same facet takes Google
+Play's icon where there is no iOS app: a `playStoreId` (the Play
+package name) on the bundle, the listing's `og:image` requested at
+`=s512` (the largest Play serves; WebP or PNG by negotiation,
+normalised to PNG on disk). antennapod `de.danoeh.antennapod`,
+podcastaddict `com.bambuna.podcastaddict`, podkicker `ait.podka` (its
+site url). 56 artworks in the facet; captions and menus say which
+store.

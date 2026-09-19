@@ -34,6 +34,9 @@ export interface GlassBundle {
    *  1024 marketing icon (pipeline/fetch-appstore-artwork.mjs →
    *  public/raster/<slug>.png, generated, gitignored). */
   appStoreId: number | null;
+  /** Google Play package name, for an Android-only platform: the same
+   *  Raster facet, the Play listing's 512 icon. */
+  playStoreId: string | null;
   /** What the drift IS, from the committed apps/web/lib/drift-diagnosis.json
    *  snapshot (pipeline/audit-drift-diagnosis.mjs --write): primary cause
    *  plus every cause that fired — material | artwork | plate | registration
@@ -372,9 +375,17 @@ export type AssetFacet = Facet | "raster";
 export const assetFacetOf = (facet: GridFacet): AssetFacet =>
   facet === "compare" ? "glass" : facet;
 
-/** The dev-only Raster facet's image: the App Store's 1024 artwork. */
+/** The dev-only Raster facet's image: the App Store's 1024 artwork, or
+ *  Google Play's 512 icon for an Android-only platform. */
 export function rasterPath(slug: string): string {
   return `/raster/${slug}.png`;
+}
+
+/** Which store the Raster facet's image came from, for captions. */
+export function rasterSource(b: GlassBundle): string | null {
+  if (b.appStoreId != null) return `App Store artwork · id ${b.appStoreId}`;
+  if (b.playStoreId != null) return `Google Play artwork · ${b.playStoreId}`;
+  return null;
 }
 
 export function parseFacet(raw: string | null): GridFacet {
@@ -397,7 +408,7 @@ export const facetCounts: Record<GridFacet, number> = {
   // dev-only: bundles that have a flat to be compared against
   compare: visibleCards.filter((c) => c.bundle !== null && c.platform.hasFlat).length,
   // dev-only: bundles with an identified App Store id (store artwork fetched)
-  raster: visibleCards.filter((c) => c.bundle?.appStoreId != null).length,
+  raster: visibleCards.filter((c) => c.bundle != null && (c.bundle.appStoreId != null || c.bundle.playStoreId != null)).length,
 };
 
 /**
@@ -413,7 +424,8 @@ export function facetCards(list: Card[], facet: GridFacet): Card[] {
   if (facet === "compare")
     return list.filter((c) => c.bundle !== null && c.platform.hasFlat);
   // raster: one card per bundle with an App Store id
-  if (facet === "raster") return list.filter((c) => c.bundle?.appStoreId != null);
+  if (facet === "raster")
+    return list.filter((c) => c.bundle != null && (c.bundle.appStoreId != null || c.bundle.playStoreId != null));
   // One card per platform, and only platforms that ship the facet — the
   // grid shows what exists; gaps are the missing-flat/badge lenses' job.
   const seen = new Set<string>();
