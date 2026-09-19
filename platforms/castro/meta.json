@@ -12,7 +12,8 @@
         "variant": null,
         "file": "Castro-Default.icon",
         "hasDark": true,
-        "source": "catalog-artwork"
+        "source": "catalog-artwork",
+        "appStoreId": 1080840241
       }
     ]
   }

@@ -12,7 +12,8 @@
         "variant": null,
         "file": "Castbox.icon",
         "hasDark": true,
-        "source": "flat-svg-split"
+        "source": "flat-svg-split",
+        "appStoreId": 1243410543
       }
     ]
   }

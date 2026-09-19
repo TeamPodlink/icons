@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "predev": "node ../../pipeline/build-data.mjs && node ../../pipeline/sync-web-assets.mjs",
+    "predev": "node ../../pipeline/build-data.mjs && node ../../pipeline/sync-web-assets.mjs && (node ../../pipeline/fetch-appstore-artwork.mjs --quiet || true)",
     "dev": "vite --port 4173 --strictPort",
     "prebuild": "node ../../pipeline/build-data.mjs && node ../../pipeline/sync-web-assets.mjs",
     "build": "tsc --noEmit && vite build",

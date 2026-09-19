@@ -12,7 +12,8 @@
         "variant": null,
         "file": "Castamatic.icon",
         "hasDark": true,
-        "source": "flat-svg"
+        "source": "flat-svg",
+        "appStoreId": 966632553
       }
     ]
   }

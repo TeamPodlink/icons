@@ -8,6 +8,7 @@ import {
 import {
   ArrowLeft,
   ChevronDown,
+  Image as ImageIcon,
   PenTool,
   ScanEye,
   SquareArrowOutUpRight,
@@ -26,7 +27,7 @@ import {
 import { MaterialsIcon } from "@/components/materials-icon";
 import { PageCard } from "@/components/page-card";
 import { copyItemsFor, downloadItemsFor, menuItemsFor } from "@/lib/asset-menus";
-import { lensesEnabled, resolvePlatform, type Facet, type Platform } from "@/lib/platforms";
+import { lensesEnabled, rasterPath, resolvePlatform, type AssetFacet, type Facet, type Platform } from "@/lib/platforms";
 import { useTheme } from "@/lib/theme";
 import { useTitle } from "@/lib/use-title";
 import {
@@ -57,12 +58,13 @@ const SQUARE_HERO_WIDTH = "min(100%, calc(100vh - 20rem), 32rem)";
  *  fourth: "compare", the light Liquid Glass rendition against the flat
  *  vector — the facet-drift audit's pair, on screen. Not a Facet: no
  *  route, no card, no assets of its own; gated like the QA lenses. */
-type DetailFacet = Facet | "compare";
+type DetailFacet = Facet | "compare" | "raster";
 
 function parseDetailFacet(raw: string | null): DetailFacet {
   if (raw === "vector" || raw === "flat") return "flat";
   if (raw === "badge") return "badge";
   if (raw === "compare" && lensesEnabled) return "compare";
+  if (raw === "raster" && lensesEnabled) return "raster";
   return "glass";
 }
 
@@ -189,6 +191,9 @@ export function IconDetailPage() {
     ...(lensesEnabled && p.bundles.length > 0 && p.hasFlat
       ? [{ facet: "compare" as const, label: "Compare glass vs vector (dev)", icon: ScanEye }]
       : []),
+    ...(lensesEnabled && p.bundles[0]?.appStoreId != null
+      ? [{ facet: "raster" as const, label: "App Store artwork (dev)", icon: ImageIcon }]
+      : []),
   ];
   const requested = parseDetailFacet(params.get("facet"));
   // A ?facet the platform doesn't ship falls back to its first variant.
@@ -217,8 +222,9 @@ export function IconDetailPage() {
     else navigate("/");
   };
 
-  // The compare view offers the glass rendition's assets (its left half).
-  const assetFacet: Facet = facet === "compare" ? "glass" : facet;
+  // The compare view offers the glass rendition's assets (its left half);
+  // the raster view its own store PNG.
+  const assetFacet: AssetFacet = facet === "compare" ? "glass" : facet;
   const copyItems = copyItemsFor(assetFacet, p, p.bundles[0] ?? null, darkTheme);
   const downloadItems = downloadItemsFor(
     assetFacet,
@@ -334,6 +340,18 @@ export function IconDetailPage() {
         ) : facet === "compare" && p.bundles[0] ? (
           <div style={{ width: SQUARE_HERO_WIDTH }}>
             <CompareArtwork platform={p} bundle={p.bundles[0]} />
+          </div>
+        ) : lensesEnabled && facet === "raster" && p.bundles[0] ? (
+          <div style={{ width: SQUARE_HERO_WIDTH }} className="py-2">
+            <img
+              src={rasterPath(p.bundles[0].slug)}
+              alt={`${p.bundles[0].title} App Store icon`}
+              decoding="async"
+              className="aspect-square w-full select-none rounded-[22.5%]"
+            />
+            <p className="mt-4 text-center font-mono text-xs text-neutral-500 dark:text-neutral-400">
+              App Store artwork · id {p.bundles[0].appStoreId} · pipeline/fetch-appstore-artwork.mjs
+            </p>
           </div>
         ) : null}
       </div>

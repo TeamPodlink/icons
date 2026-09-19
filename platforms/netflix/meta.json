@@ -11,6 +11,7 @@
         "variant": null,
         "file": "Netflix.icon",
         "source": "flat-svg",
+        "appStoreId": 363590051,
         "hasDark": false,
         "darkStatus": "native"
       }

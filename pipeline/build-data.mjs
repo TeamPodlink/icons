@@ -87,6 +87,8 @@ const out = readPlatforms().map(({ id, dir, meta }) => ({
     hasDark: b.hasDark ?? false,
     darkStatus: b.darkStatus ?? null,
     source: b.source ?? null,
+    // App Store id (meta) — drives the dev-only Raster facet (pipeline/fetch-appstore-artwork.mjs)
+    appStoreId: b.appStoreId ?? null,
     drift: drift[b.slug] ?? null,
     driftMaterialOff: driftMaterialOff[b.slug] ?? null,
     diagnosis: diagnosis[b.slug] ? { primary: diagnosis[b.slug].primary, causes: diagnosis[b.slug].causes } : null,

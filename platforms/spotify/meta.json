@@ -14,7 +14,8 @@
         "recipe": true,
         "rmse": 2.18,
         "hasDark": true,
-        "source": "decanted"
+        "source": "decanted",
+        "appStoreId": 324684580
       }
     ]
   }

@@ -11,7 +11,8 @@
         "variant": null,
         "file": "AnytimePlayer.icon",
         "hasDark": true,
-        "source": "appstore-artwork-split"
+        "source": "appstore-artwork-split",
+        "appStoreId": 1582300839
       }
     ]
   }

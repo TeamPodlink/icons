@@ -13,6 +13,7 @@ import {
   badgePath,
   flatPath,
   lensesEnabled,
+  rasterPath,
   type Card,
   type GridFacet,
 } from "@/lib/platforms";
@@ -110,6 +111,21 @@ function ComparePreview({ card }: { card: Card }) {
   );
 }
 
+/** Dev-only raster tile: the App Store's own 1024 artwork, under the
+ *  iOS corner radius so it reads beside the glass renditions. */
+function RasterPreview({ card }: { card: Card }) {
+  return (
+    <img
+      src={rasterPath(card.bundle!.slug)}
+      alt={`${card.title} App Store icon`}
+      {...previewCommon}
+      width={96}
+      height={96}
+      className={cn(previewCls, "rounded-[22.5%]")}
+    />
+  );
+}
+
 /** A platform missing this facet: keep the card (catalog gaps stay
  *  visible, per the QA-lens ethos) with an explicit empty treatment. */
 function MissingPreview({ label }: { label: string }) {
@@ -174,7 +190,7 @@ export function IconCard({
   const missing =
     (shown === "flat" && !p.hasFlat) || (shown === "badge" && !p.hasBadge);
 
-  const title = facet === "glass" || facet === "compare" ? card.title : p.name;
+  const title = facet === "flat" || facet === "badge" ? p.name : card.title;
 
   /** Right-click menu: "Open details", then exactly the detail hero's
    *  menu (lib/asset-menus.ts menuItemsFor — Copy ▸ / Download ▸ / dev
@@ -258,6 +274,8 @@ export function IconCard({
             <BadgePreview card={card} />
           ) : shown === "compare" ? (
             <ComparePreview card={card} />
+          ) : shown === "raster" ? (
+            <RasterPreview card={card} />
           ) : (
             <FlatPreview card={card} />
           )}

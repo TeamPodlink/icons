@@ -6917,3 +6917,30 @@ shadow filter. Catalogue after: 60 of 71 pairs at the floor against the
 glass master; the material lens holds six (podcastparrot, overcast,
 castamatic, moonfm, podcastrepublic, apple), every one of them the
 specular the vector cannot carry, or a raster.
+
+## The Raster facet: the App Store's own artwork, dev-only (2026-09-19)
+
+A fourth dev-only grid facet, "Raster": for every bundle with an
+`appStoreId` in meta.json, the App Store's 1024 marketing icon
+(`itunes.apple.com/lookup` → the 512 artwork URL rewritten to
+1024x1024bb.png, as the 2026-09-13 store cross-checks did), fetched by
+`pipeline/fetch-appstore-artwork.mjs` into `apps/web/public/raster/`
+(generated, gitignored, cached; `pnpm dev` runs it and tolerates being
+offline). Routed at /raster behind the lens gate, a tile per card under
+the iOS corner radius, a detail segment, and menus that copy or
+download the store PNG (no Finder row: the file is a cache, not a
+source). 26 ids added to meta this round from an iTunes search by name,
+accepted only where seller and bundle id name the platform: amazonmusic
+510855668, anytimeplayer 1582300839, apple 525463029, audible 379693831,
+castamatic 966632553, castbox 1243410543, castro 1080840241, disctopia
+1162011563, fountain 1576394424, goodpods 1483407582, icatcher 414419105,
+moonfm 1243771413, netflix 363590051, neuecast 6446780219, overcast
+888422857, pocketcasts 414834813, podcastapp 1199070742, podcastguru
+1535235039, podcastrepublic 6443981281, podhome 6736411073, podurama
+1497491520, rssradio 386600664, sodes 1321953436, spotify 324684580,
+spreaker 388449677, yoto 1412039719. Not identified: antennapod,
+podcastaddict, podkicker (Android only), curiocaster, listennotes,
+podcastindex, podnews, rss, subscribebyemail, subscribeonandroid (web
+or no app), gpodder, greatpods, podchaser, podengine, podfriend, podlp,
+podstation, rephonic, stenofm, tunestr (the search returned other
+apps). 53 artworks fetched.

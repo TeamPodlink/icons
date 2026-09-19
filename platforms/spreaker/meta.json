@@ -12,7 +12,8 @@
         "variant": null,
         "file": "Spreaker.icon",
         "hasDark": true,
-        "source": "adaptive-icon"
+        "source": "adaptive-icon",
+        "appStoreId": 388449677
       }
     ]
   }

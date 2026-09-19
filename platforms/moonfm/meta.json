@@ -12,7 +12,8 @@
         "variant": null,
         "file": "MoonFM.icon",
         "hasDark": true,
-        "source": "flat-svg"
+        "source": "flat-svg",
+        "appStoreId": 1243771413
       }
     ]
   }

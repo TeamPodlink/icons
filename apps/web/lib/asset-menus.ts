@@ -29,6 +29,8 @@ import {
   assetPath,
   badgePath,
   flatPath,
+  rasterPath,
+  type AssetFacet,
   type Facet,
   type GlassBundle,
   type Platform,
@@ -166,13 +168,36 @@ function badgeDownloadItems(
   ];
 }
 
+/** Dev-only Raster facet: the App Store's 1024 artwork as one PNG. */
+function rasterCopyItems(bundle: GlassBundle): ContextMenuItem[] {
+  return [
+    {
+      label: "PNG 1024 (App Store)",
+      icon: ImageIcon,
+      onSelect: () =>
+        copyImage(rasterPath(bundle.slug), `${bundle.title} — App Store 1024px PNG`),
+    },
+  ];
+}
+function rasterDownloadItems(bundle: GlassBundle): ContextMenuItem[] {
+  return [
+    {
+      label: "PNG 1024 (App Store)",
+      icon: ImageIcon,
+      onSelect: () =>
+        downloadAsset(rasterPath(bundle.slug), `${bundle.slug}-appstore.png`),
+    },
+  ];
+}
+
 /** Copy options for the variant on screen (theme-scoped). */
 export function copyItemsFor(
-  facet: Facet,
+  facet: AssetFacet,
   platform: Platform,
   bundle: GlassBundle | null,
   darkTheme: boolean
 ): ContextMenuItem[] {
+  if (facet === "raster") return bundle?.appStoreId != null ? rasterCopyItems(bundle) : [];
   if (facet === "glass") return bundle ? glassCopyItems(bundle, darkTheme) : [];
   if (facet === "badge") return badgeCopyItems(platform, darkTheme);
   return vectorCopyItems(platform);
@@ -183,11 +208,11 @@ export function copyItemsFor(
  *  icon.svg for vector, badge.svg for badge). import.meta.env.DEV folds
  *  at build time, so a production build drops the row and its fetch. */
 function revealItems(
-  facet: Facet,
+  facet: AssetFacet,
   platform: Platform,
   bundle: GlassBundle | null
 ): ContextMenuItem[] {
-  if (!import.meta.env.DEV) return [];
+  if (!import.meta.env.DEV || facet === "raster") return [];
   return [
     {
       label: "Open in Finder",
@@ -206,7 +231,7 @@ function revealItems(
  *  list; the grid card prepends "Open details" to the same list, so the
  *  two can never drift apart. Empty when the facet has no assets. */
 export function menuItemsFor(
-  facet: Facet,
+  facet: AssetFacet,
   platform: Platform,
   bundle: GlassBundle | null,
   darkTheme: boolean
@@ -223,11 +248,12 @@ export function menuItemsFor(
 
 /** The full download range for the variant on screen (theme-scoped). */
 export function downloadItemsFor(
-  facet: Facet,
+  facet: AssetFacet,
   platform: Platform,
   bundle: GlassBundle | null,
   darkTheme: boolean
 ): ContextMenuItem[] {
+  if (facet === "raster") return bundle?.appStoreId != null ? rasterDownloadItems(bundle) : [];
   if (facet === "glass")
     return bundle ? glassDownloadItems(bundle, darkTheme) : [];
   if (facet === "badge") return badgeDownloadItems(platform, darkTheme);

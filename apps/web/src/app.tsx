@@ -29,6 +29,9 @@ export function App() {
           {lensesEnabled && (
             <Route path="/compare" element={<Home facet="compare" />} />
           )}
+          {lensesEnabled && (
+            <Route path="/raster" element={<Home facet="raster" />} />
+          )}
           <Route path="/icon/:id" element={<IconDetailPage />} />
           <Route path="/directory/:category" element={<CategoryPage />} />
           <Route path="/docs/guide" element={<GuideDocs />} />

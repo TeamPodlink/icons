@@ -2,6 +2,7 @@ import { Link, useLocation } from "react-router";
 import {
   BookOpen,
   GitPullRequest,
+  Image as ImageIcon,
   Megaphone,
   Package,
   PenTool,
@@ -41,7 +42,11 @@ export function Sidebar() {
     { href: "/badges", label: "Badge", icon: StretchHorizontal, badge: facetCounts.badge },
     // Dev-only: the facet-drift audit's diff panels as a grid.
     ...(lensesEnabled
-      ? [{ href: "/compare", label: "Compare", icon: ScanEye, badge: facetCounts.compare }]
+      ? [
+          { href: "/compare", label: "Compare", icon: ScanEye, badge: facetCounts.compare },
+          // Dev-only: the App Store's own artwork per bundle with an id.
+          { href: "/raster", label: "Raster", icon: ImageIcon, badge: facetCounts.raster },
+        ]
       : []),
   ];
 

@@ -29,6 +29,11 @@ export interface GlassBundle {
    *  material pair. Null for pairs without material — their master is
    *  already material-free — and until the audit has run with the flag. */
   driftMaterialOff: number | null;
+  /** App Store id from meta.json, when the platform ships an iOS app we
+   *  have identified. Drives the dev-only "Raster" facet: the store's own
+   *  1024 marketing icon (pipeline/fetch-appstore-artwork.mjs →
+   *  public/raster/<slug>.png, generated, gitignored). */
+  appStoreId: number | null;
   /** What the drift IS, from the committed apps/web/lib/drift-diagnosis.json
    *  snapshot (pipeline/audit-drift-diagnosis.mjs --write): primary cause
    *  plus every cause that fired — material | artwork | plate | registration
@@ -356,17 +361,27 @@ export type Facet = "glass" | "flat" | "badge";
  *  whole catalogue's residuals can be read at a glance. Not a Facet: no
  *  assets of its own (its menus are the glass bundle's), gated like the
  *  QA lenses. */
-export type GridFacet = Facet | "compare";
+export type GridFacet = Facet | "compare" | "raster";
+
+/** What a menu can act on: the three facets, or the dev-only store
+ *  raster (its own PNG). */
+export type AssetFacet = Facet | "raster";
 
 /** The assets a grid facet's menus act on: compare offers the glass
- *  bundle's, as the detail's compare segment does. */
-export const assetFacetOf = (facet: GridFacet): Facet =>
+ *  bundle's, as the detail's compare segment does; raster its own PNG. */
+export const assetFacetOf = (facet: GridFacet): AssetFacet =>
   facet === "compare" ? "glass" : facet;
+
+/** The dev-only Raster facet's image: the App Store's 1024 artwork. */
+export function rasterPath(slug: string): string {
+  return `/raster/${slug}.png`;
+}
 
 export function parseFacet(raw: string | null): GridFacet {
   if (raw === "flat" || raw === "badge") return raw;
   // "compare" is a grid facet only on the dev server (see GridFacet).
   if (raw === "compare" && lensesEnabled) return "compare";
+  if (raw === "raster" && lensesEnabled) return "raster";
   return "glass";
 }
 
@@ -381,6 +396,8 @@ export const facetCounts: Record<GridFacet, number> = {
   badge: platforms.filter((p) => p.active && p.hasBadge).length,
   // dev-only: bundles that have a flat to be compared against
   compare: visibleCards.filter((c) => c.bundle !== null && c.platform.hasFlat).length,
+  // dev-only: bundles with an identified App Store id (store artwork fetched)
+  raster: visibleCards.filter((c) => c.bundle?.appStoreId != null).length,
 };
 
 /**
@@ -395,6 +412,8 @@ export function facetCards(list: Card[], facet: GridFacet): Card[] {
   // compare: one card per bundle, and only pairs the audit can score
   if (facet === "compare")
     return list.filter((c) => c.bundle !== null && c.platform.hasFlat);
+  // raster: one card per bundle with an App Store id
+  if (facet === "raster") return list.filter((c) => c.bundle?.appStoreId != null);
   // One card per platform, and only platforms that ship the facet — the
   // grid shows what exists; gaps are the missing-flat/badge lenses' job.
   const seen = new Set<string>();

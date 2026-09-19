@@ -9,6 +9,7 @@ export const FACET_ROUTES: Record<GridFacet, string> = {
   flat: "/vector",
   badge: "/badges",
   compare: "/compare", // dev-only (routed behind lensesEnabled in app.tsx)
+  raster: "/raster", // dev-only, likewise
 };
 
 const FACET_TITLES: Record<GridFacet, string> = {
@@ -16,6 +17,7 @@ const FACET_TITLES: Record<GridFacet, string> = {
   flat: "Vector · refraction",
   badge: "Badge · refraction",
   compare: "Compare · refraction",
+  raster: "Raster · refraction",
 };
 
 const FACET_HEADINGS: Record<GridFacet, string> = {
@@ -23,6 +25,7 @@ const FACET_HEADINGS: Record<GridFacet, string> = {
   flat: "Vector",
   badge: "Badge",
   compare: "Compare",
+  raster: "Raster",
 };
 
 export function Home({ facet = "glass" }: { facet?: GridFacet }) {
