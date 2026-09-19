@@ -230,56 +230,57 @@
     "castamatic": {
       "primary": "material",
       "causes": [
-        "material",
-        "colour",
-        "plate",
-        "filter"
+        "material"
       ],
-      "central": 24.18,
-      "glassLayers": 3,
+      "central": 11.73,
+      "glassLayers": 1,
       "specular": true,
-      "struct": 0.05,
+      "struct": 0.002,
       "signed": [
-        -9.6,
-        -16.1,
-        -11
+        -3.7,
+        -9.4,
+        -8.8
       ],
-      "lumaShare": 1,
-      "edgeShare": 0.34,
+      "lumaShare": 0.92,
+      "edgeShare": 0.31,
       "plateShare": 0.33,
       "plateSigned": [
-        -13.5,
-        -7.2,
-        3.3
+        -5.2,
+        -1.5,
+        -1.7
       ],
-      "plateRmse": 12.75,
+      "plateRmse": 5.79,
       "glyphSigned": [
-        -10.8,
-        -24,
-        -22.6
+        -1.9,
+        -14.9,
+        -13.5
       ],
-      "filter": true,
-      "fit": null,
+      "filter": false,
+      "fit": {
+        "tx": 0,
+        "ty": -0.0156,
+        "s": 1
+      },
       "materialOff": {
-        "central": 19.55,
-        "struct": 0.044,
+        "central": 0.76,
+        "struct": 0,
         "signed": [
-          -5.8,
-          -6.7,
-          -2.1
+          0.1,
+          0.1,
+          0.1
         ],
         "plateSigned": [
-          -8.4,
-          -5.8,
-          5
+          0,
+          -0.2,
+          -0.1
         ],
-        "plateRmse": 10.92,
+        "plateRmse": 0.47,
         "glyphSigned": [
-          -8.7,
-          -8.7,
-          -8.7
+          0.2,
+          0.2,
+          0.2
         ],
-        "edgeShare": 0.54
+        "edgeShare": 0.65
       }
     },
     "anytimeplayer": {
@@ -311,28 +312,26 @@
       "materialOff": null
     },
     "fountain": {
-      "primary": "geometry",
-      "causes": [
-        "geometry"
-      ],
-      "central": 17.95,
+      "primary": "floor",
+      "causes": [],
+      "central": 1.01,
       "glassLayers": 0,
       "specular": false,
-      "struct": 0.032,
+      "struct": 0,
       "signed": [
-        1,
-        1.1,
-        2.7
+        0.8,
+        0.6,
+        0.6
       ],
-      "lumaShare": 0.99,
-      "edgeShare": 0.92,
+      "lumaShare": 0.88,
+      "edgeShare": 0.38,
       "plateShare": 0.83,
       "plateSigned": [
-        0.8,
-        1,
-        2.7
+        0.9,
+        0.6,
+        0.6
       ],
-      "plateRmse": 2.97,
+      "plateRmse": 0.87,
       "glyphSigned": null,
       "filter": false,
       "fit": null,
