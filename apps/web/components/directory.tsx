@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { IconCard } from "@/components/icon-card";
 import { WarningBanner } from "@/components/warning-banner";
 import { PageCard } from "@/components/page-card";
-import { facetCards, lensesEnabled, type Card, type Facet } from "@/lib/platforms";
+import { facetCards, lensesEnabled, type Card, type GridFacet } from "@/lib/platforms";
 
 /** Alphabetical compare that ignores punctuation, so "’sodes" sorts
  *  under S instead of leading the list on its apostrophe. */
@@ -158,7 +158,7 @@ export function Directory({
   cards: Card[];
   heading: string;
   /** Which facet view to render — routed via the sidebar, not a toolbar control. */
-  facet?: Facet;
+  facet?: GridFacet;
 }) {
   const [query, setQuery] = useUrlState("search", "");
   const [sortRaw, setSort] = useUrlState("sort", DEFAULT_SORT);

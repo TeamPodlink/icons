@@ -8,8 +8,6 @@ import {
 import {
   ArrowLeft,
   ChevronDown,
-  Copy,
-  Download,
   PenTool,
   ScanEye,
   SquareArrowOutUpRight,
@@ -27,7 +25,7 @@ import {
 } from "@/components/icon-detail";
 import { MaterialsIcon } from "@/components/materials-icon";
 import { PageCard } from "@/components/page-card";
-import { copyItemsFor, downloadItemsFor } from "@/lib/asset-menus";
+import { copyItemsFor, downloadItemsFor, menuItemsFor } from "@/lib/asset-menus";
 import { lensesEnabled, resolvePlatform, type Facet, type Platform } from "@/lib/platforms";
 import { useTheme } from "@/lib/theme";
 import { useTitle } from "@/lib/use-title";
@@ -229,12 +227,15 @@ export function IconDetailPage() {
     darkTheme
   );
 
-  // Right-click on the hero: the grid card's Copy ▸ / Download ▸ tree
-  // (no "Open details" — we're already here).
-  const heroMenuItems: ContextMenuItem[] = [
-    { label: "Copy", icon: Copy, children: copyItems },
-    { label: "Download", icon: Download, children: downloadItems },
-  ];
+  // Right-click on the hero: the shared tree (Copy ▸ / Download ▸ / dev
+  // Open in Finder) — the grid card shows exactly this plus "Open
+  // details", which is meaningless here.
+  const heroMenuItems: ContextMenuItem[] = menuItemsFor(
+    assetFacet,
+    p,
+    p.bundles[0] ?? null,
+    darkTheme
+  );
 
   return (
     <PageCard>

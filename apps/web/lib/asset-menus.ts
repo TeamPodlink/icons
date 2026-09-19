@@ -9,7 +9,14 @@
 // Download carries the variant's full filetype and size range, with the
 // AVIF/WebP size matrices as nested submenus.
 
-import { CodeXml, FileImage, Image as ImageIcon } from "lucide-react";
+import {
+  CodeXml,
+  Copy,
+  Download,
+  FileImage,
+  FolderOpen,
+  Image as ImageIcon,
+} from "lucide-react";
 import type { ContextMenuItem } from "@/components/context-menu";
 import {
   copyImage,
@@ -169,6 +176,49 @@ export function copyItemsFor(
   if (facet === "glass") return bundle ? glassCopyItems(bundle, darkTheme) : [];
   if (facet === "badge") return badgeCopyItems(platform, darkTheme);
   return vectorCopyItems(platform);
+}
+
+/** Dev server only: reveal the facet's source in Finder through the
+ *  vite.config.ts /__reveal middleware (the .icon bundle for glass,
+ *  icon.svg for vector, badge.svg for badge). import.meta.env.DEV folds
+ *  at build time, so a production build drops the row and its fetch. */
+function revealItems(
+  facet: Facet,
+  platform: Platform,
+  bundle: GlassBundle | null
+): ContextMenuItem[] {
+  if (!import.meta.env.DEV) return [];
+  return [
+    {
+      label: "Open in Finder",
+      icon: FolderOpen,
+      onSelect: () => {
+        const q = new URLSearchParams({ platform: platform.id, facet });
+        if (bundle) q.set("slug", bundle.slug);
+        void fetch(`/__reveal?${q}`);
+      },
+    },
+  ];
+}
+
+/** The one context-menu tree for a facet on screen — Copy ▸, Download ▸
+ *  and, on the dev server, Open in Finder. The detail's hero menu IS this
+ *  list; the grid card prepends "Open details" to the same list, so the
+ *  two can never drift apart. Empty when the facet has no assets. */
+export function menuItemsFor(
+  facet: Facet,
+  platform: Platform,
+  bundle: GlassBundle | null,
+  darkTheme: boolean
+): ContextMenuItem[] {
+  const copy = copyItemsFor(facet, platform, bundle, darkTheme);
+  const download = downloadItemsFor(facet, platform, bundle, darkTheme);
+  if (!copy.length && !download.length) return [];
+  return [
+    { label: "Copy", icon: Copy, children: copy },
+    { label: "Download", icon: Download, children: download },
+    ...revealItems(facet, platform, bundle),
+  ];
 }
 
 /** The full download range for the variant on screen (theme-scoped). */

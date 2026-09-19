@@ -240,9 +240,13 @@ export function BadgeArtwork({
 export function CompareArtwork({
   platform,
   bundle,
+  compact = false,
 }: {
   platform: Platform;
   bundle: GlassBundle;
+  /** Grid-tile form: 256² canvas, no caption, no padding — the card
+   *  already carries the drift chip. */
+  compact?: boolean;
 }) {
   // The facet-drift audit's diff panel, on screen: |glass − vector| × 4
   // per channel over the pixels both facets cover (the masks' corner
@@ -251,10 +255,10 @@ export function CompareArtwork({
   // browser's own render of the flat. A thin bright outline is
   // registration or edge softness, a filled region is colour or shading,
   // black is agreement. Dev-only, like the audit it mirrors.
-  const SIZE = 512;
+  const SIZE = compact ? 256 : 512;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [error, setError] = useState<string | null>(null);
-  const glassSrc = assetPath(bundle.slug, { size: 512 });
+  const glassSrc = assetPath(bundle.slug, { size: SIZE });
   const flatSrc = flatPath(platform.id);
   useEffect(() => {
     let cancelled = false;
@@ -294,10 +298,10 @@ export function CompareArtwork({
     return () => {
       cancelled = true;
     };
-  }, [glassSrc, flatSrc]);
+  }, [glassSrc, flatSrc, SIZE]);
   const cap = "font-mono text-xs text-neutral-500 dark:text-neutral-400";
   return (
-    <div className="w-full space-y-4 py-2">
+    <div className={cn("w-full", !compact && "space-y-4 py-2")}>
       <div className="relative aspect-square w-full overflow-hidden rounded-[22%] bg-black">
         <canvas
           ref={canvasRef}
@@ -312,12 +316,12 @@ export function CompareArtwork({
           </p>
         )}
       </div>
-      <p className={cn(cap, "text-center")}>
+      {!compact && <p className={cn(cap, "text-center")}>
         4×|glass − vector| · facet drift (central RMSE, light glass vs vector):{" "}
         {bundle.drift === null ? "unmeasured" : bundle.drift.toFixed(2)}
         {bundle.driftMaterialOff !== null && ` · material off: ${bundle.driftMaterialOff.toFixed(2)}`}
         {" · "}pipeline/audit-facet-drift.mjs --sheets
-      </p>
+      </p>}
     </div>
   );
 }

@@ -6,11 +6,12 @@ import {
   Package,
   PenTool,
   Scale,
+  ScanEye,
   StretchHorizontal,
 } from "lucide-react";
 
 import { MaterialsIcon } from "@/components/materials-icon";
-import { categorySlug, facetCounts, getCategories } from "@/lib/platforms";
+import { categorySlug, facetCounts, getCategories, lensesEnabled } from "@/lib/platforms";
 import { ScrollFade } from "@/components/scroll-fade";
 import { cn } from "@/lib/cn";
 
@@ -38,6 +39,10 @@ export function Sidebar() {
     { href: "/", label: "Liquid Glass", icon: MaterialsIcon, badge: facetCounts.glass },
     { href: "/vector", label: "Vector", icon: PenTool, badge: facetCounts.flat },
     { href: "/badges", label: "Badge", icon: StretchHorizontal, badge: facetCounts.badge },
+    // Dev-only: the facet-drift audit's diff panels as a grid.
+    ...(lensesEnabled
+      ? [{ href: "/compare", label: "Compare", icon: ScanEye, badge: facetCounts.compare }]
+      : []),
   ];
 
   const docs = [

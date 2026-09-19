@@ -350,8 +350,24 @@ export function badgePath(id: string, dark = false): string {
  */
 export type Facet = "glass" | "flat" | "badge";
 
-export function parseFacet(raw: string | null): Facet {
-  return raw === "flat" || raw === "badge" ? raw : "glass";
+/** What the directory grid can show: the three facets plus, in dev only,
+ *  "compare" — one card per bundle with a flat, rendering the
+ *  facet-drift audit's 4×|glass − vector| panel (CompareArtwork) so the
+ *  whole catalogue's residuals can be read at a glance. Not a Facet: no
+ *  assets of its own (its menus are the glass bundle's), gated like the
+ *  QA lenses. */
+export type GridFacet = Facet | "compare";
+
+/** The assets a grid facet's menus act on: compare offers the glass
+ *  bundle's, as the detail's compare segment does. */
+export const assetFacetOf = (facet: GridFacet): Facet =>
+  facet === "compare" ? "glass" : facet;
+
+export function parseFacet(raw: string | null): GridFacet {
+  if (raw === "flat" || raw === "badge") return raw;
+  // "compare" is a grid facet only on the dev server (see GridFacet).
+  if (raw === "compare" && lensesEnabled) return "compare";
+  return "glass";
 }
 
 /**
@@ -359,10 +375,12 @@ export function parseFacet(raw: string | null): Facet {
  * (one per bundle, flat fallbacks included); flat and badge count the
  * active platforms that actually ship that facet.
  */
-export const facetCounts: Record<Facet, number> = {
+export const facetCounts: Record<GridFacet, number> = {
   glass: visibleCards.length,
   flat: platforms.filter((p) => p.active && p.hasFlat).length,
   badge: platforms.filter((p) => p.active && p.hasBadge).length,
+  // dev-only: bundles that have a flat to be compared against
+  compare: visibleCards.filter((c) => c.bundle !== null && c.platform.hasFlat).length,
 };
 
 /**
@@ -372,8 +390,11 @@ export const facetCounts: Record<Facet, number> = {
  * Platforms missing the facet stay listed — the card renders an explicit
  * gap so catalog holes remain visible.
  */
-export function facetCards(list: Card[], facet: Facet): Card[] {
+export function facetCards(list: Card[], facet: GridFacet): Card[] {
   if (facet === "glass") return list;
+  // compare: one card per bundle, and only pairs the audit can score
+  if (facet === "compare")
+    return list.filter((c) => c.bundle !== null && c.platform.hasFlat);
   // One card per platform, and only platforms that ship the facet — the
   // grid shows what exists; gaps are the missing-flat/badge lenses' job.
   const seen = new Set<string>();

@@ -10,6 +10,7 @@ import { LegalDocs } from "@/src/pages/docs-legal";
 import { PackagesDocs } from "@/src/pages/docs-packages";
 import { ShowcaseDocs } from "@/src/pages/docs-showcase";
 import { Home } from "@/src/pages/home";
+import { lensesEnabled } from "@/lib/platforms";
 import { NotFound } from "@/src/pages/not-found";
 
 export function App() {
@@ -23,6 +24,11 @@ export function App() {
           <Route path="/" element={<Home facet="glass" />} />
           <Route path="/vector" element={<Home facet="flat" />} />
           <Route path="/badges" element={<Home facet="badge" />} />
+          {/* Dev-only compare grid (the drift audit's diff panels); a
+              released build has no route here, like the lenses. */}
+          {lensesEnabled && (
+            <Route path="/compare" element={<Home facet="compare" />} />
+          )}
           <Route path="/icon/:id" element={<IconDetailPage />} />
           <Route path="/directory/:category" element={<CategoryPage />} />
           <Route path="/docs/guide" element={<GuideDocs />} />

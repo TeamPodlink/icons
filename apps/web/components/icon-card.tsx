@@ -1,24 +1,20 @@
 import { useLayoutEffect, useState } from "react";
-import {
-  Copy,
-  Download,
-  FolderOpen,
-  Maximize2,
-  SquareArrowOutUpRight,
-} from "lucide-react";
+import { Maximize2, SquareArrowOutUpRight } from "lucide-react";
 import {
   ContextMenu,
   type ContextMenuItem,
 } from "@/components/context-menu";
 import { TransitionLink } from "@/components/transition-link";
-import { copyItemsFor, downloadItemsFor } from "@/lib/asset-menus";
+import { menuItemsFor } from "@/lib/asset-menus";
+import { CompareArtwork } from "@/components/icon-detail";
 import {
+  assetFacetOf,
   assetPath,
   badgePath,
   flatPath,
   lensesEnabled,
   type Card,
-  type Facet,
+  type GridFacet,
 } from "@/lib/platforms";
 import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/cn";
@@ -104,6 +100,16 @@ function BadgePreview({ card }: { card: Card }) {
   );
 }
 
+/** Dev-only compare tile: the drift audit's 4×|glass − vector| panel in
+ *  the glass card's box (CompareArtwork in its compact form). */
+function ComparePreview({ card }: { card: Card }) {
+  return (
+    <div className={previewCls}>
+      <CompareArtwork platform={card.platform} bundle={card.bundle!} compact />
+    </div>
+  );
+}
+
 /** A platform missing this facet: keep the card (catalog gaps stay
  *  visible, per the QA-lens ethos) with an explicit empty treatment. */
 function MissingPreview({ label }: { label: string }) {
@@ -127,7 +133,7 @@ export function IconCard({
 }: {
   card: Card;
   /** The directory-level facet view; the card adapts artwork + actions. */
-  facet?: Facet;
+  facet?: GridFacet;
 }) {
   const navigate = useTransitionNavigate();
   // Menu actions resolve to the rendition on screen (theme-scoped).
@@ -146,7 +152,7 @@ export function IconCard({
   const detailHref =
     facet === "glass"
       ? `/icon/${p.id}`
-      : `/icon/${p.id}?facet=${facet === "flat" ? "vector" : "badge"}`;
+      : `/icon/${p.id}?facet=${facet === "flat" ? "vector" : facet}`;
 
   const openDetails = () => {
     nameCardForTransition(card.key);
@@ -163,16 +169,18 @@ export function IconCard({
 
   // What this card actually shows: the glass view falls back to the flat
   // vector for platforms that have no glass bundle yet (card.facet).
-  const shown: Facet =
+  const shown: GridFacet =
     facet === "glass" ? (card.facet === "glass" ? "glass" : "flat") : facet;
   const missing =
     (shown === "flat" && !p.hasFlat) || (shown === "badge" && !p.hasBadge);
 
-  const title = facet === "glass" ? card.title : p.name;
+  const title = facet === "glass" || facet === "compare" ? card.title : p.name;
 
-  /** Right-click menu: Open details, then the shared per-variant Copy /
-   *  Download trees (lib/asset-menus.ts — same options as the detail
-   *  toolbar's dropdowns). */
+  /** Right-click menu: "Open details", then exactly the detail hero's
+   *  menu (lib/asset-menus.ts menuItemsFor — Copy ▸ / Download ▸ / dev
+   *  Open in Finder), so the two views can never disagree. A compare
+   *  card acts on the glass bundle's assets, as the detail's compare
+   *  segment does. */
   const menuItems: ContextMenuItem[] = [
     {
       label: "Open details",
@@ -180,35 +188,8 @@ export function IconCard({
       // Same navigation as a card click: background location + morph.
       onSelect: openDetails,
     },
+    ...(missing ? [] : menuItemsFor(assetFacetOf(shown), p, b, darkTheme)),
   ];
-  if (!missing) {
-    menuItems.push(
-      {
-        label: "Copy",
-        icon: Copy,
-        children: copyItemsFor(shown, p, b, darkTheme),
-      },
-      {
-        label: "Download",
-        icon: Download,
-        children: downloadItemsFor(shown, p, b, darkTheme),
-      }
-    );
-  }
-  // Dev server only: reveal the facet's source in Finder through the
-  // vite.config.ts /__reveal middleware. import.meta.env.DEV folds at
-  // build time, so a production build drops the row and its fetch.
-  if (import.meta.env.DEV) {
-    menuItems.push({
-      label: "Open in Finder",
-      icon: FolderOpen,
-      onSelect: () => {
-        const q = new URLSearchParams({ platform: p.id, facet: shown });
-        if (b) q.set("slug", b.slug);
-        void fetch(`/__reveal?${q}`);
-      },
-    });
-  }
 
   return (
     <div
@@ -275,6 +256,8 @@ export function IconCard({
             <GlassPreview card={card} />
           ) : shown === "badge" ? (
             <BadgePreview card={card} />
+          ) : shown === "compare" ? (
+            <ComparePreview card={card} />
           ) : (
             <FlatPreview card={card} />
           )}

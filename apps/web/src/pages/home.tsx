@@ -1,28 +1,31 @@
 import { Navigate, useSearchParams } from "react-router";
 import { Directory } from "@/components/directory";
-import { parseFacet, visibleCards, type Facet } from "@/lib/platforms";
+import { parseFacet, visibleCards, type GridFacet } from "@/lib/platforms";
 import { useTitle } from "@/lib/use-title";
 
 /** Route per facet — the sidebar's top-level navigation. */
-export const FACET_ROUTES: Record<Facet, string> = {
+export const FACET_ROUTES: Record<GridFacet, string> = {
   glass: "/",
   flat: "/vector",
   badge: "/badges",
+  compare: "/compare", // dev-only (routed behind lensesEnabled in app.tsx)
 };
 
-const FACET_TITLES: Record<Facet, string> = {
+const FACET_TITLES: Record<GridFacet, string> = {
   glass: "refraction · podcast app icons",
   flat: "Vector · refraction",
   badge: "Badge · refraction",
+  compare: "Compare · refraction",
 };
 
-const FACET_HEADINGS: Record<Facet, string> = {
+const FACET_HEADINGS: Record<GridFacet, string> = {
   glass: "Home",
   flat: "Vector",
   badge: "Badge",
+  compare: "Compare",
 };
 
-export function Home({ facet = "glass" }: { facet?: Facet }) {
+export function Home({ facet = "glass" }: { facet?: GridFacet }) {
   const [params] = useSearchParams();
   useTitle(FACET_TITLES[facet]);
 
