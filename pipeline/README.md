@@ -7286,3 +7286,45 @@ kept `hasDark` false). Rendered: plate 22,23,24, glyph 254–255,
 native, 0 missing. A "shipped" status that would have excused the
 identical renditions was written and reverted the same hour, on the
 evidence above.
+### antennapod: the official shadow without a filter, and a nested-opacity law (2026-09-19)
+
+The 5.77 was ictool's filter kernel (dilated 0.5 units, σ + 8 px,
+edge-clamped — "ictool's shadow kernel", 2026-09-14) rendering the
+official `feGaussianBlur` drop shadow differently from every browser;
+the flat, which keeps the filter, scores 1.01 against the Play Store
+raster, so the flat was right and the bundle wrong. The bundle's
+shadow is now filter-free, the Yoto method generalised to an
+arbitrary shape: **24 offset copies of the mark** from +2.5σ to −2.5σ
+(σ 1.5 / dy .748 in the mark's units = 22.6 / 11.3 px), outward
+offsets as the mark plus a round-joined stroke of width 2e (exact
+dilation), inward offsets as the mark under a mask of its own white
+fill with a black stroke of width 2|e| (exact erosion; the two shapes
+do not overlap — 0 shared pixels — so per-path strokes erode the union
+correctly), opacities stacking to .35 × the gaussian CDF. Distance
+from the edge stands in for the true convolution, which differs at
+corners: librsvg renders the construct within 3.4 RMSE of the real
+filter over the band. Against the glass master **5.77 → 1.89**
+(12 layers gave 2.12; the step between layers was visible as 10 px
+terraces in the band profile), diagnosis floor; the store figure is
+untouched at 1.01. Band profile below the ring, flat vs master, now
+within 1–2/255 at every 8 px sample. The flat's filter id is
+`antennapod-baked-shadow` so the diagnosis' filter cause — renderer
+disagreement over a filter — no longer fires on a bundle that has
+none.
+
+**ictool applies a group's opacity twice when children carry their
+own.** The first build nested the twelve `<g opacity>` layers under a
+`<g opacity=".35">` and came out at about half strength (5.77 → 6.95,
+band +7/+13 in G/B). Probes (a black square over the blue canvas,
+sRGB-converted): a single `<g opacity=".5">` renders exactly .5; but
+`<g opacity=".35"><g opacity=".5">` renders **.061**, not .175 — and
+two stacked .5 children under .35 render .065 outside and **.113**
+inside, which is 1 − (1 − .175)² = .319, times .35 again. So the
+outer opacity is multiplied into each opacity-bearing child AND
+applied to the composite. Strokes are honoured exactly (root units,
+under a transform, stroke-only, inside a mask), evenodd holes are
+respected, and adjacent stroked paths union correctly — none of those
+were the cause. Rule: never nest opacity groups in a bundle layer;
+fold the outer factor into the children's targets. Yoto's copies use
+`fill-opacity` on paths and jiosaavn's lobes are gradients, which is
+why neither tripped it.
