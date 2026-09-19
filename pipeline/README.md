@@ -6692,3 +6692,69 @@ Instruments in the session scratch `agent-podbean/`: `measure.mjs`,
 `plate2d.mjs`, `platemodel.mjs`, `ambient.mjs`, `glowprofile.mjs`,
 `build.mjs` (OPT gain/step/kmax/lam), `score.mjs`, `chrome-score.mjs`,
 `grid.mjs`, `region-chrome.mjs`, `verify-geom.mjs`, `audit0/1.json`.
+
+### sodes: the flat assembled from the bundle's layer, material-off (2026-09-18)
+
+The material-off pass filed sodes' 24.67 as colour + plate (off 6.06;
+glyph −2.5/−11.1/−0.6 material-off minus flat, plate 4.7, structural
+0): the shapes agreed and the colours did not. Two declarations were
+wrong, neither of them a transcription error. The plate carried the
+canvas's own `display-p3 .82,.229,.949 → .514,.102,.78` verbatim but
+spanned `y1=0 → y2=32` — the canvas-inset law again (rows 105 → 919,
+clamped outside), so the flat's ramp ran 10% slower at each end. And
+the mark was `#fff`, where the bundle paints `gray:1` inside a group at
+**opacity .95** — the 5% of purple showing through is the −11 green.
+Nothing in the flat was off by more than the format's own laws.
+
+**Measured.** One layer, `1.apostrophe.svg` (1024-unit CoreSVG, one
+path), position scale .95996 with a −0.5 pt translation: the path is
+used verbatim under `translate(.625015) scale(.02999875)` — the same
+placement the previous flat already had (structural 0). Mask from that
+path at 1024; the material-off render read per region and per row:
+
+| region | reads | @105 | @919 |
+| --- | --- | --- | --- |
+| plate (outside the mark dilated 3 px, cols 130–894; fit over rows 130–900, rms 0.35/0.27/0.11, within-row sd ≤ 1, left band = right band to 0.03) | linear in y | 227,36,251 | 144,3,207 |
+| mark (eroded 3 px, rows 161–867) | within-row sd 0.00 on almost every row; a 4/255 ramp in red, 1/255 in green and blue | 255,244,255 | 250,243,253 |
+
+The plate is the declared P3 canvas as the shipped master squashes it
+to sRGB — every channel inside sRGB, so the flat declares `rgb()` and
+needs no allowlist entry (the previous flat's `color(display-p3 …)`
+triples leave with it). The mark's ramp is white at .95 over the
+plate's line (predicted 253.3/243.9/254.7 at row 161 and
+249.7/242.5/252.7 at 867 from the plate fit; measured 254/245/255 and
+250/243/253 — ictool composites the opacity ≈ 0.5/255 brighter than
+straight sRGB math). Three encodings of the mark were scored against
+the material-off render (librsvg at 1024 → 256 lanczos3, over gray,
+rows/cols 51..204): the bundle's own `#fff opacity=".95"` **0.79**, a
+two-stop gradient of the fit evaluated at the canvas law's rows **0.72**,
+a flat `rgb(252,244,254)` 0.85. The gradient ships; the verbatim
+opacity form is within 0.07 of it and is the same thing said twice.
+The gradient is referenced from inside the scaled path, so its y's are
+in the path's 1024-unit space: rows 105 / 919 of the canvas are
+`(105 − 20.0005) / .95996 = 88.54` and `936.50` there (the
+`userSpaceOnUse`-inside-a-scaled-group trap, apple's ledger).
+
+**Scored.** Candidate vs material-off, per region at 1024 inside the
+audit's crop (rows/cols 204–816): plate **0.75** (signed
++0.20/+0.01/+0.04), mark **0.63** (+0.20/−0.28/−0.28), the 3-px edge
+band 4.38 (1.9% of the crop; the 468 pixels > 24 are all the mark's
+antialiased outline, CoreSVG vs librsvg). Outside the crop the render
+carries a bright ~20-px band inside the iOS squircle's edge (row 8
+reads 255,91,255; row 20 239,47,255; row 40 is the plate) that no
+full-bleed flat reproduces and the audit's crop never sees — reported
+so nobody chases it. The audit (Chrome, --material-off):
+**24.67 → 20.14** against the glass master, **6.06 → 0.70** with the
+material off. The 20.14 that remains is the layer's glass, the group's
+specular and its .45 translucency — the icatcher construction (26.67 /
+0.73). `flatSource` set to `official` (the developer's own layer
+artwork, measured). `badge.svg` followed in the form it already had —
+plate badge, viewBox 0 0 32 32 under the house-squircle `clipPath` —
+with the same two gradients (ids `sodes-badge-*`); generated badges
+re-rendered by the build. validate ✓ 73/73, icons tests 276 ✓.
+
+Trap, small but real: a 1-channel mask PNG read back through sharp
+`.raw()` without `toColourspace("b-w")` comes back with three channels,
+and every index into it is off by 3× — the first per-region pass read
+plate 8.4 and 18,700 pixels > 24 on artwork whose rows all read ~1/255.
+Check `info.channels` before indexing a mask.
