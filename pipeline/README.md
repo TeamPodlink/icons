@@ -7030,3 +7030,35 @@ shadow to carry (material-flat.mjs measure: T 0, shadow none). Against
 the master **4.16** (the red N's bbox within 2–4 px of the render's, the
 rest its specular edge), material-off 3.71, against the store 30.5 →
 **13.7**. The badge keeps the brand's divided-N EPS mark, untouched.
+
+### spreaker: the iOS icon measured into the Android layers (2026-09-19)
+
+Spreaker 7.59.1's `Assets.car` holds no stack, and its 1024 `AppIcon`
+is byte-identical to the fetched App Store artwork (central 0.00): the
+store raster IS the shipped iOS icon. The bundle is the Android
+adaptive-icon's two vector layers (2026-08-18); the store test read
+10.0 against the iOS icon. Measured from it into the same two files:
+
+- Plate (columns 24–96 and 928–1000, per row): white to row 512, then
+  252,251,248 / 245,241,230 / 238,232,212 / 232,224,197 at rows 640 /
+  768 / 896 / 1000 — 17 stops. Trap: the background layer's 448-unit
+  square maps to the canvas as y_px = 4.0058·y − 385, bleeding 385 px
+  past both edges; stops written at row/1024 landed 9.2 (the first
+  pass); at (y_px + 385)/4.0058 they land.
+- Glow: opacity toward #eb9a00 by radius, outside the star: 0.129 at
+  128 px, 0.102 at 192, 0.069 at 256, 0.037 at 320, 0.004 at 384, 0 by
+  400. The Android layer's radial ran to 688 px (171.73 units) with a
+  linear 0.2 → 0 — right at 256 px, 0.088 too strong at 384. Now r
+  99.855 units (400 px) with the measured stops.
+- Star: the iOS star is 737×814 px to the Android layer's 730×806 (IoU
+  0.979) — scaled 1.0096/1.0099 about its centre; its gradient re-read
+  per row of the eroded interior (231,161,24 at row 139 → 240,186,50 →
+  252,188,8 at 512 → 234,158,5 → 222,139,4 at 884; the Android
+  gradient read 245,200,63 at the top).
+
+Flat reassembled from the two layers over the white canvas: against
+the iOS icon **10.03 → 3.99** (117 px > 24, the star's edge); the
+bundle's own render against it 3.73 (was 10.04); flat vs glass 0.92.
+Source label stays `adaptive-icon` (the geometry is the Android
+layers'; the colours are now the iOS icon's). Badge: the star's
+gradient carried over, ink box unchanged.
