@@ -7230,19 +7230,24 @@ the disc's hue exactly (least squares on the colour difference gives
 Apple's live compositor would draw this; ictool never will.
 
 **Bundle.** `Assets/glow.svg`, a non-glass group under the glyph, in
-both appearances: each lobe is fourteen concentric circles whose
-opacities stack to the blurred-disc profile × α (exact for a circle,
-no offset-path approximation needed). The glyph group's shadow is
-`none`; the glyph stays glass. In Dark the black lobe vanishes into
+both appearances: each lobe is one radial gradient in the lobe's
+colour whose 49 stop-opacities sample the blurred-disc profile × α
+(ictool honours opacity stops, as iheartradio's vignette showed).
+The first build stacked fourteen concentric circles per lobe instead,
+which is exact for a circle in principle but banded visibly on the
+dark canvas — the steps sit ~37 px apart for the wide lobe, and each
+is a whole opacity increment. The gradient renders smooth and scores
+better (halo field 1.45 → 1.21). The glyph group's shadow is `none`;
+the glyph stays glass. In Dark the black lobe vanishes into
 the dark canvas and the teal glow remains, as the layer-color shadow
 at 0.8 used to look.
 
 **Flat.** Two shadow-only filters on a `<circle>` of the disc
 (`jiosaavn-baked-shadow`, `jiosaavn-baked-glow`), under the artwork.
 
-**Numbers.** Halo field rmse vs the store: ictool **1.45**, flat
-**1.44**. Against the glass master **3.89 → 1.08** (material-off
-0.81 → 1.08 — the two facets now agree with or without the material);
+**Numbers.** Halo field rmse vs the store: ictool **1.21**, flat
+**1.44**. Against the glass master **3.89 → 1.02** (material-off
+0.81 → 1.02 — the two facets now agree with or without the material);
 against the store **7.47 → 5.89**. What remains in the store sheet is
 the glyph's outline and a thin ring at the disc rim, neither of them
 the halo — and not a tracing gap either: the four paths in the glyph,
