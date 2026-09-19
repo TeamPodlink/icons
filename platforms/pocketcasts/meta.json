@@ -12,7 +12,7 @@
         "title": "Pocket Casts",
         "variant": null,
         "file": "PocketCasts.icon",
-        "hasDark": false,
+        "hasDark": true,
         "source": "official-svg",
         "appStoreId": 414834813
       }

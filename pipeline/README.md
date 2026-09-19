@@ -7256,3 +7256,33 @@ the flat and the badge are byte-identical to the logo on jiosaavn.com
 389×407 px at 1024 against our 386×406, centroids 1 px apart, so the
 outline is the store's own edge rendering of the same vector. 5.89
 is that figure's floor.
+
+### pocketcasts: the developer's own dark variant (2026-09-19)
+
+"Missing dark" was right to list pocketcasts after all. The premise
+behind dropping the variant ("what iOS shows for an app without a
+dark icon" is the light icon) was wrong: since iOS 18 beta 3 the
+system generates a dark icon for such apps — background darkened,
+glyph re-tinted with the plate colour, or a plain dimming when the
+two cannot be separated — so a red-plate icon is never shown
+unchanged in Dark. For pocketcasts that automatic treatment is what
+ictool produces with the plate as the canvas fill and the glyph free
+to tint (red mark on the default dark gradient, rendered as a
+control). Maintainer's call: adopt the developer's OWN dark icon
+instead. Pocket Casts 8.20 for iOS ships it as the in-app alternate
+`AppIcon-Dark` (a plain catalog image, 324 px, pulled with a
+`CUICatalog imageWithName:` variant of flat-icon-extract): the same
+white glyph at the same size (218/324 = .673 against the light icon's
+690/1024 = .674) on a solid **22,23,24** plate (98.5% of plate pixels,
+the rest antialiasing). The Mac app's dark variant is the same idea on
+#000000; the iOS one is the reference here.
+
+`Assets/icon-dark.svg` is the light layer with the plate at #161718,
+wired as `image-name-specializations` — REPLACING `image-name`, not
+beside it: with both keys present ictool reads the plain one and the
+Dark rendition came out byte-identical to Default (build-assets duly
+kept `hasDark` false). Rendered: plate 22,23,24, glyph 254–255,
+`hasDark` true from build-assets; the dark-status audit lists 8
+native, 0 missing. A "shipped" status that would have excused the
+identical renditions was written and reverted the same hour, on the
+evidence above.
