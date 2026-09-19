@@ -1,51 +1,68 @@
 {
-  "fill" : {
-    "linear-gradient" : [
+  "fill": {
+    "linear-gradient": [
       "srgb:0.14902,0.16078,0.20392,1.00000",
       "srgb:0.14902,0.16078,0.20392,1.00000"
     ]
   },
-  "groups" : [
+  "groups": [
     {
-      "blend-mode" : "normal",
-      "hidden" : false,
-      "layers" : [
+      "blend-mode": "normal",
+      "hidden": false,
+      "layers": [
         {
-          "glass" : true,
-          "image-name" : "glyph.svg",
-          "name" : "glyph",
-          "position" : {
-            "scale" : 32,
-            "translation-in-points" : [
+          "glass": true,
+          "image-name": "glyph.svg",
+          "name": "glyph",
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
               0,
               0
             ]
           }
         }
       ],
-      "shadow-specializations" : [
+      "specular": false,
+      "translucency": {
+        "enabled": true,
+        "value": 0
+      },
+      "shadow": {
+        "kind": "none",
+        "opacity": 0.5
+      }
+    },
+    {
+      "blend-mode": "normal",
+      "hidden": false,
+      "layers": [
         {
-          "value" : {
-            "kind" : "layer-color",
-            "opacity" : 4
-          }
-        },
-        {
-          "appearance" : "dark",
-          "value" : {
-            "kind" : "layer-color",
-            "opacity" : 0.8
+          "glass": false,
+          "image-name": "glow.svg",
+          "name": "glow",
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
           }
         }
       ],
-      "specular" : false,
-      "translucency" : {
-        "enabled" : true,
-        "value" : 0
+      "lighting": "individual",
+      "shadow": {
+        "kind": "none",
+        "opacity": 0.5
+      },
+      "specular": false,
+      "translucency": {
+        "enabled": false,
+        "value": 0
       }
     }
   ],
-  "supported-platforms" : {
-    "squares" : "shared"
+  "supported-platforms": {
+    "squares": "shared"
   }
 }

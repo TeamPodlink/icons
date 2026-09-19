@@ -7207,3 +7207,47 @@ shadow 5.81 → ictool **1.31**, flat **1.18**, flat vs ictool 0.60.
 Against the store artwork **3.31 → 1.28** (signed +0.4/0.0/−0.1);
 against the glass master 1.45 → 1.56 (the two blurs differ by 0.6 in
 the band). The face itself is unchanged.
+
+### The JioSaavn halo, recreated (2026-09-19)
+
+The bundle carried the halo as a native `layer-color` shadow at
+opacity 4 on the glass glyph group — ictool draws that as a dark drop
+shadow below the disc, which is not what the App Store artwork has,
+and the flat had nothing. Both facets now carry the halo the Yoto way:
+measured from the store, built without filters in the bundle.
+
+**Measured.** Store minus its canvas (38,41,52) outside the disc,
+40k pixels, fitted as two blurred offset copies of the disc with a
+joint least squares on the amplitudes (blurred-disc profiles from a
+real blur, not the CDF — σ is a third of the radius, so curvature
+counts): a **glow in the disc's own colour** (30,204,175) offset
+**+60/+60 px** at 1024, σ 120, opacity **0.261**, over a **black
+shadow** offset **−40/−50**, σ 60, opacity **0.382**. Field rms 8.49
+→ **0.67**. By angle at 10 px out, store against model: bottom-right
+−3/30/22 vs −2/29/21, top-left −12/−7/−11 vs −12/−6/−11. The glow is
+the disc's hue exactly (least squares on the colour difference gives
+α .18 with residual under 1.5), which is what `layer-color` means —
+Apple's live compositor would draw this; ictool never will.
+
+**Bundle.** `Assets/glow.svg`, a non-glass group under the glyph, in
+both appearances: each lobe is fourteen concentric circles whose
+opacities stack to the blurred-disc profile × α (exact for a circle,
+no offset-path approximation needed). The glyph group's shadow is
+`none`; the glyph stays glass. In Dark the black lobe vanishes into
+the dark canvas and the teal glow remains, as the layer-color shadow
+at 0.8 used to look.
+
+**Flat.** Two shadow-only filters on a `<circle>` of the disc
+(`jiosaavn-baked-shadow`, `jiosaavn-baked-glow`), under the artwork.
+
+**Numbers.** Halo field rmse vs the store: ictool **1.45**, flat
+**1.44**. Against the glass master **3.89 → 1.08** (material-off
+0.81 → 1.08 — the two facets now agree with or without the material);
+against the store **7.47 → 5.89**. What remains in the store sheet is
+the glyph's outline and a thin ring at the disc rim, neither of them
+the halo — and not a tracing gap either: the four paths in the glyph,
+the flat and the badge are byte-identical to the logo on jiosaavn.com
+(`flatSource: official`, recorded now). The store's white reads
+389×407 px at 1024 against our 386×406, centroids 1 px apart, so the
+outline is the store's own edge rendering of the same vector. 5.89
+is that figure's floor.
