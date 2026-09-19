@@ -6758,3 +6758,24 @@ Trap, small but real: a 1-channel mask PNG read back through sharp
 and every index into it is off by 3× — the first per-region pass read
 plate 8.4 and 18,700 pixels > 24 on artwork whose rows all read ~1/255.
 Check `info.channels` before indexing a mask.
+
+### pocketcasts: the flat takes the app's ramp (2026-09-18)
+
+The material-off pass filed pocketcasts' 7.41 as `colour` (glyph −10.6
+uniform, material-off figure identical to the glass one: the group's
+specular and translucency do nothing measurable on a non-glass layer,
+which retires the 4/255 entry's "material lifts the plate" reading).
+The flat painted the official glyph `#fff`; the app paints it under a
+vertical ramp, `gray = 230.93 + 0.02779·y` at 1024 in the shipped PNG,
+and the bundle's `Assets/icon.svg` already carries that ramp as an
+objectBoundingBox gradient (`#EBEBEB → #fff @ .9839`, measured in
+"pocketcasts: PNG layers vs the official vector under the loss bar").
+Re-read from the material-off render: `gray = 231.44 + 0.02775·y`, rms
+0.11, 235.6 at row 149 to 255.7 at row 874 — the same line. The flat
+now carries the same gradient on the same path; plate stays the brand's
+`#F43E37` (the render reads 245,62,55, ictool's +1 on the red channel
+through the P3 round trip, not a declaration to copy). Candidate vs
+material-off at 256: **0.99**, 0 px > 24, mark interior 0.75. Audit:
+glass **7.41 → 1.12**, material-off 1.12; diagnosis floor. The badge
+(the brand's own roundel artwork, white glyph) is untouched: it is
+their badge, not our reading of their icon.
