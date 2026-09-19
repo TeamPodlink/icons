@@ -6423,3 +6423,87 @@ and the groups' specular). The previous flat's plate (`#FF5960 .964 →
 #FF3A42 → #E51231`) and the refit crescent are gone with it. Badge
 regenerated from the flat under the house-squircle clip; `flatSource`
 official.
+
+### fountain: the official Android VectorDrawable becomes the flat; the bundle's raster stays (2026-09-18)
+
+The four `geometry` pairs (anytimeplayer, fountain, podverse, snipd)
+were not in the Android adaptive-icon round, so their official APKs
+were opened this time (apkeep `-d google-play`, Aurora anonymous
+token; Play package ids read off the developers' own sites where they
+link them, else the Play search page).
+
+**fountain (`fm.fountain.apps` 1.5.6, versionCode 1826, Play signing
+cert SHA-256 `ff9bda989a899f4caf997ec2484db0fbfe6a7ab1202bbdfbb72ee753c468aa0e`).**
+Adaptive icon: background a VectorDrawable black square, foreground a
+VectorDrawable of the two-drop mark — a solid `#f8a025` lower drop and
+an upper drop under an inlined `<gradient>` (`#fcb70c → #fba422`,
+vertical, y 25.01 → 41.01 in path space) in a group at scale .58,
+translate 22.68 on the 108 viewport. Converted path-for-path. Against
+the iOS `glyph.png` (the store raster the bundle carries), bbox aspect
+0.4480 on both sides and bbox-normalised silhouette IoU **0.990**: the
+same cut of the mark. The colours are not the same: the lower drop
+agrees (248,160,37 vs 248,160,38) but the raster's upper drop starts at
+255,195,2 where the vector declares an sRGB `#fcb70c` (252,183,12) —
+the iOS art carries a yellow the Android vector does not. So the flat
+takes the vector's GEOMETRY and the shipped master's COLOURS: lower
+drop `rgb(251,161,38)` (interior mean, flat to the row), upper drop a
+16-stop vertical gradient of the master's per-row means over the
+drop's eroded interior (255,195,2 at row 94 → 251,165,34 at row 440),
+registration a coordinate descent on the audit's own scorer:
+**scale 1.905 about (511.25, 511.75)** from the bbox start of 1.914.
+Read the colours from the MASTER, not from the asset PNG — the first
+pass read `glyph.png` and scored 12.5 on the glyph interior; the
+master reads 1.15. Also measured: a silhouette-mismatch fit at 1024
+(mismatch 2,567 → 1,442 px at scale 1.913, +0.5/+0.75) scores WORSE on
+pixels (flat 6.40, bundle probe 8.13) — the raster's edge is soft, and
+minimising binary mismatch is not minimising RMSE; the RMSE fit stands.
+
+Audit: **17.95 → 5.53** (Chrome; librsvg candidate 5.58), residual by
+class at 1024: glyph interior 1.15, plate 2.78, rim 50.5 on 2.7% of the
+crop — every pixel over 24 is the raster edge band. Diagnosis stays
+`geometry` (edgeShare 0.98) at the floor's doorstep. `flatSource`
+official; badge regenerated from the same paths to the previous
+badge's measured ink box (14.625–25.4 × 8–32, h 24, scale 0.9121).
+
+**The bundle's raster replaced, by decision.** The same vector as a
+`glyph.svg` layer in place of `glyph.png`, ictool vs ictool at 512:
+central **7.15 / 7.09** (Default / Dark), glyph interior 0.83, plate
+0.00, every >24 pixel inside the 2-px rim (1,277 / 1,299), rim RMSE
+29.8 — the loss bar's rim clause met, its central clause not: the store
+raster's edge is ~1 px softer than a CoreSVG edge and nothing legitimate
+sharpens or blurs the other side. The maintainer chose the vector
+anyway (2026-09-18): the residual is entirely the raster's own
+antialiasing, and the developer's VectorDrawable is the more
+authoritative artwork. Recorded as the first waiver of the central
+clause; the rule stays as written for cases where the residual is not
+the edge alone. Source `appstore-artwork-split` → `flat-svg-split`
+(canvas plus the flat's mark as an SVG layer, with the `{1, dark 1}`
+guard). Drift after: **1.01**, floor — the flat and the bundle now
+share the glyph. Raster-element platforms 13 → 12.
+
+**podverse (`com.podverse`).** Play download refused (silent); the
+source is open (podverse-rn): the adaptive icon is
+`@color/ic_launcher_background` plus a RASTER foreground
+(`mipmap-*/ic_launcher_foreground.png`), and podverse-ios's
+`AppIcon.appiconset` is PNGs only. podverse-web publishes Illustrator
+wordmarks (`podverse-logo-*.svg`, `podverse-brand-blue.svg`) whose
+"O" is the headphones — a real vector of a RELATED drawing, not of the
+icon: bbox-normalised IoU 0.9815 against `glyph.png`, but as a flat at
+the bbox registration it scores 19.33 against the master (the traced
+flat scores 13.13), 17.98 after an RMSE fit, and **13.83 with the band
+and each cup fitted separately** (silhouette IoU 0.9418): the band's
+thickness and the cups' set differ, so no placement of the wordmark's
+parts reproduces the icon. `safari-pinned-tab.svg` is a potrace
+square. The maintainer's caution stands: the raster is the better
+reference here, and the flat is unchanged.
+
+**snipd (`ai.topicfinder.podcastdiscovery` 4.1.21, cert
+`58bd20a10aebf39f4623e5f303498e0b8f95cac48c6dd1117ff7b39061732b9a`).**
+Degenerate adaptive icon (`<background>@null` / `<foreground>@null`,
+the playerfm pattern); the launcher is a 192-px `ic_launcher.png`, and
+no drawable with `pathData` beyond Material and Intercom UI vectors.
+Nothing to adopt.
+
+**anytimeplayer.** Already answered in "registered off the inner
+features": the open repo's only VectorDrawable is the launcher
+background. Not re-opened.

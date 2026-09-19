@@ -65,9 +65,25 @@
       },
       "layers": [
         {
-          "image-name": "glyph.png",
+          "image-name": "glyph.svg",
           "name": "glyph",
-          "glass": false
+          "glass": false,
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          },
+          "opacity-specializations": [
+            {
+              "value": 1
+            },
+            {
+              "appearance": "dark",
+              "value": 1
+            }
+          ]
         }
       ]
     }

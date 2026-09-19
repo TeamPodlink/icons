@@ -4,6 +4,7 @@
   "guidelinesUrl": "https://www.fountain.fm/podcaster-guide#:~:text=Listen%20on%20Fountain%20badges",
   "url": "https://fountain.fm",
   "added": "2023-02-06",
+  "flatSource": "official",
   "liquidGlass": {
     "bundles": [
       {
@@ -12,7 +13,7 @@
         "variant": null,
         "file": "Fountain.icon",
         "hasDark": true,
-        "source": "appstore-artwork-split"
+        "source": "flat-svg-split"
       }
     ]
   }
