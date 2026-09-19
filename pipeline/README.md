@@ -7076,9 +7076,13 @@ artwork — with the official glyph **690 px** wide, centred (rows/cols
 scale(1.99039)` (690/32 ÷ the glyph's 10.8333 box); the flat's white
 bbox now reads 167–856 exactly. Against the store artwork **55.21 →
 7.96**; against the glass master 1.17 (the bundle and the flat moved
-together). Two differences the iOS icon also shows, left as they are
-pending a decision: its glyph is flat white (255 at the top row) where
-the bundle and flat carry the Mac layer's 235 → 255 ramp — the +4.6
-uniform that remains against the store — and it has no dark variant
-where the bundle carries the Mac app's black plate. The badge (the
+together). Then, "iOS app all the way down" (same day): the glyph is flat white,
+as the iOS icon paints it (the Mac layer's 235 → 255 ramp left with the
+Mac sizing), and the dark variant is gone — `icon-dark.svg` deleted,
+one `image-name` layer with the `{1, dark 1}` guard (without it the
+white glyph would auto-tint to the untouched default canvas's blue in
+Dark; the red plate is a layer and stays), `hasDark` false; the Dark
+render is byte-identical to Default, which is what iOS shows for an
+app without a dark icon. Against the store artwork **7.96 → 2.13**
+(signed 0.0/0.0/0.0), against the glass master 1.12. The badge (the
 brand's roundel) is untouched.

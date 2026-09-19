@@ -64,15 +64,7 @@
       },
       "layers": [
         {
-          "image-name-specializations": [
-            {
-              "value": "icon.svg"
-            },
-            {
-              "appearance": "dark",
-              "value": "icon-dark.svg"
-            }
-          ],
+          "image-name": "icon.svg",
           "name": "icon",
           "glass": false,
           "position": {
