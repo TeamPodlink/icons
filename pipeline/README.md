@@ -6779,3 +6779,44 @@ material-off at 256: **0.99**, 0 px > 24, mark interior 0.75. Audit:
 glass **7.41 → 1.12**, material-off 1.12; diagnosis floor. The badge
 (the brand's own roundel artwork, white glyph) is untouched: it is
 their badge, not our reading of their icon.
+
+### snipd: the S measured as two circles (2026-09-18)
+
+Diagnosed `geometry` at 8.33 after the 2026-09-17 plate and gradient
+refit, with a "specular highlight across the centre" as the stated
+remainder. At the audit's 256 the residual split as: the edge band 55%
+of the energy (RMSE 42, +36 green — the master greener just OUTSIDE
+the flat's S), its 1–2 px outer ring 30%, the top lobe 9%, the bottom
+lobe 3%, plate 1%. Not a highlight problem; a shape one. Two false
+leads, measured and dropped: the master's edge is a ~5-px ramp at 1024
+(G 33 → 236 over five pixels where a vector edge is one), but blurring
+the candidate by σ 1–4 px only worsened the score (5.80 → 6.09 →
+14.81), so the audit's resampling already absorbs the ramp; and a
+per-lobe RMSE descent on scale/offset (shared 8.41 → 6.11, per lobe
+5.90) kept enlarging the discs without closing the edge.
+
+**What the S is.** With the mask confined to the crop (the first pass
+took the squircle's rim light for S pixels and fitted nonsense), rays
+from each lobe's centre over its outer arc give least-squares circles:
+top lobe centre (550.5, 471.9) px, r **240.8**; bottom (471.6, 551.0),
+r **240.4**; rms 0.35 / 0.37 on the G > 110 boundary. The half-disc
+model's centres were within 0.3 px; the seam direction (−1, 1)/√2
+passes through both centres to 0.14 px; the centres sit 111.7 px apart
+along it where the shipped path had 110.8. The tips retract 2–4 px
+from the sharp corner. So the mark is the two half-discs at scale
+1.003, 0.9 px further apart, with the boundary at the raster's 50%
+level one pixel inside the G > 110 contour: r **239.8 / 239.4** px
+(scored 5.62 → 4.71 for that pixel; −1.5 px 5.15, −2 px 6.06). Tip
+fillet r 0.2 units (sharp 5.83, 0.1–0.2 5.67, 0.5 6.03). Lobe colours
+are the master's per-row means over each lobe's eroded interior as
+two-stop gradients: top 123,255,216 → 0,227,158 (rows 237–627, rms
+5.2 in red — the highlight lives here, a diagonal component the row
+model does not carry), bottom 10,218,154 → 0,163,112 (rows 396–785,
+rms ≤ 1.4). Plate gradient unchanged.
+
+**Shipped.** `icon.svg` built from those parameters (no path traced:
+the geometry is the circle fits and the seam, the fillet a scored
+radius). Audit **8.33 → 4.78**, floor; the store raster stays in the
+bundle. Badge in its bare-mark form, the same two paths and gradients
+to the previous ink box (w 18.15 → 17.73, h 24 both). validate ✓
+73/73, icons tests 276 ✓.
