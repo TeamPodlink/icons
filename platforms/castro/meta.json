@@ -12,7 +12,7 @@
         "variant": null,
         "file": "Castro-Default.icon",
         "hasDark": true,
-        "source": "catalog-artwork",
+        "source": "flat-svg-split",
         "appStoreId": 1080840241
       }
     ]

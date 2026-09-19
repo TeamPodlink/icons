@@ -7328,3 +7328,68 @@ were the cause. Rule: never nest opacity groups in a bundle layer;
 fold the outer factor into the children's targets. Yoto's copies use
 `fill-opacity` on paths and jiosaavn's lobes are gradients, which is
 why neither tripped it.
+
+### gpodder and castro off the raster lens: filter-free blurs, generalised (2026-09-19)
+
+Both bundles were rasters only because the official flats carry
+`feGaussianBlur` filters ictool renders with its own kernel. With the
+antennapod construct in hand (`pipeline/shadow-stack.mjs`), both are
+vector bundles again — and the work turned up two more rules.
+
+**gpodder.** The official SVG verbatim as the layer, minus its white
+canvas (the bundle fill, dark-pinned), with the mascot's shadow (black
+at .5, σ .554 units = 17.7 px, no offset) as 24 offset copies stacking
+to the CDF. Glass **0.75 → 1.30** (the raster was a Chrome render of
+the same flat; the rise is CoreSVG's edge antialiasing, as the
+official-svg attempt measured on 2026-08-18 — that attempt's 3.95
+was the filter), diagnosis floor, `hasDark` true as before; the dark
+rendition's rings over the gray pin read within 2/255 of the raster's.
+Source `flat-svg`.
+
+**castro.** The flat is the App Store artwork's own vector (Figma
+export: a `#A9FF9B` glow at .4 under σ 3.077, and three drop shadows
+on the white mark — dy 1.508 σ .878 at .149, dy 5.065 σ 2.948 at
+.221, dy 22.677 σ 13.2 at .37). Two findings before it worked:
+
+1. **Chrome does not render the declared third lobe.** Headless
+   renders of the flat with one lobe at a time, fitted as a blurred
+   offset silhouette: lobes 1 and 2 come out as declared (dy 1.50 σ
+   1.00 at .151; dy 5.06 σ 3.25 at .222), but the third comes out at
+   **dy 17.5 σ 13.44 at .219** — three quarters of the offset and 60%
+   of the opacity — and the developer's own 1024 export agrees with
+   Chrome (G 138 below the mark against 137), while librsvg and
+   ictool both honour the declaration (121 / 115). Chrome is the
+   reference rasteriser, so the bundle is built on what Chrome draws.
+2. **The distance stack is wrong for blurs wider than the feature.**
+   Under a true blur a band of width w reaches only 2Φ(w/2σ) − 1 at
+   its centre; the stack, which models a single edge, paints full
+   amplitude — so the σ-13 lobe (430 px on a 5-unit ring) came out at
+   18/255 rms against the true blur, and the glow and the mid lobe at
+   8 and 5. Two fixes: the stack's target is now the exact 1-D band
+   profile Φ(d/σ) − Φ((d − w)/σ) with w = 2 × the path's max inscribed
+   distance (chamfer distance transform: ring 5.23 units, dot 6.40),
+   built per path so each carries its own w — glow 8.07 → 5.78, mid
+   lobe 5.39 → 3.54; and where even that loses, the lobe is instead
+   **one radial gradient sampling the true blur's angular-mean
+   profile** about the offset centroid (the jiosaavn construct), which
+   fits the wide lobe at **0.74** (max 2.8). The build measures both
+   for every lobe against a real blur of the silhouette and keeps the
+   better (`light.svg`: glow and lobes 1–2 stacks, lobe 3 radial).
+
+Dark is the shipped catalog dark, measured: the mark under a vertical
+gradient 23,234,150 → 11,126,111 (fit rms 0.44), no glow, and the
+same three lobes at **.150/.230/.255 in 56,56,56** (alpha rms 0.78
+against the raster's field, 28.1 without). The Dark rendition against
+the shipped dark composited over ictool's own Dark canvas: **2.32**,
+mean 0.3/0.5/1.0. (Composited over the linear 0.192 → 0.078 pin
+formula it reads 5.8 with a −3.5 mean — ictool renders that pin
+darker, 31 → 16 down the centre, as the P3 trap entry already
+recorded; measure against ictool's canvas, not the formula.)
+
+Glass **1.57 → 2.10**, store 1.71 unchanged, diagnosis floor. The
+flat's filter ids are `castro-baked-glow` / `castro-baked-shadow`. Both
+rises (gpodder +0.55, castro +0.53) are the edge-AA and corner cost of
+a vector against a Chrome raster of the same art — a measurable loss
+under the 2026-09-18 rule, accepted here for the vectorisation.
+Source `flat-svg-split`. Raster elements 12 → **10** (queue and
+tunestr remain, both inner-shadow filters).

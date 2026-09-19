@@ -12,7 +12,7 @@
         "title": "gPodder",
         "variant": null,
         "file": "gPodder.icon",
-        "source": "flat-svg-browser",
+        "source": "flat-svg",
         "hasDark": true
       }
     ]
