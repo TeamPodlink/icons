@@ -7113,3 +7113,53 @@ Against the glass master **3.79 → 3.10**; against the store artwork
 18.27 → 17.81 — by design: the 17 is the store's baked shadow and the
 plate's difference under it, which the vector is not meant to chase.
 Badge (the official mark on its plate) untouched.
+
+### Four plates against the iOS icon: yoto, podurama, iheartradio, globalplayer (2026-09-19)
+
+Plates read away from each glyph in the store artwork (the shipped iOS
+icon), our ictool master and the flat. Row bands hide a diagonal, so
+each was also fitted as a plane in x and y.
+
+**podurama.** Both are 45° diagonals (store 42°, ours 47° from
+vertical) with the same kink: solid 239,43,122 to the diagonal's
+midpoint, then a ramp — but the ramps differ: the store's ends at
+≈244,80,98 (per-decile 239,45,120 → 243,68,105 at t .85), ours ran to
+a display-p3 pink (252,55,100 at t .85). End stop moved to
+`rgb(244,80,98)` in the flat and the bundle's layer; the P3 allowlist
+entry left with it. Against the store 71.21 → 71.06 — the glyph is that
+figure, as recorded; the plate is now right.
+
+**iheartradio.** The 4×|store − vector| showed a diagonal band. The
+store's plate is G = 0 everywhere, flat 198,0,43 over the top ~60%, then
+darkening toward the bottom-right corner (6×6 cell means: 198 across the
+top rows; bottom row 187 183 178 176 173 171; B 43 → 38 in step) — a
+vignette, not a plane (plane rms 4.3). Ours was a vertical two-stop
+canvas, 195 → 178 straight down. A bilinear plate layer (two vertical
+gradients under a horizontal luminance mask) rendered through ictool
+carried the mask correctly but hit the CoreSVG stop law: pure-red stops
+came back with G 23–28. So the construct avoids colour stops: the
+canvas is the store's flat 198,0,43 solid, and a light-only layer
+`vignette.svg` carries a black radial gradient with stop-OPACITY only —
+centre (1.0, 2.2) in canvas units, radius 1.75, opacity .628 at the
+centre → 0 at the radius (grid fit on the store's darkening factor,
+rms 1.07/255) — which multiplies R and B alike, as the store does.
+ictool renders it with G 0–2. Plate rmse vs the store 5.50 → 3.25 on
+the first fit; the wide-grid fit shipped. Against the store **4.29 →
+2.81**, against the glass master 1.19 → 1.21.
+
+**yoto.** The iOS plate is a gentler, non-monotonic vertical ramp than
+ours: side columns per 32 rows read 254,101,70 at the top, 240,89,59 at
+row 576, back up to 247,93,62 at 704, then 230,67,35 at 992, where the
+two-stop canvas ran 252,97,66 → 233,70,37 and darkened too fast through
+the middle (10–17 off in G/B over the lower half). A two-stop canvas
+cannot carry the bump, so the plate is now a light-only layer
+`plate.svg` with 30 stops from the side columns (rows 64–928 valid,
+ends held), the flat's gradient the same stops. The raster also has a
+dark dip at the bottom centre (218 vs 238 at the sides on row 880), the
+face's baked shadow — not chased, as with audible. Against the store
+3.74 → 3.31, against the glass master 1.48 → 1.45; the crop is mostly
+the face, so the number moves less than the plate did.
+
+**globalplayer.** Within 9 by row band and the same vignette shape;
+the only gap is the top-left lobe, 15–20 brighter in the store over a
+small region. Left as it is (store figure 3.42).

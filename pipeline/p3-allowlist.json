@@ -1,5 +1,5 @@
 {
-  "_comment": "display-p3 declarations whose triple is an exact n/255 in every channel \u2014 the same-triple signature (see 'The same-triple wrong-space law' in pipeline/README.md). Everything listed here predates the 2026-09-13 sweep and is NOT known to be a bug: 14 were measured consistent with their master by audit-declared-colors.mjs, the rest are either indeterminate (the two facets draw different artwork, so colour cannot be judged) or live in a flat-svg* bundle that is built from icon.svg and so cannot arbitrate its own source. validate.mjs rejects any NEW one. Before adding an entry, run: node pipeline/audit-declared-colors.mjs --only <slug>",
+  "_comment": "display-p3 declarations whose triple is an exact n/255 in every channel — the same-triple signature (see 'The same-triple wrong-space law' in pipeline/README.md). Everything listed here predates the 2026-09-13 sweep and is NOT known to be a bug: 14 were measured consistent with their master by audit-declared-colors.mjs, the rest are either indeterminate (the two facets draw different artwork, so colour cannot be judged) or live in a flat-svg* bundle that is built from icon.svg and so cannot arbitrate its own source. validate.mjs rejects any NEW one. Before adding an entry, run: node pipeline/audit-declared-colors.mjs --only <slug>",
   "allow": {
     "fountain/icon.svg": [
       "1 0.7882 0"
@@ -54,9 +54,6 @@
     ],
     "podnews/icon.svg": [
       "0.6902 0.0706 0.0706"
-    ],
-    "podurama/icon.svg": [
-      "0.9647 0.3216 0.3725"
     ],
     "podurama/badge.svg": [
       "0.9373 0.1686 0.4784",
