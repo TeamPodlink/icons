@@ -7443,3 +7443,13 @@ x 121–902, the store's exactly. The red is the store's to the unit
 with both facets in step); against the store 13.62, which the sheet
 shows is the plate's 4 px of height and the triangle's 5 px of width —
 the store renders a slightly different cut of the same mark.
+
+### icatcher: specular on (2026-09-19)
+
+Maintainer's call: the store icon is glossy skeuomorphism, and the
+bundle's glass group had `specular: false`. Switched on. The master
+now carries the highlights along the arcs; against the flat, which the
+material tool built without them (it measures translucency and shadow,
+not specular), the glass figure rises **2.56 → 5.26**; the store figure
+is the flat's and stays 14.68. Material-off is not measured for a
+materialised flat.

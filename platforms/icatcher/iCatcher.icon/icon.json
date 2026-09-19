@@ -58,7 +58,7 @@
     {
       "hidden": false,
       "blend-mode": "normal",
-      "specular": false,
+      "specular": true,
       "translucency": {
         "enabled": true,
         "value": 0.5
