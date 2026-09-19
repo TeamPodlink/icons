@@ -154,6 +154,7 @@ export function sourceLabel(b: GlassBundle): string | null {
  */
 const PLATFORM_LENSES = new Set([
   "raster elements",
+  "traced",
   "missing flat",
   "missing badge",
   "missing url",
@@ -191,10 +192,13 @@ export const lensesEnabled =
  * vectorisation backlog — platforms with at least one facet built from
  * pixels (`rasterFacets` non-empty: a bundle with PNG layers, or a flat /
  * badge SVG that embeds an <image>), to be replaced whenever a vector of
- * the mark turns up or can be measured off the raster. It replaces the
- * former "hand-drawn art" lens (flats with `flatSource: "drawn"`), which
- * flagged provenance rather than a gap — a measured drawing is a finished
- * facet, not a worklist item, and `flatSource` stays on the card as data;
+ * the mark turns up or can be measured off the raster; "traced" is the
+ * re-sourcing backlog — flats with `flatSource: "drawn"`, drawn or
+ * measured off a raster rather than taken from the developer's own
+ * vector. A traced flat is finished artwork, but every one is a
+ * candidate for replacement by the official vector when one turns up
+ * (jiosaavn's site logo was byte-identical to ours; others' may not be),
+ * so the list is a worklist again after a spell as card-only data;
  * "missing flat" / "missing badge"
  * are the artwork queues for platforms without a flat icon or badge,
  * "missing url" the meta.json website-link backfill, and "inactive"
@@ -210,6 +214,7 @@ export function debugCategories(p: Platform, b: GlassBundle | null): string[] {
       if (cause !== "floor") cats.push(DRIFT_LENSES[cause]);
   }
   if (p.rasterFacets.length > 0) cats.push("raster elements");
+  if (p.flatSource === "drawn") cats.push("traced");
   if (!p.hasFlat) cats.push("missing flat");
   if (!p.hasBadge) cats.push("missing badge");
   if (!p.url) cats.push("missing url");
