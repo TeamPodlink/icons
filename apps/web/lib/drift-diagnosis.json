@@ -1,5 +1,5 @@
 {
-  "generated": "2026-09-18",
+  "generated": "2026-09-19",
   "thresholds": {
     "FLOOR": 5,
     "ARTWORK": 0.15,
@@ -11,114 +11,60 @@
     "EDGE": 0.5
   },
   "bundles": {
-    "apple": {
+    "moonfm": {
       "primary": "material",
       "causes": [
         "material"
       ],
-      "central": 12.03,
+      "central": 44.36,
       "glassLayers": 3,
       "specular": true,
-      "struct": 0.013,
+      "struct": 0.399,
       "signed": [
-        -8.8,
-        -9.6,
-        -6.8
+        31,
+        36.9,
+        5.7
       ],
       "lumaShare": 1,
-      "edgeShare": 0.46,
-      "plateShare": 0.4,
+      "edgeShare": 0.16,
+      "plateShare": 0.19,
       "plateSigned": [
-        -5.8,
-        -5.4,
-        -5.8
+        -2.1,
+        -2.1,
+        -2.1
       ],
-      "plateRmse": 7.19,
+      "plateRmse": 6.54,
       "glyphSigned": [
-        -10.6,
-        -12.3,
-        -6.2
+        45.1,
+        52.3,
+        8.6
       ],
       "filter": false,
       "fit": {
-        "tx": 6.4023,
-        "ty": 6.4023,
-        "s": 0.59946
+        "tx": 0,
+        "ty": -0.0313,
+        "s": 1
       },
       "materialOff": {
-        "central": 0.93,
+        "central": 0.49,
         "struct": 0,
         "signed": [
-          0,
-          0,
-          0.2
+          0.1,
+          0.1,
+          0.1
         ],
         "plateSigned": [
-          -0.2,
-          -0.1,
-          0.2
+          0.3,
+          0.3,
+          0.3
         ],
-        "plateRmse": 0.58,
+        "plateRmse": 0.55,
         "glyphSigned": [
-          0.2,
-          0.2,
-          0.2
+          0,
+          0,
+          0
         ],
-        "edgeShare": 0.21
-      }
-    },
-    "moonfm": {
-      "primary": "material",
-      "causes": [
-        "material",
-        "colour",
-        "plate"
-      ],
-      "central": 38.62,
-      "glassLayers": 3,
-      "specular": true,
-      "struct": 0.36,
-      "signed": [
-        10.4,
-        26.1,
-        6.4
-      ],
-      "lumaShare": 1,
-      "edgeShare": 0.24,
-      "plateShare": 0.19,
-      "plateSigned": [
-        -7.1,
-        -7.1,
-        -7.1
-      ],
-      "plateRmse": 12.52,
-      "glyphSigned": [
-        18.1,
-        40.7,
-        12.8
-      ],
-      "filter": false,
-      "fit": null,
-      "materialOff": {
-        "central": 20.38,
-        "struct": 0.014,
-        "signed": [
-          -20.6,
-          -10.7,
-          0.7
-        ],
-        "plateSigned": [
-          -4.7,
-          -4.7,
-          -4.8
-        ],
-        "plateRmse": 6.52,
-        "glyphSigned": [
-          -27,
-          -11.7,
-          4.1
-        ],
-        "edgeShare": 0.26
+        "edgeShare": 0.76
       }
     },
     "icatcher": {
@@ -150,7 +96,11 @@
         -13.5
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": {
         "central": 0.73,
         "struct": 0,
@@ -176,111 +126,57 @@
     "sodes": {
       "primary": "material",
       "causes": [
-        "material",
-        "colour",
-        "plate"
-      ],
-      "central": 24.67,
-      "glassLayers": 1,
-      "specular": true,
-      "struct": 0.293,
-      "signed": [
-        -11.2,
-        -30.5,
-        -5.8
-      ],
-      "lumaShare": 1,
-      "edgeShare": 0.13,
-      "plateShare": 0.24,
-      "plateSigned": [
-        -4,
-        -6.3,
-        -4.3
-      ],
-      "plateRmse": 7.35,
-      "glyphSigned": [
-        -13,
-        -40.1,
-        -5.2
-      ],
-      "filter": false,
-      "fit": null,
-      "materialOff": {
-        "central": 6.06,
-        "struct": 0,
-        "signed": [
-          -1.9,
-          -9.4,
-          -0.5
-        ],
-        "plateSigned": [
-          -1,
-          -6,
-          -0.5
-        ],
-        "plateRmse": 4.7,
-        "glyphSigned": [
-          -2.5,
-          -11.1,
-          -0.6
-        ],
-        "edgeShare": 0.09
-      }
-    },
-    "castamatic": {
-      "primary": "material",
-      "causes": [
         "material"
       ],
-      "central": 11.73,
+      "central": 20.14,
       "glassLayers": 1,
       "specular": true,
-      "struct": 0.002,
+      "struct": 0.203,
       "signed": [
-        -3.7,
-        -9.4,
-        -8.8
+        -9.7,
+        -21.2,
+        -5.4
       ],
-      "lumaShare": 0.92,
-      "edgeShare": 0.31,
-      "plateShare": 0.33,
+      "lumaShare": 1,
+      "edgeShare": 0.16,
+      "plateShare": 0.24,
       "plateSigned": [
-        -5.2,
-        -1.5,
-        -1.7
+        -3.3,
+        -0.4,
+        -4
       ],
-      "plateRmse": 5.79,
+      "plateRmse": 5.11,
       "glyphSigned": [
-        -1.9,
-        -14.9,
-        -13.5
+        -11.1,
+        -29.1,
+        -4.7
       ],
       "filter": false,
       "fit": {
-        "tx": 0,
-        "ty": -0.0156,
-        "s": 1
+        "tx": 0.0134,
+        "ty": 0.0291,
+        "s": 0.99819
       },
       "materialOff": {
-        "central": 0.76,
+        "central": 0.7,
         "struct": 0,
         "signed": [
-          0.1,
-          0.1,
-          0.1
-        ],
-        "plateSigned": [
-          0,
+          -0.5,
           -0.2,
           -0.1
         ],
-        "plateRmse": 0.47,
-        "glyphSigned": [
-          0.2,
-          0.2,
-          0.2
+        "plateSigned": [
+          -0.3,
+          -0.1,
+          -0.2
         ],
-        "edgeShare": 0.65
+        "plateRmse": 0.54,
+        "glyphSigned": [
+          -0.6,
+          -0.1,
+          -0.1
+        ],
+        "edgeShare": 0.35
       }
     },
     "anytimeplayer": {
@@ -306,32 +202,6 @@
         0
       ],
       "plateRmse": 0.07,
-      "glyphSigned": null,
-      "filter": false,
-      "fit": null,
-      "materialOff": null
-    },
-    "fountain": {
-      "primary": "floor",
-      "causes": [],
-      "central": 1.01,
-      "glassLayers": 0,
-      "specular": false,
-      "struct": 0,
-      "signed": [
-        0.8,
-        0.6,
-        0.6
-      ],
-      "lumaShare": 0.88,
-      "edgeShare": 0.38,
-      "plateShare": 0.83,
-      "plateSigned": [
-        0.9,
-        0.6,
-        0.6
-      ],
-      "plateRmse": 0.87,
       "glyphSigned": null,
       "filter": false,
       "fit": null,
@@ -393,7 +263,7 @@
       "primary": "material",
       "causes": [
         "material",
-        "geometry"
+        "registration"
       ],
       "central": 13.87,
       "glassLayers": 0,
@@ -419,7 +289,11 @@
         -0.4
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": -0.2451,
+        "ty": 1.5232,
+        "s": 1.01015
+      },
       "materialOff": {
         "central": 13.87,
         "struct": 0.038,
@@ -471,41 +345,124 @@
         0.7
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": -0.0526,
+        "ty": -0.0681,
+        "s": 1.00329
+      },
       "materialOff": null
     },
-    "podbean": {
-      "primary": "colour",
+    "apple": {
+      "primary": "material",
       "causes": [
-        "colour",
-        "plate"
+        "material"
       ],
-      "central": 12.51,
-      "glassLayers": 0,
-      "specular": false,
-      "struct": 0.006,
+      "central": 12.03,
+      "glassLayers": 3,
+      "specular": true,
+      "struct": 0.013,
       "signed": [
-        -2.1,
-        -4.2,
-        -1.8
+        -8.8,
+        -9.6,
+        -6.8
       ],
       "lumaShare": 1,
-      "edgeShare": 0.38,
-      "plateShare": 0.68,
+      "edgeShare": 0.46,
+      "plateShare": 0.4,
       "plateSigned": [
-        -2.7,
+        -5.8,
         -5.4,
-        -1.8
+        -5.8
       ],
-      "plateRmse": 11.69,
+      "plateRmse": 7.19,
       "glyphSigned": [
-        -11,
-        -11,
-        -10.1
+        -10.6,
+        -12.3,
+        -6.2
       ],
       "filter": false,
-      "fit": null,
-      "materialOff": null
+      "fit": {
+        "tx": 6.4023,
+        "ty": 6.4023,
+        "s": 0.59946
+      },
+      "materialOff": {
+        "central": 0.93,
+        "struct": 0,
+        "signed": [
+          0,
+          0,
+          0.2
+        ],
+        "plateSigned": [
+          -0.2,
+          -0.1,
+          0.2
+        ],
+        "plateRmse": 0.58,
+        "glyphSigned": [
+          0.2,
+          0.2,
+          0.2
+        ],
+        "edgeShare": 0.21
+      }
+    },
+    "castamatic": {
+      "primary": "material",
+      "causes": [
+        "material"
+      ],
+      "central": 11.73,
+      "glassLayers": 1,
+      "specular": true,
+      "struct": 0.002,
+      "signed": [
+        -3.7,
+        -9.4,
+        -8.8
+      ],
+      "lumaShare": 0.92,
+      "edgeShare": 0.31,
+      "plateShare": 0.33,
+      "plateSigned": [
+        -5.2,
+        -1.5,
+        -1.7
+      ],
+      "plateRmse": 5.79,
+      "glyphSigned": [
+        -1.9,
+        -14.9,
+        -13.5
+      ],
+      "filter": false,
+      "fit": {
+        "tx": 0,
+        "ty": -0.0156,
+        "s": 1
+      },
+      "materialOff": {
+        "central": 0.76,
+        "struct": 0,
+        "signed": [
+          0.1,
+          0.1,
+          0.1
+        ],
+        "plateSigned": [
+          0,
+          -0.2,
+          -0.1
+        ],
+        "plateRmse": 0.47,
+        "glyphSigned": [
+          0.2,
+          0.2,
+          0.2
+        ],
+        "edgeShare": 0.65
+      }
     },
     "overcast": {
       "primary": "material",
@@ -536,7 +493,11 @@
         -1.4
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": -0.0156,
+        "s": 1
+      },
       "materialOff": {
         "central": 2.92,
         "struct": 0,
@@ -588,7 +549,11 @@
         -12.6
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": -0.0313,
+        "ty": -0.0896,
+        "s": 1.00571
+      },
       "materialOff": {
         "central": 0.73,
         "struct": 0,
@@ -640,61 +605,12 @@
         -0.7
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0.0762,
+        "ty": 0.0764,
+        "s": 0.99523
+      },
       "materialOff": null
-    },
-    "pocketcasts": {
-      "primary": "material",
-      "causes": [
-        "material",
-        "colour"
-      ],
-      "central": 7.41,
-      "glassLayers": 0,
-      "specular": true,
-      "struct": 0,
-      "signed": [
-        -3.8,
-        -4.2,
-        -4.2
-      ],
-      "lumaShare": 0.99,
-      "edgeShare": 0.31,
-      "plateShare": 0.44,
-      "plateSigned": [
-        1,
-        0,
-        0
-      ],
-      "plateRmse": 0.58,
-      "glyphSigned": [
-        -10.6,
-        -10.6,
-        -10.6
-      ],
-      "filter": false,
-      "fit": null,
-      "materialOff": {
-        "central": 7.41,
-        "struct": 0,
-        "signed": [
-          -3.8,
-          -4.2,
-          -4.2
-        ],
-        "plateSigned": [
-          1,
-          0,
-          0
-        ],
-        "plateRmse": 0.58,
-        "glyphSigned": [
-          -10.6,
-          -10.6,
-          -10.6
-        ],
-        "edgeShare": 0.31
-      }
     },
     "audible": {
       "primary": "material",
@@ -802,7 +718,11 @@
         -0.8
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "tunein": {
@@ -829,6 +749,40 @@
       "glyphSigned": null,
       "filter": false,
       "fit": null,
+      "materialOff": null
+    },
+    "podbean": {
+      "primary": "floor",
+      "causes": [],
+      "central": 3.92,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0.004,
+      "signed": [
+        1.2,
+        1,
+        1.3
+      ],
+      "lumaShare": 1,
+      "edgeShare": 0.83,
+      "plateShare": 0.6,
+      "plateSigned": [
+        1.1,
+        0.4,
+        1.1
+      ],
+      "plateRmse": 2.05,
+      "glyphSigned": [
+        0,
+        0.5,
+        0.7
+      ],
+      "filter": false,
+      "fit": {
+        "tx": 0,
+        "ty": -0.0156,
+        "s": 1
+      },
       "materialOff": null
     },
     "jiosaavn": {
@@ -858,7 +812,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "spotify": {
@@ -918,7 +876,11 @@
         0.2
       ],
       "filter": true,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "curiocaster": {
@@ -948,7 +910,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "castro": {
@@ -978,7 +944,11 @@
         0
       ],
       "filter": true,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0.0156,
+        "s": 1
+      },
       "materialOff": null
     },
     "podcastguru": {
@@ -1008,7 +978,11 @@
         -0.2
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": -0.0156,
+        "s": 1
+      },
       "materialOff": null
     },
     "yoto": {
@@ -1038,7 +1012,11 @@
         2
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "amazonmusic": {
@@ -1068,7 +1046,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "goodpods": {
@@ -1098,7 +1080,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "podurama": {
@@ -1128,7 +1114,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": -0.0156,
+        "s": 1
+      },
       "materialOff": null
     },
     "podfriend": {
@@ -1158,7 +1148,11 @@
         0.2
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "greatpods": {
@@ -1188,7 +1182,11 @@
         1
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": -0.0156,
+        "s": 1
+      },
       "materialOff": null
     },
     "iheartradio": {
@@ -1244,7 +1242,45 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0.0429,
+        "ty": 0.0434,
+        "s": 0.99829
+      },
+      "materialOff": null
+    },
+    "pocketcasts": {
+      "primary": "floor",
+      "causes": [],
+      "central": 1.12,
+      "glassLayers": 0,
+      "specular": true,
+      "struct": 0,
+      "signed": [
+        0.8,
+        0.1,
+        0.2
+      ],
+      "lumaShare": 0.77,
+      "edgeShare": 0.78,
+      "plateShare": 0.44,
+      "plateSigned": [
+        1,
+        0,
+        0
+      ],
+      "plateRmse": 0.58,
+      "glyphSigned": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "filter": false,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "hark": {
@@ -1274,7 +1310,11 @@
         -0.6
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": -0.0156,
+        "s": 1
+      },
       "materialOff": null
     },
     "rssradio": {
@@ -1304,7 +1344,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "podcastindex": {
@@ -1359,6 +1403,32 @@
       "fit": null,
       "materialOff": null
     },
+    "fountain": {
+      "primary": "floor",
+      "causes": [],
+      "central": 1.01,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0.8,
+        0.6,
+        0.6
+      ],
+      "lumaShare": 0.88,
+      "edgeShare": 0.38,
+      "plateShare": 0.83,
+      "plateSigned": [
+        0.9,
+        0.6,
+        0.6
+      ],
+      "plateRmse": 0.87,
+      "glyphSigned": null,
+      "filter": false,
+      "fit": null,
+      "materialOff": null
+    },
     "listennotes": {
       "primary": "floor",
       "causes": [],
@@ -1386,7 +1456,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "deezer": {
@@ -1416,7 +1490,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0.0413,
+        "ty": 0.0267,
+        "s": 0.99839
+      },
       "materialOff": null
     },
     "podhome": {
@@ -1446,7 +1524,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": -0.0156,
+        "s": 1
+      },
       "materialOff": null
     },
     "podkicker": {
@@ -1476,7 +1558,11 @@
         0.1
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "spreaker": {
@@ -1506,7 +1592,11 @@
         -1.3
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "podstation": {
@@ -1536,7 +1626,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "youtubemusic": {
@@ -1566,7 +1660,11 @@
         -1
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "podcastaddict": {
@@ -1596,7 +1694,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0.0486,
+        "ty": 0.0486,
+        "s": 0.99696
+      },
       "materialOff": null
     },
     "stenofm": {
@@ -1626,7 +1728,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "playerfm": {
@@ -1656,7 +1762,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "rephonic": {
@@ -1686,7 +1796,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "parasocial": {
@@ -1716,7 +1830,11 @@
         0.2
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "metacast": {
@@ -1772,7 +1890,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "subscribebyemail": {
@@ -1802,7 +1924,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "downcast": {
@@ -1832,7 +1958,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0.0409,
+        "ty": 0.0247,
+        "s": 0.99845
+      },
       "materialOff": null
     },
     "globalplayer": {
@@ -1862,7 +1992,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "ivoox": {
@@ -1892,7 +2026,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0.0445,
+        "ty": 0.0404,
+        "s": 0.99721
+      },
       "materialOff": null
     },
     "gpodder": {
@@ -1922,7 +2060,11 @@
         0.9
       ],
       "filter": true,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "podimo": {
@@ -1952,7 +2094,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0.0151,
+        "ty": 0.0291,
+        "s": 0.99818
+      },
       "materialOff": null
     },
     "youtube": {
@@ -1982,7 +2128,11 @@
         -1
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0.6132,
+        "ty": 0.6132,
+        "s": 0.96164
+      },
       "materialOff": null
     },
     "podchaser": {
@@ -2012,7 +2162,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "podnews": {
@@ -2042,7 +2196,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "siriusxm": {
@@ -2072,7 +2230,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "soundcloud": {
@@ -2102,7 +2264,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "podengine": {
@@ -2132,7 +2298,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "podlp": {
@@ -2162,7 +2332,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "audacy": {
@@ -2192,7 +2366,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0.0049,
+        "ty": 0.0205,
+        "s": 0.99872
+      },
       "materialOff": null
     },
     "netflix": {
@@ -2222,7 +2400,11 @@
         0.2
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "tunestr": {
@@ -2252,7 +2434,11 @@
         0.3
       ],
       "filter": true,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "playapod": {
@@ -2282,7 +2468,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "castbox": {
@@ -2312,7 +2502,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     },
     "subscribeonandroid": {
@@ -2342,7 +2536,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": -0.0156,
+        "s": 1
+      },
       "materialOff": null
     },
     "neuecast": {
@@ -2372,7 +2570,11 @@
         0
       ],
       "filter": false,
-      "fit": null,
+      "fit": {
+        "tx": 0,
+        "ty": 0,
+        "s": 1
+      },
       "materialOff": null
     }
   }
