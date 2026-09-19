@@ -6806,8 +6806,11 @@ along it where the shipped path had 110.8. The tips retract 2–4 px
 from the sharp corner. So the mark is the two half-discs at scale
 1.003, 0.9 px further apart, with the boundary at the raster's 50%
 level one pixel inside the G > 110 contour: r **239.8 / 239.4** px
-(scored 5.62 → 4.71 for that pixel; −1.5 px 5.15, −2 px 6.06). Tip
-fillet r 0.2 units (sharp 5.83, 0.1–0.2 5.67, 0.5 6.03). Lobe colours
+(scored 5.62 → 4.71 for that pixel; −1.5 px 5.15, −2 px 6.06). The
+tips are SHARP: a scored fillet (r 0.2, worth 0.65 on the figure) was
+shipped for a day and withdrawn on 2026-09-19 — it was mimicking the
+raster's antialiasing at the corners, not the developer's mark, and
+the maintainer knows the mark. Lobe colours
 are the master's per-row means over each lobe's eroded interior as
 two-stop gradients: top 123,255,216 → 0,227,158 (rows 237–627, rms
 5.2 in red — the highlight lives here, a diagonal component the row
@@ -6815,8 +6818,10 @@ model does not carry), bottom 10,218,154 → 0,163,112 (rows 396–785,
 rms ≤ 1.4). Plate gradient unchanged.
 
 **Shipped.** `icon.svg` built from those parameters (no path traced:
-the geometry is the circle fits and the seam, the fillet a scored
-radius). Audit **8.33 → 4.78**, floor; the store raster stays in the
-bundle. Badge in its bare-mark form, the same two paths and gradients
-to the previous ink box (w 18.15 → 17.73, h 24 both). validate ✓
-73/73, icons tests 276 ✓.
+the geometry is the circle fits and the seam, the corners sharp).
+Audit **8.33 → 5.43** (4.78 with the withdrawn fillet); what remains is
+the raster's ~5-px edge ramp and the corners' antialiasing, and the
+diagnosis reads `geometry` at the floor's doorstep. The store raster
+stays in the bundle. Badge in its bare-mark form, the same two paths
+and gradients to the previous ink box (w 18.15 → 17.97, h 24 both).
+validate ✓ 73/73, icons tests 276 ✓.

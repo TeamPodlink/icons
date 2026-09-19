@@ -577,36 +577,38 @@
       }
     },
     "snipd": {
-      "primary": "floor",
-      "causes": [],
-      "central": 4.78,
+      "primary": "geometry",
+      "causes": [
+        "geometry"
+      ],
+      "central": 5.43,
       "glassLayers": 0,
       "specular": false,
-      "struct": 0.008,
+      "struct": 0.01,
       "signed": [
-        -1.4,
-        -0.3,
-        -0.9
+        -1.3,
+        0.1,
+        -0.8
       ],
       "lumaShare": 1,
-      "edgeShare": 0.73,
+      "edgeShare": 0.77,
       "plateShare": 0.46,
       "plateSigned": [
         -1.6,
-        -1.7,
+        -1.8,
         -1.8
       ],
       "plateRmse": 1.89,
       "glyphSigned": [
         -1.4,
         0.5,
-        -0.4
+        -0.3
       ],
       "filter": false,
       "fit": {
-        "tx": -0.1547,
-        "ty": -0.1076,
-        "s": 1.00969
+        "tx": 0,
+        "ty": 0.0469,
+        "s": 1
       },
       "materialOff": null
     },
