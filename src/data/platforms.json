@@ -4,7 +4,9 @@
       "name": "Amazon Music",
       "id": "amazonmusic",
       "active": true,
-      "aliases": ["amazon"],
+      "aliases": [
+        "amazon"
+      ],
       "guidelinesUrl": "https://podcasters.amazon.com/promotional-tools"
     },
     {
@@ -340,6 +342,12 @@
       "id": "subscribeonandroid",
       "active": true,
       "guidelinesUrl": "https://www.subscribeonandroid.com/podcasters/"
+    },
+    {
+      "name": "The Podcast App",
+      "id": "thepodcastapp",
+      "active": true,
+      "guidelinesUrl": "https://thepodcastapp.dev/"
     },
     {
       "name": "TrueFans",
