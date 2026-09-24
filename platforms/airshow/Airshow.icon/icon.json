@@ -1,8 +1,8 @@
 {
   "fill": {
     "linear-gradient": [
-      "srgb:0.04706,0.02745,0.08235,1.00000",
-      "srgb:0.14902,0.07843,0.26667,1.00000"
+      "display-p3:0.04300,0.02700,0.07800,1.00000",
+      "display-p3:0.13700,0.07800,0.25100,1.00000"
     ],
     "orientation": {
       "start": {
@@ -18,8 +18,8 @@
       {
         "value": {
           "linear-gradient": [
-            "srgb:0.04706,0.02745,0.08235,1.00000",
-            "srgb:0.14902,0.07843,0.26667,1.00000"
+            "display-p3:0.04300,0.02700,0.07800,1.00000",
+            "display-p3:0.13700,0.07800,0.25100,1.00000"
           ],
           "orientation": {
             "start": {
@@ -57,22 +57,37 @@
   "groups": [
     {
       "hidden": false,
-      "blend-mode": "normal",
-      "specular": false,
-      "translucency": {
-        "enabled": false,
-        "value": 0
-      },
       "layers": [
         {
-          "image-name": "glyph.png",
-          "name": "glyph",
+          "image-name": "balloon.png",
+          "name": "balloon",
+          "position": {
+            "scale": 0.588,
+            "translation-in-points": [
+              0.0,
+              -0.5
+            ]
+          },
           "glass": false
         }
-      ]
+      ],
+      "shadow": {
+        "kind": "none",
+        "opacity": 0.5
+      },
+      "blend-mode": "normal",
+      "lighting": "individual",
+      "specular": false,
+      "translucency": {
+        "enabled": true,
+        "value": 0
+      }
     }
   ],
   "supported-platforms": {
+    "circles": [
+      "watchOS"
+    ],
     "squares": "shared"
   }
 }

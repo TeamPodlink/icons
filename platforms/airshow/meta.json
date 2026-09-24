@@ -6,6 +6,7 @@
   ],
   "url": "https://airshow.fm",
   "added": "2026-08-18",
+  "flatSource": "drawn",
   "liquidGlass": {
     "bundles": [
       {
@@ -13,7 +14,7 @@
         "title": "Airshow",
         "variant": null,
         "file": "Airshow.icon",
-        "source": "appstore-artwork-split",
+        "source": "decanted",
         "appStoreId": 1584582270,
         "hasDark": true
       }

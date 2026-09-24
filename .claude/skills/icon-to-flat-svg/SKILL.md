@@ -1,6 +1,6 @@
 ---
 name: icon-to-flat-svg
-description: Assemble a platform's flat facet (icon.svg + badge.svg, 32×32) mechanically from its Liquid Glass .icon bundle or other official vector material — declared fills, verbatim glyph paths, measured placement. Tracing is a documented last resort, taken only after every official vector source is ruled out. Use when a platform is missing its flat icon, when asked to build icon.svg from a bundle, to convert a .icon to the flat facet, or to add a badge for a bundle-only platform.
+description: Assemble a platform's flat facet (icon.svg + badge.svg, 32×32) mechanically from its Liquid Glass .icon bundle or other official vector material — declared fills, verbatim glyph paths, measured placement. Tracing is a documented last resort, taken only after every official vector source is ruled out — by measured primitives, or through QuiverAI's Image-to-SVG endpoint (pipeline/vectorize-quiver.mjs) for shaded artwork. Use when a platform is missing its flat icon, when asked to build icon.svg from a bundle, to convert a .icon to the flat facet, or to add a badge for a bundle-only platform.
 ---
 
 # .icon → flat facet: mechanical assembly
@@ -78,6 +78,67 @@ Still out of bounds:
 If a fill is not declared in `icon.json` (e.g. an `automatic-gradient`,
 or a raster-only layer) and cannot be measured from official artwork,
 stop and say so.
+
+### Vectorizing through QuiverAI (an official trace method, 2026-09-23)
+
+When the artwork is a shaded illustration a primitive trace cannot
+carry (airshow's balloon: primitives reached 18.84 against the master,
+the API 15.42), the sanctioned second trace method is QuiverAI's
+Image-to-SVG endpoint through `pipeline/vectorize-quiver.mjs`. It sits
+INSIDE the trace rules above — the five sources are exhausted first,
+the result ships `"flatSource": "drawn"`, the fit error is reported —
+with these additions:
+
+- **Input**: the developer's own layer when the bundle is decanted
+  (`--image platforms/<id>/<Name>.icon/Assets/<layer>.png`), else the
+  split glyph (`--only <slug>`, the default `--source glyph`) — the
+  artwork alone on transparency, so the model vectorizes the mark and
+  not the plate. Use `--source master` only when the plate or a shadow
+  is part of what must be captured. A decanted layer is also the cue
+  to check the bundle itself: airshow's store-artwork split rendered
+  the balloon larger than the store does (14 against it); the decanted
+  stack renders it at 1.05.
+- **Model and effort**: run `arrow-2` at `--effort medium` first (about
+  $0.13 for a 1024 glyph); then `--model arrow-2-telos --effort high
+  --stream` and keep whichever scores lower against the master once
+  plated. Record both figures. `xhigh` does not complete: the endpoint
+  sends nothing until the document is done, and the connection is cut
+  at about 340 s on every try (three on 2026-09-23, streamed or not),
+  which `high` finishes inside (176 s for a 1024 glyph). Always
+  `--stream` on telos; `--adopt` strips the background telos adds
+  (`--drop <ids>`) and unwraps its nested `<svg>`.
+- **Plating**: the endpoint returns a document in the image's pixel box
+  (`viewBox="0 0 1024 1024"` for a 1024 input). The flat is the house
+  plate (the declared canvas, as ictool paints it) plus that document's
+  content in a `<g transform="scale(.03125)">` (1/32 for a 1024 box,
+  with the `translate` for a non-zero `minX/minY`), every `id`
+  prefixed `<platform>-q-` and every `url(#…)` / `href="#…"` rewritten
+  to match; `xlink:href` becomes `href` (the plated root declares no
+  xlink namespace, and Chrome draws nothing when it meets the prefix —
+  a fully transparent render is that symptom). Copy paths and
+  gradients verbatim; do not simplify. A decanted layer is placed by
+  the layer law (`--transform`, rendered size = natural × scale, centred,
+  plus the translation), then registered with `--fit-bbox "x0 y0 x1
+  y1"` (the artwork's box on the master, px): the model does not always
+  draw at the frame it was asked for (arrow-2 drew the 1024 × 1379
+  balloon at 0.74 of it; telos at 0.999), and the tool reports the
+  scale it applied and the aspect error, which should be under 1%.
+- **Sanitise before shipping**: refuse a document with `<script>`,
+  `<image>`, `<foreignObject>`, or any `http(s)` reference in `href` /
+  `url()`. The tool's output line lists the element counts; the SVG
+  guide at docs.quiver.ai says the same.
+- **Provenance**: the `icon.svg` header comment names the endpoint, the
+  model, the effort, the response `id` and `request_id`, the date, the
+  input image and its source, and the central RMSE against the master
+  as plated. The ledger entry repeats them with the token counts.
+- **Badge**: as for any trace — the mark bare when it reads on both
+  pills (viewBox the mark's bbox + 2%), plated otherwise.
+- **The key**: `QUIVERAI_API_KEY` in the repo's gitignored `.env`,
+  loaded by the tool with `process.loadEnvFile`; it is never printed
+  and never belongs in a file the repo tracks.
+
+An API vectorization is a derived drawing. It never becomes
+`"official"`, and a developer's own vector, found later, replaces it.
 
 ## House flat-icon format
 

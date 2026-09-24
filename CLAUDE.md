@@ -11,6 +11,9 @@ Glass — plus the directory website.
 - `pnpm dev` — website on :4173 (runs data/asset/api generation first)
 - `node pipeline/validate.mjs` — structural validation (any platform)
 - `node pipeline/build-assets.mjs` — render Liquid Glass rasters (macOS + Icon Composer ONLY)
+- `node pipeline/vectorize-quiver.mjs --only <slug>` — QuiverAI Image-to-SVG
+  trace of a platform's raster (key: QUIVERAI_API_KEY in .env); `--adopt`
+  writes the facets. Method: the icon-to-flat-svg skill.
 
 ## Architecture
 
