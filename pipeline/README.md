@@ -7469,3 +7469,557 @@ slightly differently (our ink covers 158k px to its 95k at the same
 threshold, with run widths within 2 px on the rows sampled), and the
 1.6% vertical squeeze. Nothing changed: the flat is the official
 vector, and a non-uniform scale on it would be a guess.
+
+### Stale masters after an abandoned experiment (2026-09-21)
+
+Reviewing the `drift: geometry` lens, `--only anytimeplayer` read
+**23.92** where the snapshot says 19.19. The flat had not changed
+(its Chrome raster hashed to the morning's file); the MASTER had:
+`packages/refraction/assets/{anytimeplayer,pandora,podcastparrot,
+snipd}.png` were renders from the 2026-09-19 13:30–13:43 vector-swap
+trial (the bundles rebuilt from our flats under the loss bar, then
+reverted by path — `git checkout` restores the bundle, not the
+gitignored render). anytimeplayer's stale master matched the trial's
+flat at 1.85 RMSE (1024) and the store raster at 18.15; pandora,
+podcastparrot and snipd differed from their fresh renders by 6.7 /
+17.3 / 7.1. Re-rendered all four with `build-assets --only`; the
+audit reads 19.19 / 5.18 / 13.87 / 5.43 again, the snapshot's figures
+to the hundredth, and `sync-web-assets` refreshed the site's copies.
+Trap: after reverting a bundle experiment, re-render its master (and
+re-sync) before trusting any audit figure or Compare view for it — the
+audit reads the master straight from `assets/`, uncached.
+
+The lens itself, reviewed against the fresh sheets: anytimeplayer is
+a hairline on every edge of a high-contrast, edge-dense mark (the
+d3485868 scratch `geo/anytime-model.mjs` primitive model reached
+~12.5 against the store art, its residual the letter bowls, not
+recorded here — a `downcast-flat`-style generator would be the
+finish); podverse is the headphone outline everywhere (redraw, no
+official vector; ledger 2026-09-18); podcastparrot is the painterly
+PNG's shading, filed `geometry` only because 71% of the energy sits at
+the vector's edges — accept; snipd is the top lobe's diagonal highlight
+and the plate's −1.7 uniform offset; pandora the compressed gradient
+mesh's texture. Nothing changed but the renders.
+
+**Re-supplied sources, matched (2026-09-21).** `~/Downloads/podcastparrot.svg`
+is byte-identical (md5 19b0b084…) to `pipeline/podcastparrot-flat/supplied.svg`
+— the hand-drawn parrot of the 2026-09-17 entry, confirmed by the maintainer
+as not the developer's; the refit flat and `flatSource: drawn` stand. The
+Pandora brand kit's `Pandora_App_Icon_RBG.eps` is the file the 2026-09-14
+flat was converted from (icon.svg's header cites it). Nothing changed.
+
+### anytimeplayer: the mark measured as primitives (2026-09-21)
+
+The 19.19 was the ledger's "raster-recreation floor" (2026-09-14) only
+because the flat was still the repo's Material-style paths registered
+by a similarity transform: the ring, triangle and letters are each a
+different cut. Rebuilt as a generator, `pipeline/anytimeplayer-flat/
+gen.mjs`, the downcast way — every constant a measurement of the
+master (ictool's render of the App Store artwork the bundle carries,
+1024) at the 0.5-coverage level of its green channel, pixel i
+covering [i, i+1):
+
+- **ring**: rays every 1.5° from the centre, last two crossings,
+  least-squares circles — centre (511.18, 511.35), r 385.55 / 440.14,
+  rms 1.16 (the raster's ~3 px edge ramp, not a shape error).
+- **triangle**: the hull of three equal corner circles — (344.19,
+  212.51), (851.35, 514.78), (343.79, 817.49), r 27.44 / 27.36 / 26.94
+  at rms 0.14 / 0.09 / 0.11, shipped as their mean 27.25. The corner
+  centres put the triangle's axis at y 515.0 where the ring's is
+  511.35 — the mark sits 3.6 px low in its ring, and the left edge
+  (TLS on 294 row crossings, rms 0.00) is x 316.82, exactly r inside
+  the corner centres. The upper edge fits a line at 30.81° (rms 0.10),
+  the corner-centre chord at 30.80°.
+- **letters**: the counters are axis-aligned ellipses, not circles —
+  a (415.5, 510.09) 77.82 × 81.65, p (676.37, 514.98) 77.73 × 81.68,
+  rms 0.27 / 0.28 (a circle fits at 1.03). The bowls' outer contours
+  are neither: about each counter centre the radius runs ~120 px over
+  the top and inner side, drops to 113.7 toward the stem notch and
+  reaches 123 opposite it, and the p's outer side is a flatter r 133
+  (the a's is behind the triangle's left edge; it borrows the p's,
+  mirrored). Each bowl is a chain of five narrow-window circle fits
+  (rms 0.06–0.25 each; the windows and constants are in `M`), joined at
+  circle–circle intersections, and each letter is ONE outline: bowl
+  chain → stem (a: 490.56–534.47 with a semicircular cap, lowest point
+  629.31; p: 557.02–601.58, descender invisible below the triangle and
+  stopped at 760, inside the ring) → back to the notch where the bottom
+  arc meets the stem edge (a: (490.56, 591.5); p: (601.58, 595.8) —
+  both sharp, the rows through them follow the bottom arc to 0.5 px).
+  The counters are painted white LAST: on the master they overhang the
+  stems by ~3 px (the a's counter reaches x 493.3 past the stem's 490.56
+  edge; the p's 598.6 past 601.58), so they are not holes the stem cuts.
+- **construction**: plate, the ring as an evenodd annulus, the white
+  triangle, the two letters in the plate's #F90 painted over it, the
+  counters in white over those. Letters outside the triangle vanish
+  into the plate, which is what the master shows (the a's bowl is
+  flush with the left edge, the descender ends in orange).
+
+Two traps recorded. A closed path of two 180° arcs is ambiguous, and
+Chrome and librsvg both resolved the ring's and the bowls' halves
+wrongly enough to score 17.85 — every circle and ellipse is four
+quarter arcs now (8.22 with nothing else changed). And the stale-master
+trap above: the first measurements in this session were taken on the
+abandoned experiment's render and had to be thrown away.
+
+Scored refinement (`R` in the generator): a bounded coordinate descent
+on every constant, ±1 px, steps 0.5 → 0.05, junction angles and the
+descender bottom held, librsvg scoring (within 0.03 of Chrome here):
+**5.38 → 4.00**. Nothing moved more than 0.5 px except the two
+constants that were never measurements: the a's borrowed outer side
+(+1.0 r, at the bound) and the p's bottom arc radius (+1.0, its window
+ends at the notch). The prior session's circle-and-fillet model
+(scratch `geo/anytime-model.mjs`, 2026-09-19) scored 9.21 under the
+audit metric; its own 12.5 was a different scorer.
+
+Audit: **19.19 → 4.01** against the glass master, **19.18 → 4.02**
+against the store raster (Chrome; 0% of crop pixels over 40, mean
+channel +0.0/+0.1/+0.0). Of the 1024-px pixels over 24, 91% lie within
+2 px of a flat edge — the raster's ramp, the floor. Diagnosis `floor`
+(was `geometry`); `flatSource: drawn` like downcast and listennotes.
+Badge regenerated from the same paths under the house squircle.
+validate ✓ 76/76, icons tests 285 ✓. Sheet: scratch
+`ap/anytimeplayer-review.png` (old flat | new | master | 4× diff |
+badge | 32 px). Not done: swapping the bundle's `glyph.png` for this
+vector under the loss bar — the geometry lens was the brief; the
+fountain precedent says the rim clause will pass and the central
+clause will not, and that is a maintainer call.
+
+### podverse: the headphones measured as primitives (2026-09-22)
+
+The 13.13 was the traced flat against the App Store raster: "headphone
+outline differs everywhere — a redraw" (2026-09-18), with no official
+vector to be had (that entry: the Play download refused, podverse-rn
+and podverse-ios ship PNG icons, the web wordmarks are a related
+drawing at IoU 0.98 that scores 13.83 at best). Rebuilt as a
+generator, `pipeline/podverse-flat/gen.mjs`, every constant a
+measurement of the master (ictool's render of the store artwork the
+bundle carries, 1024) at the 0.5-coverage level of its blue channel
+(plate 0, mark 179), pixel i covering [i, i+1):
+
+- **headband**: an annulus, centre (512, 510.4), r 248.55 / 305.15,
+  least-squares circles on rays every 1° over 195–345°, rms 0.08 both
+  — the cleanest primitive in the catalogue. It runs unbroken from
+  the left housing's kink (139.3°) over the top to the right's; the
+  sector is cut at 137° / 43°, 2° below each kink, where both ends
+  hide inside the housings.
+- **housings**: each is ONE ellipse — a general conic on 284 boundary
+  points spanning the shoulder above the pad, the bulge below the kink
+  and the bottom: (383.45, 692.19), semi-axes 105.29 × 124.18, the
+  long axis 16.65° off vertical (parallel to the pad), rms 0.14 — cut
+  by the slit line, whose chord is the housing's straight edge. Above
+  the kink the annulus is outside the ellipse and the outer edge is the
+  circle; below it the ellipse is outside and the edge is the bulge;
+  the union makes the kink itself.
+- **slit**: two parallel lines 18.99 px apart (TLS on 119 and 148 row
+  crossings, rms 0.07 / 0.06, both at 74.23°) — the housing's edge and
+  the pad's.
+- **pads**: a rounded rectangle 58.1 wide between its two side lines
+  (74.23° and 74.35°, rms 0.06 each — a 0.12° taper, kept), with four
+  different corners: top-outer r 42.4 (rms 0.04), top-slit r 34.0
+  (rms 0.04) — those two arcs meet each other, there is no flat top —
+  bottom-outer r 29.1 (rms 0.11) tangent to a bottom end line 4.7° off
+  perpendicular (rms 0.18 on 24 points), and a sharp bottom-slit
+  corner (three boundary points; nothing to fit). One outline each.
+- **symmetry**: the right cup re-measured in mirrored coordinates
+  agrees with the left to a pixel and 0.15°, so the mark is built once
+  and mirrored by an SVG transform about x = 16 — with the measured
+  0.9 px by which the right cup sits closer to the centre (pad
+  centroids 402.27 vs 620.84). The first pass mirrored the arcs by
+  hand (x flipped, sweeps flipped, ellipse rotation negated) and Chrome
+  drew the right housing as a crescent at 10.6; the transform is the
+  trap-free way to mirror an elliptical arc.
+- **colour**: `#0D7AB3`, the band's interior mean (12.5, 122.5, 179.2);
+  the old flat's `#0C7BB3` was one of its two modes. Plate `#000` as
+  declared.
+
+Two more traps. The generator's first score was 28.7 because the
+housing ellipse was painted whole with a stripe over the slit — the
+ellipse's centre is on the PAD side of the slit, so the housing is the
+smaller segment and the rest showed through; a clipped segment
+(ellipse ∩ half-plane, the chord computed from the line–ellipse
+intersection) is the shape. And a line–circle junction where the
+circle crosses the line twice (the top-slit corner's r 34 circle cuts
+the pad's edge 50 px apart) needs a hint on the right side of the
+corner, or the chain runs backwards.
+
+Scored refinement (`R`): ±1 px bounded descent on every constant,
+angles and line directions held, **1.82 → 1.42**; the only constant
+at its bound is the top-outer arc's centre (+1, its radius −0.45),
+the shortest fit window of the corner set.
+
+Audit: **13.13 → 1.46** against the glass master, **13.10 → 1.18**
+against the store raster (Chrome; 0% of crop pixels over 40, mean
+channel +0.5/+0.8/+0.8 glass, +0.0/+0.0/+0.0 store). Every 1024-px
+pixel over 24 lies within 2 px of a flat edge. Diagnosis `floor` (was
+`geometry`); `flatSource: drawn`. Badge from the same paths under the
+house squircle (the old badge was a scaled copy of the trace).
+validate ✓ 76/76, icons tests ✓. Sheet: scratch
+`pv/podverse-review.png` (old | new | master | 4× diff | badge | 32 px).
+Not done, as for anytimeplayer: the bundle keeps `glyph.png`; the loss
+bar swap is the maintainer's call. The `drift: geometry` lens now
+holds three pairs — podcastparrot's painterly PNG and the two floors
+(snipd 5.43, pandora 5.18).
+
+### castamatic: the crescents carry the material too (2026-09-22)
+
+The 2026-09-19 materialisation stopped at the centre — "top/bottom
+crescents are not glass layers: specular only" — and left 9.94. Asked
+to look at the shadows. Ablations through ictool (`hideGroup-0/1`,
+`hideGroupNoT-0/1`, `noShadowTop/Bottom/Center/Crescents`,
+`noSpecular`, `noBlurMaterial`, all squashed P3→sRGB before reading;
+the cached `full` render is P3-coded and reads 20/255 off the shipped
+master until it is), region means inside each footprint, luma:
+
+| region | master − flat | translucency | shadow | specular | blur-material |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| top crescent | −8.7 | −9.1 | −2.5 | 0.3 | 0.1 |
+| bottom crescent | −15.7 | −16.4 | −2.7 | 0.3 | 0.2 |
+| centre | −2.6 | −10.9 | −4.1 | −0.1 | 0.0 |
+| plate below | −2.3 | 0.0 | −1.9 | −0.3 | 0.0 |
+
+**The crescents carry the translucency law**, glass or not: their
+weight per row-decile reads 0.021 → 0.198 (top, rows 149–447) and
+0.019 → 0.197 (bottom, rows 574–872), the same curve as the centre's
+(0.016 → 0.199, T .3) — so "translucency does nothing on a non-glass
+group" holds for podcastparrot's decanted PNG and not here; the
+crescents are SVG layers in groups with `translucency .3`, and ictool
+fades them toward the plate exactly as it fades the glass centre. That
+is the teal in the diff (G and B lower where the white crescents take
+the red), and nearly the whole figure. Specular is worth 0.3.
+
+**The shadows, separated.** Per group, fractional darkening
+(lum(no-shadow) − lum(full)) / lum(no-shadow) outside the group's own
+silhouette, fitted to a·blur_σ(silhouette shifted dy) on a grid
+(σ 4–40, dy 0–48): top **dy 40 σ 32 a .135**, bottom **dy 40 σ 32 a
+.133** (rms 1.6/255 each), centre **dy 8 σ 40 a .065** (rms 1.2). The
+crescents cast a drop shadow (edge 6.4 → plateau 8.1 at 16–28 px below,
+gone by 64; 12.6 → 19.6 on the near-white centre, the same opacity on a
+brighter backdrop); the centre's is a near-unoffset halo. A shared
+(dy, σ) for the bundle — the 2026-09-19 rule — lands at 32/40 and
+costs the centre 0.1 rms, so each group keeps its own. The earlier
+joint fit's centre shadow (dy 40 σ 56 a .047) had absorbed the
+crescents' offset; it is replaced. Opacities scored on a 3 × 3 grid
+(crescents .11/.135/.16 × centre .05/.065/.08): the measured pair is
+within 0.02 of the optimum; kept as measured.
+
+**Applied by hand** (material-flat's `apply` refuses a materialised
+flat): the bottom and top groups become `castamatic-material-2/3`,
+each under a mask of its decile fade and preceded by a `<use>` of its
+silhouette through its shadow filter, in the flat's paint order
+(bottom before top; each shadow lands on everything beneath, as
+ictool's does). Ablation of the candidate: translucency alone 6.42,
+shadows alone 8.63, both **4.30** (Chrome; signed −0.2/+0.4/+0.3 from
+−3.6/−6.6/−6.3).
+
+Audit: **9.94 → 4.30** against the glass master, **8.98 → 7.13**
+against the store raster (the store's own rendition differs from
+ictool's material). Diagnosis `floor` (was `material`). Badge
+untouched (a bare rendition without the material, as the rule says).
+validate ✓ 76/76, icons tests 285 ✓. Sheet: scratch
+`cm/castamatic-review.png` (old | old diff | master | new | new diff).
+Left: the specular, and the shadow's shape — the real one is denser at
+the edge than a gaussian of the silhouette (the 2026-09-19 note).
+
+### disctopia: the D and the chevron, traced from primitives (2026-09-22)
+
+A trace, taken after the five sources (icon-to-flat-svg, "Exhaust the
+official sources first"): (1) iOS — the bundle is the App Store
+artwork split, `glyph.png` only, no vector in the catalogue we hold;
+(2) Android — `com.disctopia.android` via apkeep `-d google-play` with
+the Aurora token and `--accept-tos`: "Downloading…" and no file, the
+silent refusal the skill records for gated and delisted listings
+(podverse failed the same way on 2026-09-18); (3) web —
+disctopia.com serves `disctopia-full-logo.png` (1440 × 136) and no
+inline SVG, no `.svg` favicon, no manifest icons; (4) press kit — none
+linked, and a search for one finds nothing; (5) the developer — not
+asked. Labelled `flatSource: drawn`. Generator
+`pipeline/disctopia-flat/gen.mjs`, every constant a measurement of the
+master (ictool's render of the store artwork, 1024) at the
+0.5-coverage level of its brightest channel (plate 0, mark ≥ 150),
+pixel i covering [i, i+1):
+
+- **The D's two outlines are not conics.** Circle, ellipse and
+  superellipse fits miss by 2.3–5.3 px rms; the outer shape is a stem
+  and a bowl whose curvature keeps changing. In 30° windows about
+  (470, 515) each outline is eight least-squares circles at rms
+  0.09–0.24 (the top and bottom windows are near-straight, r 2160–3434;
+  the bowl proper r 243–370), joined at their intersections, with the
+  stem edges as lines: outer x 281.11 (TLS on 540 crossings, rms
+  0.002), inner x 351.67. The outer chain meets the stem at y 207 and
+  814, the inner at 272 and 751.5 — where the master's rows show the
+  corners, so the stem corners carry no fillet.
+- **The chevron** is four lines (rms 0.08–0.17): the arms' right edges
+  at ±25.6° (c 165.85 / 768.006) and their left edges at ±25.7° (c
+  233.03 / 701.231), 67.2 px apart — a stroke of one width whose arms
+  end inside the stem, with a black notch between the stem's inner
+  edge and the left edges. Fillets: the outer apex is SHARP (a 20-point
+  circle fit read r 8.6 at rms 2.1, which was antialiasing — the 3×
+  zoom settles it); the notch apex r 11.6 (rms 0.46); the notch's two
+  stem corners r 13.9, derived — the sharp vertices sit at y 427.2 /
+  609.0 and the notch opens at 437.5 / 598.5, and for a 64.4° corner a
+  fillet's nearest point lies 0.742·r below the vertex.
+- **The gradient** is one horizontal ramp over both shapes, read as
+  per-column means of the mark's interior (3 px inside every edge):
+  linear `#A2C1E5` (x 288) → `#A2CF64` (546), flat to 612, then an
+  eased fall to `#1E7FA7` at the bowl's edge (793) carried as 17
+  measured stops — not linear in sRGB (R drops 5, 13, 24, 34 per 15
+  px), so no two-stop model holds.
+
+Three construction traps. All four outlines in one evenodd path put
+the chevron's arms (which run into the stem) over the stem and cut
+holes there — 42.2; the D and the chevron are two paths. A fillet
+routine that picks the offset-line intersection nearest a hint needs
+the hint INSIDE the corner: the notch apex's hint on the wrong side
+put a blob at the apex. And the arms' junctions with the stem are
+sharp, as the rows show (the edge x advances 8.2 px per 4 rows to the
+stem line with no curl).
+
+Scored refinement (`R`): ±1 px on every constant, ±3 on the two
+fillet radii, apex held sharp, angles, line directions and gradient
+held: **5.54 → 1.78** (librsvg; Chrome 1.91). No arc centre moved more
+than 0.85 px; the stem-corner fillet grew to 15.7, the notch apex
+shrank to 10.8.
+
+Audit: **1.91** against the glass master, **1.79** against the store
+raster (Chrome; 0% of crop pixels over 40; 98% luma share — the
+residual is the edge band of a bright mark on black, where a
+one-pixel hairline costs twice what it costs on the orange pairs).
+Diagnosis `floor`. Badge: the mark bare, replacing the 2026-09-14
+raster crop, viewBox `8.46 5.86 16.64 20.28` (the mark's bbox + 2%) as
+that crop was. `missing flat` 2 → 1 (airshow). validate ✓ 76/76, icons
+tests 288 ✓ (the package gains the icon). Sheet: scratch
+`dt/disctopia-review.png` (master | new | 4× diff | badge | 32 px).
+
+### airshow: the balloon traced from primitives (2026-09-22)
+
+The last platform without a flat. A trace, after the five sources: (1)
+iOS — the IPA (`com.feedbin.Podcast` 4.0, ipatool, the account's free
+license) ships a genuine `IconImageStack` — `AppIcon_Assets/balloon
+image.png` at 1024 × 1379 over a named gradient, five named colours —
+and its only `Vector` entries are the Feedbin logo PDF and two UI
+glyphs; the balloon is a raster in the developer's own stack (which
+also means the bundle could be DECANTED rather than split from the
+store artwork — not done here, a separate job); (2) Android — none,
+the app is iOS-only; (3) web — airshow.fm's `airshow.svg` is the
+wordmark, its `balloon.png` a 314 × 423 raster, `icon-app.png` 128 px;
+(4) press kit — none; (5) the developer (Feedbin) — not asked.
+`flatSource: drawn`. Generator `pipeline/airshow-flat/gen.mjs`.
+
+**What a flat can carry of a shaded 3-D illustration.** The master is
+a rendered balloon: five gores lit from the upper right, a load ring,
+two ropes and a hub, a torus rim, a bowl with a highlight. The trace
+keeps the geometry and the local colour, and nothing of the shading:
+
+- **envelope**: rays from (511.5, 400) on a warm-colour test (R − B >
+  40 — a luma test swept in the glass rim light at the top, r 392 →
+  the plate edge), ten 30° circle windows from 120° over the crown to
+  60° at rms 0.12–1.1 (the crown windows are the rough ones: the
+  gores meet in a point at (516.6, 108.8)), closed down to the load
+  ring's centre line so the skirt is envelope, not plate (the first
+  chord at y 654 left a 280 × 16 px hole: rows 660–700 read 74/255);
+- **gores**: five, their four boundaries tracked row by row on the G/R
+  ratio (yellow > 0.55; the highlight on the left red gore and the
+  shadow on the lower yellows defeat a hue class) and fitted as
+  circles — b1 (988.6, 463.2) r 589 rms 1.1, b2 (19.5, 466.1) r 604
+  rms 0.9, b0 two arcs joined at y 300 — and one ellipse, b3 (350.5,
+  424.6) 326.7 × 424.3 at 85.6°, rms 0.8. Painted as "everything right
+  of boundary k" under the envelope clip, in order. The candidate's
+  gore runs match the master's to a few px at every row;
+- **colours**: each gore a vertical gradient of its 20-row-band means
+  (every other band, 110–650), the lower assembly's from region means,
+  the ring, rim, ropes and bowl each with the master's left-to-right
+  lighting (ring 118,36,38 → 241,124,129; rim 163,77,80 → 243,130,138;
+  the left rope in shadow 158,71,33 against the right's 225,150,94;
+  the bowl's left side under a black ramp α .45);
+- **lower assembly**: ring ellipse (511.5, 694) 141.5 × 24 with a
+  dark-red hole; hub 505–518 × 720–742; ropes at 413 and 611 (warm
+  columns 408–418 / 605–617); bowl ellipse (512, 821.4) 113.8 × 95
+  drawn below y 780 (its top pokes past the rim otherwise and painted
+  the hub region tan — rows 730–750 read 110); rim (511.5, 785)
+  119.5 × 35; opening (511.5, 776) 86 × 20.
+
+**Shading, tried and dropped.** The residual over the envelope is
+lateral: each gore's luma relative to its band mean runs 0.66 → 1.45
+across its width (light from the right), and the far-left gore is
+0.57–0.64 of its colour. Two models were scored: per-gore lateral
+overlays from those tenths (gain 0 / 0.5 / 1 / 1.5 → 25.73 / 25.51 /
+27.26 / 30.69 — banded, and no better than none) and one radial
+lit-sphere overlay over the envelope (162-point grid: best 25.63
+against 25.73 without). Neither carries a per-gore cylinder shade,
+so the flat stays flat, like podcastparrot's.
+
+Audit: **18.84** against the glass master, **22.34** against the store
+raster (Chrome; 11% / 17% of crop pixels over 40; residual by region at
+1024 after the fixes: envelope rmse 19 = the shading, lower assembly
+47 → the ring's and rim's shaded tori, edges 67, plate 27 before the
+skirt fix). Refinement ±0.75 px: 19.82 → 18.84 with most constants at
+the bound (a ±1.5 run reached 23.95 and moved everything to its limit
+— the shading pulls on the geometry, and the bound is what keeps the
+drawing measured). Diagnosis `geometry` — 74% of the residual energy
+sits within 2 px of the flat's edges, which here are the gore
+boundaries, where the master's shading is darkest; the classifier has
+no shading verdict for a pair whose edges carry the shade. Badge: the
+mark bare, the
+plate stripped, viewBox `6.22 2.9 19.53 26.22` (bbox + 2%, as the
+raster crop was). `missing flat` 1 → 0; the catalogue has a flat for
+every platform. validate ✓ 76/76, icons tests 291 ✓. Sheet: scratch
+`as/airshow-review.png` (master | new | 4× diff | badge | 32 px).
+
+### QuiverAI vectorization: a tool, tried on the airshow balloon (2026-09-23)
+
+`pipeline/vectorize-quiver.mjs` sends a platform's raster (the bundle's
+split glyph by default, `--source master|store` otherwise, or any
+`--image`) to QuiverAI's Image-to-SVG endpoint (`POST /v1/svgs/
+vectorizations`, JSON with the image as base64, `attributes.viewBox` set
+to the image's pixel box, `--model` / `--effort` / `--auto-crop` /
+`--target-size` passed through) and saves each returned SVG with a
+Chrome render, a source | render | 4× diff sheet and the audit's
+central RMSE against the SOURCE (a split glyph scored against the
+plated master reads the plate, 52 on the first try). The key is
+`QUIVERAI_API_KEY` from the gitignored `.env` (Node's
+`process.loadEnvFile`), sent as a Bearer header, never printed; 429 and
+503 retry with `Retry-After`; errors print status, code, message and
+request_id. `--models` lists the account's models (arrow-1, -1.1,
+-1.1-max, -2, -2-telos; the last two also edit and animate). It writes
+under /tmp/quiver-vectorize-work/<name>, nothing under platforms/.
+
+**airshow, `arrow-2` at medium effort**: 29 s, 673 tokens in / 6,126
+out (about $0.13 at the model's rates), one 9.1 KB SVG — 21 paths, 6
+ellipses, 11 linear and 1 radial gradient, no scripts, images or
+external references, ids `paint<n>_…` (prefixed `airshow-q-` when
+plated). Central **15.18** against the glyph it was given; put on the
+house plate at scale 1/32 it reads **15.42** against the glass master
+where the primitive trace of 2026-09-22 reads 18.84 — and the sheet
+(scratch `as/airshow-trace-vs-quiver.png`) shows the difference is the
+shading: the gores' highlights and rim, the ropes' light side, the
+bowl's specular. Not adopted: whether an API vectorization may ship as
+a flat (it is a derived drawing, `flatSource: drawn` if anything) is a
+maintainer decision the icon-to-flat-svg skill does not yet cover.
+
+### airshow: the QuiverAI vector adopted; the method made official (2026-09-23)
+
+Maintainer's call: API vectorization joins the skill as the second
+sanctioned trace method (icon-to-flat-svg, "Vectorizing through
+QuiverAI"), inside the trace rules — sources exhausted first,
+`flatSource: drawn`, never `official`, a developer's own vector
+replaces it — and airshow is the first flat shipped through it,
+replacing yesterday's primitive trace.
+
+**The passes**, all on the bundle's split `glyph.png` (1024, the
+balloon on transparency), plated on the canvas as ictool paints it
+(`#0C0715 → #261444`) at scale 1/32 and scored against the glass
+master:
+
+| model, effort | time | document | plated vs master |
+| --- | ---: | --- | ---: |
+| primitive trace (2026-09-22) | — | 7.8 KB, 5 gore gradients | 18.84 |
+| arrow-2, low | 25 s | 8.5 KB, 19 paths, 6 ellipses, 10 gradients | 16.27 |
+| arrow-2, medium | 29 s | 9.1 KB, 21 paths, 6 ellipses, 12 gradients | 15.42 |
+| arrow-2-telos, high | 176 s | 20.1 KB, 52 paths, 8 ellipses, 36 gradients, 10 `use`, 5 clipPaths, 2 blur filters | **14.85** |
+| arrow-2-telos, xhigh | — | dropped at 341 s, three tries | — |
+
+Telos draws a background of its own (`dark-purple-background`, two
+gradients — scored 54 against the transparent source until dropped),
+nests a second `<svg>`, names its groups (`striped-balloon-envelope`,
+`suspension-supports`, `basket-front-rim`) and reuses its shapes
+through `use` + clipPath; the two filters are soft blurs (σ 4 and
+3.5) on the basket's shadow and light. `--adopt` strips the
+background by id, unwraps the nesting, prefixes the 57 ids
+`airshow-q-`, and writes the provenance header. What the API carries
+that the primitives could not is exactly the shading: the gores'
+highlights and rim light, the ropes' lit side, the bowl's specular
+(sheet: scratch `as/airshow-trace-vs-quiver.png`).
+
+**The connection.** The endpoint sends no bytes until the document is
+complete — the low-effort run's 200 SSE frames all arrived at 25 s —
+and something in front of it closes an idle connection at about 340 s
+(3 tries: plain fetch, node:https, streamed). Node's fetch gives up on
+headers at 300 s on its own (`UND_ERR_HEADERS_TIMEOUT`), so the tool
+went to node:https with a 30-minute timeout; that only moved the
+failure to the server's limit. `high` completes at 176 s; `xhigh` is
+recorded as not reachable for a 1024 glyph until the API streams
+during reasoning. The first two xhigh attempts may have been billed
+server-side; the platform's usage log will say.
+
+Audit: **18.84 → 14.85** against the glass master, **22.34 → 18.38**
+against the store raster (Chrome; 6% / 8% of crop pixels over 40,
+signed −2.8/−4.7/−3.1 — the vector runs a touch darker than the
+render). Diagnosis `geometry` (edge share). Badge: the mark bare at
+the same box as the trace's. `flatSource` stays `drawn`. validate ✓
+76/76, icons tests 291 ✓. The primitive generator
+`pipeline/airshow-flat/gen.mjs` stays in the repo as the measured
+record of the artwork's geometry and as the fallback if the API
+route is ever withdrawn.
+
+### podcastparrot: the QuiverAI vector replaces the hand-drawn refit (2026-09-23)
+
+The second flat through the method. Input: the decanted layer
+`parrot.png` (1024, the bird on transparency, running off the left and
+bottom edges), plated on the declared canvas (`gray 1.0 → 0.925`,
+`#FFFFFF → #ECECEC`) at scale 1/32:
+
+| model, effort | time | document | plated vs master |
+| --- | ---: | --- | ---: |
+| hand-drawn, refit (2026-09-17) | — | 25 elements, three overlays | 13.87 |
+| arrow-2, medium | 26 s, 673 in / 4,658 out | 6.7 KB, 12 paths, 2 circles, 8 gradients | **9.12** |
+| arrow-2-telos, high | 150 s | 11.3 KB, 26 paths, 4 `use`, 2 clipPaths, 1 blur, its own black background | 12.13 |
+
+Telos lost to the fast model here — its render read 92.76 until a
+trap was found and fixed: the telos documents reference their shapes
+with `xlink:href`, the plated root declares no xlink namespace, and
+Chrome draws NOTHING for the whole document when it meets the prefix
+(a fully transparent render is the symptom). The tool and the skill
+now rewrite `xlink:href` to `href` before plating. With that, telos
+reads 12.13 — the model's shading is heavier than the master's — and
+medium ships. Audit: **13.87 → 9.12** against the glass master,
+**13.98 → 9.25** against the store raster (Chrome; 2% of crop pixels
+over 40; signed +1.7/+1.8/−2.8); diagnosis stays `material` (the
+specular group) with the `geometry` cause gone. Badge plated, as the
+bird is cut by the canvas edge. `flatSource` stays `drawn`. The
+2026-09-17 refit toolchain (`pipeline/podcastparrot-flat/`) stays as
+the record of the supplied drawing and its measurement.
+
+### airshow: the bundle decanted, the flat re-vectorized from its layer (2026-09-23)
+
+**The bundle.** The IPA's `AppIcon` is a genuine stack (ledger, the
+2026-09-22 trace entry), so it was decanted (decant host mode,
+`~/Developer/decant`, the natural-size scaling fix): one group, one
+layer — `balloon.png` 1024 × 1379 at `position.scale .588`,
+`translation-in-points [0, −0.5]`, no glass, specular off, shadow
+none, translucency enabled at 0 — on a declared display-p3 canvas
+(0.043,0.027,0.078 → 0.137,0.078,0.251) with the standard gray dark
+pin. Its ictool render matches the store raster at **1.05** (1024
+central, 0% over 40) where the appstore-artwork split it replaces
+matched it at 14.09: the split had drawn the balloon larger than the
+store does (glyph.png at scale 1 against the layer's .588 of a taller
+asset). Source `appstore-artwork-split → decanted`; `hasDark` stays
+(the dark canvas is declared); both masters re-rendered; `glyph.png`
+gone. The old bundle is in the session scratch (`as/old-bundle/`).
+
+**The flat, again.** Against the new master the glyph-based telos flat
+of this morning reads 18.53 — it had been fit to the mis-scaled
+bundle — so the layer itself was vectorized (`--image …/balloon.png`,
+1024 × 1379): arrow-2 medium drew it at 0.74 of its frame (the tool's
+"vs the source" figure is meaningless for a non-square input, which
+its 1024 × 1024 render squashes — the plated figure is the one that
+counts), telos high at 0.999. Placement by the layer law
+(`--transform "6.5922 3.3141 0.018375"` = the .588 scale and the
+−0.5 pt translation in 32 units) then `--fit-bbox "211 109 812 916"`
+(the balloon's box on the master) — a similarity the tool solves from
+the document's rendered box, reporting scale ×0.9992 and a 0.17%
+aspect error for telos:
+
+| candidate | plated vs the decanted master |
+| --- | ---: |
+| glyph-based telos flat (adopted this morning) | 18.53 |
+| balloon layer, arrow-2 medium, registered (×1.3459) | 18.36 |
+| balloon layer, arrow-2-telos high, registered (×0.9992) | **15.99** |
+
+Audit: **15.99** against the glass master, **16.07** against the store
+raster (Chrome; 10% of crop pixels over 40; signed −3.5/−7.5/−4.1 —
+telos shades darker than the render); the store figure falls from
+22.34 → 18.38 → 16.07 across the day as first the flat and then the
+bundle moved toward the store's own rendition. Diagnosis `colour` —
+the glyph reads −7.5 green against the master, telos's shading — with
+no structural cause. Bare badge at the same box. The `.events` log of the streamed run is
+in /tmp/quiver-vectorize-work/airshow-balloon/.
