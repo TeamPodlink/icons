@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--Generator: Apple Native CoreSVG 362-->
+<!DOCTYPE svg
+PUBLIC "-//W3C//DTD SVG 1.1//EN"
+       "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 1024 1024">
+ <defs>
+  <clipPath id="clip0_6007_369">
+   <rect fill="white" height="1024" width="1024" x="0" y="0"/>
+  </clipPath>
+ </defs>
+ <g clip-path="url(#clip0_6007_369)">
+  <path d="M674.6 271.16C606.28 309.99 528.26 362.6 450.09 422.74C368.1 485.83 294.16 550.89 238.07 609.1C242.32 621.14 247.36 632.81 253.12 644.05C309.08 584.45 385.97 516.24 471.44 450.48C553.04 387.7 634.78 333.05 704.63 294.46C695.15 286.06 685.12 278.27 674.6 271.16Z" fill="black"/>
+ </g>
+</svg>

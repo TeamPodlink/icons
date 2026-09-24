@@ -1,0 +1,20 @@
+{
+  "name": "Wavlake",
+  "active": true,
+  "url": "https://wavlake.com",
+  "added": "2026-09-19",
+  "flatSource": "official",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "wavlake",
+        "title": "Wavlake",
+        "variant": null,
+        "file": "Wavlake.icon",
+        "source": "flat-svg-split",
+        "appStoreId": 6463653431,
+        "hasDark": true
+      }
+    ]
+  }
+}

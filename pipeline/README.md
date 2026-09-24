@@ -8023,3 +8023,26 @@ bundle moved toward the store's own rendition. Diagnosis `colour` —
 the glyph reads −7.5 green against the master, telos's shading — with
 no structural cause. Bare badge at the same box. The `.events` log of the streamed run is
 in /tmp/quiver-vectorize-work/airshow-balloon/.
+
+## Three platforms added 2026-09-19, committed 2026-09-23
+
+Radio Thmanyah, Wavlake and Xiaoyuzhou arrived in the working tree on
+2026-09-19 (meta.json `added`), built by a session that wrote no ledger
+entry; they are committed here on the maintainer's instruction with
+what the repo itself can verify, and their provenance narrative is
+owed by their author.
+
+| slug | bundle source | flatSource | assets | glass | central (glass) | store | material off |
+| --- | --- | --- | --- | --- | ---: | ---: | ---: |
+| radiothmanyah (App Store 1641282078) | appstore-artwork-split | official | glyph.png + glyph-dark.png | 0/1 | 11.34 | 11.33 | — |
+| wavlake (6463653431) | flat-svg-split | official | icon.svg (the flat as the layer) | 0/1 | 0.70 | 2.71 | — |
+| xiaoyuzhou (1488894313) | decanted | official | bg, line1, line2, theme, tints: 11 layers, 5 glass, specular | 5/11+s | 12.66 | 26.90 | 1.12 |
+
+Each has icon.svg, badge.svg and a dark rendition; validate ✓ 76/76,
+icons tests 291 ✓ with them in. Masters rendered 2026-09-19 15:20.
+Diagnosis rows added to the snapshot (radiothmanyah `geometry`,
+wavlake `floor`, xiaoyuzhou `material` — its 12.66 is the five glass
+layers, 1.12 with the material off, so its flat could take the
+material-flat treatment of 2026-09-19). The OP3 popularity data was
+refreshed the same day (`fetched` 2026-08-18 → 2026-09-19) and is
+committed alongside.

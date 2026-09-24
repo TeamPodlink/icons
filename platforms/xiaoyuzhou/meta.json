@@ -1,0 +1,25 @@
+{
+  "name": "Xiaoyuzhou",
+  "active": true,
+  "aliases": [
+    "\u5c0f\u5b87\u5b99",
+    "Xiao Yu Zhou",
+    "XiaoYuZhou FM"
+  ],
+  "url": "https://www.xiaoyuzhoufm.com",
+  "added": "2026-09-19",
+  "flatSource": "official",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "xiaoyuzhou",
+        "title": "Xiaoyuzhou",
+        "variant": null,
+        "file": "Xiaoyuzhou.icon",
+        "source": "decanted",
+        "appStoreId": 1488894313,
+        "hasDark": true
+      }
+    ]
+  }
+}

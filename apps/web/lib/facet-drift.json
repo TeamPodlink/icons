@@ -1,6 +1,6 @@
 {
   "generated": "2026-09-19",
-  "pairs": 73,
+  "pairs": 76,
   "central": {
     "anytimeplayer": 4.01,
     "podcastparrot": 9.12,
@@ -56,6 +56,9 @@
     "subscribebyemail": 0.79,
     "airshow": 15.99,
     "disctopia": 1.91,
+    "radiothmanyah": 11.34,
+    "wavlake": 0.7,
+    "xiaoyuzhou": 12.66,
     "downcast": 0.79,
     "globalplayer": 0.78,
     "ivoox": 0.76,
@@ -77,6 +80,7 @@
     "neuecast": 0.41
   },
   "materialOff": {
+    "xiaoyuzhou": 1.12,
     "podcastparrot": 9.12,
     "overcast": 2.92,
     "tunein": 4.97,
@@ -136,6 +140,9 @@
     "castro": 1.71,
     "airshow": 16.07,
     "disctopia": 1.79,
+    "radiothmanyah": 11.33,
+    "wavlake": 2.71,
+    "xiaoyuzhou": 26.9,
     "downcast": 1.11,
     "antennapod": 1.01,
     "parasocial": 0.61,

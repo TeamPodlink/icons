@@ -1697,6 +1697,108 @@
       "fit": null,
       "materialOff": null
     },
+    "radiothmanyah": {
+      "primary": "geometry",
+      "causes": [
+        "geometry"
+      ],
+      "central": 11.34,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0.016,
+      "signed": [
+        0.5,
+        -0.2,
+        -0.3
+      ],
+      "lumaShare": 0.89,
+      "edgeShare": 1,
+      "plateShare": 0.42,
+      "plateSigned": [
+        1,
+        0,
+        0
+      ],
+      "plateRmse": 0.59,
+      "glyphSigned": [
+        0,
+        0,
+        0
+      ],
+      "filter": false,
+      "fit": null,
+      "materialOff": null
+    },
+    "wavlake": {
+      "primary": "floor",
+      "causes": [],
+      "central": 0.7,
+      "glassLayers": 0,
+      "specular": false,
+      "struct": 0,
+      "signed": [
+        0.4,
+        0.4,
+        0.4
+      ],
+      "lumaShare": 0.92,
+      "edgeShare": 0.31,
+      "plateShare": 0.83,
+      "plateSigned": [
+        0.4,
+        0.4,
+        0.4
+      ],
+      "plateRmse": 0.64,
+      "glyphSigned": null,
+      "filter": false,
+      "fit": null,
+      "materialOff": null
+    },
+    "xiaoyuzhou": {
+      "primary": "material",
+      "causes": [
+        "material"
+      ],
+      "central": 12.66,
+      "glassLayers": 5,
+      "specular": true,
+      "struct": 0.014,
+      "signed": [
+        7.6,
+        0.5,
+        -1.2
+      ],
+      "lumaShare": 0.77,
+      "edgeShare": 0.51,
+      "plateShare": 0.17,
+      "plateSigned": [
+        -4.5,
+        -4.5,
+        -4.8
+      ],
+      "plateRmse": 8.2,
+      "glyphSigned": [
+        13.6,
+        3.2,
+        0.8
+      ],
+      "filter": false,
+      "fit": null,
+      "materialOff": {
+        "central": 1.12,
+        "struct": 0,
+        "signed": [
+          0,
+          0.2,
+          0.3
+        ],
+        "plateSigned": null,
+        "plateRmse": null,
+        "glyphSigned": null,
+        "edgeShare": null
+      }
+    },
     "downcast": {
       "primary": "floor",
       "causes": [],

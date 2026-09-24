@@ -1,0 +1,24 @@
+{
+  "name": "Radio Thmanyah",
+  "active": true,
+  "aliases": [
+    "Radio thmanyah",
+    "Thmanyah"
+  ],
+  "url": "https://radio.thmanyah.com",
+  "added": "2026-09-19",
+  "flatSource": "official",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "radiothmanyah",
+        "title": "Radio Thmanyah",
+        "variant": null,
+        "file": "RadioThmanyah.icon",
+        "source": "appstore-artwork-split",
+        "appStoreId": 1641282078,
+        "hasDark": true
+      }
+    ]
+  }
+}
