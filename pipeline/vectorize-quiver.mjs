@@ -28,6 +28,7 @@
 //   node pipeline/vectorize-quiver.mjs --adopt <returned.svg> --only <slug> [--bbox "x0 y0 x1 y1"]
 //     [--plate "#top,#bottom"] [--provenance "…"] [--input <file>] [--drop <id,id>]
 //     [--transform "tx ty s"] [--fit-bbox "x0 y0 x1 y1"]   placement override / registration onto the master's box (px)
+//     [--grade]                                             grade every colour to the master by a fitted affine RGB map
 //     writes platforms/<id>/icon.svg + badge.svg: the document plated on the declared canvas in the 32-unit frame,
 //     ids prefixed <slug>-q-, a provenance header; badge bare when --bbox (px, the mark's box) is given, plated otherwise
 //
@@ -116,7 +117,6 @@ if (flag("--adopt")) {
   const orient = doc.fill?.orientation ?? { start: { x: 0.5, y: 0 }, stop: { x: 0.5, y: 1 } };
   const plate = `<linearGradient id="${slug}-plate" gradientUnits="userSpaceOnUse" x1="${orient.start.x * 32}" y1="${orient.start.y * 32}" x2="${orient.stop.x * 32}" y2="${orient.stop.y * 32}"><stop stop-color="${stops[0]}"/><stop offset="1" stop-color="${stops[1]}"/></linearGradient>`;
   const prov = flag("--provenance") ?? ""; // free text: model, effort, response id, request id, score
-  const head = `<!-- ${slug}: QuiverAI Image-to-SVG vectorization of ${basename(flag("--input") ?? src)} (${prov || "see pipeline/README.md"}), ${new Date().toLocaleDateString("sv-SE")}; plated on the declared canvas at scale ${scale.toFixed(6)}, ids prefixed ${slug}-q-. A derived drawing: flatSource drawn. Method: .claude/skills/icon-to-flat-svg, "Vectorizing through QuiverAI". -->`;
   // placement: the document's pixel box onto the 32-unit canvas (scale 32 / viewBox width); --transform "tx ty s" overrides it; --fit-bbox
   // "x0 y0 x1 y1" (px, the artwork's box on the master) registers the document's rendered content onto that box by a similarity — for
   // layers whose document was drawn at another size than the placement law predicts (arrow drew the 1024 × 1379 balloon layer at 0.74)
@@ -134,7 +134,30 @@ if (flag("--adopt")) {
     const docX0 = (x0 / 32 - tx) / sc, docY0 = (y0 / 32 - ty) / sc; tx = X0 / 32 - docX0 * s2; ty = Y0 / 32 - docY0 * s2; sc = s2;
     console.log(`fit-bbox: rendered ${x0}–${x1} × ${y0}–${y1} → ${X0}–${X1} × ${Y0}–${Y1}: scale ×${k.toFixed(4)} (x ${kx.toFixed(4)}, y ${ky.toFixed(4)}; aspect off by ${(100 * Math.abs(kx - ky) / k).toFixed(2)}%) → translate(${tx.toFixed(4)} ${ty.toFixed(4)}) scale(${sc.toFixed(6)})`);
   }
+  // --grade: the model's colours are its own reading of the raster (arrow-2-telos drew airshow's balloon 4/11/6 brighter than the layer
+  // it was given, with the layer itself rendering to the master within 1). Fit an affine RGB map, master ≈ T·[r g b 1], by least
+  // squares over the artwork's interior (its own alpha, 3 px in from every edge) and apply it to every colour in the document — the
+  // pandora precedent (ledger 2026-09-14). The map goes into the header.
+  let gradeNote = "";
+  if (has("--grade")) {
+    const masterPng = join(root, "packages/refraction/assets", `${slug}.png`);
+    const probe = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><g transform="translate(${tx.toFixed(4)} ${ty.toFixed(4)}) scale(${sc.toFixed(6)})">${art}</g></svg>`;
+    const dir = join("/tmp/quiver-vectorize-work", `grade-${Math.floor(Math.random() * 1e9)}`); mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, "icon.svg"), probe); writeFileSync(join(dir, "wrap.html"), `<!doctype html><html><head><style>html,body{margin:0;padding:0}img{width:1024px;height:1024px;display:block}</style></head><body><img src="icon.svg"></body></html>`);
+    execFileSync(CHROME, ["--headless=new", "--disable-gpu", `--screenshot=${join(dir, "out.png")}`, "--window-size=1024,1024", "--default-background-color=00000000", join(dir, "wrap.html")], { stdio: "ignore" });
+    const A = await sharp(join(dir, "out.png")).ensureAlpha().raw().toBuffer(), Mi = await sharp(masterPng).ensureAlpha().raw().toBuffer(); rmSync(dir, { recursive: true, force: true });
+    const N = 1024, pts = []; for (let y = 3; y < N - 3; y++) for (let x = 3; x < N - 3; x++) { const i = (y * N + x) * 4; if (A[i + 3] < 255) continue; let ok = true; for (let dy = -3; dy <= 3 && ok; dy++) for (let dx = -3; dx <= 3; dx++) if (A[((y + dy) * N + x + dx) * 4 + 3] < 255) { ok = false; break; } if (ok) pts.push(i); }
+    const T = []; for (let c = 0; c < 3; c++) { const AtA = Array.from({ length: 4 }, () => new Float64Array(4)), AtY = new Float64Array(4); for (const i of pts) { const v = [A[i], A[i + 1], A[i + 2], 1]; for (let a = 0; a < 4; a++) { AtY[a] += v[a] * Mi[i + c]; for (let b = 0; b < 4; b++) AtA[a][b] += v[a] * v[b]; } } const Ab = AtA.map((r, i) => [...r, AtY[i]]); for (let i = 0; i < 4; i++) { let p = i; for (let r = i + 1; r < 4; r++) if (Math.abs(Ab[r][i]) > Math.abs(Ab[p][i])) p = r; [Ab[i], Ab[p]] = [Ab[p], Ab[i]]; for (let r = 0; r < 4; r++) { if (r === i) continue; const f = Ab[r][i] / Ab[i][i]; for (let k = i; k <= 4; k++) Ab[r][k] -= f * Ab[i][k]; } } T.push(Ab.map((r, i) => r[4] / r[i])); }
+    const mapRGB = (r, g, b) => T.map((t) => Math.round(Math.max(0, Math.min(255, t[0] * r + t[1] * g + t[2] * b + t[3]))));
+    let e0 = 0, e1 = 0, sg = [0, 0, 0]; for (const i of pts) { const q = mapRGB(A[i], A[i + 1], A[i + 2]); for (let c = 0; c < 3; c++) { e0 += (Mi[i + c] - A[i + c]) ** 2; e1 += (Mi[i + c] - q[c]) ** 2; sg[c] += Mi[i + c] - A[i + c]; } }
+    const hex = (n) => n.toString(16).padStart(2, "0");
+    let count = 0; const gradeColour = (str) => { let m; if ((m = str.match(/^#([0-9a-f]{6})$/i))) { const [r, g, b] = [0, 2, 4].map((k) => parseInt(m[1].slice(k, k + 2), 16)); count++; return "#" + mapRGB(r, g, b).map(hex).join("").toUpperCase(); } if ((m = str.match(/^#([0-9a-f]{3})$/i))) { const [r, g, b] = m[1].split("").map((ch) => parseInt(ch + ch, 16)); count++; return "#" + mapRGB(r, g, b).map(hex).join("").toUpperCase(); } if ((m = str.match(/^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i))) { count++; const q = mapRGB(+m[1], +m[2], +m[3]); return str.replace(/\(\s*\d+\s*,\s*\d+\s*,\s*\d+/, `(${q[0]},${q[1]},${q[2]}`); } return str; };
+    art = art.replace(/\b(fill|stroke|stop-color|flood-color|lighting-color)="([^"]+)"/g, (m0, k, v) => `${k}="${gradeColour(v)}"`).replace(/\b(fill|stroke|stop-color|flood-color)\s*:\s*([^;"]+)/g, (m0, k, v) => `${k}:${gradeColour(v.trim())}`);
+    gradeNote = ` Graded to the master by the affine map R'=${T[0].map((v) => v.toFixed(4)).join(",")}; G'=${T[1].map((v) => v.toFixed(4)).join(",")}; B'=${T[2].map((v) => v.toFixed(4)).join(",")} (each a·R+b·G+c·B+d), fitted over ${pts.length} interior pixels: rms ${Math.sqrt(e0 / pts.length / 3).toFixed(2)} → ${Math.sqrt(e1 / pts.length / 3).toFixed(2)}, ${count} colours rewritten.`;
+    console.log(`grade: ${pts.length} interior px, master − document ${sg.map((v) => (v / pts.length).toFixed(1)).join("/")}, rms ${Math.sqrt(e0 / pts.length / 3).toFixed(2)} → ${Math.sqrt(e1 / pts.length / 3).toFixed(2)}; ${count} colours rewritten`);
+  }
   const group = `<g transform="translate(${tx.toFixed(4)} ${ty.toFixed(4)}) scale(${sc.toFixed(6)})">${art}</g>`;
+  const head = `<!-- ${slug}: QuiverAI Image-to-SVG vectorization of ${basename(flag("--input") ?? src)} (${prov || "see pipeline/README.md"}), ${new Date().toLocaleDateString("sv-SE")}; plated on the declared canvas at scale ${scale.toFixed(6)}, ids prefixed ${slug}-q-. ${gradeNote} A derived drawing: flatSource drawn. Method: .claude/skills/icon-to-flat-svg, "Vectorizing through QuiverAI". -->`;
   const icon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">\n  ${head}\n  <defs>${plate}</defs><path fill="url(#${slug}-plate)" d="M0 0h32v32H0z"/>${group}\n</svg>\n`;
   // badge: bare (viewBox = the artwork's bbox in 32 units + 2%, from --bbox "x0 y0 x1 y1" px) or plated under the house squircle
   let badge;

@@ -8046,3 +8046,31 @@ layers, 1.12 with the material off, so its flat could take the
 material-flat treatment of 2026-09-19). The OP3 popularity data was
 refreshed the same day (`fetched` 2026-08-18 → 2026-09-19) and is
 committed alongside.
+
+### airshow: graded to the master; the `colour` lens cleared (2026-09-23)
+
+The adopted vector sat in `drift: colour` with the glyph reading
+−2.7/−10.4/−6.8 against the master. Where the offset comes from,
+measured over ~300k matched interior pixels (both warm, 3 px from
+any edge): the layer placed by the law against the master **0.99**
+(signed −0.1/0.0/0.1 — ictool renders the layer faithfully, and the
+master is the store raster within 0.92), the flat against the placed
+layer **17.61** (signed −3.7/−10.8/−6.2). So the vector is brighter
+and greener than the raster it was drawn from — the model's own
+reading of the colours, not a profile (none of the layer PNGs carry
+one, and forcing the P3→sRGB transform on the flat makes it 21.55).
+
+The pandora remedy (2026-09-14): an affine RGB map, master ≈ T·[R G
+B 1], fitted by least squares over the interior and applied to every
+colour in the document. `vectorize-quiver.mjs --adopt --grade` now
+does it — the map from the document's own alpha (3 px eroded) against
+the master, 127 colours rewritten, the map in the header:
+R' = .9548R − .0422G + .1547B − 2.47; G' = −.0884R + .7839G + .4289B −
+.41; B' = .0028R − .1176G + 1.1224B − 1.94. Interior rms 19.18 → 16.47;
+audit **15.99 → 13.44** against the glass master, **16.07 → 13.46**
+against the store (Chrome; 5% of crop pixels over 40; signed
+−0.3/−0.1/−0.3). Diagnosis `colour` → `geometry` (the edge share; the
+shape of the shading, which a grade cannot touch). Trap on the way:
+the first grade scrambled every colour — the six hex digits were
+sliced from 1, 3, 5 instead of 0, 2, 4 — and read 58 before the
+header's map was checked against a stop by hand.

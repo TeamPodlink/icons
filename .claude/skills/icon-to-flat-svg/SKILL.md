@@ -123,6 +123,15 @@ with these additions:
   draw at the frame it was asked for (arrow-2 drew the 1024 × 1379
   balloon at 0.74 of it; telos at 0.999), and the tool reports the
   scale it applied and the aspect error, which should be under 1%.
+- **Grade to the master** (`--grade`): the model reads colours its own
+  way — arrow-2-telos drew airshow's balloon 4/11/6 brighter than the
+  layer it was given, while ictool renders that layer to the master
+  within 1 — so the adopt step fits an affine RGB map, master ≈ T·[R G
+  B 1], over the document's interior (its own alpha, 3 px eroded) and
+  rewrites every colour by it, the pandora precedent. The map goes in
+  the header. Check one stop by hand against the map before trusting
+  the audit: a scrambled rewrite reads 58, not 13. Skip the grade only
+  when the interior means are already under 3/255.
 - **Sanitise before shipping**: refuse a document with `<script>`,
   `<image>`, `<foreignObject>`, or any `http(s)` reference in `href` /
   `url()`. The tool's output line lists the element counts; the SVG
