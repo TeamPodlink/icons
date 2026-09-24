@@ -9,13 +9,23 @@ interface ShowcaseEntry {
   description: string;
 }
 
-/** Sites using the collection — add yours via PR (keep alphabetical). */
+/** Sites using the collection — add yours via PR (Podnews first, then alphabetical). */
 const SHOWCASE: ShowcaseEntry[] = [
   {
     name: "Podnews",
     url: "https://podnews.net",
     description:
       "Daily news for the podcast and on-demand audio industry.",
+  },
+  {
+    name: "Hue",
+    url: "https://aspirethemes.com/themes/hue",
+    description: "Aspire Themes' Ghost theme for podcast websites.",
+  },
+  {
+    name: "Kitelinks",
+    url: "https://kite.link",
+    description: "One simple link for each podcast episode.",
   },
 ];
 
@@ -33,7 +43,7 @@ export function ShowcaseDocs() {
             key={s.url}
             href={s.url}
             target="_blank"
-            rel="noreferrer"
+            rel="nofollow noopener noreferrer"
             className="flex flex-col space-y-1 rounded-md border border-neutral-200 px-4 py-3 hover:bg-neutral-100/80 dark:border-neutral-800 dark:hover:bg-neutral-800/20"
           >
             <span className="text-[15px] font-medium">{s.name}</span>
