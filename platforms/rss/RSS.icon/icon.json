@@ -62,13 +62,6 @@
           "image-name": "mark.svg",
           "name": "mark",
           "glass": true,
-          "position": {
-            "scale": 4,
-            "translation-in-points": [
-              0,
-              0
-            ]
-          },
           "fill-specializations": [
             {
               "value": {
@@ -92,6 +85,27 @@
                     "y": 0.915
                   }
                 }
+              }
+            }
+          ],
+          "position-specializations": [
+            {
+              "value": {
+                "scale": 4,
+                "translation-in-points": [
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "idiom": "watchOS",
+              "value": {
+                "scale": 3.2893497844384685,
+                "translation-in-points": [
+                  0,
+                  0
+                ]
               }
             }
           ]
@@ -154,6 +168,9 @@
     }
   ],
   "supported-platforms": {
-    "squares": "shared"
+    "squares": "shared",
+    "circles": [
+      "watchOS"
+    ]
   }
 }

@@ -16,7 +16,8 @@
         "rmse": 7.12,
         "hasDark": true,
         "source": "decanted",
-        "appStoreId": 888422857
+        "appStoreId": 888422857,
+        "hasCircleDark": false
       }
     ]
   }

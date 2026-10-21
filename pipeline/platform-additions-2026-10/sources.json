@@ -1,0 +1,123 @@
+[
+  {
+    "id": "sonnet",
+    "name": "Sonnet",
+    "appStoreId": null,
+    "playStoreId": "com.sonnet.app",
+    "evidence": "https://play.google.com/store/apps/details?id=com.sonnet.app",
+    "note": "Current Android app describes podcast playback; updated September 24, 2026.",
+    "artworkUrl": "https://play-lh.googleusercontent.com/Wcx27LBN_JOuw8suQCNVgrA4N7pvDMYob5LaOFRHhufkEW2Yqp-86V9w3cGA0K-DZEG46B4i5ZQqXexIx3LRow=s1024",
+    "artworkSHA256": "254122f1892ae0bc472578e0b62ff6b3fd5bb0b6e23245cc8eafb39661fd3a05",
+    "method": "Vector trace of current Google Play artwork."
+  },
+  {
+    "id": "listnr",
+    "name": "LiSTNR",
+    "appStoreId": 1462845202,
+    "playStoreId": null,
+    "evidence": "https://www.listnr.com",
+    "note": "Active podcast catalogue and Australian listener app.",
+    "artworkUrl": "https://www.listnr.com/favicon/icon.svg",
+    "artworkSHA256": "982f2a1bf481d1f4991a1d7b5d9cc6d78b28c0d29e1de32579520a354ea8f33f",
+    "method": "Official SVG, Illustrator metadata stripped; source paths and colors retained."
+  },
+  {
+    "id": "anghami",
+    "name": "Anghami",
+    "appStoreId": 545395155,
+    "playStoreId": null,
+    "evidence": "https://www.anghami.com/podcasts",
+    "note": "Current music and podcast listener app.",
+    "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/67/dc/4b/67dc4b6d-7cee-2d83-d697-eb48a3e694e7/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/1024x1024bb.png",
+    "artworkSHA256": "fd924d29d8316d11152fb9ed94fe30d9fe5bb6fbb4600534d14c5a5ae9a3e4d6",
+    "method": "Vector trace of current App Store artwork."
+  },
+  {
+    "id": "audiomack",
+    "name": "Audiomack",
+    "appStoreId": 921765888,
+    "playStoreId": null,
+    "evidence": "https://audiomack.com/audiomack-podcasts",
+    "note": "Listener platform has an official podcast catalogue; excludes the separate Creator app.",
+    "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/88/19/5b/88195b2f-d2ac-1ae0-07de-eaa6f2e9652d/AppIcon-1-0-0-1x_U007emarketing-0-6-0-85-220.png/1024x1024bb.png",
+    "artworkSHA256": "414cf5f88067f2e20f8bf577252154419d4f42dfbd37deb9915a19427c1cdd37",
+    "method": "Vector trace of current App Store artwork."
+  },
+  {
+    "id": "bbcsounds",
+    "name": "BBC Sounds",
+    "appStoreId": 1380676511,
+    "playStoreId": "com.bbc.sounds",
+    "evidence": "https://apps.apple.com/gb/app/bbc-sounds/id1380676511",
+    "note": "Active podcast listener app; UK availability.",
+    "artworkUrl": "https://play-lh.googleusercontent.com/_0gXszv2P2SN5zyjegLGOHG7iUgPjvPOhySSsvdF30sb83r6A-711GkN0YhK_j_QPp3cktFN4gpBT2p_D8NN=s1024",
+    "artworkSHA256": "da468b613519d7a6bd27cf0f2642a49c63e072f21f784f6bc6771c63adc3d179",
+    "method": "Vector trace of current Google Play artwork."
+  },
+  {
+    "id": "claromusica",
+    "name": "Claro Música",
+    "appStoreId": 843577241,
+    "playStoreId": null,
+    "evidence": "https://www.claro.com.pe/personas/app/claro-musica/",
+    "note": "Official consumer service explicitly includes podcasts.",
+    "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/14/ab/a2/14aba26f-77a7-fe3a-b0ed-16423ddc12ae/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/1024x1024bb.png",
+    "artworkSHA256": "7241d59f3e6f4157079ae1d859949ea6520637580282aa8c4f8e5704b61b6bfe",
+    "method": "Vector trace of current App Store artwork."
+  },
+  {
+    "id": "hungama",
+    "name": "Hungama",
+    "appStoreId": 414009038,
+    "playStoreId": "com.hungama.myplay.activity",
+    "evidence": "https://www.hungama.com",
+    "note": "Current Hungama OTT service includes a Popular Podcast catalogue; not the separate music-only app.",
+    "artworkUrl": "https://play-lh.googleusercontent.com/wgOCIZ-YRBxaipjC4D_2lE_GsB--ylEesEPM9w9jr8RbL8CRRc5Q42S5mn7pA0jbzpS-ic722lOxWpgRwYuoPw=s1024",
+    "artworkSHA256": "5ecf40b53853d300605c132d27a2d611faaa28821da97773111c0994af68f59f",
+    "method": "Vector trace of current Google Play artwork."
+  },
+  {
+    "id": "kkbox",
+    "name": "KKBOX",
+    "appStoreId": 300915900,
+    "playStoreId": null,
+    "evidence": "https://apps.apple.com/tw/app/id300915900",
+    "note": "Current app explicitly offers music and podcasts.",
+    "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/6f/67/74/6f6774a6-8471-4f10-cacc-8170222921e4/AppIcon-0-0-1x_U007emarketing-0-8-0-0-0-85-220.png/1024x1024bb.png",
+    "artworkSHA256": "87d38e532fec72476398f5c36be57c14c0d86447b5a13856711f66a4ad212aa0",
+    "method": "Vector trace of current App Store artwork."
+  },
+  {
+    "id": "mixcloud",
+    "name": "Mixcloud",
+    "appStoreId": 401206431,
+    "playStoreId": null,
+    "evidence": "https://www.mixcloud.com",
+    "note": "Active listener platform for radio shows, mixes and podcasts.",
+    "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/51/39/0c/51390ce1-2252-dc76-9074-25214acf6f57/AppIcon-0-0-1x_U007epad-0-1-85-220.png/1024x1024bb.png",
+    "artworkSHA256": "2ea1ca97ad60877b66ccc03b9a2f9a8f39bcfb19455ee356894de240a28597b5",
+    "method": "Vector trace of current App Store artwork."
+  },
+  {
+    "id": "zvuk",
+    "name": "Zvuk",
+    "appStoreId": null,
+    "playStoreId": "com.zvooq.openplay",
+    "evidence": "https://play.google.com/store/apps/details?id=com.zvooq.openplay",
+    "note": "Current HiFi music and podcast listener app, formerly SberZvuk.",
+    "artworkUrl": "https://play-lh.googleusercontent.com/kH31Wty-nBc5qzdtSaMbzFOgqi3FzOOVvbQdbl2xatpTLaQaBzK8M8748_0HQ7Mm2LAx_zksKLd5z4jOYnCFyn0=s1024",
+    "artworkSHA256": "9120924148f7690689cadc748addc53ca9fa553c3197e225900552252829d48c",
+    "method": "Vector trace of current Google Play artwork."
+  },
+  {
+    "id": "tidal",
+    "name": "TIDAL",
+    "appStoreId": 913943275,
+    "playStoreId": null,
+    "evidence": "https://support.tidal.com/hc/en-us/articles/360003671658-My-Video-Mix",
+    "note": "Official listener support still documents original podcasts; not a general RSS-directory claim.",
+    "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/31/e8/eb/31e8eb5e-8dbc-42fe-c5c1-ffcc16d904b5/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/1024x1024bb.png",
+    "artworkSHA256": "29e18413005a273549185351572d906ab447a46d6d764ac13854ef6501750bd5",
+    "method": "Vector trace of current App Store artwork."
+  }
+]

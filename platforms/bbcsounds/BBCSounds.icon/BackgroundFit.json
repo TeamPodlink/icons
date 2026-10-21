@@ -1,0 +1,22 @@
+{
+  "id": "bbcsounds",
+  "before": {
+    "background": 40.23963781440747,
+    "central": 53.22599426404429
+  },
+  "after": {
+    "background": 0.8449219590359535,
+    "central": 38.5639510220985,
+    "colors": [
+      57,
+      60,
+      62,
+      19,
+      21,
+      23
+    ]
+  },
+  "samples": 23652,
+  "renders": 26,
+  "scope": "Default native background fill only; prior Dark and Tinted fill values preserved. Foreground artwork/materials unchanged."
+}

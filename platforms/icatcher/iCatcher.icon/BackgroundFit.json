@@ -1,0 +1,22 @@
+{
+  "id": "icatcher",
+  "before": {
+    "background": 12.608507257560758,
+    "central": 10.809670521380149
+  },
+  "after": {
+    "background": 0.695959924971722,
+    "central": 7.325021675210674,
+    "colors": [
+      0,
+      88,
+      178,
+      0,
+      88,
+      179
+    ]
+  },
+  "samples": 22901,
+  "renders": 26,
+  "scope": "Default native background fill only; prior Dark and Tinted fill values preserved. Foreground artwork/materials unchanged."
+}

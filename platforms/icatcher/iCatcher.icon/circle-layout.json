@@ -1,0 +1,11 @@
+{
+  "safeArea": {
+    "inset": 0.1,
+    "layers": [
+      "icon"
+    ]
+  },
+  "vector": {
+    "group": "circle-safe-area"
+  }
+}

@@ -16,9 +16,10 @@
         "title": "Xiaoyuzhou",
         "variant": null,
         "file": "Xiaoyuzhou.icon",
-        "source": "decanted",
+        "source": "flat-svg",
         "appStoreId": 1488894313,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

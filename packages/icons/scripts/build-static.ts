@@ -13,6 +13,7 @@ import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import opentype from 'opentype.js'
 import { shapes } from '../src/core/shapes.js'
+import type { IconShape } from '../src/core/types.js'
 import {
   extractSvgContent,
   extractViewBox,
@@ -38,7 +39,6 @@ const FONT_PATH = join(ROOT, 'node_modules/@fontsource/inter/files/inter-latin-4
 // the LEGACY squircle (77.2% handles, `M16 0c12.357 0 16 3.643 16 16…`),
 // squatter and 3.7% of the side deeper into the corner; see
 // pipeline/README.md, "The three squircles".
-const HOUSE_SQUIRCLE_32 = shapes.superellipse.svgPath(32)
 const HOUSE_SQUIRCLE_24 = shapes.superellipse.svgPath(24)
 
 // Platforms with custom badge text (instead of "Listen on" / platform name)
@@ -134,7 +134,7 @@ function assertNoMaskIdCollision(content: string, maskId: string, source: string
     )
 }
 
-function generateIcon(sourceSvg: string, name: string): string {
+function generateIcon(sourceSvg: string, name: string, shape: IconShape = 'superellipse'): string {
   const content = prefixIds(extractSvgContent(sourceSvg), name)
   assertNoMaskIdCollision(content, `${name}_m`, `${name}/icon.svg`)
   const viewBox = extractViewBox(sourceSvg)
@@ -143,7 +143,7 @@ function generateIcon(sourceSvg: string, name: string): string {
 
   return minifySvg(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
     <mask id="${name}_m" width="32" height="32" x="0" y="0" maskUnits="userSpaceOnUse" style="mask-type:alpha">
-      <path d="${HOUSE_SQUIRCLE_32}"/>
+      <path d="${shapes[shape].svgPath(32)}"/>
     </mask>
     <g mask="url(#${name}_m)">
       <svg viewBox="${viewBox}" width="32" height="32"${fillAttr}>${content}</svg>
@@ -280,7 +280,15 @@ function main() {
       if (hasFlat) {
         const iconSvg = readFileSync(join(dir, 'icon.svg'), 'utf-8')
         writtenIcons.add(`${name}.svg`)
-        writeFileSync(join(ICONS_DIR, `${name}.svg`), generateIcon(iconSvg, name))
+        const squircle = join(dir, 'icon-superellipse.svg')
+        writeFileSync(join(ICONS_DIR, `${name}.svg`), generateIcon(existsSync(squircle) ? readFileSync(squircle, 'utf-8') : iconSvg, name))
+        for (const shape of ['square', 'circle'] as const) {
+          const variant = join(dir, `icon-${shape}.svg`)
+          const source = existsSync(variant) ? readFileSync(variant, 'utf-8') : iconSvg
+          const filename = `${name}-${shape}.svg`
+          writtenIcons.add(filename)
+          writeFileSync(join(ICONS_DIR, filename), generateIcon(source, `${name}-${shape}`, shape))
+        }
         icons++
       }
 

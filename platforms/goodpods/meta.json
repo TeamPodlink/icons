@@ -14,7 +14,8 @@
         "file": "Goodpods.icon",
         "source": "flat-svg-split",
         "appStoreId": 1483407582,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

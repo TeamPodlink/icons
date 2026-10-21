@@ -12,7 +12,8 @@
         "file": "Gaana.icon",
         "source": "flat-svg-split",
         "appStoreId": 585270521,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

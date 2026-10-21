@@ -1,0 +1,21 @@
+{
+  "name": "Sonnet",
+  "active": true,
+  "url": "https://sonnet.fm",
+  "added": "2026-10-16",
+  "flatSource": "drawn",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "sonnet",
+        "title": "Sonnet",
+        "variant": null,
+        "file": "Sonnet.icon",
+        "source": "flat-svg-split",
+        "playStoreId": "com.sonnet.app",
+        "hasDark": true,
+        "hasCircleDark": false
+      }
+    ]
+  }
+}

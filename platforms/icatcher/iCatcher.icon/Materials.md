@@ -1,0 +1,9 @@
+# Store artwork material review — October 2026
+
+Compared with the refreshed App Store raster using Icon Composer 27.1, design generation 27.
+
+Default appearance: glass on, specular off, translucency 0.25, none shadow at 0.5 opacity. Dark and tinted material specializations retain their prior values. Existing watchOS geometry, background coverage, and intentional bleed are preserved.
+
+Central 60% RGB RMSE against the store raster at 256px: 24.71 → 10.81. This measures native Liquid Glass against store artwork, unlike the directory’s vector-versus-store drift score.
+
+Vector artwork uses the opaque white source glyph. The former baked opacity ramp (98.8% at the top to 53.2% at the bottom) and synthetic shadow were removed; they do not match the refreshed artwork. The Circle variant keeps its computed safe-area transform. Native Liquid Glass shading remains controlled by this bundle.

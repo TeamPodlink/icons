@@ -1,0 +1,59 @@
+{
+  "source": "Liquid Glass Default rendition",
+  "designGeneration": 27,
+  "sourceHash": "fb2fd723d284",
+  "measurementCommand": "node pipeline/material-flat.mjs measure --only audacy --translucency-only --json /tmp/audacy-translucency.json",
+  "groups": [
+    {
+      "group": 0,
+      "files": [
+        "icon.svg"
+      ],
+      "rows": [
+        205,
+        818
+      ],
+      "translucency": 0.25,
+      "shadowOpacity": 0,
+      "alpha": [
+        0.005,
+        0.006,
+        0.012,
+        0.022,
+        0.036,
+        0.054,
+        0.071,
+        0.092,
+        0.116,
+        0.139
+      ],
+      "shadow": null
+    }
+  ],
+  "implementation": {
+    "files": [
+      "icon.svg",
+      "icon-circle.svg"
+    ],
+    "maskId": "audacy-material-translucency-mask",
+    "gradientCoordinates": "userSpaceOnUse, mapped to the existing foreground bounds",
+    "opacity": "1 minus measured backdrop weight, sampled at the centers of ten vertical bands",
+    "preserved": [
+      "background",
+      "glyph geometry",
+      "circle scale and positioning"
+    ],
+    "circle": "Same measured fade applied within the existing circle foreground bounds."
+  },
+  "verification": {
+    "metric": "central 60% RGB RMSE at 256px, both sides rendered at 1024px in sRGB",
+    "vectorVsGlass": {
+      "before": 11.327129981401376,
+      "after": 4.0809436788499625
+    },
+    "circleVsGlass": {
+      "before": 11.107950324397732,
+      "after": 4.201136444139216
+    }
+  }
+}

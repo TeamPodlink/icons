@@ -2,7 +2,7 @@
   "name": "refraction-monorepo",
   "private": true,
   "version": "0.0.0",
-  "description": "Podcast platform icons, badges, and Liquid Glass — directory site and npm packages.",
+  "description": "Podcast platform icons, badges, and Liquid Glass \u2014 directory site and npm packages.",
   "license": "MIT",
   "packageManager": "pnpm@10.15.0",
   "scripts": {
@@ -11,13 +11,16 @@
     "test": "pnpm -r test",
     "assets": "node pipeline/build-assets.mjs",
     "release:assets": "node pipeline/upload-assets.mjs",
-    "validate": "node pipeline/validate.mjs"
+    "validate": "node pipeline/validate.mjs",
+    "export:figma": "node pipeline/export-figma.mjs"
   },
   "engines": {
     "node": ">=18"
   },
   "devDependencies": {
     "@aws-sdk/client-s3": "^3.658.0",
+    "@open-pencil/core": "0.16.0",
+    "@xmldom/xmldom": "0.9.12",
     "sharp": "^0.34.3"
   },
   "pnpm": {

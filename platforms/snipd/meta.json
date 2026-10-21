@@ -10,10 +10,10 @@
         "title": "Snipd",
         "variant": null,
         "file": "Snipd.icon",
-        "source": "appstore-artwork",
+        "source": "flat-svg",
         "appStoreId": 1557206126,
-        "hasDark": false,
-        "darkStatus": "native"
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

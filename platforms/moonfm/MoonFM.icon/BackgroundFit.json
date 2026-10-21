@@ -1,0 +1,22 @@
+{
+  "id": "moonfm",
+  "before": {
+    "background": 4.217282017406904,
+    "central": 3.5749667636995164
+  },
+  "after": {
+    "background": 0.6218523920855051,
+    "central": 4.231229155108528,
+    "colors": [
+      253,
+      253,
+      253,
+      244,
+      244,
+      244
+    ]
+  },
+  "samples": 16602,
+  "renders": 10,
+  "scope": "Default native background fill only; prior Dark and Tinted fill values preserved. Foreground artwork/materials unchanged."
+}

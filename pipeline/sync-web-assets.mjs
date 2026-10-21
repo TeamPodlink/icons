@@ -6,7 +6,8 @@
 // Glass rasters from R2), the library copy is skipped — flat icons and
 // badges are always copied, since the site serves those itself.
 
-import { cpSync, existsSync, mkdirSync, readdirSync, rmSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { root } from "./lib.mjs";
 
@@ -54,3 +55,21 @@ for (const { src, dest, hint } of jobs) {
       (swept ? ` (${swept} stale file(s) swept)` : "")
   );
 }
+
+// Compare draws into a canvas, so replacing a file at the same URL does
+// not rerun its image-loading effect. Content versions refresh both the
+// browser image cache and the canvas when any comparison input changes.
+const revisions = {};
+for (const directory of ["library", "flat", "raster"]) {
+  const dir = join(root, "apps/web/public", directory);
+  if (!existsSync(dir)) continue;
+  for (const file of readdirSync(dir).sort()) {
+    if (!/\.(png|svg)$/.test(file)) continue;
+    revisions[`/${directory}/${file}`] = createHash("sha256")
+      .update(readFileSync(join(dir, file))).digest("hex").slice(0, 16);
+  }
+}
+const revisionsFile = join(root, "apps/web/lib/asset-revisions.gen.json");
+const revisionsJson = JSON.stringify(revisions, null, 2) + "\n";
+if (!existsSync(revisionsFile) || readFileSync(revisionsFile, "utf8") !== revisionsJson)
+  writeFileSync(revisionsFile, revisionsJson);

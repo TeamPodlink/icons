@@ -11,6 +11,7 @@
 import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSync } from 'fs'
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
+import { execFileSync } from 'node:child_process'
 import { extractSvgContent, extractViewBox, extractRootFill, prefixIds } from '../src/core/svg.js'
 
 const __dirname = dirname(fileURLToPath(import.meta.url))
@@ -62,6 +63,7 @@ function escapeForTemplate(s: string): string {
 }
 
 function main() {
+  execFileSync(process.execPath, [join(ROOT, '../../pipeline/sync-circle-layouts.mjs')], { stdio: 'inherit' })
   console.log('Generating icon data...\n')
 
   if (!existsSync(SOURCE_DIR)) {
@@ -134,6 +136,17 @@ function main() {
       entry += `    content: \`${escapeForTemplate(icon.content)}\`,\n`
       if (icon.rootFill) {
         entry += `    rootFill: '${icon.rootFill}',\n`
+      }
+      const shapeVariants: Record<string, { viewBox: string; content: string; rootFill?: string }> = {}
+      for (const shape of ['square', 'circle', 'superellipse']) {
+        const raw = readSvgFile(join(dir, `icon-${shape}.svg`))
+        if (raw) {
+          const { viewBox, content, rootFill } = processSvg(raw, `${id}-${shape}`)
+          shapeVariants[shape] = { viewBox, content, ...(rootFill && { rootFill }) }
+        }
+      }
+      if (Object.keys(shapeVariants).length) {
+        entry += `    shapeVariants: ${JSON.stringify(shapeVariants)},\n`
       }
       if (badge) {
         entry += `    badge: \`${escapeForTemplate(badge.content)}\`,\n`

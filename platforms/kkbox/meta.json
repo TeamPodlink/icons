@@ -1,0 +1,22 @@
+{
+  "name": "KKBOX",
+  "active": true,
+  "url": "https://www.kkbox.com",
+  "added": "2026-10-16",
+  "flatSource": "drawn",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "kkbox",
+        "title": "KKBOX",
+        "variant": null,
+        "file": "KKBOX.icon",
+        "source": "flat-svg-split",
+        "appStoreId": 300915900,
+        "appStoreCountry": "tw",
+        "hasDark": true,
+        "hasCircleDark": false
+      }
+    ]
+  }
+}

@@ -15,6 +15,7 @@ import {
   type Platform,
   rasterPath,
   type CompareReference,
+  comparisonLabels,
 } from "@/lib/platforms";
 import {
   copyImage,
@@ -23,11 +24,13 @@ import {
   downloadAsset,
 } from "@/lib/asset-actions";
 import { embedHtml } from "@/lib/embed-html";
+import type { GlassShape } from "@/lib/vector-shape";
 import { useLiquidRender } from "@/lib/use-liquid-render";
 import { useParallax } from "@/lib/use-parallax";
 import { cn } from "@/lib/cn";
 import { LiveChip } from "@/components/live-chip";
 import { iconTransitionName } from "@/lib/view-transition";
+import assetRevisions from "@/lib/asset-revisions.gen.json";
 
 /**
  * Morph-lock milestone: the detail is stripped to the card's own
@@ -80,21 +83,22 @@ function formatAdded(added: string): string {
  *  parallax. Fills its container's width as a square — the detail page
  *  sizes the container to fit the available space — so it serves the
  *  512px rendition (1024px PNG covers 2x displays). */
-export function GlassArtwork({ bundle }: { bundle: GlassBundle }) {
+export function GlassArtwork({ bundle, shape = "squircle" }: { bundle: GlassBundle; shape?: GlassShape }) {
   const [live, setLive] = useState(false);
-  const liveUri = useLiquidRender(bundle.slug, 512, live && bundle.recipe);
+  const showLive = shape === "squircle" && live && bundle.recipe;
+  const liveUri = useLiquidRender(bundle.slug, 512, showLive);
   const parallax = useParallax<HTMLDivElement>();
   const alt = `${bundle.title} app icon`;
   const sized = (dark: boolean) => ({
-    src: assetPath(bundle.slug, { size: 512, dark }),
-    srcSet: `${assetPath(bundle.slug, { size: 512, dark })} 1x, ${assetPath(bundle.slug, { dark })} 2x`,
+    src: assetPath(bundle.slug, { size: 512, dark, shape }),
+    srcSet: `${assetPath(bundle.slug, { size: 512, dark, shape })} 1x, ${assetPath(bundle.slug, { dark, shape })} 2x`,
   });
   const imgCls = "h-full w-full select-none";
   const common = { decoding: "async" as const, width: 512, height: 512 };
 
   return (
     <div className="relative w-full py-2">
-      {DETAIL_SECTIONS && bundle.recipe && (
+      {DETAIL_SECTIONS && bundle.recipe && shape === "squircle" && (
         <div className="absolute right-0 top-0">
           <LiveChip
             live={live}
@@ -110,9 +114,9 @@ export function GlassArtwork({ bundle }: { bundle: GlassBundle }) {
         style={{ viewTransitionName: iconTransitionName(bundle.slug) }}
         className="relative aspect-square w-full"
       >
-        {live && bundle.recipe && liveUri ? (
+        {showLive && liveUri ? (
           <img src={liveUri} alt={alt} {...common} className={imgCls} />
-        ) : !bundle.hasDark ? (
+        ) : !(shape === "circle" ? bundle.hasCircleDark : bundle.hasDark) ? (
           <img {...sized(false)} alt={alt} {...common} className={imgCls} />
         ) : (
           <>
@@ -135,7 +139,7 @@ export function GlassArtwork({ bundle }: { bundle: GlassBundle }) {
         <div
           ref={parallax.shineRef}
           aria-hidden="true"
-          className="pointer-events-none absolute inset-0 rounded-[22.5%] opacity-0 transition-opacity duration-300"
+          className={cn("pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-300", shape === "circle" ? "rounded-full" : "rounded-[22.5%]")}
         />
       </div>
     </div>
@@ -150,8 +154,10 @@ export function GlassArtwork({ bundle }: { bundle: GlassBundle }) {
 export function FlatArtwork({
   platform,
   transitionKey = platform.id,
+  shape = "squircle",
 }: {
   platform: Platform;
+  shape?: import("@/lib/vector-shape").VectorShape;
   /** The grid-card key this hero morphs from (bundle slug, or the
    *  platform id for glass-less platforms); null renders it unnamed. */
   transitionKey?: string | null;
@@ -169,7 +175,7 @@ export function FlatArtwork({
         className="relative aspect-square w-full"
       >
         <img
-          src={flatPath(platform.id)}
+          src={flatPath(platform.id, shape)}
           alt={`${platform.name} icon`}
           decoding="async"
           width={512}
@@ -232,13 +238,14 @@ export function BadgeArtwork({
   );
 }
 
-/** Dev-only "Compare" hero: the flat vector blended over the light
- *  Liquid Glass rendition under a slider — the facet-drift audit's pair
- *  (pipeline/audit-facet-drift.mjs) on screen, so registration and
- *  colour differences read as ghosting. Always the LIGHT rendition,
- *  whatever the site theme: that is the pair the audit scores, and the
- *  flat has no dark rendition to compare against. The caption is the
- *  bundle's drift from the committed snapshot. */
+/** Version local comparison inputs by content, leaving immutable CDN URLs alone. */
+function comparisonSource(src: string): string {
+  const revision = (assetRevisions as Record<string, string>)[src];
+  return revision ? `${src}?v=${revision}` : src;
+}
+
+/** Four-times absolute difference for the selected pair of light artwork.
+ * Scores use the central 60% crop; the canvas shows the whole shared area. */
 export function CompareArtwork({
   platform,
   bundle,
@@ -250,26 +257,19 @@ export function CompareArtwork({
   /** Grid-tile form: 256² canvas, no caption, no padding — the card
    *  already carries the drift chip. */
   compact?: boolean;
-  /** What the vector is diffed against: the light Liquid Glass master
-   *  (ictool), or the store's own raster (App Store / Google Play) —
-   *  the audit's --reference store. */
+  /** Pair of assets to compare, shared with grid sorting and captions. */
   reference?: CompareReference;
 }) {
-  // The facet-drift audit's diff panel, on screen: |glass − vector| × 4
-  // per channel over the pixels both facets cover (the masks' corner
-  // disagreement is not artwork and stays black), computed on a canvas
-  // from the light Liquid Glass master (512, delivery sRGB) and the
-  // browser's own render of the flat. A thin bright outline is
-  // registration or edge softness, a filled region is colour or shading,
-  // black is agreement. Dev-only, like the audit it mirrors.
+  // Use lossless masters; mask disagreement is excluded from the display.
   const SIZE = compact ? 256 : 512;
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [error, setError] = useState<string | null>(null);
-  const glassSrc = reference === "store" ? rasterPath(bundle.slug) : assetPath(bundle.slug, { size: SIZE });
-  const flatSrc = flatPath(platform.id);
+  const glassSrc = comparisonSource(reference !== "glass" ? rasterPath(bundle.slug) : assetPath(bundle.slug));
+  const flatSrc = comparisonSource(reference === "glass-store" ? assetPath(bundle.slug) : flatPath(platform.id));
   useEffect(() => {
     let cancelled = false;
     setError(null);
+    canvasRef.current?.getContext("2d")?.clearRect(0, 0, SIZE, SIZE);
     const load = (src: string) =>
       new Promise<HTMLImageElement>((resolve, reject) => {
         const img = new Image();
@@ -308,13 +308,13 @@ export function CompareArtwork({
   }, [glassSrc, flatSrc, SIZE]);
   const cap = "font-mono text-xs text-neutral-500 dark:text-neutral-400";
   return (
-    <div className={cn("w-full", !compact && "space-y-4 py-2")}>
+    <div className="w-full">
       <div className="relative aspect-square w-full overflow-hidden rounded-[22%] bg-black">
         <canvas
           ref={canvasRef}
           width={SIZE}
           height={SIZE}
-          aria-label={`4× absolute difference, ${bundle.title} ${reference === "store" ? "store raster" : "Liquid Glass (light)"} vs ${platform.name} vector`}
+          aria-label={`4× absolute difference, ${bundle.title}: ${comparisonLabels[reference]}`}
           className="h-full w-full select-none"
         />
         {error && (
@@ -323,14 +323,7 @@ export function CompareArtwork({
           </p>
         )}
       </div>
-      {!compact && <p className={cn(cap, "text-center")}>
-        {reference === "store" ? "4×|store − vector| · facet drift (central RMSE, store raster vs vector): " : "4×|glass − vector| · facet drift (central RMSE, light glass vs vector): "}
-        {reference === "store"
-          ? (bundle.driftStore === null ? "unmeasured" : bundle.driftStore.toFixed(2))
-          : (bundle.drift === null ? "unmeasured" : bundle.drift.toFixed(2))}
-        {reference === "glass" && bundle.driftMaterialOff !== null && ` · material off: ${bundle.driftMaterialOff.toFixed(2)}`}
-        {" · "}pipeline/audit-facet-drift.mjs --sheets{reference === "store" ? " --reference store" : ""}
-      </p>}
+
     </div>
   );
 }

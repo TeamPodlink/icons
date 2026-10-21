@@ -1,0 +1,54 @@
+{
+  "reference": "apps/web/public/raster/youtubemusic.png",
+  "measurement": {
+    "designGeneration": 27,
+    "renderSize": 1024,
+    "scoreSize": 256,
+    "crop": [
+      51,
+      51,
+      154,
+      154
+    ],
+    "colorSpace": "sRGB via ICC conversion",
+    "channels": "RGB"
+  },
+  "beforeRmse": 6.213092522522723,
+  "afterRmse": 4.016596395839715,
+  "settings": {
+    "translucency": 0.28,
+    "shadow": {
+      "kind": "layer-color",
+      "opacity": 0.45
+    },
+    "specular": true
+  },
+  "verification": [
+    {
+      "platform": "macOS",
+      "mode": "Default",
+      "beforeAfterRgbaRmse": 3.523966172303853
+    },
+    {
+      "platform": "iOS",
+      "mode": "Dark",
+      "beforeAfterRgbaRmse": 0
+    },
+    {
+      "platform": "iOS",
+      "mode": "TintedLight",
+      "beforeAfterRgbaRmse": 0
+    },
+    {
+      "platform": "iOS",
+      "mode": "TintedDark",
+      "beforeAfterRgbaRmse": 0
+    },
+    {
+      "platform": "watchOS",
+      "mode": "Default",
+      "beforeAfterRgbaRmse": 0
+    }
+  ],
+  "notes": "The chromatic shadow opacity drops from 0.75 to 0.45 and translucency moves from 0.30 to 0.28. The red disc, ring and play cutouts, their geometry, and the separate full-bleed watchOS circle asset are unchanged. Less shadow spill more closely matches the Store ring and triangle."
+}

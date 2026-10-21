@@ -1,0 +1,58 @@
+{
+  "source": "Liquid Glass Default rendition",
+  "designGeneration": 27,
+  "sourceHash": "2e9665a967de",
+  "measurementCommand": "node pipeline/material-flat.mjs measure --only gaana --translucency-only --json /tmp/gaana-translucency.json",
+  "groups": [
+    {
+      "group": 0,
+      "files": [
+        "icon.svg"
+      ],
+      "rows": [
+        213,
+        810
+      ],
+      "translucency": 0.25,
+      "shadowOpacity": 0,
+      "alpha": [
+        0.006,
+        0.008,
+        0.018,
+        0.028,
+        0.042,
+        0.056,
+        0.073,
+        0.093,
+        0.117,
+        0.142
+      ],
+      "shadow": null
+    }
+  ],
+  "implementation": {
+    "files": [
+      "icon.svg"
+    ],
+    "maskId": "gaana-material-translucency-mask",
+    "gradientCoordinates": "userSpaceOnUse, mapped to the existing foreground bounds",
+    "opacity": "1 minus measured backdrop weight, sampled at the centers of ten vertical bands",
+    "preserved": [
+      "background",
+      "glyph geometry",
+      "circle scale and positioning"
+    ],
+    "circle": "Same measured fade applied within the existing circle foreground bounds."
+  },
+  "verification": {
+    "metric": "central 60% RGB RMSE at 256px, both sides rendered at 1024px in sRGB",
+    "vectorVsGlass": {
+      "before": 8.329455442238919,
+      "after": 5.145575716814294
+    },
+    "circleVsGlass": {
+      "before": 43.90688617928579,
+      "after": 41.74453330205119
+    }
+  }
+}

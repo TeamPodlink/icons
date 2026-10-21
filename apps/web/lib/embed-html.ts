@@ -11,6 +11,7 @@ export interface EmbedBundle {
   /** Whether a distinct dark rendition exists (adds the
    *  prefers-color-scheme sources). */
   hasDark: boolean;
+  hasCircleDark?: boolean;
 }
 
 /** Absolute asset base for copied markup: the production R2 release
@@ -41,17 +42,18 @@ const escapeAttr = (s: string) =>
  */
 export function embedHtml(
   bundle: EmbedBundle,
-  base: string = embedAssetBase()
+  base: string = embedAssetBase(),
+  circle = false
 ): string {
   const url = (dark: boolean, size: 64 | 128, ext: "avif" | "webp") =>
-    `${base}/${bundle.slug}${dark ? "-dark" : ""}-${size}.${ext}`;
+    `${base}/${bundle.slug}${circle ? "-circle" : ""}${dark ? "-dark" : ""}-${size}.${ext}`;
   const srcset = (dark: boolean, ext: "avif" | "webp") =>
     `${url(dark, 64, ext)} 1x, ${url(dark, 128, ext)} 2x`;
   const source = (dark: boolean, ext: "avif" | "webp") =>
     `  <source${dark ? ' media="(prefers-color-scheme: dark)"' : ""} type="image/${ext}" srcset="${srcset(dark, ext)}">`;
 
   const lines = ["<picture>"];
-  if (bundle.hasDark) {
+  if (circle ? bundle.hasCircleDark ?? bundle.hasDark : bundle.hasDark) {
     lines.push(source(true, "avif"), source(true, "webp"));
   }
   lines.push(

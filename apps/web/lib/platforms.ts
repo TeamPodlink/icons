@@ -1,3 +1,4 @@
+import type { GlassShape, VectorShape } from "./vector-shape";
 import raw from "./platforms.gen.json";
 
 export interface GlassBundle {
@@ -7,6 +8,8 @@ export interface GlassBundle {
   recipe: boolean;
   rmse: number | null;
   hasDark: boolean;
+  /** Distinct dark rendition measured from the native watchOS render. */
+  hasCircleDark: boolean;
   /**
    * For hasDark:false bundles (identical light/dark renditions), the
    * measured classification from pipeline/audit-dark-status.mjs:
@@ -34,6 +37,8 @@ export interface GlassBundle {
    *  which Apple renders with its own pipeline. Null without a store
    *  raster or until that audit has run. */
   driftStore: number | null;
+  /** Light Liquid Glass versus official App Store raster. */
+  driftGlassStore: number | null;
   /** App Store id from meta.json, when the platform ships an iOS app we
    *  have identified. Drives the dev-only "Raster" facet: the store's own
    *  1024 marketing icon (pipeline/fetch-appstore-artwork.mjs →
@@ -245,6 +250,8 @@ export interface Card {
   driftMaterialOff: number | null;
   /** See GlassBundle.driftStore. */
   driftStore: number | null;
+  /** Light Liquid Glass versus official App Store raster. */
+  driftGlassStore: number | null;
 }
 
 export const cards: Card[] = platforms.flatMap((p): Card[] => {
@@ -262,6 +269,7 @@ export const cards: Card[] = platforms.flatMap((p): Card[] => {
       drift: b.drift,
       driftMaterialOff: b.driftMaterialOff,
       driftStore: b.driftStore,
+      driftGlassStore: b.driftGlassStore,
     }));
   if (p.hasFlat)
     return [
@@ -278,6 +286,7 @@ export const cards: Card[] = platforms.flatMap((p): Card[] => {
         drift: null,
         driftMaterialOff: null,
         driftStore: null,
+        driftGlassStore: null,
       },
     ];
   return [];
@@ -348,17 +357,18 @@ export function assetPath(
     size?: 32 | 64 | 128 | 256 | 512;
     dark?: boolean;
     format?: "avif" | "webp";
+    shape?: GlassShape;
   } = {}
 ): string {
-  const d = opts.dark ? "-dark" : "";
+  const d = `${opts.shape === "circle" ? "-circle" : ""}${opts.dark ? "-dark" : ""}`;
   return opts.size
     ? `${ASSET_BASE}/${slug}${d}-${opts.size}.${opts.format ?? "avif"}`
     : `${ASSET_BASE}/${slug}${d}.png`;
 }
 
 /** Flat squircle SVG path for a platform id. */
-export function flatPath(id: string): string {
-  return `/flat/${id}.svg`;
+export function flatPath(id: string, shape: VectorShape = "squircle"): string {
+  return `/flat/${id}${shape === "squircle" ? "" : `-${shape}`}.svg`;
 }
 
 /** "Listen on" badge SVG path for a platform id (light + dark pair). */
@@ -395,11 +405,20 @@ export function rasterPath(slug: string): string {
   return `/raster/${slug}.png`;
 }
 
-/** The Compare facet's reference: the ictool master or the store raster.
- *  URL state (?ref=store) on /compare and on the detail's compare segment. */
-export type CompareReference = "glass" | "store";
+/** Comparison pairs, stored in the ref URL parameter on grid and detail. */
+export type CompareReference = "glass" | "store" | "glass-store";
 export const parseCompareReference = (raw: string | null): CompareReference =>
-  raw === "store" ? "store" : "glass";
+  raw === "store" || raw === "glass-store" ? raw : "glass";
+
+export const comparisonLabels: Record<CompareReference, string> = {
+  glass: "Vector ↔ Liquid Glass",
+  store: "Vector ↔ Store",
+  "glass-store": "Liquid Glass ↔ App Store",
+};
+
+export function comparisonScore(bundle: GlassBundle, reference: CompareReference): number | null {
+  return reference === "glass-store" ? bundle.driftGlassStore : reference === "store" ? bundle.driftStore : bundle.drift;
+}
 
 /** Which store the Raster facet's image came from, for captions. */
 export function rasterSource(b: GlassBundle): string | null {

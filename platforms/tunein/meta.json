@@ -13,7 +13,8 @@
         "file": "TuneIn.icon",
         "source": "decanted",
         "appStoreId": 418987775,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

@@ -58,24 +58,18 @@
     {
       "hidden": false,
       "blend-mode": "normal",
-      "specular": false,
-      "translucency": {
-        "enabled": false,
-        "value": 0
-      },
       "layers": [
         {
           "image-name-specializations": [
             {
-              "value": "glyph.png"
+              "value": "glyph.svg"
             },
             {
               "appearance": "dark",
-              "value": "glyph-dark.png"
+              "value": "glyph-dark.svg"
             }
           ],
           "name": "glyph",
-          "glass": false,
           "opacity-specializations": [
             {
               "value": 1
@@ -84,12 +78,85 @@
               "appearance": "dark",
               "value": 1
             }
+          ],
+          "glass-specializations": [
+            {
+              "value": true
+            },
+            {
+              "appearance": "dark",
+              "value": false
+            },
+            {
+              "appearance": "tinted",
+              "value": false
+            }
           ]
+        }
+      ],
+      "specular-specializations": [
+        {
+          "value": true
+        },
+        {
+          "appearance": "dark",
+          "value": false
+        },
+        {
+          "appearance": "tinted",
+          "value": false
+        }
+      ],
+      "translucency-specializations": [
+        {
+          "value": {
+            "enabled": true,
+            "value": 0.28
+          }
+        },
+        {
+          "appearance": "dark",
+          "value": {
+            "enabled": false,
+            "value": 0
+          }
+        },
+        {
+          "appearance": "tinted",
+          "value": {
+            "enabled": false,
+            "value": 0
+          }
+        }
+      ],
+      "shadow-specializations": [
+        {
+          "value": {
+            "kind": "neutral",
+            "opacity": 0.55
+          }
+        },
+        {
+          "appearance": "dark",
+          "value": {
+            "kind": "neutral",
+            "opacity": 0.5
+          }
+        },
+        {
+          "appearance": "tinted",
+          "value": {
+            "kind": "neutral",
+            "opacity": 0.5
+          }
         }
       ]
     }
   ],
   "supported-platforms": {
-    "squares": "shared"
+    "squares": "shared",
+    "circles": [
+      "watchOS"
+    ]
   }
 }

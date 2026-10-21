@@ -1,0 +1,24 @@
+{
+  "name": "Anghami",
+  "active": true,
+  "url": "https://www.anghami.com",
+  "added": "2026-10-16",
+  "flatSource": "drawn",
+  "aliases": [
+    "أنغامي"
+  ],
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "anghami",
+        "title": "Anghami",
+        "variant": null,
+        "file": "Anghami.icon",
+        "source": "flat-svg-split",
+        "appStoreId": 545395155,
+        "hasDark": true,
+        "hasCircleDark": false
+      }
+    ]
+  }
+}

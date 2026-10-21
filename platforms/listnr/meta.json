@@ -1,0 +1,22 @@
+{
+  "name": "LiSTNR",
+  "active": true,
+  "url": "https://www.listnr.com",
+  "added": "2026-10-16",
+  "flatSource": "official",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "listnr",
+        "title": "LiSTNR",
+        "variant": null,
+        "file": "LiSTNR.icon",
+        "source": "flat-svg-split",
+        "appStoreId": 1462845202,
+        "appStoreCountry": "au",
+        "hasDark": true,
+        "hasCircleDark": false
+      }
+    ]
+  }
+}

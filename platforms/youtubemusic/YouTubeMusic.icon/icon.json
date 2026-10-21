@@ -56,14 +56,45 @@
   },
   "groups": [
     {
-      "hidden": false,
       "blend-mode": "normal",
-      "specular": false,
-      "translucency": {
-        "enabled": false,
-        "value": 0
-      },
       "layers": [
+        {
+          "image-name": "red.svg",
+          "name": "Red disc with ring and play cutouts",
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          },
+          "hidden-specializations": [
+            {
+              "value": false
+            },
+            {
+              "appearance": "dark",
+              "value": true
+            },
+            {
+              "appearance": "tinted",
+              "value": true
+            }
+          ],
+          "glass-specializations": [
+            {
+              "value": true
+            },
+            {
+              "appearance": "dark",
+              "value": false
+            },
+            {
+              "appearance": "tinted",
+              "value": false
+            }
+          ]
+        },
         {
           "image-name": "icon.svg",
           "name": "icon",
@@ -74,12 +105,126 @@
               0,
               0
             ]
+          },
+          "hidden-specializations": [
+            {
+              "value": true
+            },
+            {
+              "appearance": "dark",
+              "value": false
+            },
+            {
+              "appearance": "tinted",
+              "value": false
+            }
+          ]
+        }
+      ],
+      "hidden-specializations": [
+        {
+          "value": false
+        },
+        {
+          "value": true,
+          "idiom": "watchOS"
+        }
+      ],
+      "specular-specializations": [
+        {
+          "value": true
+        },
+        {
+          "appearance": "dark",
+          "value": false
+        },
+        {
+          "appearance": "tinted",
+          "value": false
+        }
+      ],
+      "translucency-specializations": [
+        {
+          "value": {
+            "enabled": true,
+            "value": 0.28
+          }
+        },
+        {
+          "appearance": "dark",
+          "value": {
+            "enabled": false,
+            "value": 0
+          }
+        },
+        {
+          "appearance": "tinted",
+          "value": {
+            "enabled": false,
+            "value": 0
+          }
+        }
+      ],
+      "shadow-specializations": [
+        {
+          "value": {
+            "kind": "layer-color",
+            "opacity": 0.45
+          }
+        },
+        {
+          "appearance": "dark",
+          "value": {
+            "kind": "neutral",
+            "opacity": 0.5
+          }
+        },
+        {
+          "appearance": "tinted",
+          "value": {
+            "kind": "neutral",
+            "opacity": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "name": "Circle branding",
+      "hidden-specializations": [
+        {
+          "value": true
+        },
+        {
+          "value": false,
+          "idiom": "watchOS"
+        }
+      ],
+      "blend-mode": "normal",
+      "specular": false,
+      "translucency": {
+        "enabled": false,
+        "value": 0
+      },
+      "layers": [
+        {
+          "name": "circle-branding",
+          "image-name": "circle.svg",
+          "glass": false,
+          "position": {
+            "scale": 34.04255319148936,
+            "translation-in-points": [
+              0,
+              0
+            ]
           }
         }
       ]
     }
   ],
   "supported-platforms": {
-    "squares": "shared"
+    "squares": "shared",
+    "circles": [
+      "watchOS"
+    ]
   }
 }

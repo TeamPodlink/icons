@@ -45,6 +45,7 @@ apps/web/public/flat/
 apps/web/public/badges/
 apps/web/public/raster/
 apps/web/lib/platforms.gen.json
+apps/web/lib/asset-revisions.gen.json
 
 # Assets package payload (published to npm, not committed)
 packages/refraction/assets/

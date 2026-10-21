@@ -1,0 +1,27 @@
+{
+  "name": "Zvuk",
+  "active": true,
+  "url": "https://zvuk.com",
+  "added": "2026-10-16",
+  "flatSource": "drawn",
+  "aliases": [
+    "SberZvuk",
+    "Zvooq",
+    "Звук",
+    "СберЗвук"
+  ],
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "zvuk",
+        "title": "Zvuk",
+        "variant": null,
+        "file": "Zvuk.icon",
+        "source": "flat-svg-split",
+        "playStoreId": "com.zvooq.openplay",
+        "hasDark": true,
+        "hasCircleDark": false
+      }
+    ]
+  }
+}

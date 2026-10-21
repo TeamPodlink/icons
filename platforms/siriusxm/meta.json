@@ -12,7 +12,8 @@
         "file": "SiriusXM.icon",
         "source": "flat-svg-split",
         "appStoreId": 317951436,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

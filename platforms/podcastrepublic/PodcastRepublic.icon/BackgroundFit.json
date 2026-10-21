@@ -1,0 +1,22 @@
+{
+  "id": "podcastrepublic",
+  "before": {
+    "background": 12.39689096696319,
+    "central": 9.301373288982633
+  },
+  "after": {
+    "background": 0.5055650061919421,
+    "central": 1.0320931009905419,
+    "colors": [
+      64,
+      134,
+      229,
+      64,
+      135,
+      230
+    ]
+  },
+  "samples": 20342,
+  "renders": 26,
+  "scope": "Default native background fill only; prior Dark and Tinted fill values preserved. Foreground artwork/materials unchanged."
+}

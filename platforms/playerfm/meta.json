@@ -12,7 +12,8 @@
         "file": "PlayerFM.icon",
         "source": "flat-svg-split",
         "appStoreId": 940568467,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

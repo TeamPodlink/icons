@@ -12,12 +12,36 @@
         {
           "image-name": "light.png",
           "name": "light",
-          "glass": false
+          "glass": false,
+          "position-specializations": [
+            {
+              "value": {
+                "scale": 1,
+                "translation-in-points": [
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "value": {
+                "scale": 1.0638297872340425,
+                "translation-in-points": [
+                  0.0,
+                  0.0
+                ]
+              },
+              "idiom": "watchOS"
+            }
+          ]
         }
       ]
     }
   ],
   "supported-platforms": {
-    "squares": "shared"
+    "squares": "shared",
+    "circles": [
+      "watchOS"
+    ]
   }
 }

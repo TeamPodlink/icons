@@ -13,7 +13,8 @@
         "file": "AnytimePlayer.icon",
         "hasDark": true,
         "source": "appstore-artwork-split",
-        "appStoreId": 1582300839
+        "appStoreId": 1582300839,
+        "hasCircleDark": false
       }
     ]
   }

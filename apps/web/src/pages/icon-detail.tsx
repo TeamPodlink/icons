@@ -24,10 +24,14 @@ import {
   FlatArtwork,
   GlassArtwork,
 } from "@/components/icon-detail";
+import { FixedDetailControls } from "@/components/fixed-detail-controls";
+import { ComparisonControl } from "@/components/comparison-control";
 import { MaterialsIcon } from "@/components/materials-icon";
 import { PageCard } from "@/components/page-card";
+import { VectorShapeControl } from "@/components/vector-shape-control";
+import { parseGlassShape, parseVectorShape } from "@/lib/vector-shape";
 import { copyItemsFor, downloadItemsFor, menuItemsFor } from "@/lib/asset-menus";
-import { lensesEnabled, parseCompareReference, rasterPath, rasterSource, resolvePlatform, type AssetFacet, type Facet, type Platform } from "@/lib/platforms";
+import { lensesEnabled, parseCompareReference, rasterPath, rasterSource, resolvePlatform, type CompareReference, type AssetFacet, type Facet, type Platform } from "@/lib/platforms";
 import { useTheme } from "@/lib/theme";
 import { useTitle } from "@/lib/use-title";
 import {
@@ -162,6 +166,7 @@ export function IconDetailPage() {
   const [heroMenu, setHeroMenu] = useState<{ x: number; y: number } | null>(
     null
   );
+  const facetControlRef = useRef<HTMLDivElement>(null);
   const platform = resolvePlatform(id);
   useTitle(platform ? `${platform.name} · refraction` : "Not found · refraction");
 
@@ -219,7 +224,7 @@ export function IconDetailPage() {
       ? [{ facet: "badge" as const, label: "Badge", icon: StretchHorizontal }]
       : []),
     ...(lensesEnabled && p.bundles.length > 0 && p.hasFlat
-      ? [{ facet: "compare" as const, label: "Compare glass vs vector (dev)", icon: ScanEye }]
+      ? [{ facet: "compare" as const, label: "Compare artwork (dev)", icon: ScanEye }]
       : []),
     ...(lensesEnabled && p.bundles[0] && rasterSource(p.bundles[0]) !== null
       ? [{ facet: "raster" as const, label: "Store artwork (dev)", icon: ImageIcon }]
@@ -232,8 +237,10 @@ export function IconDetailPage() {
     : segments[0]?.facet ?? "glass";
 
   // Compare segment: ?ref=store diffs against the store raster when there is one.
-  const compareRef = parseCompareReference(params.get("ref")) === "store" && p.bundles[0]?.driftStore !== null ? "store" : "glass";
-  const setCompareRef = (r: "glass" | "store") => {
+  const wantedRef = parseCompareReference(params.get("ref"));
+  const compareRef = wantedRef === "store" && p.bundles[0]?.driftStore == null
+    || wantedRef === "glass-store" && p.bundles[0]?.driftGlassStore == null ? "glass" : wantedRef;
+  const setCompareRef = (r: CompareReference) => {
     const next = new URLSearchParams(params);
     if (r === "glass") next.delete("ref"); else next.set("ref", r);
     setParams(next, { replace: true, preventScrollReset: true });
@@ -263,12 +270,14 @@ export function IconDetailPage() {
   // The compare view offers the glass rendition's assets (its left half);
   // the raster view its own store PNG.
   const assetFacet: AssetFacet = facet === "compare" ? "glass" : facet;
-  const copyItems = copyItemsFor(assetFacet, p, p.bundles[0] ?? null, darkTheme);
+  const shape = facet === "flat" ? parseVectorShape(params.get("shape")) : facet === "glass" ? parseGlassShape(params.get("shape")) : "squircle";
+  const copyItems = copyItemsFor(assetFacet, p, p.bundles[0] ?? null, darkTheme, shape);
   const downloadItems = downloadItemsFor(
     assetFacet,
     p,
     p.bundles[0] ?? null,
-    darkTheme
+    darkTheme,
+    shape
   );
 
   // Right-click on the hero: the shared tree (Copy ▸ / Download ▸ / dev
@@ -278,12 +287,13 @@ export function IconDetailPage() {
     assetFacet,
     p,
     p.bundles[0] ?? null,
-    darkTheme
+    darkTheme,
+    shape
   );
 
   return (
-    <PageCard>
-      <div className="sticky top-0 z-40 grid h-12 grid-cols-[1fr_auto_1fr] items-center border-b border-neutral-200 bg-white/80 px-4 py-1.5 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/40">
+    <PageCard viewportClassName="flex flex-col">
+      <div className="sticky top-0 z-40 grid h-12 shrink-0 grid-cols-[1fr_auto_1fr] items-center border-b border-neutral-200 bg-white/80 px-4 py-1.5 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/40">
         {/* Back is the arrow alone; the name beside it is the page H1. */}
         <div className="flex min-w-0 items-center space-x-1.5">
           <button
@@ -311,6 +321,7 @@ export function IconDetailPage() {
         </div>
         {segments.length > 0 ? (
           <div
+            ref={facetControlRef}
             role="group"
             aria-label="Variant"
             className="flex items-center rounded-md border border-neutral-200 p-0.5 dark:border-neutral-800"
@@ -347,71 +358,51 @@ export function IconDetailPage() {
         </div>
       </div>
 
-      {/* The selected variant's hero, scaled to fit the available space:
-          square heroes take min(column width, viewport height minus the
-          chrome, 512px — the largest sized rendition); the badge keeps
-          its natural wide aspect at up to 36rem. Every hero carries the
-          container-pair name and its artwork the icon name, keyed like
-          the grid card (panelKey), so the cell ↔ detail morph runs for
-          glass, vector and badge alike — the grid the user came from
-          decides which artwork the card showed. Right-click anywhere on
-          the hero for the grid's Copy ▸ / Download ▸ tree. */}
+      {((facet === "flat" && p.hasFlat) || (facet === "glass" && p.bundles[0]) || (facet === "compare" && p.bundles[0])) && (
+        <FixedDetailControls anchor={facetControlRef}>
+          {facet === "compare" ? (
+            <ComparisonControl value={compareRef} onChange={setCompareRef}
+              hasStore={p.bundles[0].driftStore !== null}
+              hasAppStore={p.bundles[0].driftGlassStore !== null} />
+          ) : <VectorShapeControl facet={facet === "glass" ? "glass" : "flat"} />}
+        </FixedDetailControls>
+      )}
+
+      {/* Only artwork participates in centering within the detail viewport. */}
       <div
         onContextMenu={(e) => {
           e.preventDefault();
           setHeroMenu({ x: e.clientX, y: e.clientY });
         }}
-        className="flex min-h-[calc(100vh-12rem)] flex-col items-center justify-center px-6 py-12"
+        data-detail-artwork=""
+        className="flex min-h-0 flex-1 items-center justify-center px-6"
       >
         {facet === "glass" && p.bundles[0] ? (
           <div style={{ ...cardTransitionStyle(panelKey(p)), width: SQUARE_HERO_WIDTH }}>
-            <GlassArtwork bundle={p.bundles[0]} />
+            <GlassArtwork bundle={p.bundles[0]} shape={parseGlassShape(shape)} />
           </div>
         ) : facet === "flat" && p.hasFlat ? (
           <div style={{ ...cardTransitionStyle(panelKey(p)), width: SQUARE_HERO_WIDTH }}>
-            <FlatArtwork platform={p} transitionKey={panelKey(p)} />
+            <FlatArtwork platform={p} transitionKey={panelKey(p)} shape={shape} />
           </div>
         ) : facet === "badge" && p.hasBadge ? (
           <div style={{ ...cardTransitionStyle(panelKey(p)), width: "min(100%, 36rem)" }}>
             <BadgeArtwork platform={p} transitionKey={panelKey(p)} />
           </div>
         ) : facet === "compare" && p.bundles[0] ? (
-          <div style={{ width: SQUARE_HERO_WIDTH }} className="space-y-3">
+          <div style={{ width: SQUARE_HERO_WIDTH }}>
             <CompareArtwork platform={p} bundle={p.bundles[0]} reference={compareRef} />
-            {p.bundles[0].driftStore !== null && (
-              <div role="group" aria-label="Compare against" className="flex justify-center">
-                <div className="flex items-center rounded-md border border-neutral-200 p-0.5 font-mono text-xs dark:border-neutral-800">
-                  {(["glass", "store"] as const).map((r) => (
-                    <button
-                      key={r}
-                      type="button"
-                      aria-pressed={compareRef === r}
-                      onClick={() => setCompareRef(r)}
-                      className={
-                        "cursor-pointer rounded px-2 py-0.5 " +
-                        (compareRef === r
-                          ? "bg-neutral-200 text-black dark:bg-neutral-800 dark:text-white"
-                          : "text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white")
-                      }
-                    >
-                      vs {r}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+
           </div>
         ) : lensesEnabled && facet === "raster" && p.bundles[0] ? (
-          <div style={{ width: SQUARE_HERO_WIDTH }} className="py-2">
+          <div style={{ width: SQUARE_HERO_WIDTH }}>
             <img
               src={rasterPath(p.bundles[0].slug)}
               alt={`${p.bundles[0].title} store icon`}
               decoding="async"
               className="aspect-square w-full select-none rounded-[22.5%]"
             />
-            <p className="mt-4 text-center font-mono text-xs text-neutral-500 dark:text-neutral-400">
-              {rasterSource(p.bundles[0])} · pipeline/fetch-appstore-artwork.mjs
-            </p>
+
           </div>
         ) : null}
       </div>

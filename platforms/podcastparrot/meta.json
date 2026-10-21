@@ -16,7 +16,8 @@
         "file": "PodcastParrot.icon",
         "source": "decanted",
         "appStoreId": 1451559709,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

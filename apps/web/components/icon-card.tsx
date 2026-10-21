@@ -13,13 +13,13 @@ import {
   assetPath,
   badgePath,
   flatPath,
-  lensesEnabled,
   parseCompareReference,
   rasterPath,
   type Card,
   type GridFacet,
 } from "@/lib/platforms";
 import type { GridOrder } from "@/lib/grid-order";
+import { parseGlassShape, parseVectorShape, type GlassShape, type VectorShape } from "@/lib/vector-shape";
 import { useTheme } from "@/lib/theme";
 import { cn } from "@/lib/cn";
 import {
@@ -36,18 +36,19 @@ const previewCommon = {
   decoding: "async" as const,
 };
 
-function GlassPreview({ card }: { card: Card }) {
+function GlassPreview({ card, shape }: { card: Card; shape: GlassShape }) {
+  const cls = previewCls;
   const b = card.bundle!;
   const alt = `${card.title} app icon`;
   // 96px box: 128 rendition on 1x displays, 256 on 2x.
   const sized = (dark: boolean) => ({
-    src: assetPath(b.slug, { size: 128, dark }),
-    srcSet: `${assetPath(b.slug, { size: 128, dark })} 1x, ${assetPath(b.slug, { size: 256, dark })} 2x`,
+    src: assetPath(b.slug, { size: 128, dark, shape }),
+    srcSet: `${assetPath(b.slug, { size: 128, dark, shape })} 1x, ${assetPath(b.slug, { size: 256, dark, shape })} 2x`,
   });
   const common = { ...previewCommon, width: 96, height: 96 };
-  if (!b.hasDark)
+  if (!(shape === "circle" ? b.hasCircleDark : b.hasDark))
     return (
-      <img {...sized(false)} alt={alt} {...common} className={previewCls} />
+      <img {...sized(false)} alt={alt} {...common} className={cls} />
     );
   return (
     <>
@@ -55,22 +56,22 @@ function GlassPreview({ card }: { card: Card }) {
         {...sized(false)}
         alt={alt}
         {...common}
-        className={cn(previewCls, "dark:hidden")}
+        className={cn(cls, "dark:hidden")}
       />
       <img
         {...sized(true)}
         alt={alt}
         {...common}
-        className={cn(previewCls, "hidden dark:block")}
+        className={cn(cls, "hidden dark:block")}
       />
     </>
   );
 }
 
-function FlatPreview({ card }: { card: Card }) {
+function FlatPreview({ card, shape }: { card: Card; shape: VectorShape }) {
   return (
     <img
-      src={flatPath(card.platform.id)}
+      src={flatPath(card.platform.id, shape)}
       alt={`${card.platform.name} icon`}
       {...previewCommon}
       width={96}
@@ -110,7 +111,7 @@ function ComparePreview({ card }: { card: Card }) {
   // ?ref=store diffs against the store raster (when the bundle has one)
   const [params] = useSearchParams();
   const wanted = parseCompareReference(params.get("ref"));
-  const reference = wanted === "store" && card.driftStore !== null ? "store" : "glass";
+  const reference = wanted === "store" && card.driftStore === null ? "glass" : wanted;
   return (
     <div className={previewCls}>
       <CompareArtwork platform={card.platform} bundle={card.bundle!} compact reference={reference} />
@@ -155,12 +156,15 @@ export function IconCard({
   card,
   facet = "glass",
   gridOrder,
+  score = null,
 }: {
   card: Card;
   /** The directory-level facet view; the card adapts artwork + actions. */
   facet?: GridFacet;
   /** The grid's order, carried to the detail so ← / → step through it. */
   gridOrder?: GridOrder;
+  /** The value currently used to rank this card; absent for other sort orders. */
+  score?: { value: number; label: string } | null;
 }) {
   const navigate = useTransitionNavigate();
   // Menu actions resolve to the rendition on screen (theme-scoped).
@@ -180,10 +184,11 @@ export function IconCard({
   // so the detail's compare segment opens against the same reference.
   const [params] = useSearchParams();
   const ref = facet === "compare" ? parseCompareReference(params.get("ref")) : "glass";
+  const shape = facet === "flat" ? parseVectorShape(params.get("shape")) : facet === "glass" ? parseGlassShape(params.get("shape")) : "squircle";
   const detailHref =
     facet === "glass"
-      ? `/icon/${p.id}`
-      : `/icon/${p.id}?facet=${facet === "flat" ? "vector" : facet}${ref === "store" ? "&ref=store" : ""}`;
+      ? `/icon/${p.id}${shape === "circle" ? "?shape=circle" : ""}`
+      : `/icon/${p.id}?facet=${facet === "flat" ? "vector" : facet}${ref !== "glass" ? `&ref=${ref}` : ""}${facet === "flat" && shape !== "squircle" ? `&shape=${shape}` : ""}`;
 
   const navState = gridOrder ? { grid: gridOrder } : undefined;
   const openDetails = () => {
@@ -220,7 +225,7 @@ export function IconCard({
       // Same navigation as a card click: background location + morph.
       onSelect: openDetails,
     },
-    ...(missing ? [] : menuItemsFor(assetFacetOf(shown), p, b, darkTheme)),
+    ...(missing ? [] : menuItemsFor(assetFacetOf(shown), p, b, darkTheme, shape)),
   ];
 
   return (
@@ -233,52 +238,18 @@ export function IconCard({
       className="group relative flex flex-col items-center justify-center rounded-md border border-neutral-200 px-3.5 py-3 hover:bg-neutral-100/80 dark:border-neutral-800 dark:hover:bg-neutral-800/20"
     >
       <div className="flex h-6 w-full items-center justify-end space-x-2 pb-0.5">
-        {/* Dev-only facet-drift readout (central RMSE between the light
-            Liquid Glass master and the flat, apps/web/lib/facet-drift.json),
-            gated like the QA lenses so a production build drops it. */}
-        {lensesEnabled && card.drift !== null && (
+        {score !== null && (
           <span
-            title="Facet drift: central RMSE, light Liquid Glass master vs flat icon (pipeline/audit-facet-drift.mjs)"
+            title={`${score.label}: ${score.value.toFixed(2)} RMSE. Lower means a closer match.`}
+            aria-label={`${score.label}: ${score.value.toFixed(2)} RMSE`}
             className={cn(
-              "rounded-full border px-2 py-0.5 font-mono text-[11px] tabular-nums",
-              card.drift <= 5
+              "relative z-10 rounded-full border px-2 py-0.5 font-mono text-[11px] tabular-nums",
+              score.value <= 5
                 ? "border-emerald-300 text-emerald-600 dark:border-emerald-900 dark:text-emerald-500"
                 : "border-neutral-300 text-neutral-400 dark:border-neutral-800 dark:text-neutral-500"
             )}
           >
-            {card.drift.toFixed(2)}
-          </span>
-        )}
-        {/* Material pairs carry a second figure: the same audit against the
-            bundle with its glass material off (--material-off), i.e. what
-            the flat gets wrong once the sheen is out of the picture. */}
-        {lensesEnabled && card.driftMaterialOff !== null && (
-          <span
-            title="Facet drift with the bundle's material off: central RMSE, flat vs the layer stack rendered without glass/specular/translucency/shadow (pipeline/audit-facet-drift.mjs --material-off)"
-            className={cn(
-              "rounded-full border px-2 py-0.5 font-mono text-[11px] tabular-nums",
-              card.driftMaterialOff <= 5
-                ? "border-emerald-300 text-emerald-600 dark:border-emerald-900 dark:text-emerald-500"
-                : "border-neutral-300 text-neutral-400 dark:border-neutral-800 dark:text-neutral-500"
-            )}
-          >
-            off {card.driftMaterialOff.toFixed(2)}
-          </span>
-        )}
-        {/* Against the store's own raster (--reference store): the icon as
-            the App Store / Google Play shows it, rendered by Apple's own
-            pipeline — a different reference from the ictool master. */}
-        {lensesEnabled && card.driftStore !== null && (
-          <span
-            title="Facet drift against the store's own raster: central RMSE, flat vs the App Store / Google Play artwork (pipeline/audit-facet-drift.mjs --reference store)"
-            className={cn(
-              "rounded-full border px-2 py-0.5 font-mono text-[11px] tabular-nums",
-              card.driftStore <= 5
-                ? "border-emerald-300 text-emerald-600 dark:border-emerald-900 dark:text-emerald-500"
-                : "border-neutral-300 text-neutral-400 dark:border-neutral-800 dark:text-neutral-500"
-            )}
-          >
-            store {card.driftStore.toFixed(2)}
+            {score.value.toFixed(2)}
           </span>
         )}
         {shown === "flat" && facet === "glass" && (
@@ -301,7 +272,7 @@ export function IconCard({
               label={shown === "flat" ? "missing flat" : "missing badge"}
             />
           ) : shown === "glass" ? (
-            <GlassPreview card={card} />
+            <GlassPreview card={card} shape={parseGlassShape(shape)} />
           ) : shown === "badge" ? (
             <BadgePreview card={card} />
           ) : shown === "compare" ? (
@@ -309,7 +280,7 @@ export function IconCard({
           ) : shown === "raster" ? (
             <RasterPreview card={card} />
           ) : (
-            <FlatPreview card={card} />
+            <FlatPreview card={card} shape={shape} />
           )}
         </div>
       </div>

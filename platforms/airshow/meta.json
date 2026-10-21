@@ -16,7 +16,8 @@
         "file": "Airshow.icon",
         "source": "decanted",
         "appStoreId": 1584582270,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

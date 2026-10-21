@@ -12,7 +12,8 @@
         "file": "Hark.icon",
         "source": "flat-svg-split",
         "appStoreId": 1540109137,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

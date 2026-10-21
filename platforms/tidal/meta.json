@@ -1,0 +1,22 @@
+{
+  "name": "TIDAL",
+  "active": true,
+  "url": "https://tidal.com",
+  "added": "2026-10-16",
+  "flatSource": "drawn",
+  "guidelinesUrl": "https://developer.tidal.com/documentation/guidelines-design-guidelines-2_0",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "tidal",
+        "title": "TIDAL",
+        "variant": null,
+        "file": "TIDAL.icon",
+        "source": "flat-svg-split",
+        "appStoreId": 913943275,
+        "hasDark": true,
+        "hasCircleDark": false
+      }
+    ]
+  }
+}

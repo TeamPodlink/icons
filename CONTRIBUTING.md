@@ -22,6 +22,15 @@ Follow the existing conventions: `icon.svg` is a 32×32 (`viewBox="0 0
 32 32"`) square; badges follow the shapes in existing platforms. Run
 `pnpm --filter @podlink/icons validate`.
 
+Vector icons support square, squircle, and circle output. Optional
+`icon-circle.svg`, `icon-square.svg`, or `icon-superellipse.svg` files
+override the artwork for that shape in both the React package and static
+downloads. Keep their viewBox at `0 0 32 32`; the build applies the outer
+mask. Scale the foreground independently of a full-bleed background when
+adapting a mark, and document the source of the adjustment. Without an
+override, the build clips `icon.svg` without changing its scale. See
+[vector shape guidance](pipeline/vector-shapes.md).
+
 ## Adding a Liquid Glass icon
 
 **App developers (preferred):** export your `.icon` file from Icon

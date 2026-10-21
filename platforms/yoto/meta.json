@@ -12,7 +12,8 @@
         "file": "Yoto.icon",
         "source": "flat-svg-split",
         "appStoreId": 1412039719,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

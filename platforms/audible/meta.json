@@ -14,7 +14,8 @@
         "file": "Audible.icon",
         "hasDark": true,
         "source": "official-svg",
-        "appStoreId": 379693831
+        "appStoreId": 379693831,
+        "hasCircleDark": false
       }
     ]
   }

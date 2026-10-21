@@ -7,7 +7,7 @@
   ],
   "url": "https://radio.thmanyah.com",
   "added": "2026-09-19",
-  "flatSource": "official",
+  "flatSource": "drawn",
   "liquidGlass": {
     "bundles": [
       {
@@ -15,9 +15,10 @@
         "title": "Radio Thmanyah",
         "variant": null,
         "file": "RadioThmanyah.icon",
-        "source": "appstore-artwork-split",
+        "source": "flat-svg",
         "appStoreId": 1641282078,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

@@ -11,7 +11,8 @@
         "variant": null,
         "file": "PodcastIndex.icon",
         "source": "flat-svg-split",
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

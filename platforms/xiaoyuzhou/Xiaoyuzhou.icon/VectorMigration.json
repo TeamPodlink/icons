@@ -1,0 +1,44 @@
+{
+  "sourceSHA256": {
+    "bg.png": "b4a0f81d676d7ef87d8043875a0d886b4f33cc314bd58cf5f0c44cde313dfc04",
+    "bg_dark.png": "e31d03bd6354c52e33ac88f54330fdccaef2ba019c66e2aa414612581cc18503",
+    "line1_dark.png": "ad4f164cea466d5353ce6328e398b6c5a9ef4b9718155b03add33de1faca5ac5",
+    "line2_dark.png": "c120aec02513854b06bf465cd57c15fe485274fdce3da165586a829f29d5563c",
+    "theme_dark.png": "865e0cad0465adf26d006bc05c1c4d8131a1d4e0aa2193c271ceca143b5fc738"
+  },
+  "geometry": "Official 1024px orbit paths; concentric annuli centered at (511.573,511.573), radii 397.227/502.186/608 and width 25.6; planet radius 290.56.",
+  "shading": "Fitted elliptical radial gradients and outlined edge highlights. Planet halo uses fitted transparent radial gradients. All assets are vector paths and gradients, with no images or SVG filters.",
+  "renderer": "Icon Composer 27; 1024px converted to sRGB, central 60% RGB RMSE at 256px",
+  "comparisonToPreviousBundle": [
+    {
+      "name": "light",
+      "central": 0.034360406637202474,
+      "pixelIdentical": false
+    },
+    {
+      "name": "dark",
+      "central": 3.7944309441488038,
+      "pixelIdentical": false
+    },
+    {
+      "name": "tinted-light",
+      "central": 0,
+      "pixelIdentical": true
+    },
+    {
+      "name": "tinted-dark",
+      "central": 0,
+      "pixelIdentical": true
+    },
+    {
+      "name": "circle",
+      "central": 0.041747405891744395,
+      "pixelIdentical": false
+    },
+    {
+      "name": "circle-dark",
+      "central": 0.041747405891744395,
+      "pixelIdentical": false
+    }
+  ]
+}

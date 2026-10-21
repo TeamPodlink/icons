@@ -11,6 +11,8 @@
 // blurred, offset copy of the layer's alpha (SVG filter primitives).
 //
 //   node pipeline/material-flat.mjs measure --only <slug> [--json <out>]
+//     [--translucency-only] skips shadow fitting; both commands accept it.
+//     Native render caches include the bundle content hash and generation.
 //     Renders the bundle through ictool as full / no-translucency /
 //     no-shadow / each glass layer hidden (cached under --work), and for
 //     every glass layer reads: its row extent, the translucency weight
@@ -26,15 +28,21 @@
 //     `<id>-material-`. The plate and every non-glass element are left
 //     alone. Re-running apply on an already-materialised flat is refused.
 import { execFileSync } from "node:child_process";
-import { cpSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import sharp from "sharp";
+import { createHash } from "node:crypto";
 import { readPlatforms, root } from "./lib.mjs";
 
-const ICTOOL = "/Applications/Icon Composer.app/Contents/Executables/ictool";
+const ICTOOL = [
+  "/Applications/Icon Composer.app/Contents/Executables/ictool",
+  "/Applications/Xcode.app/Contents/Applications/Icon Composer.app/Contents/Executables/ictool",
+].find(existsSync);
+if (!ICTOOL) throw new Error("Install Icon Composer or Xcode to measure materials");
 const N = 1024;
 const args = process.argv.slice(2);
 const cmd = args[0];
+const translucencyOnly = args.includes("--translucency-only");
 const flag = (n) => { const i = args.indexOf(n); return i < 0 ? null : args[i + 1]; };
 const flags = (n) => args.map((a, i) => (a === n ? args[i + 1] : null)).filter(Boolean);
 const only = flag("--only");
@@ -45,6 +53,11 @@ const platform = readPlatforms().find((p) => (p.meta.liquidGlass?.bundles ?? [])
 if (!platform) { console.error(`no bundle ${only}`); process.exit(2); }
 const bundleMeta = platform.meta.liquidGlass.bundles.find((b) => b.slug === only);
 const bundlePath = join(platform.dir, bundleMeta.file);
+const hash = createHash("sha256").update("design-generation-27").update(readFileSync(join(bundlePath, "icon.json")));
+for (const file of readdirSync(join(bundlePath, "Assets")).sort()) {
+  if (!file.startsWith(".")) hash.update(file).update(readFileSync(join(bundlePath, "Assets", file)));
+}
+const cacheKey = hash.digest("hex").slice(0, 12);
 
 const toS = (s) => s.withIccProfile("srgb", { attach: false });
 const load = async (f) => toS(sharp(f)).ensureAlpha().raw().toBuffer();
@@ -61,7 +74,7 @@ async function blurred(sil, sigma) {
 
 function renderVariant(name, mutate) {
   mkdirSync(work, { recursive: true });
-  const out = join(work, `${only}-${name}.png`);
+  const out = join(work, `${only}-${cacheKey}-${name}.png`);
   if (existsSync(out)) return out;
   const dir = join(work, `${only}-${name}.icon`);
   rmSync(dir, { recursive: true, force: true });
@@ -69,23 +82,35 @@ function renderVariant(name, mutate) {
   const j = JSON.parse(readFileSync(join(dir, "icon.json"), "utf8"));
   mutate(j);
   writeFileSync(join(dir, "icon.json"), JSON.stringify(j, null, 2));
-  execFileSync(ICTOOL, [dir, "--export-image", "--output-file", out, "--platform", "macOS", "--rendition", "Default", "--width", String(N), "--height", String(N), "--scale", "1"], { stdio: "pipe" });
+  execFileSync(ICTOOL, [dir, "--export-image", "--output-file", out, "--platform", "macOS", "--rendition", "Default", "--width", String(N), "--height", String(N), "--scale", "1", "--design-generation", "27"], { stdio: "pipe" });
   rmSync(dir, { recursive: true, force: true });
   return out;
+}
+
+// Isolate silhouette bounds from native edge lighting and drop shadows.
+function geometryOnly(doc) {
+  for (const group of doc.groups) {
+    group.translucency = { enabled: false, value: 0 };
+    group.shadow = { kind: "none", opacity: 0 };
+    group.specular = false;
+    for (const key of ["translucency-specializations", "shadow-specializations", "specular-specializations", "blur-material"]) delete group[key];
+    for (const layer of group.layers) { layer.glass = false; delete layer["glass-specializations"]; }
+  }
 }
 
 async function measure() {
   const doc = JSON.parse(readFileSync(join(bundlePath, "icon.json"), "utf8"));
   const full = await load(renderVariant("full", () => {}));
   const noT = await load(renderVariant("noTransl", (j) => { for (const g of j.groups) { g.translucency = { enabled: false, value: 0 }; delete g["translucency-specializations"]; } }));
-  const noS = await load(renderVariant("noShadow", (j) => { for (const g of j.groups) g.shadow = { kind: "none", opacity: 0 }; }));
+  const noS = translucencyOnly ? full : await load(renderVariant("noShadow", (j) => { for (const g of j.groups) { g.shadow = { kind: "none", opacity: 0 }; delete g["shadow-specializations"]; } }));
+  const geometry = await load(renderVariant("geometry", geometryOnly));
   const layers = [];
   doc.groups.forEach((g, gi) => g.layers.forEach((l, li) => {
     if (!isGlass(l) || l.hidden) return;
-    layers.push({ gi, li, file: l["image-name"] ?? l["image-name-specializations"]?.[0]?.value, translucency: (g["translucency-specializations"]?.find((s) => !s.appearance)?.value ?? g.translucency)?.value ?? 0, shadowOpacity: g.shadow?.kind === "none" ? 0 : (g.shadow?.opacity ?? 0) });
+    layers.push({ gi, li, file: l["image-name"] ?? l["image-name-specializations"]?.[0]?.value, translucency: (g["translucency-specializations"]?.find((s) => !s.appearance)?.value ?? g.translucency)?.value ?? 0, shadowOpacity: (g["shadow-specializations"]?.find((s) => !s.appearance && !s.idiom)?.value ?? g.shadow)?.opacity ?? 0 });
   }));
   const out = []; const collected = [];
-  // Each layer's VISIBLE footprint: where hiding it (translucency off, so
+  // Each layer's VISIBLE footprint: where hiding it (all materials off, so
   // nothing shows through anything) changes the render, minus the
   // footprints of the layers above it (groups and layers are listed
   // top-to-bottom). Without the subtraction a lower layer reads the
@@ -94,9 +119,9 @@ async function measure() {
   const covered = new Uint8Array(N * N);
   for (const L of layers) {
     const hid = await load(renderVariant(`hide-${L.gi}-${L.li}`, (j) => { j.groups[L.gi].layers[L.li].hidden = true; }));
-    const hidNoT = await load(renderVariant(`hideNoT-${L.gi}-${L.li}`, (j) => { for (const g of j.groups) { g.translucency = { enabled: false, value: 0 }; delete g["translucency-specializations"]; } j.groups[L.gi].layers[L.li].hidden = true; }));
+    const hiddenGeometry = await load(renderVariant(`hideGeometry-${L.gi}-${L.li}`, (j) => { geometryOnly(j); j.groups[L.gi].layers[L.li].hidden = true; }));
     const mask = new Uint8Array(N * N); let y0 = N, y1 = 0, area = 0;
-    for (let i = 0; i < N * N; i++) { if (covered[i]) continue; const q = i * 4; if (Math.max(Math.abs(noT[q] - hidNoT[q]), Math.abs(noT[q + 1] - hidNoT[q + 1]), Math.abs(noT[q + 2] - hidNoT[q + 2])) > 24) { mask[i] = 1; area++; const y = (i / N) | 0; if (y < y0) y0 = y; if (y > y1) y1 = y; } }
+    for (let i = 0; i < N * N; i++) { if (covered[i]) continue; const q = i * 4; if (Math.max(Math.abs(geometry[q] - hiddenGeometry[q]), Math.abs(geometry[q + 1] - hiddenGeometry[q + 1]), Math.abs(geometry[q + 2] - hiddenGeometry[q + 2])) > 24) { mask[i] = 1; area++; const y = (i / N) | 0; if (y < y0) y0 = y; if (y > y1) y1 = y; } }
     for (let i = 0; i < N * N; i++) if (mask[i]) covered[i] = 1;
     if (area < N * N * 0.005) { console.log(`${L.file.padEnd(20)} visible footprint ${area} px — below 0.5% of the canvas, no material applied`); continue; }
     // translucency weight per row-decile of the footprint, interior pixels (eroded 3), channel with the largest backdrop contrast
@@ -179,7 +204,7 @@ async function measure() {
     out.push({ group: c.gi, files: c.files, rows: [c.y0, c.y1], translucency: c.L.translucency, shadowOpacity: c.L.shadowOpacity, alpha: c.alpha.map((v) => +v.toFixed(3)), shadow });
     console.log(`${c.files.join("+").padEnd(20)} rows ${c.y0}-${c.y1} area ${(c.area / (N * N) * 100).toFixed(1)}%  T ${c.L.translucency}  α ${c.alpha.map((v) => v.toFixed(2)).join(" ")}  shadow ${shadow ? `dy ${shadow.dy} σ ${shadow.sigma} a ${shadow.opacity}` : "none"}`);
   });
-  const jsonOut = flag("--json"); if (jsonOut) writeFileSync(jsonOut, JSON.stringify({ slug: only, groups: out }, null, 2) + "\n");
+  const jsonOut = flag("--json"); if (jsonOut) writeFileSync(jsonOut, JSON.stringify({ slug: only, sourceHash: cacheKey, designGeneration: 27, groups: out }, null, 2) + "\n");
 }
 
 async function apply() {
@@ -216,7 +241,7 @@ async function apply() {
     defs.appendChild(grad); defs.appendChild(mask);
     // shadow-only filter: blurred, offset alpha of the source, flooded black at the fitted opacity — the source itself is NOT merged back
     let shadowUse = null;
-    if (L.shadow) {
+    if (L.shadow && !translucencyOnly) {
       const f = d.createElementNS(NS, "filter"); f.setAttribute("id", `${id}-shadow`); f.setAttribute("filterUnits", "userSpaceOnUse"); f.setAttribute("x", "-8"); f.setAttribute("y", "-8"); f.setAttribute("width", "48"); f.setAttribute("height", "48");
       const blur = d.createElementNS(NS, "feGaussianBlur"); blur.setAttribute("in", "SourceAlpha"); blur.setAttribute("stdDeviation", (L.shadow.sigma / 32).toFixed(4)); blur.setAttribute("result", "b");
       const off = d.createElementNS(NS, "feOffset"); off.setAttribute("in", "b"); off.setAttribute("dy", (L.shadow.dy / 32).toFixed(4)); off.setAttribute("result", "o");

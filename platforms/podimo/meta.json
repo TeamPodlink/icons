@@ -12,7 +12,8 @@
         "file": "Podimo.icon",
         "source": "flat-svg-split",
         "appStoreId": 1476538730,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

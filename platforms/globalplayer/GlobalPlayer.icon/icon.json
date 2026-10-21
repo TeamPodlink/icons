@@ -50,13 +50,6 @@
           ],
           "name": "icon",
           "glass": false,
-          "position": {
-            "scale": 32,
-            "translation-in-points": [
-              0,
-              0
-            ]
-          },
           "opacity-specializations": [
             {
               "value": 1
@@ -64,6 +57,27 @@
             {
               "appearance": "dark",
               "value": 1
+            }
+          ],
+          "position-specializations": [
+            {
+              "value": {
+                "scale": 32,
+                "translation-in-points": [
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "value": {
+                "scale": 32,
+                "translation-in-points": [
+                  96,
+                  0
+                ]
+              },
+              "idiom": "watchOS"
             }
           ]
         },
@@ -92,6 +106,9 @@
     }
   ],
   "supported-platforms": {
-    "squares": "shared"
+    "squares": "shared",
+    "circles": [
+      "watchOS"
+    ]
   }
 }

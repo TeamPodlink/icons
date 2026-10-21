@@ -56,7 +56,6 @@
   },
   "groups": [
     {
-      "hidden": false,
       "blend-mode": "normal",
       "specular": false,
       "translucency": {
@@ -76,10 +75,54 @@
             ]
           }
         }
+      ],
+      "hidden-specializations": [
+        {
+          "value": false
+        },
+        {
+          "value": true,
+          "idiom": "watchOS"
+        }
+      ]
+    },
+    {
+      "name": "Circle branding",
+      "hidden-specializations": [
+        {
+          "value": true
+        },
+        {
+          "value": false,
+          "idiom": "watchOS"
+        }
+      ],
+      "blend-mode": "normal",
+      "specular": false,
+      "translucency": {
+        "enabled": false,
+        "value": 0
+      },
+      "layers": [
+        {
+          "name": "circle-branding",
+          "image-name": "circle.svg",
+          "glass": false,
+          "position": {
+            "scale": 34.04255319148936,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        }
       ]
     }
   ],
   "supported-platforms": {
-    "squares": "shared"
+    "squares": "shared",
+    "circles": [
+      "watchOS"
+    ]
   }
 }

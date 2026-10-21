@@ -50,7 +50,123 @@
   },
   "groups": [
     {
-      "hidden": false,
+      "name": "Store material foreground",
+      "layers": [
+        {
+          "image-name": "material-glyph.svg",
+          "name": "store-glyph",
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          },
+          "glass-specializations": [
+            {
+              "value": true
+            },
+            {
+              "appearance": "dark",
+              "value": false
+            },
+            {
+              "appearance": "tinted",
+              "value": false
+            }
+          ]
+        }
+      ],
+      "hidden-specializations": [
+        {
+          "value": false
+        },
+        {
+          "appearance": "dark",
+          "value": true
+        },
+        {
+          "appearance": "tinted",
+          "value": true
+        }
+      ],
+      "translucency-specializations": [
+        {
+          "value": {
+            "enabled": true,
+            "value": 0.25
+          }
+        },
+        {
+          "appearance": "dark",
+          "value": {
+            "enabled": true,
+            "value": 0.5
+          }
+        },
+        {
+          "appearance": "tinted",
+          "value": {
+            "enabled": true,
+            "value": 0.5
+          }
+        }
+      ]
+    },
+    {
+      "name": "Store material background",
+      "specular": false,
+      "translucency": {
+        "enabled": false,
+        "value": 0
+      },
+      "shadow": {
+        "kind": "none",
+        "opacity": 0
+      },
+      "layers": [
+        {
+          "image-name": "material-plate.svg",
+          "name": "plate",
+          "glass": false,
+          "position-specializations": [
+            {
+              "value": {
+                "scale": 32,
+                "translation-in-points": [
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "idiom": "watchOS",
+              "value": {
+                "scale": 34.04255319148936,
+                "translation-in-points": [
+                  0,
+                  0
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "hidden-specializations": [
+        {
+          "value": false
+        },
+        {
+          "appearance": "dark",
+          "value": true
+        },
+        {
+          "appearance": "tinted",
+          "value": true
+        }
+      ]
+    },
+    {
       "shadow": {
         "kind": "neutral",
         "opacity": 0.5
@@ -71,17 +187,14 @@
             {
               "appearance": "dark",
               "value": "icon-dark.svg"
+            },
+            {
+              "value": "circle.svg",
+              "idiom": "watchOS"
             }
           ],
           "name": "icon",
           "glass": false,
-          "position": {
-            "scale": 32,
-            "translation-in-points": [
-              0,
-              0
-            ]
-          },
           "opacity-specializations": [
             {
               "value": 1
@@ -90,7 +203,41 @@
               "appearance": "dark",
               "value": 1
             }
+          ],
+          "position-specializations": [
+            {
+              "value": {
+                "scale": 32,
+                "translation-in-points": [
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "value": {
+                "scale": 34.04255319148936,
+                "translation-in-points": [
+                  0,
+                  0
+                ]
+              },
+              "idiom": "watchOS"
+            }
           ]
+        }
+      ],
+      "hidden-specializations": [
+        {
+          "value": true
+        },
+        {
+          "appearance": "dark",
+          "value": false
+        },
+        {
+          "appearance": "tinted",
+          "value": false
         }
       ]
     }

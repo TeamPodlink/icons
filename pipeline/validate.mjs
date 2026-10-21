@@ -6,6 +6,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { readPlatforms, root } from "./lib.mjs";
+import { validateSafeArea } from "./circle-safe-area.mjs";
 
 const BUNDLE_SIZE_CAP = 8 * 1024 * 1024; // 8 MB per .icon bundle
 const errors = [];
@@ -36,7 +37,7 @@ for (const { id, dir, meta } of platforms) {
     err(`${id}: added must be a YYYY-MM-DD date, got ${JSON.stringify(meta.added)}`);
   // XML forbids "--" inside a comment; librsvg and Chrome refuse the whole
   // file, so a chatty header comment silently blanks an icon on the site.
-  for (const f of ["icon.svg", "badge.svg", "badge-dark.svg"]) {
+  for (const f of ["icon.svg", "icon-square.svg", "icon-circle.svg", "icon-superellipse.svg", "badge.svg", "badge-dark.svg"]) {
     const fp = join(dir, f);
     if (!existsSync(fp)) continue;
     for (const m of readFileSync(fp, "utf8").matchAll(/<!--([\s\S]*?)-->/g))
@@ -59,6 +60,15 @@ for (const { id, dir, meta } of platforms) {
     if (slugs.has(b.slug)) err(`${bid}: duplicate bundle slug`);
     slugs.add(b.slug);
 
+    if (b.appStoreCountry != null && (!b.appStoreId || !/^[a-z]{2}$/.test(b.appStoreCountry)))
+      err(`${bid}: appStoreCountry requires appStoreId and a two-letter lowercase country code`);
+
+    if (b.hasCircleDark != null && typeof b.hasCircleDark !== "boolean")
+      err(`${bid}: hasCircleDark must be a boolean`);
+
+    if (b.circleSafeArea != null || b.circleLayerOffsets != null)
+      err(`${bid}: circle layout belongs inside the .icon bundle, not platform metadata`);
+
     // darkStatus: measured classification of hasDark:false bundles
     // (pipeline/audit-dark-status.mjs) — "native" (artwork already
     // dark; identical light/dark is correct) or "missing" (dark
@@ -73,6 +83,11 @@ for (const { id, dir, meta } of platforms) {
     if (!existsSync(bundle)) {
       err(`${bid}: bundle dir not found: ${b.file}`);
       continue;
+    }
+    const circlePolicy = join(bundle, "circle-layout.json");
+    if (existsSync(circlePolicy)) {
+      try { validateSafeArea(JSON.parse(readFileSync(circlePolicy, "utf8")).safeArea); }
+      catch (error) { err(`${bid}: ${error.message}`); }
     }
     const size = dirSize(bundle);
     if (size > BUNDLE_SIZE_CAP)

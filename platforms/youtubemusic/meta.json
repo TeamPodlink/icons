@@ -13,7 +13,8 @@
         "file": "YouTubeMusic.icon",
         "source": "flat-svg-split",
         "appStoreId": 1017492454,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

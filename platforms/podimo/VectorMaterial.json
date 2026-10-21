@@ -1,0 +1,58 @@
+{
+  "source": "Liquid Glass Default rendition",
+  "designGeneration": 27,
+  "sourceHash": "b5954d235bf9",
+  "measurementCommand": "node pipeline/material-flat.mjs measure --only podimo --translucency-only --json /tmp/podimo-translucency.json",
+  "groups": [
+    {
+      "group": 0,
+      "files": [
+        "icon.svg"
+      ],
+      "rows": [
+        172,
+        852
+      ],
+      "translucency": 0.25,
+      "shadowOpacity": 0,
+      "alpha": [
+        0.007,
+        0.009,
+        0.013,
+        0.022,
+        0.035,
+        0.051,
+        0.069,
+        0.095,
+        0.118,
+        0.137
+      ],
+      "shadow": null
+    }
+  ],
+  "implementation": {
+    "files": [
+      "icon.svg"
+    ],
+    "maskId": "podimo-material-translucency-mask",
+    "gradientCoordinates": "userSpaceOnUse, mapped to the existing foreground bounds",
+    "opacity": "1 minus measured backdrop weight, sampled at the centers of ten vertical bands",
+    "preserved": [
+      "background",
+      "glyph geometry",
+      "circle scale and positioning"
+    ],
+    "circle": "Same measured fade applied within the existing circle foreground bounds."
+  },
+  "verification": {
+    "metric": "central 60% RGB RMSE at 256px, both sides rendered at 1024px in sRGB",
+    "vectorVsGlass": {
+      "before": 8.18311420368193,
+      "after": 5.832023240752466
+    },
+    "circleVsGlass": {
+      "before": 34.18565662700526,
+      "after": 32.56311104851852
+    }
+  }
+}

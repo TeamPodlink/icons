@@ -12,8 +12,9 @@
         "variant": null,
         "file": "Disctopia.icon",
         "hasDark": true,
-        "source": "appstore-artwork-split",
-        "appStoreId": 1162011563
+        "source": "flat-svg",
+        "appStoreId": 1162011563,
+        "hasCircleDark": false
       }
     ]
   }

@@ -13,7 +13,8 @@
         "file": "Castro-Default.icon",
         "hasDark": true,
         "source": "flat-svg-split",
-        "appStoreId": 1080840241
+        "appStoreId": 1080840241,
+        "hasCircleDark": false
       }
     ]
   }

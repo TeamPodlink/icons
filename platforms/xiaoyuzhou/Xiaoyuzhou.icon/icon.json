@@ -1,60 +1,14 @@
 {
   "fill": {
-    "automatic-gradient": "srgb:0.00000,0.47800,1.00000,1.00000",
-    "orientation": {
-      "start": {
-        "x": 0.5,
-        "y": 0
-      },
-      "stop": {
-        "x": 0.5,
-        "y": 1
-      }
-    },
-    "fill-specializations": [
-      {
-        "value": {
-          "automatic-gradient": "srgb:0.00000,0.47800,1.00000,1.00000",
-          "orientation": {
-            "start": {
-              "x": 0.5,
-              "y": 0
-            },
-            "stop": {
-              "x": 0.5,
-              "y": 1
-            }
-          }
-        }
-      },
-      {
-        "appearance": "dark",
-        "value": {
-          "linear-gradient": [
-            "gray:0.19200,1.00000",
-            "gray:0.07800,1.00000"
-          ],
-          "orientation": {
-            "start": {
-              "x": 0.5,
-              "y": 0
-            },
-            "stop": {
-              "x": 0.5,
-              "y": 1
-            }
-          }
-        }
-      }
-    ]
+    "automatic-gradient": "srgb:0.00000,0.47800,1.00000,1.00000"
   },
   "groups": [
     {
+      "blend-mode": "normal",
+      "blur-material": 0.5,
       "hidden": false,
       "layers": [
         {
-          "image-name": "line1.svg",
-          "name": "line1",
           "fill-specializations": [
             {
               "appearance": "tinted",
@@ -63,54 +17,24 @@
               }
             }
           ],
-          "opacity-specializations": [
+          "name": "line1",
+          "image-name-specializations": [
             {
-              "value": 1
+              "value": "line1.svg"
             },
             {
               "appearance": "dark",
-              "value": 0
+              "value": "line1_dark.svg"
             }
           ],
-          "glass-specializations": [
-            {
-              "value": true
-            },
-            {
-              "appearance": "dark",
-              "value": false
-            }
-          ]
-        },
-        {
-          "image-name": "line1_dark.png",
-          "name": "line1_dark",
-          "opacity-specializations": [
-            {
-              "value": 0
-            },
-            {
-              "appearance": "dark",
-              "value": 1
-            }
-          ],
-          "glass-specializations": [
-            {
-              "value": false
-            },
-            {
-              "appearance": "dark",
-              "value": true
-            }
-          ]
+          "glass": true
         }
       ],
+      "lighting": "individual",
       "shadow": {
         "kind": "neutral",
         "opacity": 0.5
       },
-      "blend-mode": "normal",
-      "lighting": "individual",
       "specular": true,
       "translucency-specializations": [
         {
@@ -134,50 +58,44 @@
           }
         }
       ],
-      "blur-material": 0.5
+      "name": "Outer orbit"
     },
     {
+      "blend-mode": "normal",
+      "blur-material-specializations": [
+        {
+          "value": 0.3
+        },
+        {
+          "appearance": "dark",
+          "value": 0.2
+        },
+        {
+          "appearance": "tinted",
+          "value": 0.6
+        }
+      ],
       "hidden": false,
       "layers": [
         {
           "image-name": "theme_line_dark_tint.svg",
-          "name": "theme_line_dark_tint",
-          "opacity-specializations": [
+          "name": "Planet outline",
+          "glass": true,
+          "hidden-specializations": [
             {
-              "value": 0
+              "value": true
             },
             {
               "appearance": "dark",
-              "value": 1
-            },
-            {
-              "appearance": "tinted",
-              "value": 1
-            }
-          ],
-          "glass-specializations": [
-            {
               "value": false
             },
             {
-              "appearance": "dark",
-              "value": true
-            },
-            {
               "appearance": "tinted",
-              "value": true
+              "value": false
             }
           ]
         },
         {
-          "image-name": "theme_tint.svg",
-          "name": "theme_tint",
-          "opacity": 0,
-          "glass": false
-        },
-        {
-          "image-name": "theme.svg",
-          "name": "theme",
           "fill-specializations": [
             {
               "appearance": "tinted",
@@ -189,58 +107,34 @@
               }
             }
           ],
+          "name": "theme",
           "opacity-specializations": [
             {
               "value": 1
             },
             {
               "appearance": "dark",
-              "value": 0
-            }
-          ],
-          "glass-specializations": [
-            {
-              "value": true
-            },
-            {
-              "appearance": "dark",
-              "value": false
-            }
-          ]
-        },
-        {
-          "image-name": "theme_dark.png",
-          "name": "theme_dark",
-          "opacity-specializations": [
-            {
-              "value": 0
-            },
-            {
-              "appearance": "dark",
               "value": 0.85
             }
           ],
-          "glass-specializations": [
+          "image-name-specializations": [
             {
-              "value": false
+              "value": "theme.svg"
             },
             {
               "appearance": "dark",
-              "value": true
-            },
-            {
-              "appearance": "tinted",
-              "value": true
+              "value": "theme_dark.svg"
             }
-          ]
+          ],
+          "glass": true
         }
       ],
+      "lighting": "individual",
+      "name": "Planet",
       "shadow": {
         "kind": "neutral",
         "opacity": 0.5
       },
-      "blend-mode": "normal",
-      "lighting": "individual",
       "specular": true,
       "translucency-specializations": [
         {
@@ -263,27 +157,13 @@
             "value": 0
           }
         }
-      ],
-      "blur-material-specializations": [
-        {
-          "value": 0.3
-        },
-        {
-          "appearance": "dark",
-          "value": 0.2
-        },
-        {
-          "appearance": "tinted",
-          "value": 0.6
-        }
       ]
     },
     {
+      "blend-mode": "normal",
       "hidden": false,
       "layers": [
         {
-          "image-name": "line2.svg",
-          "name": "line2",
           "fill-specializations": [
             {
               "appearance": "tinted",
@@ -292,54 +172,24 @@
               }
             }
           ],
-          "opacity-specializations": [
+          "name": "line2",
+          "image-name-specializations": [
             {
-              "value": 1
+              "value": "line2.svg"
             },
             {
               "appearance": "dark",
-              "value": 0
+              "value": "line2_dark.svg"
             }
           ],
-          "glass-specializations": [
-            {
-              "value": true
-            },
-            {
-              "appearance": "dark",
-              "value": false
-            }
-          ]
-        },
-        {
-          "image-name": "line2_dark.png",
-          "name": "line2_dark",
-          "opacity-specializations": [
-            {
-              "value": 0
-            },
-            {
-              "appearance": "dark",
-              "value": 1
-            }
-          ],
-          "glass-specializations": [
-            {
-              "value": false
-            },
-            {
-              "appearance": "dark",
-              "value": true
-            }
-          ]
+          "glass": true
         }
       ],
+      "lighting": "individual",
       "shadow": {
         "kind": "neutral",
         "opacity": 0.5
       },
-      "blend-mode": "normal",
-      "lighting": "individual",
       "specular": true,
       "translucency-specializations": [
         {
@@ -355,100 +205,58 @@
             "value": 0
           }
         }
-      ]
+      ],
+      "name": "Inner orbit"
     },
     {
+      "blend-mode": "normal",
       "hidden": false,
       "layers": [
         {
-          "image-name": "bg.png",
+          "hidden": false,
           "name": "bg",
-          "opacity-specializations": [
+          "position-specializations": [
             {
-              "value": 1
-            },
-            {
-              "appearance": "dark",
-              "value": 0
-            },
-            {
-              "appearance": "tinted",
-              "value": 0
-            }
-          ],
-          "glass-specializations": [
-            {
-              "value": true
-            },
-            {
-              "appearance": "dark",
-              "value": false
-            },
-            {
-              "appearance": "tinted",
-              "value": false
-            }
-          ]
-        },
-        {
-          "image-name": "bg_dark.png",
-          "name": "bg_dark",
-          "opacity-specializations": [
-            {
-              "value": 1
-            },
-            {
-              "appearance": "tinted",
-              "value": 0
-            }
-          ],
-          "glass-specializations": [
-            {
-              "value": true
-            },
-            {
-              "appearance": "tinted",
-              "value": false
-            }
-          ]
-        },
-        {
-          "image-name": "bg_tint.svg",
-          "name": "bg_tint",
-          "fill-specializations": [
-            {
-              "appearance": "dark",
               "value": {
-                "solid": "srgb:0.00000,0.47800,1.00000,1.00000"
+                "scale": 1,
+                "translation-in-points": [
+                  0,
+                  0
+                ]
+              }
+            },
+            {
+              "idiom": "watchOS",
+              "value": {
+                "scale": 1.0638297872340425,
+                "translation-in-points": [
+                  0,
+                  0
+                ]
               }
             }
           ],
-          "opacity-specializations": [
+          "image-name-specializations": [
             {
-              "value": 0
+              "value": "bg.svg"
+            },
+            {
+              "appearance": "dark",
+              "value": "bg_dark.svg"
             },
             {
               "appearance": "tinted",
-              "value": 1
+              "value": "bg_tint.svg"
             }
           ],
-          "glass-specializations": [
-            {
-              "value": false
-            },
-            {
-              "appearance": "tinted",
-              "value": true
-            }
-          ]
+          "glass": true
         }
       ],
+      "lighting": "individual",
       "shadow": {
         "kind": "neutral",
         "opacity": 0.5
       },
-      "blend-mode": "normal",
-      "lighting": "individual",
       "specular": true,
       "translucency-specializations": [
         {
@@ -464,7 +272,8 @@
             "value": 1
           }
         }
-      ]
+      ],
+      "name": "Background"
     }
   ],
   "supported-platforms": {

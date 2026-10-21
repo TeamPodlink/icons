@@ -1429,36 +1429,6 @@
       "fit": null,
       "materialOff": null
     },
-    "stenofm": {
-      "primary": "floor",
-      "causes": [],
-      "central": 0.89,
-      "glassLayers": 0,
-      "specular": false,
-      "struct": 0,
-      "signed": [
-        0,
-        0,
-        -0.8
-      ],
-      "lumaShare": 0.56,
-      "edgeShare": 0.73,
-      "plateShare": 0.48,
-      "plateSigned": [
-        0,
-        0,
-        -1.1
-      ],
-      "plateRmse": 0.67,
-      "glyphSigned": [
-        0,
-        0,
-        0
-      ],
-      "filter": false,
-      "fit": null,
-      "materialOff": null
-    },
     "playerfm": {
       "primary": "floor",
       "causes": [],

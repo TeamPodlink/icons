@@ -12,7 +12,8 @@
         "file": "Audacy.icon",
         "source": "flat-svg-split",
         "appStoreId": 323701765,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

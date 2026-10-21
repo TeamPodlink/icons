@@ -16,7 +16,8 @@
         "file": "JioSaavn.icon",
         "source": "appstore-artwork",
         "appStoreId": 441813332,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

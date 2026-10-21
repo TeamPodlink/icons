@@ -1,0 +1,25 @@
+{
+  "name": "Claro Música",
+  "active": true,
+  "url": "https://www.claromusica.com",
+  "added": "2026-10-16",
+  "flatSource": "drawn",
+  "aliases": [
+    "Claro Musica"
+  ],
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "claromusica",
+        "title": "Claro Música",
+        "variant": null,
+        "file": "ClaroMsica.icon",
+        "source": "flat-svg-split",
+        "appStoreId": 843577241,
+        "appStoreCountry": "mx",
+        "hasDark": true,
+        "hasCircleDark": false
+      }
+    ]
+  }
+}

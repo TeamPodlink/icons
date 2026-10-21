@@ -1,0 +1,26 @@
+{
+  "name": "Hungama",
+  "active": true,
+  "url": "https://www.hungama.com",
+  "added": "2026-10-16",
+  "flatSource": "drawn",
+  "aliases": [
+    "Hungama OTT"
+  ],
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "hungama",
+        "title": "Hungama",
+        "variant": null,
+        "file": "Hungama.icon",
+        "source": "flat-svg-split",
+        "appStoreId": 414009038,
+        "playStoreId": "com.hungama.myplay.activity",
+        "appStoreCountry": "in",
+        "hasDark": true,
+        "hasCircleDark": false
+      }
+    ]
+  }
+}

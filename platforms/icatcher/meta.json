@@ -15,7 +15,8 @@
         "file": "iCatcher.icon",
         "source": "flat-svg-split",
         "appStoreId": 414419105,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

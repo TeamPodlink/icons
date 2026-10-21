@@ -12,7 +12,8 @@
         "file": "Netflix.icon",
         "source": "decanted",
         "appStoreId": 363590051,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

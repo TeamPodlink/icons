@@ -4,7 +4,10 @@ import { useLocation, useSearchParams } from "react-router";
 import Fuse from "fuse.js";
 import { ArrowDownUp, ArrowUpDown, Check, Ruler, Search, TrendingUp } from "lucide-react";
 import { useEffect } from "react";
+import { ComparisonControl } from "@/components/comparison-control";
+import { parseCompareReference } from "@/lib/platforms";
 import { IconCard } from "@/components/icon-card";
+import { VectorShapeControl } from "@/components/vector-shape-control";
 import { WarningBanner } from "@/components/warning-banner";
 import { PageCard } from "@/components/page-card";
 import { facetCards, lensesEnabled, type Card, type GridFacet } from "@/lib/platforms";
@@ -17,9 +20,8 @@ const byTitle = (a: string, b: string) =>
 
 function useUrlState(key: string, initial: string) {
   const [params, setParams] = useSearchParams();
-  const [value, setValue] = useState(params.get(key) ?? initial);
+  const value = params.get(key) ?? initial;
   const set = (v: string) => {
-    setValue(v);
     const next = new URLSearchParams(window.location.search);
     if (v && v !== initial) next.set(key, v);
     else next.delete(key);
@@ -58,22 +60,22 @@ function useScrollMemory(anchorRef: React.RefObject<HTMLElement | null>) {
 
 /** Sort orders: Latest (production default, stays out of the URL), A-Z, Popular —
  *  and, dev-only like the QA lenses, Drift: highest facet drift first
- *  (central RMSE between the light Liquid Glass master and the flat,
- *  from the committed apps/web/lib/facet-drift.json snapshot), the
+ *  (central RMSE for the facet's comparison pair, from the committed
+ *  apps/web/lib/facet-drift.json snapshot), the
  *  re-sourcing worklist in ranked form. ?sort=drift is refused on a
  *  production build the same way the lenses are absent from it. */
-const ALL_SORTS = ["latest", "alphabetical", "popular", "drift"] as const;
+const ALL_SORTS = ["latest", "alphabetical", "popular", "drift", "artwork"] as const;
 type Sort = (typeof ALL_SORTS)[number];
 const SORTS: readonly Sort[] = lensesEnabled
   ? ALL_SORTS
-  : ALL_SORTS.filter((s) => s !== "drift");
+  : ALL_SORTS.filter((s) => s !== "drift" && s !== "artwork");
 
 /** Dev builds open on the Drift sort (the worklist), production on Latest;
  *  the default stays out of the URL either way. */
 const DEFAULT_SORT: Sort = lensesEnabled ? "drift" : "latest";
 
 const parseSort = (raw: string): Sort =>
-  raw === "alphabetical" || raw === "popular" || raw === "latest" || (raw === "drift" && lensesEnabled)
+  raw === "alphabetical" || raw === "popular" || raw === "latest" || ((raw === "drift" || raw === "artwork") && lensesEnabled)
     ? raw
     : DEFAULT_SORT;
 
@@ -81,12 +83,28 @@ const SORT_META: Record<Sort, { label: string; Icon: typeof ArrowUpDown }> = {
   latest: { label: "Latest", Icon: ArrowUpDown },
   alphabetical: { label: "A-Z", Icon: ArrowDownUp },
   popular: { label: "Popular", Icon: TrendingUp },
-  drift: { label: "Drift", Icon: Ruler },
+  drift: { label: "Visual difference", Icon: Ruler },
+  artwork: { label: "Artwork difference", Icon: Ruler },
 };
+
+/** Sorting and the card readout share the same metric and fallback. */
+function cardScore(card: Card, sort: Sort, facet: GridFacet, reference: string) {
+  if (!lensesEnabled || (sort !== "drift" && sort !== "artwork")) return null;
+  const useGlassStore = (facet === "glass" && sort === "drift")
+    || (facet === "compare" && reference === "glass-store");
+  const [value, label] = useGlassStore
+    ? [card.driftGlassStore, "Liquid Glass vs App Store"] as const
+    : facet === "compare" && reference === "store"
+      ? [card.driftStore, "Vector vs store artwork"] as const
+      : sort === "artwork" && card.driftMaterialOff !== null
+        ? [card.driftMaterialOff, "Vector vs Liquid Glass with materials off"] as const
+        : [card.drift, "Vector vs Liquid Glass"] as const;
+  return value === null ? null : { value, label };
+}
 
 /** Shows the CURRENT sort; tapping reveals the options with the current
  *  one checked. */
-function SortMenu({ sort, onChange }: { sort: Sort; onChange: (s: Sort) => void }) {
+function SortMenu({ sort, onChange, artwork }: { sort: Sort; onChange: (s: Sort) => void; artwork: boolean }) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const { label, Icon } = SORT_META[sort];
@@ -121,9 +139,9 @@ function SortMenu({ sort, onChange }: { sort: Sort; onChange: (s: Sort) => void 
         <div
           role="listbox"
           aria-label="Sort order"
-          className="absolute right-0 top-full z-50 mt-1 w-36 rounded-md border border-neutral-200 bg-white p-1 shadow-md dark:border-neutral-800 dark:bg-neutral-900"
+          className="absolute right-0 top-full z-50 mt-1 w-56 rounded-md border border-neutral-200 bg-white p-1 shadow-md dark:border-neutral-800 dark:bg-neutral-900"
         >
-          {SORTS.map((s) => {
+          {SORTS.filter((s) => artwork || s !== "artwork").map((s) => {
             const { label: l, Icon: I } = SORT_META[s];
             return (
               <button
@@ -162,22 +180,29 @@ export function Directory({
   facet?: GridFacet;
 }) {
   const [query, setQuery] = useUrlState("search", "");
-  const [sortRaw, setSort] = useUrlState("sort", DEFAULT_SORT);
-  // Compare facet: what the vector is diffed against (ictool master or the
-  // store raster) — URL state so the choice is shareable and the cards
-  // read it themselves.
+  const location = useLocation();
+  const [sortRaw] = useUrlState("sort", DEFAULT_SORT);
+  // The comparison pair travels with grid links and detail navigation.
   const [refRaw, setRef] = useUrlState("ref", "glass");
-  // Liquid Glass facet, Drift sort: which drift figure ranks the grid —
-  // the full comparison (material on) or the artwork-only one measured
-  // with the glass material disabled (material off). URL state like ?ref.
-  const [materialRaw, setMaterial] = useUrlState("material", "on");
-  const sort = parseSort(sortRaw);
+  const [params, setParams] = useSearchParams();
+  const parsedSort = parseSort(sortRaw);
+  // Preserve old shared links; new selections use a single sort parameter.
+  const sort = facet === "glass" && parsedSort === "drift" && params.get("material") === "off"
+    ? "artwork" : parsedSort === "artwork" && facet !== "glass" ? "drift" : parsedSort;
+  const changeSort = (value: Sort) => {
+    const next = new URLSearchParams(params);
+    next.delete("material");
+    if (value === DEFAULT_SORT) next.delete("sort"); else next.set("sort", value);
+    setParams(next, { replace: true, preventScrollReset: true });
+  };
   const inputRef = useRef<HTMLInputElement>(null);
   // Anchor inside the PageCard viewport, for scroll save/restore.
   const toolbarRef = useRef<HTMLDivElement>(null);
   useScrollMemory(toolbarRef);
 
-  const base = useMemo(() => facetCards(cards, facet), [cards, facet]);
+  const base = useMemo(() => facetCards(cards, facet).filter((card) =>
+    facet !== "compare" || refRaw !== "glass-store" || card.driftGlassStore !== null
+  ), [cards, facet, refRaw]);
 
   const fuse = useMemo(
     () =>
@@ -203,21 +228,8 @@ export function Directory({
           (a.popularityRank ?? Infinity) - (b.popularityRank ?? Infinity) ||
           byTitle(a.title, b.title)
       );
-    else if (sort === "drift") {
-      // "drift": worst facet agreement first; unmeasured (flat-only
-      // cards, bundles newer than the snapshot) sink to the bottom. On the
-      // Compare facet the figure follows the reference switch: against the
-      // store raster when ?ref=store. On the Liquid Glass facet it follows
-      // the material switch: ?material=off ranks by the artwork-only figure.
-      // A flat that carries the material itself has no material-off
-      // measurement (the audit skips it) — its full figure is already the
-      // artwork comparison, so it ranks by that rather than sinking.
-      const figure = (c: Card) =>
-        facet === "compare" && refRaw === "store"
-          ? c.driftStore
-          : facet === "glass" && materialRaw === "off"
-            ? (c.driftMaterialOff ?? c.drift)
-            : c.drift;
+    else if (sort === "drift" || sort === "artwork") {
+      const figure = (c: Card) => cardScore(c, sort, facet, refRaw)?.value;
       list.sort(
         (a, b) => (figure(b) ?? -1) - (figure(a) ?? -1) || byTitle(a.title, b.title)
       );
@@ -231,14 +243,14 @@ export function Directory({
           byTitle(a.title, b.title)
       );
     return list;
-  }, [base, fuse, query, sort, facet, refRaw, materialRaw]);
+  }, [base, fuse, query, sort, facet, refRaw]);
 
   const noun = facet === "badge" ? "badges" : "icons";
 
   // The detail's ← / → walk this exact order (see lib/grid-order.ts).
   const gridOrder = useMemo(
-    () => gridOrderOf(shown, window.location.pathname + window.location.search),
-    [shown]
+    () => gridOrderOf(shown, location.pathname + location.search),
+    [shown, location.pathname, location.search]
   );
 
   return (
@@ -261,68 +273,20 @@ export function Directory({
       <PageCard withSearch>
         <div
           ref={toolbarRef}
-          className="sticky top-0 z-40 grid h-12 grid-cols-[1fr_auto_1fr] items-center border-b border-neutral-200 bg-white/80 px-4 py-1.5 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/40"
+          className={`sticky top-0 z-40 grid min-h-12 items-center border-b border-neutral-200 bg-white/80 px-4 py-1.5 backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/40 ${facet === "flat" || facet === "glass" || facet === "compare" ? "grid-cols-[1fr_auto] gap-y-2 sm:grid-cols-[1fr_auto_1fr]" : "grid-cols-[1fr_auto_1fr]"}`}
         >
           <p className="font-mono text-sm text-neutral-600 dark:text-neutral-400">
             {`${shown.length} ${shown.length === 1 ? "result" : "results"}`}
           </p>
-          {/* Centre column: the Compare facet's reference switch, or the
-              Liquid Glass facet's material switch under the Drift sort
-              (empty otherwise). */}
-          <div className="flex items-center justify-center">
-            {facet === "glass" && sort === "drift" && (
-              <div
-                role="group"
-                aria-label="Drift figure"
-                className="flex items-center rounded-md border border-neutral-200 p-0.5 font-mono text-xs dark:border-neutral-800"
-              >
-                {(["on", "off"] as const).map((m) => (
-                  <button
-                    key={m}
-                    type="button"
-                    aria-pressed={materialRaw === m}
-                    title={m === "on" ? "Rank by the full drift figure: the light Liquid Glass master against the flat" : "Rank by the artwork-only figure: the master rendered with the glass material disabled (audit-facet-drift.mjs --material-off); flats that carry the material rank by their full figure"}
-                    onClick={() => setMaterial(m)}
-                    className={
-                      "cursor-pointer rounded px-2 py-0.5 " +
-                      (materialRaw === m
-                        ? "bg-neutral-200 text-black dark:bg-neutral-800 dark:text-white"
-                        : "text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white")
-                    }
-                  >
-                    material {m}
-                  </button>
-                ))}
-              </div>
-            )}
+          {/* Facet-specific controls stay centered above the grid. */}
+          <div className={`flex items-center justify-center gap-2 ${facet === "flat" || facet === "glass" || facet === "compare" ? "order-3 col-span-2 sm:order-none sm:col-span-1" : ""}`}>
+            {(facet === "flat" || facet === "glass") && <VectorShapeControl facet={facet} />}
             {facet === "compare" && (
-              <div
-                role="group"
-                aria-label="Compare against"
-                className="flex items-center rounded-md border border-neutral-200 p-0.5 font-mono text-xs dark:border-neutral-800"
-              >
-                {(["glass", "store"] as const).map((r) => (
-                  <button
-                    key={r}
-                    type="button"
-                    aria-pressed={refRaw === r}
-                    title={r === "glass" ? "Diff against the light Liquid Glass master (ictool)" : "Diff against the store's own raster (App Store / Google Play); cards without one keep the glass master"}
-                    onClick={() => setRef(r)}
-                    className={
-                      "cursor-pointer rounded px-2 py-0.5 " +
-                      (refRaw === r
-                        ? "bg-neutral-200 text-black dark:bg-neutral-800 dark:text-white"
-                        : "text-neutral-500 hover:text-black dark:text-neutral-400 dark:hover:text-white")
-                    }
-                  >
-                    vs {r}
-                  </button>
-                ))}
-              </div>
+              <ComparisonControl value={parseCompareReference(refRaw)} onChange={setRef} />
             )}
           </div>
           <div className="flex items-center justify-end">
-            <SortMenu sort={sort} onChange={setSort} />
+            <SortMenu sort={sort} onChange={changeSort} artwork={facet === "glass"} />
           </div>
         </div>
         <WarningBanner />
@@ -337,7 +301,8 @@ export function Directory({
           ) : (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
               {shown.map((card) => (
-                <IconCard key={card.key} card={card} facet={facet} gridOrder={gridOrder} />
+                <IconCard key={card.key} card={card} facet={facet} gridOrder={gridOrder}
+                  score={query ? null : cardScore(card, sort, facet, refRaw)} />
               ))}
             </div>
           )}

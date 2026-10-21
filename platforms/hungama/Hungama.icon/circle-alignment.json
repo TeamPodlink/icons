@@ -1,0 +1,38 @@
+{
+  "center": [
+    14.707827828234844,
+    16.012272086764305
+  ],
+  "translation": [
+    1.2921721717651558,
+    -0.012272086764305357
+  ],
+  "cornerRadii": [
+    13.442852317989622,
+    13.442852317989624,
+    13.44285231798963
+  ],
+  "beforeRadii": [
+    14.122376865114191,
+    12.151172823088416,
+    14.147887465150495
+  ],
+  "cornerPoints": [
+    [
+      8.1015625,
+      4.3046875
+    ],
+    [
+      28.1484375,
+      16.2578125
+    ],
+    [
+      7.9765625,
+      27.6484375
+    ]
+  ],
+  "measurementSize": 2048,
+  "method": "Equalize maximum radial distance of the upper-left, right, and lower-left rounded silhouette corners; alpha >= 0.5 at 2048px.",
+  "vectorClearance": 2.5571476820103776,
+  "nativeLayerScale": 32
+}

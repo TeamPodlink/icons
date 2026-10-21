@@ -1,0 +1,54 @@
+{
+  "reference": "apps/web/public/raster/castro.png",
+  "measurement": {
+    "designGeneration": 27,
+    "renderSize": 1024,
+    "scoreSize": 256,
+    "crop": [
+      51,
+      51,
+      154,
+      154
+    ],
+    "colorSpace": "sRGB via ICC conversion",
+    "channels": "RGB"
+  },
+  "beforeRmse": 10.02422993600312,
+  "afterRmse": 3.134406907561461,
+  "settings": {
+    "translucency": 0.26,
+    "shadow": {
+      "kind": "neutral",
+      "opacity": 0.75
+    },
+    "specular": true
+  },
+  "verification": [
+    {
+      "platform": "macOS",
+      "mode": "Default",
+      "beforeAfterRgbaRmse": 8.831823698335793
+    },
+    {
+      "platform": "iOS",
+      "mode": "Dark",
+      "beforeAfterRgbaRmse": 0
+    },
+    {
+      "platform": "iOS",
+      "mode": "TintedLight",
+      "beforeAfterRgbaRmse": 0
+    },
+    {
+      "platform": "iOS",
+      "mode": "TintedDark",
+      "beforeAfterRgbaRmse": 0
+    },
+    {
+      "platform": "watchOS",
+      "mode": "Default",
+      "beforeAfterRgbaRmse": 8.258162448653504
+    }
+  ],
+  "notes": "The old light.svg contains baked-in glow and shadow paths. Default now uses light-material.svg containing only the unchanged white mark, so Icon Composer applies one native shadow to the actual glyph silhouette. The original light.svg remains selected explicitly for tinted appearances; dark.svg remains selected for dark. The native circle uses the same clean glyph and material."
+}

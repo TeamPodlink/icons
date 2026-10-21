@@ -12,7 +12,8 @@
         "file": "Podkicker.icon",
         "source": "flat-svg-split",
         "playStoreId": "ait.podka",
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

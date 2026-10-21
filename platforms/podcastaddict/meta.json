@@ -12,7 +12,8 @@
         "file": "PodcastAddict.icon",
         "source": "flat-svg-split",
         "playStoreId": "com.bambuna.podcastaddict",
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

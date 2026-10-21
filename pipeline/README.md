@@ -6,11 +6,13 @@ scripts.
 
 | Script | Platform | What it does |
 | --- | --- | --- |
+| `export-figma.mjs` | Node 24 | Generates a local `.fig` with one component set per platform, Square/Circle variants, an artwork preview, and a conversion report. See [Figma export](figma-export.md). |
+| `review-store-materials.mjs` | macOS + Icon Composer 27 | Stages 36 material combinations per platform against refreshed store artwork. Does not adopt candidates automatically. See [October material review](liquid-glass-review-2026-10.md). |
 | `validate.mjs` | any (CI) | Structural checks: meta.json schema, bundle slugs/dirs, icon.json parses, layer assets exist, size caps, recipe presence |
 | `build-data.mjs` | any | Emits `apps/web/lib/platforms.gen.json` — the merged dataset the site renders (debug categories are computed in the site lib from these fields) |
-| `sync-web-assets.mjs` | any | Copies Liquid Glass rasters + flat/badge SVGs into `apps/web/public/` (non-fatal when sources missing); skips the raster copy when `VITE_ASSET_BASE` is set (production builds serve them from R2) |
+| `sync-web-assets.mjs` | any | Copies Liquid Glass rasters + flat/badge SVGs into `apps/web/public/` and emits content revisions so Compare canvases reload changed inputs (non-fatal when sources missing); skips the raster copy when `VITE_ASSET_BASE` is set (production builds serve them from R2). Compare uses lossless PNG masters. |
 | `upload-assets.mjs` | maintainer (R2 credentials) | Uploads `packages/refraction/assets` + `manifest.json` to R2 under the immutable `<version>/` prefix (refuses to overwrite; `--force-verify` checksum-compares, report only); `--zip <out>` writes the GitHub-Release archive for self-hosters; `--dry-run` previews without credentials. Env: `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET` |
-| `build-assets.mjs` | **macOS + Icon Composer** | Renders every Liquid Glass bundle via ictool (Default + Dark), dedupes identical dark renditions by pixel compare, emits 32-512 AVIF+WebP + 1024 PNG into `packages/refraction/assets`, writes `hasDark` back into meta.json |
+| `build-assets.mjs` | **macOS + Icon Composer** | Renders every Liquid Glass bundle via ictool (Default + Dark) for macOS squircles and watchOS circles, dedupes identical dark renditions per shape, emits 32-512 AVIF+WebP + 1024 PNG into `packages/refraction/assets`, writes measured dark metadata into meta.json; `--shape circle` preserves existing squircle files |
 | `build-svg-icons.mjs` | **macOS + Icon Composer + Chrome** | Builds `.icon` bundles from platforms' flat `icon.svg` (glassless platforms only), then attempts the dark-variant SPLIT on each by default. Emits review sheets for visual QA. See the header comment for modes, flags, and the split rules (Apple's automatic dark derivation, monochrome-only whitening, knockout detection) |
 | `build-recipes.mjs` | **macOS + Icon Composer** | Runs the two-phase procedural-recipe pipeline (`packages/engine/tools`) over all-SVG bundles and reports RMSE vs ictool; `--adopt <maxRmse>` copies winners into `packages/engine/recipes`, sets recipe/rmse in meta.json, and regenerates `recipeSlugs`. Set `PYTHON` to a venv with numpy+Pillow |
 | `audit-dark-status.mjs` | any | Classifies every `hasDark:false` bundle as `darkStatus: "native"` (artwork already dark — identical light/dark is correct) or `"missing"` (dark-variant backlog), measured from the bundle's own 1024 layer composite via the border-ring dark classifier + mean-luminance law; `--write` records it into meta.json. See "The dark-status split" below |
@@ -8074,3 +8076,29 @@ shape of the shading, which a grade cannot touch). Trap on the way:
 the first grade scrambled every colour — the six hex digits were
 sliced from 1, 3, 5 instead of 0, 2, 4 — and read 58 before the
 header's map was checked against a stop by hand.
+
+## Comparison pairs and sorting (October 2026)
+
+The Liquid Glass directory offers **Visual difference** (the full vector versus
+Liquid Glass score) and **Artwork difference** (the material-off score, falling
+back to the full score when unavailable) in the sort menu. Old
+`?material=off` links remain supported; new links use `?sort=artwork`.
+
+Compare offers Vector ↔ Liquid Glass (`ref=glass`, the default), Vector ↔ Store
+(`ref=store`), and Liquid Glass ↔ App Store (`ref=glass-store`). The last pair
+uses the lossless light master and official App Store raster and only includes
+platforms with a measured App Store pair. Its card score, detail caption,
+difference canvas, and Visual difference ordering all use that same pair.
+
+Refresh scores and optional 4× difference sheets with:
+
+```sh
+node pipeline/audit-facet-drift.mjs --reference glass-store --write --sheets
+node pipeline/build-data.mjs
+node pipeline/sync-web-assets.mjs
+```
+
+Scores are stored in `facet-drift.json` under `glassStore`; other comparisons
+are preserved. An `--only <slug>` refresh preserves other glassStore entries.
+The first full pass measured 65 App Store pairs. Scores use central 60% RGB
+RMSE at 256px in sRGB; comparison canvases display the whole shared opaque area.

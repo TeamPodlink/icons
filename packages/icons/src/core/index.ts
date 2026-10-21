@@ -8,7 +8,7 @@ export {
 } from './resolve.js'
 export { extractSvgContent, extractViewBox, prefixIds, minifySvg } from './svg.js'
 
-export type { Platform, IconData, IconShape, ShapeDefinition } from './types.js'
+export type { Platform, IconArtwork, IconData, IconShape, ShapeDefinition } from './types.js'
 export type { PlatformId } from '../generated/platform-ids.js'
 
 // Re-export icon data access

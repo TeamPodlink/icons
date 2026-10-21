@@ -1,0 +1,14 @@
+{
+  "date": "2026-10-17",
+  "reference": "apps/web/public/raster/moonfm.png",
+  "beforeCentralRmse": 4.231229155108528,
+  "afterCentralRmse": 2.30906327439285,
+  "coloredGroupTranslucency": 0.504,
+  "clearOverlayTranslucency": 0.7,
+  "shadow": {
+    "kind": "layer-color",
+    "opacity": 0.5
+  },
+  "appearance": "Default",
+  "method": "Native Icon Composer generation 27, ICC conversion to sRGB, 1024px render resized to 256px, central 60% RGB RMSE."
+}

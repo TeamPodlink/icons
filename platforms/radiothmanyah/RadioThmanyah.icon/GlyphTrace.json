@@ -1,0 +1,65 @@
+{
+  "reference": "apps/web/public/raster/radiothmanyah.png",
+  "referenceSHA256": "b10c400068f1a5ce18b1bba1df6be989e535c5cd1fdd539cfafcff092453378b",
+  "officialSVG": "https://radio.thmanyah.com/icons/eight.svg",
+  "geometry": {
+    "center": 512,
+    "top": [
+      16.8,
+      157.0
+    ],
+    "outer": [
+      75.43039908061964,
+      372.89872177259855,
+      162.02666399292315,
+      484.43208770312543
+    ],
+    "shoulder": [
+      309,
+      568
+    ],
+    "outerFoot": [
+      157.5,
+      867
+    ],
+    "innerFoot": [
+      149.5,
+      867
+    ],
+    "inner": [
+      25.067502168094244,
+      611.7703847396126,
+      45.03917748095429,
+      737.2940196017912
+    ],
+    "notch": [
+      12.4,
+      529
+    ],
+    "fitRMSE": {
+      "outerPixels": 0.12073674183081194,
+      "innerPixels": 0.08942457607499045
+    }
+  },
+  "selected": {
+    "name": "opt-33",
+    "config": {
+      "outside": -0.15,
+      "inside": 0.25,
+      "dx": 0.1,
+      "dy": -0.1,
+      "white": 255,
+      "translucency": 0.28,
+      "shadow": 0.55
+    },
+    "central": 1.5790840679034455,
+    "interior": 1.29008376836584,
+    "frame": 1.213310427047758
+  },
+  "baseline": {
+    "central": 1.8777015731582907,
+    "interior": 1.502422407644477,
+    "frame": 1.37631994528775
+  },
+  "method": "Fit mirrored cubic curves to subpixel half-contrast App Store silhouette, then refine edge offsets, placement and material settings against native Icon Composer renders. Scores use sRGB 256px, central crop [51,205)."
+}

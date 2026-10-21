@@ -13,7 +13,8 @@
         "variant": null,
         "file": "gPodder.icon",
         "source": "flat-svg",
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

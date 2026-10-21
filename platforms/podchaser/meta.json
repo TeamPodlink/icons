@@ -12,7 +12,8 @@
         "variant": null,
         "file": "Podchaser.icon",
         "source": "flat-svg-split",
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

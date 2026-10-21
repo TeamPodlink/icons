@@ -1,0 +1,57 @@
+{
+  "source": "Liquid Glass Default rendition",
+  "designGeneration": 27,
+  "sourceHash": "2209fcdef0cc",
+  "measurementCommand": "node pipeline/material-flat.mjs measure --only youtubemusic --translucency-only --json /tmp/youtubemusic-translucency.json",
+  "groups": [
+    {
+      "group": 0,
+      "files": [
+        "red.svg"
+      ],
+      "rows": [
+        120,
+        903
+      ],
+      "translucency": 0.28,
+      "shadowOpacity": 0.45,
+      "alpha": [
+        0,
+        0.001,
+        0.009,
+        0.019,
+        0.035,
+        0.055,
+        0.078,
+        0.103,
+        0.13,
+        0.17
+      ],
+      "shadow": null
+    }
+  ],
+  "implementation": {
+    "files": [
+      "icon.svg"
+    ],
+    "maskId": "youtubemusic-material-translucency-mask",
+    "gradientCoordinates": "userSpaceOnUse, mapped to the existing foreground bounds",
+    "opacity": "1 minus measured backdrop weight, sampled at the centers of ten vertical bands",
+    "preserved": [
+      "background",
+      "glyph geometry",
+      "circle scale and positioning"
+    ],
+    "circle": "Existing full-bleed variant unchanged; its native material differs from Default."
+  },
+  "verification": {
+    "metric": "central 60% RGB RMSE at 256px, both sides rendered at 1024px in sRGB",
+    "vectorVsGlass": {
+      "before": 14.205639908362079,
+      "after": 7.527622900921855
+    },
+    "circleVsGlass": {
+      "unchanged": true
+    }
+  }
+}

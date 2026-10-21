@@ -17,9 +17,14 @@ Per bundle slug (see `manifest.json` for the full list):
 assets/<slug>.png            1024px master (light)
 assets/<slug>-{32,64,128,256,512}.avif   AVIF-primary sized set
 assets/<slug>-{32,64,128,256,512}.webp   WebP fallback set
-assets/<slug>-dark*.png/webp same set, Dark rendition — only present
+assets/<slug>-dark*.png/avif/webp same set, Dark rendition — only present
                              when it differs from light
 ```
+
+Circle assets use `<slug>-circle` as their stem (including
+`<slug>-circle-dark-128.avif`), rendered natively for watchOS from the same
+bundle. The default squircle remains a macOS render. `--shape circle` on
+the build script refreshes circles without replacing squircle files.
 
 Default bundles are named by platform id (`overcast`, `pocketcasts`);
 an alternate icon would append its variant (`-dark`, `-pride`).

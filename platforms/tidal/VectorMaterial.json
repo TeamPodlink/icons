@@ -1,0 +1,58 @@
+{
+  "source": "Liquid Glass Default rendition",
+  "designGeneration": 27,
+  "sourceHash": "4978fb5cf3e9",
+  "measurementCommand": "node pipeline/material-flat.mjs measure --only tidal --translucency-only --json /tmp/tidal-translucency.json",
+  "groups": [
+    {
+      "group": 0,
+      "files": [
+        "icon.svg"
+      ],
+      "rows": [
+        313,
+        742
+      ],
+      "translucency": 0.25,
+      "shadowOpacity": 0,
+      "alpha": [
+        0.003,
+        0.01,
+        0.015,
+        0.02,
+        0.031,
+        0.059,
+        0.076,
+        0.095,
+        0.114,
+        0.137
+      ],
+      "shadow": null
+    }
+  ],
+  "implementation": {
+    "files": [
+      "icon.svg"
+    ],
+    "maskId": "tidal-material-translucency-mask",
+    "gradientCoordinates": "userSpaceOnUse, mapped to the existing foreground bounds",
+    "opacity": "1 minus measured backdrop weight, sampled at the centers of ten vertical bands",
+    "preserved": [
+      "background",
+      "glyph geometry",
+      "circle scale and positioning"
+    ],
+    "circle": "Same measured fade applied within the existing circle foreground bounds."
+  },
+  "verification": {
+    "metric": "central 60% RGB RMSE at 256px, both sides rendered at 1024px in sRGB",
+    "vectorVsGlass": {
+      "before": 6.143013872779785,
+      "after": 1.2244521976574338
+    },
+    "circleVsGlass": {
+      "before": 48.16136250294644,
+      "after": 46.57751425170123
+    }
+  }
+}

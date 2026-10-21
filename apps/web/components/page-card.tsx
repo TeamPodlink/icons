@@ -7,9 +7,11 @@ import { ScrollFade } from "@/components/scroll-fade";
 export function PageCard({
   children,
   withSearch = false,
+  viewportClassName,
 }: {
   children: React.ReactNode;
   withSearch?: boolean;
+  viewportClassName?: string;
 }) {
   return (
     <div className="p-px">
@@ -21,7 +23,8 @@ export function PageCard({
           viewportClassName={cn(
             withSearch
               ? "max-h-[calc(100vh-7.6rem)] min-h-[calc(100vh-7.6rem)]"
-              : "max-h-[calc(100vh-4.5rem)] min-h-[calc(100vh-4.5rem)]"
+              : "max-h-[calc(100vh-4.5rem)] min-h-[calc(100vh-4.5rem)]",
+            viewportClassName
           )}
         >
           {children}

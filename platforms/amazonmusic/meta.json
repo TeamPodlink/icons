@@ -17,7 +17,8 @@
         "file": "AmazonMusic.icon",
         "source": "flat-svg-split",
         "appStoreId": 510855668,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

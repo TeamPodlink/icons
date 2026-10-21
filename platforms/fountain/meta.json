@@ -14,7 +14,8 @@
         "file": "Fountain.icon",
         "hasDark": true,
         "source": "flat-svg-split",
-        "appStoreId": 1576394424
+        "appStoreId": 1576394424,
+        "hasCircleDark": false
       }
     ]
   }

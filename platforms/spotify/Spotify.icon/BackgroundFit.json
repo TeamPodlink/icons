@@ -1,0 +1,22 @@
+{
+  "id": "spotify",
+  "before": {
+    "background": 6.613593276012284,
+    "central": 5.919463091365913
+  },
+  "after": {
+    "background": 0.06774111396665095,
+    "central": 5.493317160267252,
+    "colors": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ]
+  },
+  "samples": 9879,
+  "renders": 26,
+  "scope": "Default native background fill only; prior Dark and Tinted fill values preserved. Foreground artwork/materials unchanged."
+}

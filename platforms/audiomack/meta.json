@@ -1,0 +1,21 @@
+{
+  "name": "Audiomack",
+  "active": true,
+  "url": "https://audiomack.com",
+  "added": "2026-10-16",
+  "flatSource": "drawn",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "audiomack",
+        "title": "Audiomack",
+        "variant": null,
+        "file": "Audiomack.icon",
+        "source": "flat-svg-split",
+        "appStoreId": 921765888,
+        "hasDark": true,
+        "hasCircleDark": false
+      }
+    ]
+  }
+}

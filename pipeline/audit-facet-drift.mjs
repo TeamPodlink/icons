@@ -45,13 +45,10 @@
 //      the run if a full-bleed icon rasterizes < 80% visible (the
 //      SQUIRCLE_32 mask alone covers 87.2%, measured).
 //   2. NEVER compare P3-coded pixels with sRGB. Verified here at
-//      startup rather than assumed: icatcher's canvas is declared
-//      display-p3 0.1647,0.3373,0.6549 on BOTH facets; if the master
-//      were still P3-coded it would read [42,86,167]; the sRGB
-//      conversion reads [21,87,173]. The check samples the master and
-//      the Chrome raster at a canvas point and aborts unless both are
-//      within 4/255 of the sRGB value (measured: flat [21,87,173],
-//      master [20,86,171]; a raw P3 master would miss by 21).
+//      startup rather than assumed: iCatcher's native and vector canvases
+//      share a near-constant sRGB blue (0,88,178 → 0,88,179). The native
+//      renderer emits P3-tagged pixels, which must be ICC-converted to
+//      sRGB before scoring. Check both against the authored sRGB values.
 //   3. Resampling asymmetry has a floor. Chrome@1024->256 vs Chrome@256
 //      of the same SVG costs central RMSE 9.04 (ledger, tunestr) with
 //      no artwork difference at all. So the flat side is rendered at
@@ -63,7 +60,11 @@
 //   node pipeline/audit-facet-drift.mjs                report (worst first)
 //   node pipeline/audit-facet-drift.mjs --only <slug>
 //     [--sheets] [--json <file>] [--floor] [--work <dir>] [--material-off]
-//     [--reference glass|store]
+//     [--reference glass|store|glass-store]
+//
+// --reference glass-store: compare lossless light Liquid Glass masters with
+// official App Store rasters. Skips platforms without an App Store id/raster.
+// --write updates only glassStore; --only preserves other platforms.
 //
 // --reference store (2026-09-19): score the flat against the STORE's own
 //   raster instead of the ictool master — apps/web/public/raster/<slug>.png
@@ -157,10 +158,14 @@ const writeSnapshot = args.includes("--write");
 const floor = args.includes("--floor");
 const materialOff = args.includes("--material-off");
 const reference = flag("--reference") ?? "glass";
-if (reference !== "glass" && reference !== "store") { console.error("--reference glass|store"); process.exit(2); }
+if (!["glass", "store", "glass-store"].includes(reference)) { console.error("--reference glass|store|glass-store"); process.exit(2); }
 const storeDir = join(root, "apps/web/public/raster");
-const sheetsDir = reference === "store" ? "sheets-store" : "sheets";
-const ICTOOL = "/Applications/Icon Composer.app/Contents/Executables/ictool";
+const sheetsDir = reference === "glass-store" ? "sheets-glass-store" : reference === "store" ? "sheets-store" : "sheets";
+if (reference === "glass-store" && (floor || materialOff)) throw new Error("glass-store does not support --floor or --material-off");
+const ICTOOL = [
+  "/Applications/Icon Composer.app/Contents/Executables/ictool",
+  "/Applications/Xcode.app/Contents/Applications/Icon Composer.app/Contents/Executables/ictool",
+].find(existsSync);
 const work = flag("--work") ?? "/tmp/facet-drift-work";
 const assetsDir = join(root, "packages/refraction/assets");
 const flatDir = join(root, "packages/icons/static/icons");
@@ -226,7 +231,8 @@ function disableMaterial(doc) {
  *  8-bit untagged sRGB exactly as build-assets.mjs squashes the shipped
  *  masters (trap 2). Cached by a hash of icon.json + every asset. */
 async function materialOffMaster(bundlePath, slug) {
-  const h = createHash("sha1").update(readFileSync(join(bundlePath, "icon.json")));
+  if (!ICTOOL) throw new Error("Install Icon Composer or Xcode to render material-off references");
+  const h = createHash("sha1").update("design-generation-27").update(readFileSync(join(bundlePath, "icon.json")));
   const assets = join(bundlePath, "Assets");
   if (existsSync(assets))
     for (const a of readdirSync(assets).sort()) {
@@ -244,6 +250,7 @@ async function materialOffMaster(bundlePath, slug) {
   execFileSync(ICTOOL, [
     tmp, "--export-image", "--output-file", raw, "--platform", "macOS",
     "--rendition", "Default", "--width", String(MASTER), "--height", String(MASTER), "--scale", "1",
+    "--design-generation", "27",
   ], { stdio: "pipe" });
   const buf = await sharp(raw).withIccProfile("srgb", { attach: false }).png().toBuffer();
   writeFileSync(out, buf);
@@ -369,15 +376,16 @@ async function writeSheet(slug, flatRgba, glassRgba, dir = "sheets") {
  *  those pairs the whole score is artwork. */
 function glassLayers(bundlePath) {
   const doc = JSON.parse(readFileSync(join(bundlePath, "icon.json"), "utf8"));
+  const light = (node, key) => node[key] ??
+    node[`${key}-specializations`]?.find((s) => !s.appearance && !s.idiom)?.value;
   let g = 0, n = 0, spec = false;
   for (const grp of doc.groups ?? []) {
-    if (grp.hidden) continue;
-    if (grp.specular) spec = true;
+    if (light(grp, "hidden")) continue;
+    if (light(grp, "specular")) spec = true;
     for (const l of grp.layers ?? []) {
-      if (l.hidden) continue;
+      if (light(l, "hidden")) continue;
       n++;
-      const dflt = (l["glass-specializations"] ?? []).find((s) => !s.appearance);
-      if (l.glass === true || (l.glass == null && dflt?.value === true)) g++;
+      if (light(l, "glass") === true) g++;
     }
   }
   return `${g}/${n}${spec ? "+s" : ""}`;
@@ -385,11 +393,9 @@ function glassLayers(bundlePath) {
 
 // ------------------------------------------------- startup checks
 
-/** Trap 2, verified rather than assumed: a declared-P3 canvas must
- *  read as its sRGB conversion on BOTH sides. */
-async function assertSrgbFrame(masterPng, flatPng) {
-  const P3_RAW = [42, 86, 167];
-  const SRGB = [21, 87, 173];
+/** Trap 2: native ICC-converted pixels and the SVG must match their authored sRGB canvas. */
+async function assertSrgbFrame(masterPng, flatPng, masterExpected) {
+  const SRGB = [0, 88, 179];
   const sample = async (png) => {
     const { data, info } = await sharp(png)
       .ensureAlpha()
@@ -398,15 +404,14 @@ async function assertSrgbFrame(masterPng, flatPng) {
     const i = (512 * info.width + 80) * 4;
     return [data[i], data[i + 1], data[i + 2]];
   };
-  for (const [name, png] of [["master", masterPng], ["flat", flatPng]]) {
+  for (const [name, png, expected] of [["master", masterPng, masterExpected ?? SRGB], ["flat", flatPng, SRGB]]) {
     const px = await sample(png);
-    const off = Math.max(...px.map((v, k) => Math.abs(v - SRGB[k])));
-    const offP3 = Math.max(...px.map((v, k) => Math.abs(v - P3_RAW[k])));
+    const off = Math.max(...px.map((v, k) => Math.abs(v - expected[k])));
     if (off > 4)
       throw new Error(
-        `${name} icatcher canvas reads [${px}] — expected sRGB [${SRGB}] ` +
-          `(P3-coded would be [${P3_RAW}], off by ${offP3}). The two ` +
-          `sides are not in one coding space; do not score them.`
+        `${name} icatcher canvas reads [${px}] — expected sRGB [${expected}] ` +
+          `within 4/255. Check the ICC conversion and declared canvas ` +
+          `fill before scoring these facets.`
       );
   }
 }
@@ -438,11 +443,12 @@ const pairs = [];
 const skipped = [];
 for (const b of readBundles()) {
   if (only && b.slug !== only) continue;
-  const master = reference === "store" ? join(storeDir, `${b.slug}.png`) : join(assetsDir, `${b.slug}.png`);
-  const flat = join(flatDir, `${b.platformId}.svg`);
+  if (reference === "glass-store" && !b.appStoreId) continue;
+  const master = reference !== "glass" ? join(storeDir, `${b.slug}.png`) : join(assetsDir, `${b.slug}.png`);
+  const flat = reference === "glass-store" ? join(assetsDir, `${b.slug}.png`) : join(flatDir, `${b.platformId}.svg`);
   const have = { master: existsSync(master), flat: existsSync(flat) };
   if (!have.master || !have.flat) {
-    skipped.push(`${b.slug} (no ${!have.master ? (reference === "store" ? "store raster" : "light master") : "flat icon"})`);
+    skipped.push(`${b.slug} (no ${!have.master ? (reference !== "glass" ? "store raster" : "light master") : (reference === "glass-store" ? "light master" : "flat icon")})`);
     continue;
   }
   const glass = glassLayers(b.bundlePath);
@@ -459,15 +465,26 @@ if (!pairs.length) {
   process.exit(1);
 }
 
-// Trap 2 check on icatcher's known P3 canvas, whenever it is present.
+// Trap 2 check on iCatcher's known sRGB canvas, whenever it is present.
 {
   const ic = readBundles().find((b) => b.slug === "icatcher");
   const master = ic && join(assetsDir, "icatcher.png");
   const flat = ic && join(flatDir, "icatcher.svg");
   if (ic && existsSync(master) && existsSync(flat)) {
     const png = flatRaster(readFileSync(flat, "utf8"), "icatcher", MASTER);
-    await assertSrgbFrame(master, png);
-    console.log("color frame: both facets read icatcher's P3 canvas as sRGB [21,87,173] ±4 — ok");
+    const fill = JSON.parse(readFileSync(join(ic.bundlePath, "icon.json"), "utf8")).fill;
+    const light = fill["fill-specializations"]?.find((s) => !s.appearance && !s.idiom)?.value ?? fill;
+    const stops = light["linear-gradient"];
+    let expected;
+    // The Store-matched canvas is near-constant sRGB. At the center row,
+    // averaging its two stops is within a channel of the native fill.
+    if (stops?.length === 2 && stops.every((s) => s.startsWith("srgb:"))) {
+      const colors = stops.map((s) => s.slice(5).split(",").slice(0, 3).map(Number));
+      if (colors[0].every((v, i) => Math.abs(v - colors[1][i]) <= 2 / 255))
+        expected = colors[0].map((v, i) => Math.round((v + colors[1][i]) * 255 / 2));
+    }
+    await assertSrgbFrame(master, png, expected);
+    console.log(`color frame: icatcher master sRGB [${expected ?? [0,88,179]}], vector sRGB [0,88,179] ±4 — ok`);
   } else console.log("color frame: icatcher pair absent, sRGB check skipped");
 }
 
@@ -488,9 +505,9 @@ if (floor) {
 
 const rows = [];
 for (const p of pairs) {
-  const svg = readFileSync(p.flat, "utf8");
-  const flatPng = flatRaster(svg, p.id, MASTER);
-  await assertFlatSane(flatPng, svg, p.id);
+  const svg = reference === "glass-store" ? "" : readFileSync(p.flat, "utf8");
+  const flatPng = reference === "glass-store" ? p.flat : flatRaster(svg, p.id, MASTER);
+  if (svg) await assertFlatSane(flatPng, svg, p.id);
   const [f, g] = await Promise.all([rgba256(flatPng), rgba256(p.master)]);
   const s = score(f, g);
   const row = { slug: p.slug, source: p.source, glass: p.glass, ...s, materialOff: null };
@@ -587,7 +604,7 @@ if (expected.length) {
   for (const r of expected)
     console.log(`  ${r.slug} (${r.central.toFixed(2)}): ${EXPECTED_DIVERGENCE[r.slug]}`);
 }
-if (sheets) console.log(`sheets: ${join(work, sheetsDir)}/<slug>.png (flat | ${reference === "store" ? "store raster" : "glass"} | 4x|diff|)`);
+if (sheets) console.log(`sheets: ${join(work, sheetsDir)}/<slug>.png (${reference === "glass-store" ? "Liquid Glass" : "flat"} | ${reference !== "glass" ? "store raster" : "glass"} | 4x|diff|)`);
 if (sheets && materialOff) console.log(`material-off sheets: ${join(work, "sheets-off")}/<slug>.png (flat | material off | 4x|diff|)`);
 if (materialOff) {
   const m = rows.filter((r) => r.materialOff);
@@ -603,16 +620,19 @@ if (writeSnapshot) {
   // Each map is owned by the run that measures it; a run leaves the others
   // as the snapshot holds them: central (glass reference), materialOff
   // (--material-off), store (--reference store).
-  const central = reference === "store" ? prevSnap.central ?? {} : scored;
+  const central = reference !== "glass" ? prevSnap.central ?? {} : scored;
   const off = materialOff && reference === "glass"
     ? Object.fromEntries(rows.filter((r) => r.materialOff).map((r) => [r.slug, Math.round(r.materialOff.central * 100) / 100]))
     : prevSnap.materialOff ?? {};
   const store = reference === "store" ? scored : prevSnap.store ?? {};
-  const pairs = reference === "store" ? prevSnap.pairs ?? rows.length : rows.length;
-  writeFileSync(snap, JSON.stringify({ generated: new Date().toISOString().slice(0, 10), pairs, central, materialOff: off, store }, null, 2) + "\n");
+  const pairs = reference !== "glass" ? prevSnap.pairs ?? rows.length : rows.length;
+  const glassStore = reference === "glass-store"
+    ? (only ? { ...prevSnap.glassStore, ...scored } : scored)
+    : prevSnap.glassStore ?? {};
+  writeFileSync(snap, JSON.stringify({ generated: new Date().toISOString().slice(0, 10), pairs, central, materialOff: off, store, glassStore }, null, 2) + "\n");
   console.log(`snapshot: ${snap.replace(root + "/", "")} (${rows.length} pairs)`);
 }
 if (jsonOut) {
-  writeFileSync(jsonOut, JSON.stringify({ rows, skipped, quartiles: [c[0], q(0.25), q(0.5), q(0.75), c[c.length - 1]], gap }, null, 2) + "\n");
+  writeFileSync(jsonOut, JSON.stringify({ reference, rows, skipped, quartiles: [c[0], q(0.25), q(0.5), q(0.75), c[c.length - 1]], gap }, null, 2) + "\n");
   console.log(`json: ${jsonOut}`);
 }

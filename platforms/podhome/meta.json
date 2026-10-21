@@ -12,7 +12,8 @@
         "file": "Podhome.icon",
         "source": "flat-svg-split",
         "appStoreId": 6736411073,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

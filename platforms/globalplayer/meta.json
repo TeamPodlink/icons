@@ -13,7 +13,8 @@
         "file": "GlobalPlayer.icon",
         "source": "flat-svg-split",
         "appStoreId": 1142951331,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

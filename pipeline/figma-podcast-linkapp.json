@@ -1,0 +1,183 @@
+{
+  "reviewedAt": "2026-10-17",
+  "policy": "Current Linktree Podcast platforms represented in this repository, plus plausible podcast listening destinations with show, episode, or RSS handoff evidence. Inclusion is an icon-design scope decision, not a claim of implemented Linktree integration or universal feed availability.",
+  "currentSource": "https://linktr.ee/help/en/articles/5471369-supported-platforms-for-music-and-podcast-links",
+  "current": [
+    "amazonmusic",
+    "anghami",
+    "apple",
+    "audible",
+    "audiomack",
+    "bbcsounds",
+    "castbox",
+    "castro",
+    "claromusica",
+    "deezer",
+    "gaana",
+    "goodpods",
+    "hungama",
+    "iheartradio",
+    "ivoox",
+    "jiosaavn",
+    "kkbox",
+    "listnr",
+    "mixcloud",
+    "overcast",
+    "pandora",
+    "playerfm",
+    "pocketcasts",
+    "podbean",
+    "podcastaddict",
+    "podcastguru",
+    "podcastrepublic",
+    "podfriend",
+    "rss",
+    "sonnet",
+    "soundcloud",
+    "spotify",
+    "spreaker",
+    "subscribeonandroid",
+    "tidal",
+    "tunein",
+    "youtube",
+    "youtubemusic",
+    "zvuk"
+  ],
+  "additions": {
+    "antennapod": {
+      "reason": "Podcast player with a documented feed or podcast GUID subscription link.",
+      "source": "https://github.com/nathangathright/podcast-platform-links"
+    },
+    "anytimeplayer": {
+      "reason": "Podcast player with a documented feed or podcast GUID subscription link.",
+      "source": "https://github.com/nathangathright/podcast-platform-links"
+    },
+    "audacy": {
+      "reason": "Consumer podcast catalog with show and episode pages.",
+      "source": "https://www.audacy.com/podcasts"
+    },
+    "castamatic": {
+      "reason": "Podcast player with a documented feed or podcast GUID subscription link.",
+      "source": "https://github.com/nathangathright/podcast-platform-links"
+    },
+    "downcast": {
+      "reason": "Podcast player with a documented RSS subscription URL scheme; requires an installed app.",
+      "source": "https://github.com/nathangathright/podcast-platform-links/blob/main/schemes.md"
+    },
+    "fountain": {
+      "reason": "Podcast listening destination with documented show links.",
+      "source": "https://github.com/nathangathright/podcast-platform-links"
+    },
+    "globalplayer": {
+      "reason": "Podcast listening destination with documented show links.",
+      "source": "https://github.com/nathangathright/podcast-platform-links"
+    },
+    "hark": {
+      "reason": "Podcast listening destination with documented show links.",
+      "source": "https://github.com/nathangathright/podcast-platform-links"
+    },
+    "icatcher": {
+      "reason": "Podcast player with a documented RSS subscription URL scheme; requires an installed app.",
+      "source": "https://github.com/nathangathright/podcast-platform-links/blob/main/schemes.md"
+    },
+    "moonfm": {
+      "reason": "Podcast listening destination with documented show links.",
+      "source": "https://github.com/nathangathright/podcast-platform-links"
+    },
+    "netflix": {
+      "reason": "Included by user request for podcasts available in its selective video catalog.",
+      "source": "https://www.netflix.com"
+    },
+    "neuecast": {
+      "reason": "Included by user request: consumer podcast player; show/feed handoff still needs verification.",
+      "source": "https://neuecast.app"
+    },
+    "playapod": {
+      "reason": "Podcast player with a publisher-facing listen button and show-link workflow.",
+      "source": "https://playapod.com/podcasters"
+    },
+    "podcastapp": {
+      "reason": "Podcast listening destination with documented show links.",
+      "source": "https://github.com/nathangathright/podcast-platform-links"
+    },
+    "podimo": {
+      "reason": "Listening app with official podcast sharing support; catalog and subscriptions vary by market.",
+      "source": "https://support.podimo.com/hc/en-001/articles/31874578744465-How-to-share-podcasts-with-your-friends"
+    },
+    "podkicker": {
+      "reason": "Podcast player with a documented RSS subscription URL scheme; requires an installed app.",
+      "source": "https://github.com/nathangathright/podcast-platform-links/blob/main/schemes.md"
+    },
+    "podurama": {
+      "reason": "Podcast listening destination with documented show links.",
+      "source": "https://github.com/nathangathright/podcast-platform-links"
+    },
+    "podverse": {
+      "reason": "Podcast listening destination with documented show links.",
+      "source": "https://github.com/nathangathright/podcast-platform-links"
+    },
+    "queue": {
+      "reason": "Included by user request: consumer podcast player; show/feed handoff still needs verification.",
+      "source": "https://www.eikedrescher.com/queueapp"
+    },
+    "radiothmanyah": {
+      "reason": "Consumer podcast player with public show links and app handoff.",
+      "source": "https://radio.thmanyah.com/share/show/a66bb91a-e803-5265-9773-164c74f5e7af"
+    },
+    "rssradio": {
+      "reason": "Podcast player with a documented RSS subscription URL scheme; requires an installed app.",
+      "source": "https://github.com/nathangathright/podcast-platform-links/blob/main/schemes.md"
+    },
+    "siriusxm": {
+      "reason": "Consumer podcast catalog; include only shows available there, with subscription requirements where applicable.",
+      "source": "https://cs.siriusxm.com/"
+    },
+    "snipd": {
+      "reason": "Podcast listening destination with documented show links.",
+      "source": "https://github.com/nathangathright/podcast-platform-links"
+    },
+    "truefans": {
+      "reason": "Podcast listening destination with documented show links.",
+      "source": "https://github.com/nathangathright/podcast-platform-links"
+    },
+    "xiaoyuzhou": {
+      "reason": "Consumer podcast platform with public podcast and episode pages.",
+      "source": "https://www.xiaoyuzhoufm.com/podcast-topic/68877ec431d37fc1c5fe4539"
+    },
+    "yoto": {
+      "reason": "Included by user request for children’s podcasts in the Yoto audio ecosystem.",
+      "source": "https://yotoplay.com"
+    }
+  },
+  "excluded": {
+    "airshow": "Podcast player, but a show/feed handoff suitable for the linkapp has not been verified. Hold for link verification, not a discontinuation claim.",
+    "curiocaster": "Excluded from the Podcast linkapp Figma scope by explicit user request on October 17, 2026; retained in the full repository catalog.",
+    "disctopia": "Creator/hosting platform; a general consumer listening destination is not established for this export.",
+    "gpodder": "Excluded from the Podcast linkapp Figma scope by explicit user request on October 17, 2026; retained in the full repository catalog.",
+    "greatpods": "Discovery, reviews, indexing, news, or research is the primary fit; omit from this listening-destination export.",
+    "listennotes": "Discovery, reviews, indexing, news, or research is the primary fit; omit from this listening-destination export.",
+    "metacast": "Excluded from the Podcast linkapp Figma scope by explicit user request on October 17, 2026; retained in the full repository catalog.",
+    "parasocial": "Excluded from the Podcast linkapp Figma scope by explicit user request on October 17, 2026; retained in the full repository catalog.",
+    "podcastindex": "Discovery, reviews, indexing, news, or research is the primary fit; omit from this listening-destination export.",
+    "podcastparrot": "Excluded from the Podcast linkapp Figma scope by explicit user request on October 17, 2026; retained in the full repository catalog.",
+    "podchaser": "Discovery, reviews, indexing, news, or research is the primary fit; omit from this listening-destination export.",
+    "podengine": "Discovery, reviews, indexing, news, or research is the primary fit; omit from this listening-destination export.",
+    "podhome": "Creator/hosting platform; a general consumer listening destination is not established for this export.",
+    "podlp": "Excluded from the Podcast linkapp Figma scope by explicit user request on October 17, 2026; retained in the full repository catalog.",
+    "podnews": "Discovery, reviews, indexing, news, or research is the primary fit; omit from this listening-destination export.",
+    "podstation": "Excluded from the Podcast linkapp Figma scope by explicit user request on October 17, 2026; retained in the full repository catalog.",
+    "rephonic": "Discovery, reviews, indexing, news, or research is the primary fit; omit from this listening-destination export.",
+    "sodes": "Podcast player, but a show/feed handoff suitable for the linkapp has not been verified. Hold for link verification, not a discontinuation claim.",
+    "subscribebyemail": "Email subscription utility rather than a podcast playback destination.",
+    "tunestr": "Music live-streaming focus; podcast destination support is not established.",
+    "wavlake": "Excluded from the Podcast linkapp Figma scope by explicit user request on October 17, 2026; retained in the full repository catalog."
+  },
+  "notes": [
+    "Sonnet is retained as an active current platform; see platform-additions-2026-10/README.md.",
+    "SberZvuk in Linktree’s list maps to zvuk. RSS and Subscribe on Android remain subscription actions.",
+    "TIDAL is retained from Linktree’s published list for its limited podcast catalog, not as a general RSS player.",
+    "Previously excluded discontinued apps and creator tools are not restored merely because they appear in Linktree’s published list.",
+    "Unreviewed future repository platforms are excluded by default.",
+    "Queue, Neuecast, Netflix, and Yoto were explicitly included by the user on October 17, 2026; this does not assert verified show/feed handoffs for Queue or Neuecast."
+  ]
+}

@@ -14,7 +14,8 @@
         "file": "PocketCasts.icon",
         "hasDark": true,
         "source": "official-svg",
-        "appStoreId": 414834813
+        "appStoreId": 414834813,
+        "hasCircleDark": false
       }
     ]
   }

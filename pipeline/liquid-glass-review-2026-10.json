@@ -1,0 +1,145 @@
+{
+  "designGeneration": 27,
+  "targets": [
+    {
+      "id": "listnr",
+      "bundle": "platforms/listnr/LiSTNR.icon"
+    },
+    {
+      "id": "podcastapp",
+      "bundle": "platforms/podcastapp/PodcastApp.icon"
+    },
+    {
+      "id": "playapod",
+      "bundle": "platforms/playapod/Playapod.icon"
+    },
+    {
+      "id": "icatcher",
+      "bundle": "platforms/icatcher/iCatcher.icon"
+    },
+    {
+      "id": "youtube",
+      "bundle": "platforms/youtube/YouTube.icon"
+    },
+    {
+      "id": "audible",
+      "bundle": "platforms/audible/Audible.icon"
+    },
+    {
+      "id": "goodpods",
+      "bundle": "platforms/goodpods/Goodpods.icon"
+    },
+    {
+      "id": "radiothmanyah",
+      "bundle": "platforms/radiothmanyah/RadioThmanyah.icon"
+    },
+    {
+      "id": "wavlake",
+      "bundle": "platforms/wavlake/Wavlake.icon"
+    },
+    {
+      "id": "youtubemusic",
+      "bundle": "platforms/youtubemusic/YouTubeMusic.icon"
+    },
+    {
+      "id": "snipd",
+      "bundle": "platforms/snipd/Snipd.icon"
+    },
+    {
+      "id": "siriusxm",
+      "bundle": "platforms/siriusxm/SiriusXM.icon"
+    },
+    {
+      "id": "podkicker",
+      "bundle": "platforms/podkicker/Podkicker.icon"
+    },
+    {
+      "id": "podcastaddict",
+      "bundle": "platforms/podcastaddict/PodcastAddict.icon"
+    },
+    {
+      "id": "airshow",
+      "bundle": "platforms/airshow/Airshow.icon"
+    },
+    {
+      "id": "castro",
+      "bundle": "platforms/castro/Castro-Default.icon"
+    },
+    {
+      "id": "audacy",
+      "bundle": "platforms/audacy/Audacy.icon"
+    },
+    {
+      "id": "yoto",
+      "bundle": "platforms/yoto/Yoto.icon"
+    },
+    {
+      "id": "xiaoyuzhou",
+      "bundle": "platforms/xiaoyuzhou/Xiaoyuzhou.icon"
+    },
+    {
+      "id": "podcastrepublic",
+      "bundle": "platforms/podcastrepublic/PodcastRepublic.icon"
+    },
+    {
+      "id": "playerfm",
+      "bundle": "platforms/playerfm/PlayerFM.icon"
+    },
+    {
+      "id": "podhome",
+      "bundle": "platforms/podhome/Podhome.icon"
+    },
+    {
+      "id": "overcast",
+      "bundle": "platforms/overcast/Overcast.icon"
+    },
+    {
+      "id": "ivoox",
+      "bundle": "platforms/ivoox/iVoox.icon"
+    },
+    {
+      "id": "rssradio",
+      "bundle": "platforms/rssradio/RSSRadio.icon"
+    },
+    {
+      "id": "podimo",
+      "bundle": "platforms/podimo/Podimo.icon"
+    },
+    {
+      "id": "pocketcasts",
+      "bundle": "platforms/pocketcasts/PocketCasts.icon"
+    },
+    {
+      "id": "gaana",
+      "bundle": "platforms/gaana/Gaana.icon"
+    },
+    {
+      "id": "podcastparrot",
+      "bundle": "platforms/podcastparrot/PodcastParrot.icon"
+    },
+    {
+      "id": "kkbox",
+      "bundle": "platforms/kkbox/KKBOX.icon"
+    },
+    {
+      "id": "castbox",
+      "bundle": "platforms/castbox/Castbox.icon"
+    },
+    {
+      "id": "pandora",
+      "bundle": "platforms/pandora/Pandora.icon"
+    },
+    {
+      "id": "tidal",
+      "bundle": "platforms/tidal/TIDAL.icon"
+    }
+  ],
+  "listnrPlacement": {
+    "scale": 1.0359909013762463,
+    "translation": [
+      -0.9289137399891917,
+      -41.995909372871445
+    ],
+    "silhouetteLoss": 0.0026452593022360726
+  }
+}

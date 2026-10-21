@@ -12,7 +12,8 @@
         "variant": null,
         "file": "SubscribeonAndroid.icon",
         "source": "flat-svg-split",
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

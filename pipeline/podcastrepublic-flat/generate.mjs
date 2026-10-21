@@ -38,7 +38,7 @@
 //   the glyph instead of the brand's flat white (scored, not shipped —
 //   see the README). --out alone writes only the icon.
 
-import { writeFileSync } from "node:fs";
+import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -139,8 +139,13 @@ const tri = [
 ].join("");
 
 // ------------------------------------------------------------------ colours
-// Background: the master's vertical ramp, sRGB, rows 0 and 1023.
-const BG_TOP = "#569dff", BG_BOTTOM = "#3d85e4";
+// Use the native Default canvas stops so regeneration preserves background parity.
+const nativeFill = JSON.parse(readFileSync(join(platformDir, "PodcastRepublic.icon/icon.json"), "utf8")).fill;
+const defaultFill = nativeFill["fill-specializations"]?.find((s) => !s.appearance && !s.idiom)?.value ?? nativeFill;
+const [BG_TOP, BG_BOTTOM] = defaultFill["linear-gradient"].map((stop) => {
+  if (!stop.startsWith("srgb:")) throw new Error("Expected Podcast Republic's sRGB canvas gradient");
+  return "#" + stop.slice(5).split(",").slice(0, 3).map((v) => Math.round(Number(v) * 255).toString(16).padStart(2, "0")).join("");
+});
 // Glass glyph ramp (measured on the master's glyph interior; R and G
 // clip at 255 above row ~213).
 const GLYPH_FILL =
@@ -153,7 +158,7 @@ const glyphGrad =
     : "";
 
 const provenance =
-  `the Liquid Glass icon's constructions rebuilt, not traced. Ring = annulus (outer 10, inner 8) minus two width-2 slots on the diagonals; play = equilateral triangle, corner radius 10, rounded height 89.1; both carried through the bundle's own layer transforms (ring rotation 90.331°, layer scale 2.15039). Background = the vertical ramp ictool paints for the canvas's automatic-gradient, fitted on the sRGB master. Generator: pipeline/podcastrepublic-flat/generate.mjs.`;
+  `the Liquid Glass icon's constructions rebuilt, not traced. Ring = annulus (outer 10, inner 8) minus two width-2 slots on the diagonals; play = equilateral triangle, corner radius 10, rounded height 89.1; both carried through the bundle's own layer transforms (ring rotation 90.331°, layer scale 2.15039). Background = the explicit sRGB vertical gradient shared with the Default Liquid Glass canvas. Generator: pipeline/podcastrepublic-flat/generate.mjs.`;
 const gradDefs = `<linearGradient id="b" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${BG_TOP}"/><stop offset="1" stop-color="${BG_BOTTOM}"/></linearGradient>${glyphGrad}`;
 const art = `<rect width="${VIEW}" height="${VIEW}" fill="url(#b)"/><path fill="${GLYPH_FILL}" d="${sector}${arc}${tri}"/>`;
 

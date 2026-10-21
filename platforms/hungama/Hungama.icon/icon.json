@@ -1,0 +1,128 @@
+{
+  "fill": {
+    "linear-gradient": [
+      "srgb:0.06667,0.07059,0.07843,1.00000",
+      "srgb:0.06667,0.07059,0.07843,1.00000"
+    ],
+    "orientation": {
+      "start": {
+        "x": 0.5,
+        "y": 0
+      },
+      "stop": {
+        "x": 0.5,
+        "y": 1
+      }
+    },
+    "fill-specializations": [
+      {
+        "value": {
+          "linear-gradient": [
+            "srgb:0.06667,0.07059,0.07843,1.00000",
+            "srgb:0.06667,0.07059,0.07843,1.00000"
+          ],
+          "orientation": {
+            "start": {
+              "x": 0.5,
+              "y": 0
+            },
+            "stop": {
+              "x": 0.5,
+              "y": 1
+            }
+          }
+        }
+      },
+      {
+        "appearance": "dark",
+        "value": {
+          "linear-gradient": [
+            "gray:0.19200,1.00000",
+            "gray:0.07800,1.00000"
+          ],
+          "orientation": {
+            "start": {
+              "x": 0.5,
+              "y": 0
+            },
+            "stop": {
+              "x": 0.5,
+              "y": 1
+            }
+          }
+        }
+      }
+    ]
+  },
+  "groups": [
+    {
+      "blend-mode": "normal",
+      "specular": false,
+      "translucency": {
+        "enabled": false,
+        "value": 0
+      },
+      "layers": [
+        {
+          "image-name": "icon.svg",
+          "name": "icon",
+          "glass": false,
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "hidden-specializations": [
+        {
+          "value": false
+        },
+        {
+          "idiom": "watchOS",
+          "value": true
+        }
+      ]
+    },
+    {
+      "blend-mode": "normal",
+      "specular": false,
+      "translucency": {
+        "enabled": false,
+        "value": 0
+      },
+      "layers": [
+        {
+          "image-name": "circle.svg",
+          "name": "Circle glyph",
+          "glass": false,
+          "position": {
+            "scale": 32,
+            "translation-in-points": [
+              0,
+              0
+            ]
+          }
+        }
+      ],
+      "name": "Circle radial alignment",
+      "hidden-specializations": [
+        {
+          "value": true
+        },
+        {
+          "idiom": "watchOS",
+          "value": false
+        }
+      ]
+    }
+  ],
+  "supported-platforms": {
+    "squares": "shared",
+    "circles": [
+      "watchOS"
+    ]
+  }
+}

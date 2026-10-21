@@ -1,0 +1,58 @@
+{
+  "source": "Liquid Glass Default rendition",
+  "designGeneration": 27,
+  "sourceHash": "67bb285a6069",
+  "measurementCommand": "node pipeline/material-flat.mjs measure --only wavlake --translucency-only --json /tmp/wavlake-translucency.json",
+  "groups": [
+    {
+      "group": 0,
+      "files": [
+        "icon.svg"
+      ],
+      "rows": [
+        212,
+        839
+      ],
+      "translucency": 0.25,
+      "shadowOpacity": 0.75,
+      "alpha": [
+        0.012,
+        0.012,
+        0.017,
+        0.032,
+        0.041,
+        0.056,
+        0.074,
+        0.096,
+        0.119,
+        0.144
+      ],
+      "shadow": null
+    }
+  ],
+  "implementation": {
+    "files": [
+      "icon.svg"
+    ],
+    "maskId": "wavlake-material-translucency-mask",
+    "gradientCoordinates": "userSpaceOnUse, mapped to the existing foreground bounds",
+    "opacity": "1 minus measured backdrop weight, sampled at the centers of ten vertical bands",
+    "preserved": [
+      "background",
+      "glyph geometry",
+      "circle scale and positioning"
+    ],
+    "circle": "Same measured fade applied within the existing circle foreground bounds."
+  },
+  "verification": {
+    "metric": "central 60% RGB RMSE at 256px, both sides rendered at 1024px in sRGB",
+    "vectorVsGlass": {
+      "before": 13.320914868132956,
+      "after": 1.2782590271301224
+    },
+    "circleVsGlass": {
+      "before": 57.74729102312385,
+      "after": 53.35064236923368
+    }
+  }
+}

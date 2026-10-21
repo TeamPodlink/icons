@@ -14,7 +14,8 @@
         "file": "iHeartRadio.icon",
         "source": "official-svg",
         "appStoreId": 290638154,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

@@ -1,0 +1,60 @@
+{
+  "source": "Liquid Glass Default rendition",
+  "designGeneration": 27,
+  "sourceHash": "a24d243e7dea",
+  "measurementCommand": "node pipeline/material-flat.mjs measure --only overcast --translucency-only --json /tmp/overcast-translucency.json",
+  "groups": [
+    {
+      "group": 2,
+      "files": [
+        "Tower.svg",
+        "Background Circle.svg"
+      ],
+      "rows": [
+        102,
+        920
+      ],
+      "translucency": 0.1,
+      "shadowOpacity": 0.5,
+      "alpha": [
+        0.002,
+        0.004,
+        0.004,
+        0.004,
+        0.005,
+        0.009,
+        0.012,
+        0.015,
+        0.02,
+        0.024
+      ],
+      "shadow": null
+    }
+  ],
+  "implementation": {
+    "files": [
+      "icon.svg",
+      "icon-circle.svg"
+    ],
+    "maskId": "overcast-material-translucency-mask",
+    "gradientCoordinates": "userSpaceOnUse, mapped to the existing foreground bounds",
+    "opacity": "1 minus measured backdrop weight, sampled at the centers of ten vertical bands",
+    "preserved": [
+      "background",
+      "glyph geometry",
+      "circle scale and positioning"
+    ],
+    "circle": "Same measured fade applied within the existing circle foreground bounds."
+  },
+  "verification": {
+    "metric": "central 60% RGB RMSE at 256px, both sides rendered at 1024px in sRGB",
+    "vectorVsGlass": {
+      "before": 10.906680057251807,
+      "after": 10.472425623103689
+    },
+    "circleVsGlass": {
+      "before": 11.311061433616468,
+      "after": 10.845093538534389
+    }
+  }
+}

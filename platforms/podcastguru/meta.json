@@ -15,7 +15,8 @@
         "file": "PodcastGuru.icon",
         "source": "flat-svg-split",
         "appStoreId": 1535235039,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

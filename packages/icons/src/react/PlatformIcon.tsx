@@ -30,6 +30,7 @@ export function PlatformIcon({
 
   const data = getIconData(platform)
   if (!data) return null
+  const artwork = data.shapeVariants?.[shape] ?? data
 
   const platformInfo = getPlatform(platform)
   const label = ariaLabel ?? `${platformInfo?.name ?? platform} icon`
@@ -62,11 +63,11 @@ export function PlatformIcon({
           stroke-only path inherits the SVG default and fills black.
         */}
         <svg
-          viewBox={data.viewBox}
+          viewBox={artwork.viewBox}
           width={size}
           height={size}
-          fill={data.rootFill}
-          dangerouslySetInnerHTML={{ __html: data.content }}
+          fill={artwork.rootFill}
+          dangerouslySetInnerHTML={{ __html: artwork.content }}
         />
       </g>
     </svg>

@@ -81,6 +81,11 @@ function validatePlatform(id: string, dir: string) {
   }
 
   validateSvgFile(iconPath, 'icon.svg', ICON_VIEWBOXES)
+  for (const shape of ['square', 'circle', 'superellipse']) {
+    const file = `icon-${shape}.svg`
+    const path = join(dir, file)
+    if (existsSync(path)) validateSvgFile(path, file, ICON_VIEWBOXES)
+  }
 
   if (existsSync(badgePath)) {
     validateSvgFile(badgePath, 'badge.svg', BADGE_VIEWBOXES)

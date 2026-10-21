@@ -13,7 +13,8 @@
         "file": "Metacast.icon",
         "source": "flat-svg-split",
         "appStoreId": 6462012536,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

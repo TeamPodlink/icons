@@ -13,11 +13,17 @@ export async function copyText(text: string, description: string) {
   }
 }
 
+async function imageBlob(url: string): Promise<Blob> {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`${response.status}`);
+  return response.blob();
+}
+
 /** Copy a PNG asset to the clipboard as an image (blob-fetch, so it
  *  works for cross-origin R2 assets too). */
 export async function copyImage(url: string, description: string) {
   try {
-    const blob = await fetch(url).then((r) => r.blob());
+    const blob = await imageBlob(url);
     await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
     toast.success("Copied to clipboard", { description });
   } catch {
@@ -39,9 +45,8 @@ export async function copySvg(url: string, description: string) {
  */
 export async function downloadAsset(url: string, filename: string) {
   try {
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`${res.status}`);
-    const objectUrl = URL.createObjectURL(await res.blob());
+    const blob = await imageBlob(url);
+    const objectUrl = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = objectUrl;
     a.download = filename;

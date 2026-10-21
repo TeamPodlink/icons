@@ -14,7 +14,8 @@
         "file": "Soundcloud.icon",
         "source": "flat-svg-split",
         "appStoreId": 336353151,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

@@ -11,7 +11,7 @@
         "title": "Podbean",
         "variant": null,
         "file": "Podbean.icon",
-        "source": "appstore-artwork",
+        "source": "flat-svg",
         "appStoreId": 973361050,
         "hasDark": false,
         "darkStatus": "native"

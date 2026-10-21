@@ -14,7 +14,8 @@
         "file": "Pandora.icon",
         "source": "appstore-artwork",
         "appStoreId": 284035177,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

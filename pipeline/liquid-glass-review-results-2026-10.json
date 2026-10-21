@@ -1,0 +1,690 @@
+[
+  {
+    "id": "listnr",
+    "adopted": true,
+    "baseline": {
+      "central": 60.13444825166135,
+      "interior": 48.66364349919586
+    },
+    "selected": {
+      "name": "refine-t0.25-o0.25",
+      "config": {
+        "glass": true,
+        "specular": true,
+        "translucency": 0.25,
+        "shadow": "neutral",
+        "opacity": 0.25
+      },
+      "central": 4.625650007733031,
+      "interior": 4.5597065299961
+    },
+    "tested": 52
+  },
+  {
+    "id": "podcastapp",
+    "adopted": true,
+    "baseline": {
+      "central": 26.40906083915191,
+      "interior": 18.886957697513715
+    },
+    "selected": {
+      "name": "refine-t0.2-o0.5",
+      "config": {
+        "glass": true,
+        "specular": true,
+        "translucency": 0.2,
+        "shadow": "neutral",
+        "opacity": 0.5
+      },
+      "central": 25.003710580875115,
+      "interior": 17.8412933900133
+    },
+    "tested": 52
+  },
+  {
+    "id": "playapod",
+    "adopted": false,
+    "baseline": {
+      "central": 25.99178856929367,
+      "interior": 25.667673184974934
+    },
+    "selected": {
+      "name": "prepared",
+      "config": null,
+      "central": 25.99178856929367,
+      "interior": 25.667673184974934
+    },
+    "tested": 37
+  },
+  {
+    "id": "icatcher",
+    "adopted": true,
+    "baseline": {
+      "central": 24.709641209378958,
+      "interior": 25.27935386598267
+    },
+    "selected": {
+      "name": "g1-s0-t0.25-none-0.5",
+      "config": {
+        "glass": true,
+        "specular": false,
+        "translucency": 0.25,
+        "shadow": "none",
+        "opacity": 0.5
+      },
+      "central": 10.809670521380149,
+      "interior": 11.23950667712875
+    },
+    "tested": 37
+  },
+  {
+    "id": "youtube",
+    "adopted": true,
+    "baseline": {
+      "central": 21.593338729942708,
+      "interior": 16.48881529855019
+    },
+    "selected": {
+      "name": "play-cutout",
+      "config": {
+        "glass": true,
+        "specular": true,
+        "translucency": 0.25,
+        "shadow": "layer-color",
+        "opacity": 0.5
+      },
+      "central": 11.598560536134332,
+      "interior": 8.77403697572529
+    },
+    "tested": 53,
+    "followup": {
+      "change": "Replace white play layer with even-odd cutout in red plate",
+      "previousCentral": 11.985430544711516,
+      "playOpeningRMSE": {
+        "before": 9.617178012209367,
+        "after": 1.5987840084978513
+      },
+      "darkPixelsUnchanged": true
+    }
+  },
+  {
+    "id": "audible",
+    "adopted": false,
+    "baseline": {
+      "central": 19.029739370032637,
+      "interior": 14.526665571680882
+    },
+    "selected": {
+      "name": "g1-s0-t0-neutral-0.5",
+      "config": {
+        "glass": true,
+        "specular": false,
+        "translucency": 0,
+        "shadow": "neutral",
+        "opacity": 0.5
+      },
+      "central": 18.647363904351828,
+      "interior": 14.2232818836686
+    },
+    "tested": 37
+  },
+  {
+    "id": "goodpods",
+    "adopted": false,
+    "baseline": {
+      "central": 16.919687332178352,
+      "interior": 13.547934077765936
+    },
+    "selected": {
+      "name": "g1-s1-t0-none-0.5",
+      "config": {
+        "glass": true,
+        "specular": true,
+        "translucency": 0,
+        "shadow": "none",
+        "opacity": 0.5
+      },
+      "central": 16.707886426042844,
+      "interior": 13.448002815328346
+    },
+    "tested": 37
+  },
+  {
+    "id": "radiothmanyah",
+    "adopted": true,
+    "baseline": {
+      "central": 10.840879433493853,
+      "interior": 8.108950593788958
+    },
+    "selected": {
+      "name": "refine-t0.3-o0.5",
+      "config": {
+        "glass": true,
+        "specular": true,
+        "translucency": 0.3,
+        "shadow": "neutral",
+        "opacity": 0.5
+      },
+      "central": 1.8777015731582907,
+      "interior": 1.502422407644477
+    },
+    "tested": 52
+  },
+  {
+    "id": "wavlake",
+    "adopted": true,
+    "baseline": {
+      "central": 15.60215665876244,
+      "interior": 11.894079262956373
+    },
+    "selected": {
+      "name": "refine-t0.25-o0.75",
+      "config": {
+        "glass": true,
+        "specular": false,
+        "translucency": 0.25,
+        "shadow": "neutral",
+        "opacity": 0.75
+      },
+      "central": 4.009097429937608,
+      "interior": 3.7484574254506473
+    },
+    "tested": 52
+  },
+  {
+    "id": "youtubemusic",
+    "adopted": true,
+    "baseline": {
+      "central": 15.731732024085975,
+      "interior": 14.598380440203256
+    },
+    "selected": {
+      "name": "ring-and-play-cutouts",
+      "config": {
+        "glass": true,
+        "specular": true,
+        "translucency": 0.3,
+        "shadow": "layer-color",
+        "opacity": 0.75
+      },
+      "central": 6.213092522522723,
+      "interior": 6.187601754023309
+    },
+    "tested": 55,
+    "followup": {
+      "change": "Replace white ring and play layer with even-odd cutouts in the red disc",
+      "candidates": [
+        {
+          "name": "before",
+          "central": 7.244857119778597,
+          "interior": 6.7390128873545345
+        },
+        {
+          "name": "triangle",
+          "central": 6.979024303780168,
+          "interior": 6.594866375988734
+        },
+        {
+          "name": "ring",
+          "central": 6.507364001528089,
+          "interior": 6.339526834087047
+        },
+        {
+          "name": "both",
+          "central": 6.213092522522723,
+          "interior": 6.187601754023309
+        }
+      ],
+      "watchOSCompositionPreserved": true,
+      "darkPixelsUnchanged": true,
+      "watchOSPixelsUnchanged": true
+    }
+  },
+  {
+    "id": "snipd",
+    "adopted": true,
+    "baseline": {
+      "central": 14.96313896321693,
+      "interior": 10.687228673052017
+    },
+    "selected": {
+      "name": "refine-t0.45-o0.75",
+      "config": {
+        "glass": true,
+        "specular": true,
+        "translucency": 0.45,
+        "shadow": "layer-color",
+        "opacity": 0.75
+      },
+      "central": 6.338631410546573,
+      "interior": 4.6665296435399926
+    },
+    "tested": 52
+  },
+  {
+    "id": "siriusxm",
+    "adopted": true,
+    "baseline": {
+      "central": 14.717194991370137,
+      "interior": 14.458113437842684
+    },
+    "selected": {
+      "name": "refine-t0.3-o0.5",
+      "config": {
+        "glass": true,
+        "specular": true,
+        "translucency": 0.3,
+        "shadow": "neutral",
+        "opacity": 0.5
+      },
+      "central": 4.901668442134092,
+      "interior": 6.641493755203834
+    },
+    "tested": 52
+  },
+  {
+    "id": "podkicker",
+    "adopted": false,
+    "baseline": {
+      "central": 14.28177139605777,
+      "interior": 11.809717554902237
+    },
+    "selected": {
+      "name": "g1-s0-t0-neutral-0.5",
+      "config": {
+        "glass": true,
+        "specular": false,
+        "translucency": 0,
+        "shadow": "neutral",
+        "opacity": 0.5
+      },
+      "central": 14.281746792630477,
+      "interior": 11.809638908921901
+    },
+    "tested": 37
+  },
+  {
+    "id": "podcastaddict",
+    "adopted": false,
+    "baseline": {
+      "central": 14.028825167166444,
+      "interior": 10.752589981063576
+    },
+    "selected": {
+      "name": "prepared",
+      "config": null,
+      "central": 14.028825167166444,
+      "interior": 10.752589981063576
+    },
+    "tested": 37
+  },
+  {
+    "id": "airshow",
+    "adopted": false,
+    "baseline": {
+      "central": 1.1167383878844483,
+      "interior": 1.0307937341926587
+    },
+    "selected": {
+      "name": "prepared",
+      "config": null,
+      "central": 1.1167383878844483,
+      "interior": 1.0307937341926587
+    },
+    "tested": 37
+  },
+  {
+    "id": "castro",
+    "adopted": true,
+    "baseline": {
+      "central": 13.70456147933889,
+      "interior": 12.008374587859137
+    },
+    "selected": {
+      "name": "g1-s0-t0.25-none-0.5",
+      "config": {
+        "glass": true,
+        "specular": false,
+        "translucency": 0.25,
+        "shadow": "none",
+        "opacity": 0.5
+      },
+      "central": 10.02422993600312,
+      "interior": 9.174372462588629
+    },
+    "tested": 37
+  },
+  {
+    "id": "audacy",
+    "adopted": true,
+    "baseline": {
+      "central": 13.366795448211864,
+      "interior": 10.392079693638765
+    },
+    "selected": {
+      "name": "refine-t0.25-o0.5",
+      "config": {
+        "glass": true,
+        "specular": true,
+        "translucency": 0.25,
+        "shadow": "neutral",
+        "opacity": 0.5
+      },
+      "central": 4.909039373054573,
+      "interior": 3.9010895840577766
+    },
+    "tested": 52
+  },
+  {
+    "id": "yoto",
+    "adopted": true,
+    "baseline": {
+      "central": 13.980150514993792,
+      "interior": 12.008241911276007
+    },
+    "selected": {
+      "name": "refine-t0.3-o0.75",
+      "config": {
+        "glass": true,
+        "specular": true,
+        "translucency": 0.3,
+        "shadow": "neutral",
+        "opacity": 0.75
+      },
+      "central": 4.213692018560249,
+      "interior": 6.372087744929517
+    },
+    "tested": 52
+  },
+  {
+    "id": "xiaoyuzhou",
+    "adopted": false,
+    "baseline": {
+      "central": 1.6060197658778668,
+      "interior": 1.4148297620566512
+    },
+    "selected": {
+      "name": "prepared",
+      "config": null,
+      "central": 1.6060197658778668,
+      "interior": 1.4148297620566512
+    },
+    "tested": 37
+  },
+  {
+    "id": "podcastrepublic",
+    "adopted": false,
+    "baseline": {
+      "central": 9.314880933362545,
+      "interior": 9.715987492351552
+    },
+    "selected": {
+      "name": "prepared",
+      "config": null,
+      "central": 9.314880933362545,
+      "interior": 9.715987492351552
+    },
+    "tested": 37
+  },
+  {
+    "id": "playerfm",
+    "adopted": true,
+    "baseline": {
+      "central": 12.511066108564812,
+      "interior": 9.84091604189707
+    },
+    "selected": {
+      "name": "g1-s1-t0.25-neutral-0.5",
+      "config": {
+        "glass": true,
+        "specular": true,
+        "translucency": 0.25,
+        "shadow": "neutral",
+        "opacity": 0.5
+      },
+      "central": 3.39582866622473,
+      "interior": 3.6320538641465916
+    },
+    "tested": 37
+  },
+  {
+    "id": "podhome",
+    "adopted": true,
+    "baseline": {
+      "central": 12.250512430723646,
+      "interior": 9.277198285911677
+    },
+    "selected": {
+      "name": "g1-s0-t0.25-neutral-0.5",
+      "config": {
+        "glass": true,
+        "specular": false,
+        "translucency": 0.25,
+        "shadow": "neutral",
+        "opacity": 0.5
+      },
+      "central": 4.995622697403954,
+      "interior": 3.954339729684273
+    },
+    "tested": 37
+  },
+  {
+    "id": "overcast",
+    "adopted": false,
+    "baseline": {
+      "central": 2.4709790238399063,
+      "interior": 3.0263758222144106
+    },
+    "selected": {
+      "name": "prepared",
+      "config": null,
+      "central": 2.4709790238399063,
+      "interior": 3.0263758222144106
+    },
+    "tested": 37
+  },
+  {
+    "id": "ivoox",
+    "adopted": true,
+    "baseline": {
+      "central": 10.321181581005536,
+      "interior": 8.289965169977075
+    },
+    "selected": {
+      "name": "g1-s1-t0.25-neutral-0.5",
+      "config": {
+        "glass": true,
+        "specular": true,
+        "translucency": 0.25,
+        "shadow": "neutral",
+        "opacity": 0.5
+      },
+      "central": 1.9182936304376672,
+      "interior": 1.671732271031528
+    },
+    "tested": 37
+  },
+  {
+    "id": "rssradio",
+    "adopted": true,
+    "baseline": {
+      "central": 9.932193371616988,
+      "interior": 7.605303553887668
+    },
+    "selected": {
+      "name": "g1-s1-t0.25-neutral-0.5",
+      "config": {
+        "glass": true,
+        "specular": true,
+        "translucency": 0.25,
+        "shadow": "neutral",
+        "opacity": 0.5
+      },
+      "central": 5.669817877759799,
+      "interior": 4.760724182480565
+    },
+    "tested": 37
+  },
+  {
+    "id": "podimo",
+    "adopted": true,
+    "baseline": {
+      "central": 9.894344726667628,
+      "interior": 7.397123938281624
+    },
+    "selected": {
+      "name": "g1-s1-t0.25-neutral-0.5",
+      "config": {
+        "glass": true,
+        "specular": true,
+        "translucency": 0.25,
+        "shadow": "neutral",
+        "opacity": 0.5
+      },
+      "central": 3.7686083721711747,
+      "interior": 3.0284549210714773
+    },
+    "tested": 37
+  },
+  {
+    "id": "pocketcasts",
+    "adopted": true,
+    "baseline": {
+      "central": 9.744434170407223,
+      "interior": 7.6108346612555815
+    },
+    "selected": {
+      "name": "g1-s1-t0.25-neutral-0.5",
+      "config": {
+        "glass": true,
+        "specular": true,
+        "translucency": 0.25,
+        "shadow": "neutral",
+        "opacity": 0.5
+      },
+      "central": 3.2438991784617377,
+      "interior": 2.6972139048750137
+    },
+    "tested": 37
+  },
+  {
+    "id": "gaana",
+    "adopted": true,
+    "baseline": {
+      "central": 9.274342172060598,
+      "interior": 6.725450815499017
+    },
+    "selected": {
+      "name": "g1-s1-t0.25-neutral-0.5",
+      "config": {
+        "glass": true,
+        "specular": true,
+        "translucency": 0.25,
+        "shadow": "neutral",
+        "opacity": 0.5
+      },
+      "central": 3.1522880932164985,
+      "interior": 2.393954278932763
+    },
+    "tested": 37
+  },
+  {
+    "id": "podcastparrot",
+    "adopted": false,
+    "baseline": {
+      "central": 0.705325540168501,
+      "interior": 0.7201319069588643
+    },
+    "selected": {
+      "name": "prepared",
+      "config": null,
+      "central": 0.705325540168501,
+      "interior": 0.7201319069588643
+    },
+    "tested": 37
+  },
+  {
+    "id": "kkbox",
+    "adopted": true,
+    "baseline": {
+      "central": 8.762613490064041,
+      "interior": 9.643075844939592
+    },
+    "selected": {
+      "name": "g1-s1-t0.25-neutral-0.5",
+      "config": {
+        "glass": true,
+        "specular": true,
+        "translucency": 0.25,
+        "shadow": "neutral",
+        "opacity": 0.5
+      },
+      "central": 2.8751718656235137,
+      "interior": 3.2716438822513245
+    },
+    "tested": 37
+  },
+  {
+    "id": "castbox",
+    "adopted": true,
+    "baseline": {
+      "central": 8.570244572560787,
+      "interior": 6.275311116332581
+    },
+    "selected": {
+      "name": "g1-s1-t0-none-0.5",
+      "config": {
+        "glass": true,
+        "specular": true,
+        "translucency": 0,
+        "shadow": "none",
+        "opacity": 0.5
+      },
+      "central": 4.923878013251332,
+      "interior": 3.5440160044604725
+    },
+    "tested": 37
+  },
+  {
+    "id": "pandora",
+    "adopted": true,
+    "baseline": {
+      "central": 6.263940993190912,
+      "interior": 5.098705646377736
+    },
+    "selected": {
+      "name": "g1-s1-t0-layer-color-0.5",
+      "config": {
+        "glass": true,
+        "specular": true,
+        "translucency": 0,
+        "shadow": "layer-color",
+        "opacity": 0.5
+      },
+      "central": 5.7446592902886735,
+      "interior": 4.154244170404936
+    },
+    "tested": 37
+  },
+  {
+    "id": "tidal",
+    "adopted": true,
+    "baseline": {
+      "central": 7.865899738971222,
+      "interior": 5.6575968326170925
+    },
+    "selected": {
+      "name": "g1-s1-t0.25-neutral-0.5",
+      "config": {
+        "glass": true,
+        "specular": true,
+        "translucency": 0.25,
+        "shadow": "neutral",
+        "opacity": 0.5
+      },
+      "central": 3.979555401141853,
+      "interior": 2.857864283022158
+    },
+    "tested": 37
+  }
+]

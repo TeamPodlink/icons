@@ -1,0 +1,23 @@
+{
+  "name": "BBC Sounds",
+  "active": true,
+  "url": "https://www.bbc.co.uk/sounds",
+  "added": "2026-10-16",
+  "flatSource": "drawn",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "bbcsounds",
+        "title": "BBC Sounds",
+        "variant": null,
+        "file": "BBCSounds.icon",
+        "source": "flat-svg-split",
+        "appStoreId": 1380676511,
+        "playStoreId": "com.bbc.sounds",
+        "appStoreCountry": "gb",
+        "hasDark": true,
+        "hasCircleDark": false
+      }
+    ]
+  }
+}

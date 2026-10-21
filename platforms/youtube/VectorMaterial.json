@@ -1,0 +1,58 @@
+{
+  "source": "Liquid Glass Default rendition",
+  "designGeneration": 27,
+  "sourceHash": "32a89434f8a0",
+  "measurementCommand": "node pipeline/material-flat.mjs measure --only youtube --translucency-only --json /tmp/youtube-translucency.json",
+  "groups": [
+    {
+      "group": 0,
+      "files": [
+        "red.svg"
+      ],
+      "rows": [
+        236,
+        787
+      ],
+      "translucency": 0.25,
+      "shadowOpacity": 0.5,
+      "alpha": [
+        0,
+        0.001,
+        0.005,
+        0.015,
+        0.029,
+        0.045,
+        0.063,
+        0.085,
+        0.112,
+        0.138
+      ],
+      "shadow": null
+    }
+  ],
+  "implementation": {
+    "files": [
+      "icon.svg"
+    ],
+    "maskId": "youtube-material-translucency-mask",
+    "gradientCoordinates": "userSpaceOnUse, mapped to the existing foreground bounds",
+    "opacity": "1 minus measured backdrop weight, sampled at the centers of ten vertical bands",
+    "preserved": [
+      "background",
+      "glyph geometry",
+      "circle scale and positioning"
+    ],
+    "circle": "Same measured fade applied within the existing circle foreground bounds."
+  },
+  "verification": {
+    "metric": "central 60% RGB RMSE at 256px, both sides rendered at 1024px in sRGB",
+    "vectorVsGlass": {
+      "before": 14.422580787294324,
+      "after": 7.4030359860961985
+    },
+    "circleVsGlass": {
+      "before": 45.65071768288042,
+      "after": 41.51496203614069
+    }
+  }
+}

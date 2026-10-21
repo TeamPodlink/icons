@@ -1,0 +1,59 @@
+{
+  "source": "Liquid Glass Default rendition",
+  "designGeneration": 27,
+  "sourceHash": "72a1ecae4775",
+  "measurementCommand": "node pipeline/material-flat.mjs measure --only siriusxm --translucency-only --json /tmp/siriusxm-translucency.json",
+  "groups": [
+    {
+      "group": 0,
+      "files": [
+        "icon.svg"
+      ],
+      "rows": [
+        119,
+        904
+      ],
+      "translucency": 0.3,
+      "shadowOpacity": 0,
+      "alpha": [
+        0.007,
+        0.008,
+        0.016,
+        0.03,
+        0.054,
+        0.071,
+        0.096,
+        0.131,
+        0.163,
+        0.193
+      ],
+      "shadow": null
+    }
+  ],
+  "implementation": {
+    "files": [
+      "icon.svg",
+      "icon-circle.svg"
+    ],
+    "maskId": "siriusxm-material-translucency-mask",
+    "gradientCoordinates": "userSpaceOnUse, mapped to the existing foreground bounds",
+    "opacity": "1 minus measured backdrop weight, sampled at the centers of ten vertical bands",
+    "preserved": [
+      "background",
+      "glyph geometry",
+      "circle scale and positioning"
+    ],
+    "circle": "Same measured fade applied within the existing circle foreground bounds."
+  },
+  "verification": {
+    "metric": "central 60% RGB RMSE at 256px, both sides rendered at 1024px in sRGB",
+    "vectorVsGlass": {
+      "before": 15.735815811462173,
+      "after": 3.5875609670111896
+    },
+    "circleVsGlass": {
+      "before": 16.65592558818266,
+      "after": 4.070368621391017
+    }
+  }
+}

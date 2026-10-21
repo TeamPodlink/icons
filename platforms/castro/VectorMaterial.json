@@ -1,0 +1,58 @@
+{
+  "source": "Liquid Glass Default rendition",
+  "designGeneration": 27,
+  "sourceHash": "f6529e36e4db",
+  "measurementCommand": "node pipeline/material-flat.mjs measure --only castro --translucency-only --json /tmp/castro-translucency.json",
+  "groups": [
+    {
+      "group": 0,
+      "files": [
+        "light-material.svg"
+      ],
+      "rows": [
+        147,
+        824
+      ],
+      "translucency": 0.26,
+      "shadowOpacity": 0.75,
+      "alpha": [
+        0.009,
+        0.009,
+        0.013,
+        0.028,
+        0.042,
+        0.06,
+        0.078,
+        0.104,
+        0.126,
+        0.15
+      ],
+      "shadow": null
+    }
+  ],
+  "implementation": {
+    "files": [
+      "icon.svg"
+    ],
+    "maskId": "castro-material-translucency-mask",
+    "gradientCoordinates": "userSpaceOnUse, mapped to the existing foreground bounds",
+    "opacity": "1 minus measured backdrop weight, sampled at the centers of ten vertical bands",
+    "preserved": [
+      "background",
+      "glyph geometry",
+      "circle scale and positioning"
+    ],
+    "circle": "Same measured fade applied within the existing circle foreground bounds."
+  },
+  "verification": {
+    "metric": "central 60% RGB RMSE at 256px, both sides rendered at 1024px in sRGB",
+    "vectorVsGlass": {
+      "before": 14.183392908465418,
+      "after": 10.520824562740188
+    },
+    "circleVsGlass": {
+      "before": 49.38493497454446,
+      "after": 46.987492638962365
+    }
+  }
+}

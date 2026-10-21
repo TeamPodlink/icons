@@ -16,7 +16,8 @@
         "file": "Queue.icon",
         "source": "appstore-artwork",
         "appStoreId": 6639586996,
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

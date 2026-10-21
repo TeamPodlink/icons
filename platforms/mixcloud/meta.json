@@ -1,0 +1,21 @@
+{
+  "name": "Mixcloud",
+  "active": true,
+  "url": "https://www.mixcloud.com",
+  "added": "2026-10-16",
+  "flatSource": "drawn",
+  "liquidGlass": {
+    "bundles": [
+      {
+        "slug": "mixcloud",
+        "title": "Mixcloud",
+        "variant": null,
+        "file": "Mixcloud.icon",
+        "source": "flat-svg-split",
+        "appStoreId": 401206431,
+        "hasDark": true,
+        "hasCircleDark": false
+      }
+    ]
+  }
+}

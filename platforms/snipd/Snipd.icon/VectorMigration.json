@@ -1,0 +1,52 @@
+{
+  "reference": "former Assets/light.png",
+  "referenceSHA256": "46e92d20e4b2cc55ddf6967e0f4b81d65934a8b81e8619d69539925ed45b1b70",
+  "renderer": "Icon Composer 27, iOS, 1024px, sRGB",
+  "metric": "Central 60% RGB RMSE at 256px, new vector versus previous native raster rendition",
+  "renditions": [
+    {
+      "rendition": "Default",
+      "rmse": 0
+    },
+    {
+      "rendition": "Dark",
+      "rmse": 1.9743071968741763
+    },
+    {
+      "rendition": "TintedLight",
+      "rmse": 6.320570549897806
+    },
+    {
+      "rendition": "TintedDark",
+      "rmse": 5.02176770636818
+    }
+  ],
+  "gradientFit": [
+    {
+      "lobe": "top",
+      "angleDegrees": 97.22102424860051,
+      "interiorRGBRMSE": 1.2568822158891846
+    },
+    {
+      "lobe": "bottom",
+      "angleDegrees": 110.59794604614477,
+      "interiorRGBRMSE": 0.5791972351148409
+    }
+  ],
+  "circles1024": [
+    {
+      "center": [
+        551.21726555,
+        472.79488605
+      ],
+      "radius": 240.10905082
+    },
+    {
+      "center": [
+        471.93514666,
+        551.8991924
+      ],
+      "radius": 240.0317673
+    }
+  ]
+}

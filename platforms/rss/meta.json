@@ -15,7 +15,8 @@
         "variant": null,
         "file": "RSS.icon",
         "source": "official-svg",
-        "hasDark": true
+        "hasDark": true,
+        "hasCircleDark": false
       }
     ]
   }

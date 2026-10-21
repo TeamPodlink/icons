@@ -1,0 +1,1993 @@
+{
+  "fetchedAt": "2026-10-17T04:44:59.674Z",
+  "entries": [
+    {
+      "slug": "airshow",
+      "appStoreId": 1584582270,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Airshow: Lightweight Podcasts",
+      "version": "4.0",
+      "currentVersionReleaseDate": "2026-09-16T13:34:09Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1584582270&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1584582270",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/b4/3f/15/b43f1590-87b4-9c44-31e8-283244c86827/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/0e/81/d3/0e81d3ba-12c1-ad09-dad9-d1b1356131d5/AppIcon-0-0-1x_U007epad-0-1-0-sRGB-85-220.png/1024x1024bb.png",
+      "previousSha256": "3e510aae3f677bb32cd69b6c7bbf939b8072e3157aeb00832b7027b1ea4118b7",
+      "sha256": "10c5aa484aa64e6639e0fb4d7c3de45af13b57ad28c5d86fd089a23b5348869a",
+      "pixelsChanged": true,
+      "differingPixels": 937029,
+      "rgbaRmse": 37.89964976010503,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 232512,
+      "centralHalfRgbaRmse": 1.3057330847266622
+    },
+    {
+      "slug": "amazonmusic",
+      "appStoreId": 510855668,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Amazon Music: Songs & Podcasts",
+      "version": "26.37.0",
+      "currentVersionReleaseDate": "2026-10-15T16:56:33Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=510855668&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id510855668",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/82/b6/55/82b655f8-b015-f144-2e8e-69ba44d0aa1d/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/0c/1a/c5/0c1ac553-ce81-01cd-469b-6167a6a07b70/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "bfd955555c48b97c6434b7fc3531f8b6b5ac6420bcfda4d7ac91df2cd380bc84",
+      "sha256": "d0a2a9b8ecc71231aedea8a5f66efc108f383b31ce64a0dc0d25a633cb677507",
+      "pixelsChanged": true,
+      "differingPixels": 703466,
+      "rgbaRmse": 50.95947299310862,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 129701,
+      "centralHalfRgbaRmse": 0.4571991962389084
+    },
+    {
+      "slug": "anghami",
+      "appStoreId": 545395155,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Anghami: Play Music & Podcasts",
+      "version": "8.0.40",
+      "currentVersionReleaseDate": "2026-10-01T06:26:44Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=545395155&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id545395155",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/d0/6a/0a/d06a0ab6-4f67-2f30-db36-f781fb634fe7/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/67/dc/4b/67dc4b6d-7cee-2d83-d697-eb48a3e694e7/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "fd924d29d8316d11152fb9ed94fe30d9fe5bb6fbb4600534d14c5a5ae9a3e4d6",
+      "sha256": "5a009b5ae136597ebfcb61cff76c6b62582a374001ec4febdf4b42a3be495590",
+      "pixelsChanged": true,
+      "differingPixels": 278853,
+      "rgbaRmse": 32.46211367609693,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 16405,
+      "centralHalfRgbaRmse": 0.13469838109505589
+    },
+    {
+      "slug": "anytimeplayer",
+      "appStoreId": 1582300839,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Anytime Podcast Player",
+      "version": "1.4.1",
+      "currentVersionReleaseDate": "2026-01-20T02:04:40Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1582300839&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1582300839",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/84/db/63/84db632f-9065-b47e-d97e-59d927161ec8/AppIcon-0-0-1x_U007emarketing-0-8-0-0-85-220.png/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/84/db/63/84db632f-9065-b47e-d97e-59d927161ec8/AppIcon-0-0-1x_U007emarketing-0-8-0-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "7af1d627ff5ae0ea742174fe00ac7026fc2be01e3cab653e0b961a7ef9a38da8",
+      "sha256": "02958ace63cb0b47d47038dd85ce4688476e3061d6e9c0dfa03bb9dcb9cb644f",
+      "pixelsChanged": false,
+      "differingPixels": 0,
+      "rgbaRmse": 0,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": false,
+      "centralHalfDifferingPixels": 0,
+      "centralHalfRgbaRmse": 0
+    },
+    {
+      "slug": "apple",
+      "appStoreId": 525463029,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Apple Podcasts",
+      "version": "4.6",
+      "currentVersionReleaseDate": "2026-09-14T20:04:41Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=525463029&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id525463029",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/fd/c3/02/fdc3025a-c33c-8c8a-82c9-4c09f88c9e39/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/e9/44/84/e94484bf-b003-2f78-1abd-7274f6dd3a19/podcastsCalistoga-0-0-1x_U007epad-0-1-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "5182110399c1b099e280113435b03121789ffde9d0cb88e018fa7b6444dcad94",
+      "sha256": "78cae3e7fbe3ca44fa7f489804ab4d44e02ee0934575757600dcc275d3ec0601",
+      "pixelsChanged": true,
+      "differingPixels": 1001682,
+      "rgbaRmse": 46.972498969371884,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 256256,
+      "centralHalfRgbaRmse": 8.834524404249489
+    },
+    {
+      "slug": "audacy",
+      "appStoreId": 323701765,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Audacy: Radio & Sports Talk",
+      "version": "2026.10.01",
+      "currentVersionReleaseDate": "2026-10-01T19:12:30Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=323701765&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id323701765",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/72/12/41/721241bd-fbd2-1e2a-9e58-99214119299b/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/dc/bf/c6/dcbfc687-a3af-2e1f-2f8e-5bae7ff5ce32/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "ce262913ee8da80a29bbfe4a02d1ff37100d6770736518144ce20b82f20a7f84",
+      "sha256": "004cea947831719b23a8e3c4ff460f07fbca14b845f87fcd2c37651a63b2cd40",
+      "pixelsChanged": true,
+      "differingPixels": 1043511,
+      "rgbaRmse": 46.32287664935705,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 260831,
+      "centralHalfRgbaRmse": 11.08000453398023
+    },
+    {
+      "slug": "audible",
+      "appStoreId": 379693831,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Audible: Audiobooks & Podcasts",
+      "version": "4.79.2",
+      "currentVersionReleaseDate": "2026-10-12T13:54:20Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=379693831&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id379693831",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/56/f3/1c/56f31ca1-f302-ff88-9ae2-c6129ece5446/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/5b/7e/87/5b7e8765-c4b6-34c5-8bc7-38c0404ec7f6/AppIcon-0-0-1x_U007emarketing-0-0-0-8-0-0-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "748e74e81cb7e0a95c2312ee58ca4e9220546f7dfb47df066d18163f155b9370",
+      "sha256": "fce824757a135ec2eba93b45b1c144958be5b075f30c95aee13cc8479bcdf132",
+      "pixelsChanged": true,
+      "differingPixels": 677523,
+      "rgbaRmse": 49.37875532765904,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 118280,
+      "centralHalfRgbaRmse": 3.2500428417023044
+    },
+    {
+      "slug": "audiomack",
+      "appStoreId": 921765888,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Audiomack - Play Music Offline",
+      "version": "8.10.0",
+      "currentVersionReleaseDate": "2026-09-23T18:26:19Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=921765888&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id921765888",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/c2/81/cd/c281cd3d-501e-394c-d1cd-fea1f349e163/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/88/19/5b/88195b2f-d2ac-1ae0-07de-eaa6f2e9652d/AppIcon-1-0-0-1x_U007emarketing-0-6-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "414cf5f88067f2e20f8bf577252154419d4f42dfbd37deb9915a19427c1cdd37",
+      "sha256": "1e67bb03c3d1a8abaa92241e40c523ec386e750dd9521c719ac3847ecff8cb1a",
+      "pixelsChanged": true,
+      "differingPixels": 307903,
+      "rgbaRmse": 32.62125373027292,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 104755,
+      "centralHalfRgbaRmse": 3.4617916112423592
+    },
+    {
+      "slug": "bbcsounds",
+      "appStoreId": 1380676511,
+      "country": "gb",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "BBC Sounds",
+      "version": "2.62.0",
+      "currentVersionReleaseDate": "2026-10-05T05:06:54Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1380676511&country=gb",
+      "pageUrl": "https://apps.apple.com/gb/app/id1380676511",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/01/5d/1e/015d1ead-a350-61e3-5f9c-0b59b07b0467/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/87/8b/1a/878b1a78-60d3-4f41-7cbd-eb7209690fda/AppIcon-0-0-1x_U007epad-0-1-0-sRGB-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "a35b95225a1f2f0bfd46501208ad0e463cec183bc90c62b616d261ac80b80cc2",
+      "sha256": "d7b379298d0588f7596d80baa54d76e812cc45564bf41a5fad36c3a9b43720c2",
+      "pixelsChanged": true,
+      "differingPixels": 834246,
+      "rgbaRmse": 38.6982724655587,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 225870,
+      "centralHalfRgbaRmse": 2.4213114421179784
+    },
+    {
+      "slug": "castamatic",
+      "appStoreId": 966632553,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Castamatic Podcast Player",
+      "version": "13.2.9",
+      "currentVersionReleaseDate": "2026-10-06T18:25:20Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=966632553&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id966632553",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/40/41/58/404158f7-2731-1422-9702-5e8c570ab5dd/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/8e/b1/72/8eb17233-5c65-7e90-e757-5ced1a8b26b5/AppIcon-0-0-1x_U007epad-0-0-0-1-0-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "a37c89b746228b7cf56ab0aafdfbb25efb20fc61c67e7fd9e66609cf7a433f4e",
+      "sha256": "bc67e94ee9bec32bab2819197b0f2e541b073ebbdda81c0daefb7f0124954927",
+      "pixelsChanged": true,
+      "differingPixels": 908883,
+      "rgbaRmse": 48.68371803863461,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 247957,
+      "centralHalfRgbaRmse": 6.781871011311148
+    },
+    {
+      "slug": "castbox",
+      "appStoreId": 1243410543,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Podcast App & Player - Castbox",
+      "version": "10.31.1",
+      "currentVersionReleaseDate": "2026-10-12T02:37:32Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1243410543&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1243410543",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/db/d2/d1/dbd2d10d-e3ef-bc5c-2ed7-12e6edfb5951/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/d5/9a/b9/d59ab911-1c69-248b-48d0-b1837353b615/AppIcon-0-1x_U007emarketing-0-8-0-85-220-0.png/1024x1024bb.png",
+      "previousSha256": "a3cc680fd68240aa11c0530604709ead9e83660ccddcac4d923a56343cfa03d0",
+      "sha256": "6d2954e027ac5bbd7e6d5d0a51680285a566bb117763cb72268936121f6fdb79",
+      "pixelsChanged": true,
+      "differingPixels": 507152,
+      "rgbaRmse": 48.03133390092937,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 82005,
+      "centralHalfRgbaRmse": 7.445848603776395
+    },
+    {
+      "slug": "castro",
+      "appStoreId": 1080840241,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Castro: Podcast App & Player",
+      "version": "2026.7.2",
+      "currentVersionReleaseDate": "2026-09-24T18:22:39Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1080840241&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1080840241",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/99/18/97/99189758-a20e-64f7-17a4-73136079eac2/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/11/b1/58/11b158fa-ca52-4341-a012-6a2c51437a83/DefaultIcon-0-0-1x_U007epad-0-1-0-sRGB-85-220.png/1024x1024bb.png",
+      "previousSha256": "b46b3a4a09588d7006bf005022f10bd35dbb10107c6fa06ff6a7ac6e6c5cf1b4",
+      "sha256": "ac359da031530e39bf9c1c40f0c07020955085618c155fa2cc20e456e024e651",
+      "pixelsChanged": true,
+      "differingPixels": 1040924,
+      "rgbaRmse": 41.265407150022845,
+      "initialAttempt": "lookup-fallback",
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 259504,
+      "centralHalfRgbaRmse": 12.461887545826835
+    },
+    {
+      "slug": "claromusica",
+      "appStoreId": 843577241,
+      "country": "mx",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Claro Música",
+      "version": "13.5.3 (13.5.1.9)",
+      "currentVersionReleaseDate": "2026-09-08T18:53:17Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=843577241&country=mx",
+      "pageUrl": "https://apps.apple.com/mx/app/id843577241",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/ef/a0/d0/efa0d05e-6971-c803-ce7b-1d3d97541aaa/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/14/ab/a2/14aba26f-77a7-fe3a-b0ed-16423ddc12ae/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "7241d59f3e6f4157079ae1d859949ea6520637580282aa8c4f8e5704b61b6bfe",
+      "sha256": "9e43855c43337e80f8e0ffde3e3b8552e1acca34e290a6f334d5082425a06df1",
+      "pixelsChanged": true,
+      "differingPixels": 182212,
+      "rgbaRmse": 61.21596884337102,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 10424,
+      "centralHalfRgbaRmse": 0.1286248111408356
+    },
+    {
+      "slug": "deezer",
+      "appStoreId": 292738169,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Deezer: Music Player, Podcast",
+      "version": "11.24.1",
+      "currentVersionReleaseDate": "2026-10-12T16:29:26Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=292738169&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id292738169",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/9b/a9/de/9ba9de01-0819-7b9b-58fe-29d174fe983a/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/e0/7f/fb/e07ffba4-6305-85f1-63ee-46d7580d22db/AppIcon-0-0-1x_U007epad-0-11-0-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "a00b07ad84a5df0ab008c4162794595b37c814b6af08fcefdb118de88f4a73b2",
+      "sha256": "be4a6b6534e67a663f74add86d7fbc9c44e7e56045c951b488243a651cbd4a57",
+      "pixelsChanged": true,
+      "differingPixels": 174817,
+      "rgbaRmse": 32.461671489032916,
+      "initialAttempt": "lookup-fallback",
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 668,
+      "centralHalfRgbaRmse": 0.026039632081979264
+    },
+    {
+      "slug": "disctopia",
+      "appStoreId": 1162011563,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Disctopia: Music & Podcasts",
+      "version": "3.3.16",
+      "currentVersionReleaseDate": "2025-09-23T16:37:59Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1162011563&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1162011563",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/15/b3/9d/15b39d45-7b74-f94a-970d-ca56f8c7859c/AppIcon-1x_U007emarketing-0-6-0-85-220-0.png/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/15/b3/9d/15b39d45-7b74-f94a-970d-ca56f8c7859c/AppIcon-1x_U007emarketing-0-6-0-85-220-0.png/1024x1024bb.png",
+      "previousSha256": "9b7ffb996172ff6a5acc7b5c95a6ba57d79092066c41ba9f38cc1811ab7e55cf",
+      "sha256": "ae5ba408252a43dade7ab05028f27e27c30cf0403f7b0fc4805f978352723697",
+      "pixelsChanged": false,
+      "differingPixels": 0,
+      "rgbaRmse": 0,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": false,
+      "centralHalfDifferingPixels": 0,
+      "centralHalfRgbaRmse": 0
+    },
+    {
+      "slug": "downcast",
+      "appStoreId": 393858566,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Downcast",
+      "version": "2.11.33",
+      "currentVersionReleaseDate": "2025-01-26T17:21:29Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=393858566&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id393858566",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/c8/35/7d/c8357d34-cc7a-f888-c6b6-4ebb3d8d6f2a/AppIcon-0-0-1x_U007epad-0-1-0-512MB-85-220.png/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/c8/35/7d/c8357d34-cc7a-f888-c6b6-4ebb3d8d6f2a/AppIcon-0-0-1x_U007epad-0-1-0-512MB-85-220.png/1024x1024bb.png",
+      "previousSha256": "05d301be592e5df540a0067430c4d0957ab8a055957c649fe2b83752de3a042c",
+      "sha256": "b672f0b5aefcb461e93dc42c2c83d0752d2b956f447ae1ad2192a682ecff1b92",
+      "pixelsChanged": false,
+      "differingPixels": 0,
+      "rgbaRmse": 0,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": false,
+      "centralHalfDifferingPixels": 0,
+      "centralHalfRgbaRmse": 0
+    },
+    {
+      "slug": "fountain",
+      "appStoreId": 1576394424,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Fountain: Podcast Player",
+      "version": "1.5.9",
+      "currentVersionReleaseDate": "2026-10-07T13:11:02Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1576394424&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1576394424",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/a6/0a/ac/a60aac7c-1352-2cb9-e0d5-c1c58b5ea138/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/4e/c2/a8/4ec2a8f9-ced7-1506-8afe-036291a06660/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "0aa9412d3249eb430d3a91e9564f3843d81006a4ecdb00a1330ff595e76a4999",
+      "sha256": "4305ca953f90557d5805944590bad960d511f1d33bdb4b743e1e135c1c12220b",
+      "pixelsChanged": true,
+      "differingPixels": 250198,
+      "rgbaRmse": 32.52487329360126,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 42577,
+      "centralHalfRgbaRmse": 3.3566713320849013
+    },
+    {
+      "slug": "gaana",
+      "appStoreId": 585270521,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Gaana Music - Songs & Podcasts",
+      "version": "9.26.2",
+      "currentVersionReleaseDate": "2026-10-16T07:18:07Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=585270521&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id585270521",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/f3/cf/f5/f3cff5cf-3a89-240b-4584-64ebd1305262/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/f9/35/e4/f935e46e-466e-f5be-0c89-20db9a16d72e/AppIconProd-0-0-1x_U007emarketing-0-11-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "75717e106c1d108a500c7be91fef698cfc45ff6d03bc5b1a945b96f1fc31460b",
+      "sha256": "c3b08c7f8334bfb612208fff885f2d985a50a52b618f5d4e93008d132f1fc719",
+      "pixelsChanged": true,
+      "differingPixels": 1042761,
+      "rgbaRmse": 43.81164422607505,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 259536,
+      "centralHalfRgbaRmse": 8.771988569882762
+    },
+    {
+      "slug": "globalplayer",
+      "appStoreId": 1142951331,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Global Player Radio & Podcasts",
+      "version": "180.0",
+      "currentVersionReleaseDate": "2026-10-06T13:55:42Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1142951331&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1142951331",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/ea/3d/a4/ea3da447-3a15-6080-a74f-1f79baf7a439/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/c6/58/f2/c658f2d6-2314-2211-afcb-4e3b7cc3b06f/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "46cc6861d948e722885c70541e4dc5469a5bf4f3d993fd184b7a073c35fce494",
+      "sha256": "fbe83a0ac2404274079a8e8724beec222ef92f25d3887790e3cb1c113fa7076c",
+      "pixelsChanged": true,
+      "differingPixels": 588215,
+      "rgbaRmse": 48.258814589631875,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 86313,
+      "centralHalfRgbaRmse": 4.495302927844345
+    },
+    {
+      "slug": "goodpods",
+      "appStoreId": 1483407582,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Goodpods: Podcast Player",
+      "version": "5.12.0",
+      "currentVersionReleaseDate": "2025-11-30T02:05:57Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1483407582&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1483407582",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/7d/00/38/7d003895-468f-3bb6-090e-47a19b99487c/AppIcon-0-0-1x_U007ephone-0-1-85-220.png/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/7d/00/38/7d003895-468f-3bb6-090e-47a19b99487c/AppIcon-0-0-1x_U007ephone-0-1-85-220.png/1024x1024bb.png",
+      "previousSha256": "53172e0e72448e2b133dbbc2d0de5a3ebe69c864aa5d5d4c060fcf29a4fe66ef",
+      "sha256": "ad7749ab55defbe3fc6f8e72a09b61efab53ada1a99b042903ad240045599311",
+      "pixelsChanged": false,
+      "differingPixels": 0,
+      "rgbaRmse": 0,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": false,
+      "centralHalfDifferingPixels": 0,
+      "centralHalfRgbaRmse": 0
+    },
+    {
+      "slug": "hark",
+      "appStoreId": 1540109137,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Hark Audio",
+      "version": "1.8.3",
+      "currentVersionReleaseDate": "2025-11-12T03:48:25Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1540109137&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1540109137",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/d3/3c/26/d33c2652-7fd4-76a0-b2ba-4a2c80722c4e/HarkAppIcon-0-0-1x_U007ephone-0-11-0-85-220.png/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/d3/3c/26/d33c2652-7fd4-76a0-b2ba-4a2c80722c4e/HarkAppIcon-0-0-1x_U007ephone-0-11-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "468845e6d7d7b0c1bb1aa38d3634b22f445e3776fc21b55e953f6a4e9cf4c464",
+      "sha256": "d5917190f72abdfa680f4785425125fba44c1d00f8689ddab109278468a5c1f8",
+      "pixelsChanged": false,
+      "differingPixels": 0,
+      "rgbaRmse": 0,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": false,
+      "centralHalfDifferingPixels": 0,
+      "centralHalfRgbaRmse": 0
+    },
+    {
+      "slug": "hungama",
+      "appStoreId": 414009038,
+      "country": "in",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Hungama OTT: Shows & Movies",
+      "version": "7.3.3",
+      "currentVersionReleaseDate": "2026-09-30T06:15:24Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=414009038&country=in",
+      "pageUrl": "https://apps.apple.com/in/app/id414009038",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/ba/ff/e6/baffe6b1-a2a3-b7ed-f97f-8f5f63b60af8/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/5b/0c/62/5b0c623d-14a5-53bd-ff36-810f1a02311f/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "f416552d93c66a324d01610b725b63a97691321075d472a1753039c85fd4e07e",
+      "sha256": "4b9b2130db0641323e01543ceef9d36d1808b8397273b4cc4584527c2452737a",
+      "pixelsChanged": true,
+      "differingPixels": 951313,
+      "rgbaRmse": 42.136202864823254,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 245860,
+      "centralHalfRgbaRmse": 11.418395633136859
+    },
+    {
+      "slug": "icatcher",
+      "appStoreId": 414419105,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "iCatcher! Podcast App",
+      "version": "15.2",
+      "currentVersionReleaseDate": "2026-10-09T03:53:32Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=414419105&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id414419105",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/cc/65/dc/cc65dcde-db93-98f7-b143-13902e4e0e19/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/da/8e/6e/da8e6eda-8342-c740-61fe-05dc2946fde7/iCatcher-Icon-0-0-1x_U007epad-0-1-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "25b4059a4ef451c523f2b5d5113fa34c10a1fb912827835cac1d3bdc8b0a2da7",
+      "sha256": "cfb2b8c0c80dd292c33f1d12899c30f6e6af755359ec84dc3c8f5b23831d9dea",
+      "pixelsChanged": true,
+      "differingPixels": 943991,
+      "rgbaRmse": 47.98039876548746,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 247500,
+      "centralHalfRgbaRmse": 21.846497740807873
+    },
+    {
+      "slug": "iheartradio",
+      "appStoreId": 290638154,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "iHeart: Radio, Music, Podcasts",
+      "version": "10.67.0",
+      "currentVersionReleaseDate": "2026-09-11T11:42:36Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=290638154&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id290638154",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/3a/b4/9e/3ab49ec2-d2d4-b334-428a-7bf0af0600a5/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/ec/5b/60/ec5b6015-f989-c9f9-8379-297879ddf864/AppIcon-0-0-1x_U007emarketing-0-7-0-sRGB-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "e76cdca2ed18ff518427260d78c079b5193a594cc25f0d90ecc3fddbb18d5fc0",
+      "sha256": "6cab7e842f5b8603884e8c46875862dd6d1d9ab82c98d843e9dfb63fbfa9f882",
+      "pixelsChanged": true,
+      "differingPixels": 666149,
+      "rgbaRmse": 39.917655232093566,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 74401,
+      "centralHalfRgbaRmse": 3.4512681758723924
+    },
+    {
+      "slug": "ivoox",
+      "appStoreId": 542673545,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Podcast & Radio - iVoox",
+      "version": "4.86",
+      "currentVersionReleaseDate": "2026-10-02T00:07:51Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=542673545&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id542673545",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/00/63/2a/00632a4a-13c7-df77-b93a-f334d4cfe7cf/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/4a/d7/6a/4ad76aee-8149-3180-4495-0f7e676e3875/AppIcon-0-0-1x_U007ephone-0-1-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "e5d458b384a8509ccc5bc833d1d5e2cc7a41c1d4aa3361897292311bc6141c34",
+      "sha256": "f962c689b8ed2a89603c18e014adfc9000fa8af6f7b4ba484426c2fcf42c580c",
+      "pixelsChanged": true,
+      "differingPixels": 1036159,
+      "rgbaRmse": 46.17010030676075,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 256061,
+      "centralHalfRgbaRmse": 9.066793174655793
+    },
+    {
+      "slug": "jiosaavn",
+      "appStoreId": 441813332,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "JioSaavn – Music & Podcasts",
+      "version": "10.10",
+      "currentVersionReleaseDate": "2026-09-22T05:41:57Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=441813332&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id441813332",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/0f/61/14/0f611471-e746-b8e6-f2a2-5cc86d45a79b/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/03/2e/75/032e752b-d99c-8609-0a2e-782f40dbc5b3/appiconfree-0-0-1x_U007emarketing-0-8-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "bc102dc98a6bffb0ddf4bc0da8be874a4d9ee80ffcf3554f9b0197313b401368",
+      "sha256": "76cbe1ef0a0184dddc20e051a09170f66ee27362efe39c793fd6ce0a4cbfbecb",
+      "pixelsChanged": true,
+      "differingPixels": 574615,
+      "rgbaRmse": 33.73116519034501,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 198993,
+      "centralHalfRgbaRmse": 0.43682809733474537
+    },
+    {
+      "slug": "kkbox",
+      "appStoreId": 300915900,
+      "country": "tw",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "KKBOX｜音樂＆Podcast",
+      "version": "7.25.20",
+      "currentVersionReleaseDate": "2026-10-05T03:15:18Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=300915900&country=tw",
+      "pageUrl": "https://apps.apple.com/tw/app/id300915900",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/bc/a0/2b/bca02b69-b8bd-486d-b428-7ddd98972836/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/6f/67/74/6f6774a6-8471-4f10-cacc-8170222921e4/AppIcon-0-0-1x_U007emarketing-0-8-0-0-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "87d38e532fec72476398f5c36be57c14c0d86447b5a13856711f66a4ad212aa0",
+      "sha256": "cf40c4bce3340ea010d401f1746444e87b6bb99287b5e71d575c1b2e5ae70f57",
+      "pixelsChanged": true,
+      "differingPixels": 1015199,
+      "rgbaRmse": 52.12632991274294,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 250302,
+      "centralHalfRgbaRmse": 8.01153727920621
+    },
+    {
+      "slug": "listnr",
+      "appStoreId": 1462845202,
+      "country": "au",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "LiSTNR",
+      "version": "4.45.0",
+      "currentVersionReleaseDate": "2026-10-05T22:02:28Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1462845202&country=au",
+      "pageUrl": "https://apps.apple.com/au/app/id1462845202",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/b8/d5/89/b8d58940-e242-ad83-c4b7-a0231cdf7fcf/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/a6/2f/9e/a62f9eea-0354-d76b-1690-9d6fbfa3ef8d/AppIcon-0-0-1x_U007epad-0-1-85-220.png/1024x1024bb.png",
+      "previousSha256": "7276ab160ed5f8559c5003e349a33d716e023a0c5ca48e5b89673a271e7b858d",
+      "sha256": "536002dd1e9f07818cf45fb25bcfa7fe16e1d9e751da7a6571ada54ad6a4e3ea",
+      "pixelsChanged": true,
+      "differingPixels": 562304,
+      "rgbaRmse": 50.99276880815748,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 183318,
+      "centralHalfRgbaRmse": 6.632783959353164
+    },
+    {
+      "slug": "metacast",
+      "appStoreId": 6462012536,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Metacast – podcast app",
+      "version": "1.30.0",
+      "currentVersionReleaseDate": "2026-10-05T23:37:13Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=6462012536&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id6462012536",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/9d/2a/87/9d2a8764-c895-9909-0cc5-6307d4c2fc35/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/f8/7a/85/f87a853e-ea9f-4f0c-204d-05ada07596db/AppIcon-0-0-1x_U007emarketing-0-11-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "76ac7802175826244d36cd709ad70c0b8097a11429ca575cfd438a26dc4de106",
+      "sha256": "bf6073322d7dcd2aaef42157b318ec2d4dbd3b7774851a4a5f3435657e98315f",
+      "pixelsChanged": true,
+      "differingPixels": 264253,
+      "rgbaRmse": 32.91073831377423,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 56879,
+      "centralHalfRgbaRmse": 0.2331531464713111
+    },
+    {
+      "slug": "mixcloud",
+      "appStoreId": 401206431,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Mixcloud: Music, Mixes & Radio",
+      "version": "46.0.0",
+      "currentVersionReleaseDate": "2026-10-15T09:51:57Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=401206431&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id401206431",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/cd/f6/81/cdf68181-f397-30fa-94a5-f30421b29cbf/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/51/39/0c/51390ce1-2252-dc76-9074-25214acf6f57/AppIcon-0-0-1x_U007epad-0-1-85-220.png/1024x1024bb.png",
+      "previousSha256": "2ea1ca97ad60877b66ccc03b9a2f9a8f39bcfb19455ee356894de240a28597b5",
+      "sha256": "61a60beb6b88cc4f2ede8af12a0eaddc31c1dcad4b30151f2f6a024cf82546ee",
+      "pixelsChanged": true,
+      "differingPixels": 179144,
+      "rgbaRmse": 45.77251780169209,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 101,
+      "centralHalfRgbaRmse": 0.01019561182510796
+    },
+    {
+      "slug": "moonfm",
+      "appStoreId": 1243771413,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Moon FM - The Podcasts App",
+      "version": "6.8.0",
+      "currentVersionReleaseDate": "2026-10-10T23:17:20Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1243771413&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1243771413",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/5c/64/7d/5c647d20-2453-c593-7f9f-d2522b45b2e8/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/9c/e2/8b/9ce28bf8-67f2-c8c4-4893-9244df1fade0/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "bda8514800be89a1d9e0fe9a793c24dc0e2cf62e416ccfc2f9623dcb40b5bd53",
+      "sha256": "cd98801845d1b4ba16a4f3dab1208a7f51d2b50f4b3cf0604dafe71a807fb040",
+      "pixelsChanged": true,
+      "differingPixels": 929310,
+      "rgbaRmse": 62.41126834097985,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 262143,
+      "centralHalfRgbaRmse": 12.777306356349097
+    },
+    {
+      "slug": "netflix",
+      "appStoreId": 363590051,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Netflix",
+      "version": "26.1.0",
+      "currentVersionReleaseDate": "2026-10-12T16:04:15Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=363590051&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id363590051",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/59/5e/02/595e0225-ace0-9df6-ab59-2a9aed0383e9/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/f6/ed/5f/f6ed5f40-2e41-30c1-d6ff-8d12f8c67c3e/AppIcon-0-0-1x_U007epad-0-1-0-sRGB-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "6b2c6ecd13c6f4ac2f683d44929a3de58a4f46dd8717bfe6ff152c66c7be46f2",
+      "sha256": "3d59f0167d382c10599efa6dd38771b534da319f1b613209659537e981c4123a",
+      "pixelsChanged": true,
+      "differingPixels": 441784,
+      "rgbaRmse": 37.80530204360171,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 190244,
+      "centralHalfRgbaRmse": 12.165534545969798
+    },
+    {
+      "slug": "neuecast",
+      "appStoreId": 6446780219,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Neuecast: Podcast App",
+      "version": "1.14.1",
+      "currentVersionReleaseDate": "2026-09-29T17:13:58Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=6446780219&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id6446780219",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/de/eb/eb/deebebbf-e722-dea3-8eb3-063abf6198c2/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/a8/a7/e4/a8a7e4da-aa7f-e538-3b76-8110457dce2c/AppIcon-0-0-1x_U007ephone-0-0-0-1-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "70142bef91872a8023721c8f1ea607dcde91363d97a684481ffba5846b329110",
+      "sha256": "1747c5c70d3b52f8dd3b7c704cd95c082e3ac50587d814ad1f07eab22d88023b",
+      "pixelsChanged": true,
+      "differingPixels": 184280,
+      "rgbaRmse": 33.258716609495195,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": false,
+      "centralHalfDifferingPixels": 0,
+      "centralHalfRgbaRmse": 0
+    },
+    {
+      "slug": "overcast",
+      "appStoreId": 888422857,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Overcast Podcast App",
+      "version": "2026.10",
+      "currentVersionReleaseDate": "2026-10-09T00:59:10Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=888422857&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id888422857",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/84/b3/1f/84b31f7a-099c-723b-16bb-2a93cda76f67/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/e5/e9/b8/e5e9b89b-b59a-eb09-82b3-fb0c16065acb/AppIcon-0-0-1x_U007epad-0-1-sRGB-85-220.png/1024x1024bb.png",
+      "previousSha256": "5102f5e0e4ee6d02f9f1d510587c39eea4b5263eb7312abb48b32c35f6c505ab",
+      "sha256": "8ccc3ad6e6d338ea6f112ac7ae6412e8b7ac9efd6cf628d0af9fa215d6b769eb",
+      "pixelsChanged": true,
+      "differingPixels": 969152,
+      "rgbaRmse": 51.79938252451064,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 242116,
+      "centralHalfRgbaRmse": 15.878067290980713
+    },
+    {
+      "slug": "pandora",
+      "appStoreId": 284035177,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Pandora: Music & Podcasts",
+      "version": "2610.1",
+      "currentVersionReleaseDate": "2026-10-06T18:14:17Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=284035177&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id284035177",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/b6/a3/72/b6a372ec-ae79-80bd-aa9f-ac06596c541e/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/36/fe/61/36fe6146-2732-0155-a0d9-97dc985cf3ab/AppIcon-0-0-1x_U007epad-0-1-0-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "d5a3ef27bcac49cecd940510dec52b1e2e52d30b93e2779829af0d4a7bf9caec",
+      "sha256": "9796081793c68f275186b6e45c5ee569d508165a7ac4f8c8bd8a1e8a02c6f96e",
+      "pixelsChanged": true,
+      "differingPixels": 321427,
+      "rgbaRmse": 62.622953107355755,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 158579,
+      "centralHalfRgbaRmse": 5.584560923584639
+    },
+    {
+      "slug": "parasocial",
+      "appStoreId": 6792017587,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Parasocial: A Podcast Player",
+      "version": "1.8.6",
+      "currentVersionReleaseDate": "2026-10-14T16:52:28Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=6792017587&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id6792017587",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/65/e6/e9/65e6e94f-c18a-30ab-d9c8-9dfd56a27ec1/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/e3/92/4f/e3924fe0-6d18-404f-c575-90710e20efc6/AppIcon-0-0-1x_U007epad-0-1-85-220.png/1024x1024bb.png",
+      "previousSha256": "2f6a170a78a2dcdb21a86ab09c3a34bec0a410b20f6caa7616fe9b4c46180d7a",
+      "sha256": "d315482d2fb156e8146a57c5a8365f9f37585aad03b73823e25c198c4b619d43",
+      "pixelsChanged": true,
+      "differingPixels": 441818,
+      "rgbaRmse": 32.65990725393728,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 40960,
+      "centralHalfRgbaRmse": 0.24064291354789635
+    },
+    {
+      "slug": "playapod",
+      "appStoreId": 1246857049,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Playapod",
+      "version": "2.6",
+      "currentVersionReleaseDate": "2025-09-03T14:02:21Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1246857049&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1246857049",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/24/9f/50/249f509e-2fd2-3c8e-03e0-dd2930efc18f/AppIcon-0-0-1x_U007emarketing-0-11-0-85-220.png/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/24/9f/50/249f509e-2fd2-3c8e-03e0-dd2930efc18f/AppIcon-0-0-1x_U007emarketing-0-11-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "9dc6161686e54760fa36c5c7c4db8f4ca72c5f45b9262fe07f1d246e1008319e",
+      "sha256": "72b9e1ef2db383e39681b8fa01d69cf454d008d24718ebcf58abdfd3861ab9e5",
+      "pixelsChanged": false,
+      "differingPixels": 0,
+      "rgbaRmse": 0,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": false,
+      "centralHalfDifferingPixels": 0,
+      "centralHalfRgbaRmse": 0
+    },
+    {
+      "slug": "playerfm",
+      "appStoreId": 940568467,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Player FM — Podcast App",
+      "version": "5.3.0",
+      "currentVersionReleaseDate": "2026-05-29T05:46:38Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=940568467&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id940568467",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/93/7d/13/937d1315-08b5-a308-3047-546254ec31a7/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/66/21/15/6621153c-f72c-1c21-dd6f-6992cf1b971f/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "61756cdda4a1a96034d9c677f67efc21a0ef01fff3c1f389e61bb62db2a04245",
+      "sha256": "cdc3e7e8db6b85580d9fc1d0fbbcf0a9c3499001d564d904e4d16c9b0fdbeeb2",
+      "pixelsChanged": true,
+      "differingPixels": 1033849,
+      "rgbaRmse": 42.529182577231424,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 256968,
+      "centralHalfRgbaRmse": 10.795410056866688
+    },
+    {
+      "slug": "pocketcasts",
+      "appStoreId": 414834813,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Pocket Casts: Podcast Player",
+      "version": "8.22",
+      "currentVersionReleaseDate": "2026-10-10T18:19:56Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=414834813&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id414834813",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/bc/f8/e1/bcf8e1e8-a99e-b443-d57f-1b330488e73f/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/e4/38/e5/e438e55a-3bbd-6f80-3d38-a33d00cf0313/AppIcon-0-0-1x_U007epad-0-1-0-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "bbfbe4d79f2d7b6c04add2a3ecf1accd1b7e604da9ca7f29e8a7e0938880cf1a",
+      "sha256": "00d09d62b0920d280fb6b38eee0ba0b88e40a9ad65d0d1c195955f1a2de7daf6",
+      "pixelsChanged": true,
+      "differingPixels": 1035546,
+      "rgbaRmse": 45.37226342652994,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 256038,
+      "centralHalfRgbaRmse": 8.610034453514716
+    },
+    {
+      "slug": "podbean",
+      "appStoreId": 973361050,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Podbean Podcast App & Player",
+      "version": "6.5.7",
+      "currentVersionReleaseDate": "2026-10-05T18:36:47Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=973361050&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id973361050",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/f9/f4/fe/f9f4fe38-ea48-07b3-7058-0b73d7bca273/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/35/d7/28/35d7283a-3b0f-3b1d-c50c-5542b87f3b55/AppIcon-0-0-1x_U007emarketing-0-9-0-0-GLES2_U002c0-85-220.png/1024x1024bb.png",
+      "previousSha256": "fc1c0498f1aa5af5da74e332fd30e2259b4546bc4e32a1c3955b900d55ec37f8",
+      "sha256": "181a4f3621473d8c038d834fd47333ea8ba858a2f031f766e70803b6738e9835",
+      "pixelsChanged": true,
+      "differingPixels": 609843,
+      "rgbaRmse": 33.19333149885515,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 105215,
+      "centralHalfRgbaRmse": 0.33117565544330213
+    },
+    {
+      "slug": "podcastapp",
+      "appStoreId": 1199070742,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Podcast App",
+      "version": "7.23.0",
+      "currentVersionReleaseDate": "2026-10-14T13:08:03Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1199070742&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1199070742",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/8b/0f/c4/8b0fc478-490a-bdc1-9031-a5e00f48c7b7/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/91/9e/33/919e3300-ce6d-c12b-7c63-e29917ab7a0f/AppIcon-0-0-1x_U007emarketing-0-11-0-sRGB-85-220.png/1024x1024bb.png",
+      "previousSha256": "25a133bfe85acc0dc68fd9f21e65110ea9627c61fc014cbf5b640abd2211fe08",
+      "sha256": "1be4d231557838c616cbe74f91fe36e798ed602e3ca8b820d6cab32bc3d375a7",
+      "pixelsChanged": true,
+      "differingPixels": 1041610,
+      "rgbaRmse": 45.216968749103884,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 258303,
+      "centralHalfRgbaRmse": 9.662914161639584
+    },
+    {
+      "slug": "podcastguru",
+      "appStoreId": 1535235039,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Podcast Guru - App & Player",
+      "version": "1.0.39",
+      "currentVersionReleaseDate": "2026-09-29T15:15:28Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1535235039&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1535235039",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/56/33/aa/5633aadc-3ce2-dcba-f67a-1012d3951ee6/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/c3/bd/d6/c3bdd669-4711-6eb9-75b1-112a3faac243/AppIcon-0-0-1x_U007ephone-0-1-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "9e82e06bbf7dec392c9568a9eb53b23ba9f7af1b33ee1835b5d4fd1740067ca2",
+      "sha256": "ced27ad29b9ec1d541cedfe8b875ea019fa1ce8e0f430359f0c9437b79785c5d",
+      "pixelsChanged": true,
+      "differingPixels": 221783,
+      "rgbaRmse": 62.48495624116408,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 108567,
+      "centralHalfRgbaRmse": 0.3671225632407108
+    },
+    {
+      "slug": "podcastparrot",
+      "appStoreId": 1451559709,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Podcast Parrot",
+      "version": "1.6.7",
+      "currentVersionReleaseDate": "2026-07-29T15:40:41Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1451559709&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1451559709",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/1a/7a/e8/1a7ae8bb-67c2-360b-eaa6-7c441e2c1822/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/fe/82/b3/fe82b319-b815-96a6-0cdc-cc4751ac8df1/AppIcon-0-0-1x_U007epad-0-1-sRGB-85-220.png/1024x1024bb.png",
+      "previousSha256": "0a3a5315799a21c0349888f3d2b512d9ea334f57e75fd17a1032b73cf89f02d6",
+      "sha256": "c3d37c152ca3225517895202adc48b710e5c715115475ee9146680dd92d147e7",
+      "pixelsChanged": true,
+      "differingPixels": 643692,
+      "rgbaRmse": 58.61083816170476,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 216332,
+      "centralHalfRgbaRmse": 1.6067634800805033
+    },
+    {
+      "slug": "podcastrepublic",
+      "appStoreId": 6443981281,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Podcast Republic - Podcast App",
+      "version": "26.10.0",
+      "currentVersionReleaseDate": "2026-10-05T20:38:07Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=6443981281&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id6443981281",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/ce/ae/17/ceae1772-5d39-7b6f-c73e-ea7dd1de9445/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/36/ff/fb/36fffbab-c283-509b-a9a9-40e8c2ca912a/app_icon_compose-0-1x_U007epad-0-1-85-220-0.png/1024x1024bb.png",
+      "previousSha256": "2f7c0fce407486e9c250188574fc48194ab31ec39b31322ec12f4595b2734cc2",
+      "sha256": "a5a07383f9c6756c108294b2a86bf8bd24cddea87f97e7c85e6a069731f135d4",
+      "pixelsChanged": true,
+      "differingPixels": 814848,
+      "rgbaRmse": 50.623761201937015,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 183101,
+      "centralHalfRgbaRmse": 5.713312534500657
+    },
+    {
+      "slug": "podhome",
+      "appStoreId": 6736411073,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Podhome Podcast Player",
+      "version": "1.1.3",
+      "currentVersionReleaseDate": "2025-09-30T00:38:19Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=6736411073&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id6736411073",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/51/b5/60/51b5600e-1b17-1992-91b1-571a817871da/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/33/74/4c/33744cbc-e95d-f068-e9b5-d96e9b1e4fe5/appicon-0-0-1x_U007emarketing-0-8-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "cc34bb7cc69045faf64a5315bb25bd7a7ff37cc23f27d784d883499680603119",
+      "sha256": "df7e099b51213d7d722eb0a230b53f22eb2214edc06663d21896b98c5461a93e",
+      "pixelsChanged": true,
+      "differingPixels": 328206,
+      "rgbaRmse": 33.177016148681325,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 123060,
+      "centralHalfRgbaRmse": 12.249697389562906
+    },
+    {
+      "slug": "podimo",
+      "appStoreId": 1476538730,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Podimo: Podcasts & audiobooks",
+      "version": "3.3.0",
+      "currentVersionReleaseDate": "2026-10-12T07:57:01Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1476538730&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1476538730",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/ba/dd/3a/badd3acf-c4c6-0879-3cf9-50f42edeef69/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/f2/7b/ab/f27bab63-3fdc-b356-8a11-8f61181952f6/AppIcon-0-0-1x_U007emarketing-0-9-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "e1b5ffc2b572de15f07f8d30e1956ce3e42382c148a1183167e1ec5b4d0eb128",
+      "sha256": "8fca8846521f16aa7cc57cbb111b0932fce2f65993e9b221bcfac6891ead8483",
+      "pixelsChanged": true,
+      "differingPixels": 600278,
+      "rgbaRmse": 47.74936372273116,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 256699,
+      "centralHalfRgbaRmse": 9.10355836653236
+    },
+    {
+      "slug": "podurama",
+      "appStoreId": 1497491520,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "AI Podcast Player: Podurama",
+      "version": "7.0.4",
+      "currentVersionReleaseDate": "2026-10-03T22:04:21Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1497491520&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1497491520",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/7b/cf/11/7bcf11d7-fb6f-0159-ef3c-31ac09120078/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/fd/a7/44/fda744ff-1d04-1adf-39e1-d3a22a6d7701/AppIcon-0-0-1x_U007emarketing-0-8-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "23ec1bf54720c71928ebfa34ba6603e3dafb5f2f2a7bfb847122952b052b073e",
+      "sha256": "1f0dd16aa4d8a459dc20429ef03ed9d46fa10858e0aa598b157122604a313093",
+      "pixelsChanged": true,
+      "differingPixels": 691634,
+      "rgbaRmse": 46.3643247830991,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 128655,
+      "centralHalfRgbaRmse": 4.629154813506949
+    },
+    {
+      "slug": "podverse",
+      "appStoreId": 1390888454,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Podverse",
+      "version": "4.16.1",
+      "currentVersionReleaseDate": "2024-04-22T14:53:19Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1390888454&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1390888454",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/74/23/84/74238474-3eab-a87d-4d9e-45c48196c9ad/AppIcon-1x_U007emarketing-0-10-0-85-220.png/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/74/23/84/74238474-3eab-a87d-4d9e-45c48196c9ad/AppIcon-1x_U007emarketing-0-10-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "5f6aa0fe8448971954126478947be7b09d4c03f57aa1f30f1d631500d19cb7d8",
+      "sha256": "74bc0e980fc283077a0611e623fae8a932d719a4e4b4dc326229c475de8ed5d5",
+      "pixelsChanged": false,
+      "differingPixels": 0,
+      "rgbaRmse": 0,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": false,
+      "centralHalfDifferingPixels": 0,
+      "centralHalfRgbaRmse": 0
+    },
+    {
+      "slug": "queue",
+      "appStoreId": 6639586996,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Queue - Simple Podcasts",
+      "version": "2.2.2",
+      "currentVersionReleaseDate": "2025-08-10T16:30:50Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=6639586996&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id6639586996",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/de/be/bc/debebc02-8413-7c34-3941-db30611cee03/AppIcon-0-0-1x_U007ephone-0-1-0-85-220.jpeg/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/de/be/bc/debebc02-8413-7c34-3941-db30611cee03/AppIcon-0-0-1x_U007ephone-0-1-0-85-220.jpeg/1024x1024bb.png",
+      "previousSha256": "d8a02b190cfdd4e597eaa03ea8cdda99a4178a1abfe74a53f52c400ad0bce7fa",
+      "sha256": "cef66a0e4c70ee296afa44bc7b3fd2eba765c88278f038236426c692d2c21972",
+      "pixelsChanged": false,
+      "differingPixels": 0,
+      "rgbaRmse": 0,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": false,
+      "centralHalfDifferingPixels": 0,
+      "centralHalfRgbaRmse": 0
+    },
+    {
+      "slug": "radiothmanyah",
+      "appStoreId": 1641282078,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Radio thmanyah: Podcast, Books",
+      "version": "966.0.85",
+      "currentVersionReleaseDate": "2026-08-31T23:18:26Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1641282078&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1641282078",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/01/76/a2/0176a224-9d0b-4920-6cb4-12850331e818/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/1a/f0/c1/1af0c1ff-c4e9-733d-a5b6-5d8ddb20cf2f/AppIcon-0-0-1x_U007ephone-0-1-0-sRGB-85-220.png/1024x1024bb.png",
+      "previousSha256": "df022c828dfc27fd5f7f7296f8eed5d704cbb51745bb7f27ea3076418f3a4b77",
+      "sha256": "b10c400068f1a5ce18b1bba1df6be989e535c5cd1fdd539cfafcff092453378b",
+      "pixelsChanged": true,
+      "differingPixels": 482933,
+      "rgbaRmse": 45.11250852160374,
+      "initialAttempt": "lookup-fallback",
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 206666,
+      "centralHalfRgbaRmse": 10.326464913476098
+    },
+    {
+      "slug": "rssradio",
+      "appStoreId": 386600664,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Podcast Player - Video & RSS",
+      "version": "5.6.1(4)",
+      "currentVersionReleaseDate": "2026-10-07T21:20:24Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=386600664&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id386600664",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/79/2d/9c/792d9c20-f174-e9cb-285d-f44c5d889fe7/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/ca/a9/7a/caa97aba-9ad0-75b7-b050-9237c2d57b12/AppIcon-0-0-1x_U007emarketing-0-11-0-85-220.jpeg/1024x1024bb.png",
+      "previousSha256": "c96bc6953ba01b30ce4d9f4dd0bad9c32c3ebe4281302e13f2f1b232378c2776",
+      "sha256": "8c0d93c34abd8329d860a346158575ecc0d1a33e22d6f3d3a325987b9cf96f8f",
+      "pixelsChanged": true,
+      "differingPixels": 1041023,
+      "rgbaRmse": 47.0621496519344,
+      "initialAttempt": "lookup-fallback",
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 259551,
+      "centralHalfRgbaRmse": 8.479058611007122
+    },
+    {
+      "slug": "siriusxm",
+      "appStoreId": 317951436,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "SiriusXM: Music, Sports & News",
+      "version": "2610.2.0",
+      "currentVersionReleaseDate": "2026-10-14T13:27:22Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=317951436&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id317951436",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/5c/35/ef/5c35ef9d-98a2-12a1-e8a0-fdcf3ec5b22d/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/df/dc/88/dfdc88ba-1b9a-fb70-fc39-927f72bf4998/AppIcon-0-0-1x_U007epad-0-0-0-1-0-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "f80de97a48b3ce173ccf909550b1a8f5da0a9748e92ce8444b9cf42436ea22af",
+      "sha256": "f0e929e38efc37d27a4651856184131ae347b2bbb341076bcd876376ddaba3c3",
+      "pixelsChanged": true,
+      "differingPixels": 756759,
+      "rgbaRmse": 44.22942321614294,
+      "initialAttempt": "lookup-fallback",
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 245651,
+      "centralHalfRgbaRmse": 11.122920109777542
+    },
+    {
+      "slug": "snipd",
+      "appStoreId": 1557206126,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Snipd | AI Podcast Player",
+      "version": "4.3.14",
+      "currentVersionReleaseDate": "2026-10-08T14:24:59Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1557206126&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1557206126",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/f5/47/41/f54741e6-50d7-43d2-c055-4f247500f1cd/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/93/06/28/93062828-58a6-dbda-090d-1e7a4c249fa5/AppIcon-0-0-1x_U007ephone-0-1-85-220.png/1024x1024bb.png",
+      "previousSha256": "50faba06a54546d12195cb0e4bc350a5f2263fbe986012faf785c8471b0f32b1",
+      "sha256": "c794bda5c89bdf1b32933b96117d0cae6b891178957a5187e060ff1b35028634",
+      "pixelsChanged": true,
+      "differingPixels": 968015,
+      "rgbaRmse": 34.92421237368724,
+      "initialAttempt": "lookup-fallback",
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 257786,
+      "centralHalfRgbaRmse": 15.609266187195027
+    },
+    {
+      "slug": "sodes",
+      "appStoreId": 1321953436,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "’sodes",
+      "version": "1.6.0",
+      "currentVersionReleaseDate": "2025-09-27T17:11:46Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1321953436&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1321953436",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/07/05/92/070592da-e665-9c64-c868-ded88dc8e0aa/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/46/df/f2/46dff2f4-880c-db04-d079-5076c4c9828d/Sodes-0-1x_U007ephone-0-1-0-85-220-0.png/1024x1024bb.png",
+      "previousSha256": "166b5fb05a2f653841d5aeb97a030594df030725177445ff7456c291fb03486e",
+      "sha256": "9f3d34e755747c051bb4480e142c3ade98bcb3a91c577bf792716fe64743087a",
+      "pixelsChanged": true,
+      "differingPixels": 590341,
+      "rgbaRmse": 51.50029636270007,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 253914,
+      "centralHalfRgbaRmse": 5.4964792079818565
+    },
+    {
+      "slug": "soundcloud",
+      "appStoreId": 336353151,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "SoundCloud: Discover New Music",
+      "version": "8.82.0",
+      "currentVersionReleaseDate": "2026-10-12T03:23:42Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=336353151&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id336353151",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/c2/15/ef/c215efe7-9740-791e-3b51-51d3e2981332/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/ad/d6/4f/add64fec-6669-e2d8-c02c-254732e984b6/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "54dde6b1daadcad2de3cba01772378db29aa01a62c08b5b195b6a44a8a8ed4a4",
+      "sha256": "f34964d2ce746623db618da481ecc0977b4d70ef047d9774032811fa1aee0cee",
+      "pixelsChanged": true,
+      "differingPixels": 196429,
+      "rgbaRmse": 45.955985109003414,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 1012,
+      "centralHalfRgbaRmse": 0.037695818487536684
+    },
+    {
+      "slug": "spotify",
+      "appStoreId": 324684580,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Spotify: Music and Podcasts",
+      "version": "9.1.90",
+      "currentVersionReleaseDate": "2026-10-08T07:37:17Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=324684580&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id324684580",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/e3/b1/75/e3b175a9-9c83-7a14-7294-448039348d08/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/b2/af/e8/b2afe87d-2d6a-8e4b-01bf-73b5752996dc/AppIcon-0-0-1x_U007epad-0-1-0-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "71cb637e1c9fbde4276a2a2cd6e63ad1e912cd8fe8ffa60b841c10b642666e9a",
+      "sha256": "2c4c39ee2edc0c18b90049ee4baabd9b312470c528774057fed3a9e6c98f3299",
+      "pixelsChanged": true,
+      "differingPixels": 607197,
+      "rgbaRmse": 37.31983348849664,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 169102,
+      "centralHalfRgbaRmse": 11.049822337245626
+    },
+    {
+      "slug": "spreaker",
+      "appStoreId": 388449677,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Spreaker Podcasts",
+      "version": "7.59.4",
+      "currentVersionReleaseDate": "2026-10-07T06:17:47Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=388449677&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id388449677",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/d7/76/ce/d776cebd-8025-5b41-c99f-dcf339e288de/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/2b/02/36/2b0236ba-baf0-5a7d-7291-6d5c65867847/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "902419601c45889536c699b5f36de7d1ef7fa5c97d954f87353a71b79131a58b",
+      "sha256": "86019c907142221cea3a22d47c24a638a2f2e6e5931cf7bd8d4464d37921ed52",
+      "pixelsChanged": true,
+      "differingPixels": 395778,
+      "rgbaRmse": 59.59735178752478,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 152614,
+      "centralHalfRgbaRmse": 0.6114209381920674
+    },
+    {
+      "slug": "tidal",
+      "appStoreId": 913943275,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "TIDAL Music: HiFi Sound",
+      "version": "2.220.0",
+      "currentVersionReleaseDate": "2026-10-12T09:43:43Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=913943275&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id913943275",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/ed/c3/41/edc341c6-b6db-2ae3-df0f-2f6d624b33dd/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/31/e8/eb/31e8eb5e-8dbc-42fe-c5c1-ffcc16d904b5/AppIcon-0-0-1x_U007epad-0-1-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "29e18413005a273549185351572d906ab447a46d6d764ac13854ef6501750bd5",
+      "sha256": "e9eef5e0542ec858758322567c4b810bdebbf24aed3e945e9f6a1cc854fe77b8",
+      "pixelsChanged": true,
+      "differingPixels": 263201,
+      "rgbaRmse": 32.7202359602623,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 81379,
+      "centralHalfRgbaRmse": 7.973630779240402
+    },
+    {
+      "slug": "truefans",
+      "appStoreId": 6747340246,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "TrueFans FM",
+      "version": "1.02",
+      "currentVersionReleaseDate": "2025-06-22T23:50:21Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=6747340246&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id6747340246",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/b1/04/6e/b1046ea5-1e2c-2c03-3012-df8c63616383/AppIcon-0-0-1x_U007emarketing-0-11-0-85-220.png/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/b1/04/6e/b1046ea5-1e2c-2c03-3012-df8c63616383/AppIcon-0-0-1x_U007emarketing-0-11-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "3588ab1b9af5603d9d0f76830689071f1e678d5f5449b0b378abadc1fb698330",
+      "sha256": "95e833ebff20d94daa53785e053946acf0f071d89be4c2ee9614c545907d1917",
+      "pixelsChanged": false,
+      "differingPixels": 0,
+      "rgbaRmse": 0,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": false,
+      "centralHalfDifferingPixels": 0,
+      "centralHalfRgbaRmse": 0
+    },
+    {
+      "slug": "tunein",
+      "appStoreId": 418987775,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "TuneIn Radio: Music & Sports",
+      "version": "42.6.1",
+      "currentVersionReleaseDate": "2026-10-12T15:25:36Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=418987775&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id418987775",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/01/af/9f/01af9fd0-79f9-a7a6-ab80-7fa230a8195a/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/7e/8f/17/7e8f17c8-349a-93d8-700c-210c986b51a3/AppIconFree-0-0-1x_U007epad-0-1-0-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "f7e4da84ecf9bece57e2a547169d97f917eb0d1e016b5998839f314521c2edd3",
+      "sha256": "9752ce73948d30883b158d24954664a644cb2ef540c34bc4c86cab986dc11074",
+      "pixelsChanged": true,
+      "differingPixels": 557236,
+      "rgbaRmse": 38.82901822757084,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 188710,
+      "centralHalfRgbaRmse": 2.341070449062382
+    },
+    {
+      "slug": "wavlake",
+      "appStoreId": 6463653431,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Wavlake - Social Music Player",
+      "version": "1.0.7",
+      "currentVersionReleaseDate": "2025-11-08T00:36:30Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=6463653431&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id6463653431",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/94/e5/40/94e5407c-a1cf-604d-eda8-67d2a40029dc/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/36/c5/39/36c539c8-af36-7965-e722-427fcd6b1de9/AppIcon-0-0-1x_U007epad-0-1-85-220.png/1024x1024bb.png",
+      "previousSha256": "3186e3655235be8fba6538225736d2e4aad092a3a8e1a1c72b8a58696aa395bc",
+      "sha256": "15316bebe72de0f2948e71d8ca90cb84655cdb9a539592c2fb37868e84fbf591",
+      "pixelsChanged": true,
+      "differingPixels": 397463,
+      "rgbaRmse": 33.62037427630349,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 148632,
+      "centralHalfRgbaRmse": 13.75730726103935
+    },
+    {
+      "slug": "xiaoyuzhou",
+      "appStoreId": 1488894313,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "小宇宙·一起听播客",
+      "version": "3.3.0",
+      "currentVersionReleaseDate": "2026-10-13T02:56:35Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1488894313&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1488894313",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/d5/66/0f/d5660fd4-0e8d-a761-b23f-b9aacb1fd827/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple221/v4/3d/15/87/3d1587b9-93e7-e469-db27-e4f6f5ff2a9d/AppIcon-0-0-1x_U007epad-0-1-85-220.png/1024x1024bb.png",
+      "previousSha256": "d276c632a22494ff6c9002b0a21275c7bdd8a4f2b83633a69a8c3f3fb55f9d9a",
+      "sha256": "84f8ea8397cbe18d2b39449cd4ff390cec494f97ac86513b37c600d9b03ee444",
+      "pixelsChanged": true,
+      "differingPixels": 652613,
+      "rgbaRmse": 63.677865964661535,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 259836,
+      "centralHalfRgbaRmse": 23.195488409683936
+    },
+    {
+      "slug": "yoto",
+      "appStoreId": 1412039719,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "Yoto: Music, Stories, Sleep",
+      "version": "4.2.1",
+      "currentVersionReleaseDate": "2026-10-15T08:10:34Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1412039719&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1412039719",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/f6/ea/b2/f6eab23a-514b-43b5-8e74-a7ede4fd873f/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/6e/f8/3b/6ef83be6-d24c-7735-8a50-76e86bbe1949/AppIcon-0-0-1x_U007emarketing-0-9-0-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "0eb5c95752babb980ae7a177360cd91ddcd7279ba202d6eec89ea9a87cd6ac47",
+      "sha256": "0232f7b6ea199de243368ce44d761f65cad545e4dae291bf110b28d82d680792",
+      "pixelsChanged": true,
+      "differingPixels": 1041065,
+      "rgbaRmse": 46.53220087210919,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 262144,
+      "centralHalfRgbaRmse": 12.406394246605638
+    },
+    {
+      "slug": "youtube",
+      "appStoreId": 544007664,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "YouTube",
+      "version": "21.41.5",
+      "currentVersionReleaseDate": "2026-10-11T16:03:55Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=544007664&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id544007664",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource221/v4/76/5b/a3/765ba35f-8edb-ad7a-e0c2-26a6fbfbe33b/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/9d/cc/4d/9dcc4d29-3199-cfdb-da1e-64ec30a4046b/logo_youtube_2024_q4_color-0-0-1x_U007emarketing-0-0-0-7-0-0-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "01d7514903a6c5b53399431ea165f974d13ab8092d91f12294c78cc40d2a11e8",
+      "sha256": "1e733d222918940b2504c9a714beadd7932474e86791a61a508d381a68d99819",
+      "pixelsChanged": true,
+      "differingPixels": 593333,
+      "rgbaRmse": 63.14052993929626,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 259868,
+      "centralHalfRgbaRmse": 12.250263756228597
+    },
+    {
+      "slug": "youtubemusic",
+      "appStoreId": 1017492454,
+      "country": "us",
+      "status": "fetched",
+      "source": "app-store-page",
+      "trackName": "YouTube Music",
+      "version": "9.41",
+      "currentVersionReleaseDate": "2026-10-11T17:08:17Z",
+      "lookupUrl": "https://itunes.apple.com/lookup?id=1017492454&country=us",
+      "pageUrl": "https://apps.apple.com/us/app/id1017492454",
+      "artworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/PurpleSource211/v4/6a/13/26/6a1326bc-adb7-1628-dee5-ffc54cc071e0/Placeholder.mill/1024x1024bb.png",
+      "lookupArtworkUrl": "https://is1-ssl.mzstatic.com/image/thumb/Purple211/v4/1c/49/b0/1c49b0e3-85a1-0b4e-f7bc-152c46186624/logo_youtube_music_2024_q4_color-0-0-1x_U007emarketing-0-0-0-7-0-0-0-85-220.png/1024x1024bb.png",
+      "previousSha256": "52f59bb84270e5b01b7dd795f19cfd23e821d338e9805a71d7f8881e9bc02730",
+      "sha256": "9e4ed8f478fe81866b5b8d9e7b0852b9153a95a5d9fec385676f5f882d267e7a",
+      "pixelsChanged": true,
+      "differingPixels": 673753,
+      "rgbaRmse": 63.36191086780252,
+      "previousSize": [
+        1024,
+        1024
+      ],
+      "size": [
+        1024,
+        1024
+      ],
+      "centralHalfPixelsChanged": true,
+      "centralHalfDifferingPixels": 259765,
+      "centralHalfRgbaRmse": 14.0140224123188
+    }
+  ],
+  "fetched": 65,
+  "kept": 0,
+  "failed": 0,
+  "completedAt": "2026-10-17T04:51:16.637Z",
+  "pageSources": 65,
+  "lookupFallbacks": 0,
+  "changed": 56,
+  "centralHalfChanged": 55,
+  "unchanged": 9,
+  "androidPreserved": [
+    {
+      "slug": "antennapod",
+      "unchanged": true
+    },
+    {
+      "slug": "podcastaddict",
+      "unchanged": true
+    },
+    {
+      "slug": "podkicker",
+      "unchanged": true
+    },
+    {
+      "slug": "sonnet",
+      "unchanged": true
+    },
+    {
+      "slug": "zvuk",
+      "unchanged": true
+    }
+  ],
+  "comparisonNote": "Pixel comparisons use decoded sRGB RGBA against the pre-refresh backup, including the original Apple image before its initial test. Central half is the middle 512×512 region, separate from facet scoring. Versions and release dates come from the lookup API; the displayed page may use newer artwork than that API."
+}

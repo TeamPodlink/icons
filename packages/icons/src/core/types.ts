@@ -8,9 +8,15 @@ export interface Platform {
   guidelinesUrl?: string
 }
 
-export interface IconData {
+export interface IconArtwork {
   viewBox: string
   content: string
+  rootFill?: string
+}
+
+export interface IconData extends IconArtwork {
+  /** Reviewed artwork for a particular silhouette; otherwise use icon.svg. */
+  shapeVariants?: Partial<Record<IconShape, IconArtwork>>
   /**
    * Badge artwork is authored independently of the icon and usually carries a
    * tighter viewBox (41 of 67 badges today), so it gets its own. Absent when

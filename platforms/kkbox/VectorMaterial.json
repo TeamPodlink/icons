@@ -1,0 +1,58 @@
+{
+  "source": "Liquid Glass Default rendition",
+  "designGeneration": 27,
+  "sourceHash": "f846329358fa",
+  "measurementCommand": "node pipeline/material-flat.mjs measure --only kkbox --translucency-only --json /tmp/kkbox-translucency.json",
+  "groups": [
+    {
+      "group": 0,
+      "files": [
+        "icon.svg"
+      ],
+      "rows": [
+        93,
+        930
+      ],
+      "translucency": 0.25,
+      "shadowOpacity": 0,
+      "alpha": [
+        0.005,
+        0.009,
+        0.016,
+        0.031,
+        0.043,
+        0.059,
+        0.075,
+        0.1,
+        0.117,
+        0.14
+      ],
+      "shadow": null
+    }
+  ],
+  "implementation": {
+    "files": [
+      "icon.svg"
+    ],
+    "maskId": "kkbox-material-translucency-mask",
+    "gradientCoordinates": "userSpaceOnUse, mapped to the existing foreground bounds",
+    "opacity": "1 minus measured backdrop weight, sampled at the centers of ten vertical bands",
+    "preserved": [
+      "background",
+      "glyph geometry",
+      "circle scale and positioning"
+    ],
+    "circle": "Same measured fade applied within the existing circle foreground bounds."
+  },
+  "verification": {
+    "metric": "central 60% RGB RMSE at 256px, both sides rendered at 1024px in sRGB",
+    "vectorVsGlass": {
+      "before": 8.015375677985048,
+      "after": 7.0241103464819465
+    },
+    "circleVsGlass": {
+      "before": 39.492594345674746,
+      "after": 38.24276616559238
+    }
+  }
+}
