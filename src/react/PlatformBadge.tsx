@@ -35,7 +35,6 @@ export function PlatformBadge({
   decorative = false,
 }: PlatformBadgeProps) {
   const theme = themeProp ?? 'light'
-  const label = labelProp ?? 'Listen on'
   const dir = dirProp ?? 'ltr'
   const shape = shapeProp ?? 'superellipse'
   const height = heightProp ?? 40
@@ -46,6 +45,7 @@ export function PlatformBadge({
   if (!data) return null
 
   const platformInfo = getPlatform(platform)
+  const label = labelProp ?? platformInfo?.badgeLabel ?? 'Listen on'
   const displayName = nameProp ?? platformInfo?.name ?? platform
   const fullLabel = ariaLabel ?? `${label} ${displayName}`
 

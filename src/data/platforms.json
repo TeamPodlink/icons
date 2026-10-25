@@ -510,6 +510,83 @@
       "name": "Patreon",
       "active": true,
       "guidelinesUrl": "https://www.patreon.com/brand"
+    },
+    {
+      "id": "threads",
+      "name": "Threads",
+      "active": true,
+      "guidelinesUrl": "https://www.meta.com/brand/resources/threads/",
+      "badgeLabel": "Follow on"
+    },
+    {
+      "id": "bluesky",
+      "name": "Bluesky",
+      "active": true,
+      "guidelinesUrl": "https://bsky.social/about/support/branding",
+      "badgeLabel": "Follow on"
+    },
+    {
+      "id": "mastodon",
+      "name": "Mastodon",
+      "active": true,
+      "guidelinesUrl": "https://joinmastodon.org/branding",
+      "badgeLabel": "Follow on"
+    },
+    {
+      "id": "discord",
+      "name": "Discord",
+      "active": true,
+      "guidelinesUrl": "https://discord.com/branding",
+      "badgeLabel": "Follow on"
+    },
+    {
+      "id": "reddit",
+      "name": "Reddit",
+      "active": true,
+      "guidelinesUrl": "https://redditinc.com/brand",
+      "badgeLabel": "Follow on"
+    },
+    {
+      "id": "whatsapp",
+      "name": "WhatsApp",
+      "active": true,
+      "guidelinesUrl": "https://www.meta.com/brand/resources/whatsapp/whatsapp-brand/",
+      "badgeLabel": "Follow on"
+    },
+    {
+      "id": "kofi",
+      "name": "Ko-fi",
+      "active": true,
+      "guidelinesUrl": "https://more.ko-fi.com/brand-assets",
+      "badgeLabel": "Support on"
+    },
+    {
+      "id": "paypal",
+      "name": "PayPal",
+      "active": true,
+      "guidelinesUrl": "https://newsroom.paypal-corp.com/media-resources",
+      "badgeLabel": "Support on"
+    },
+    {
+      "id": "buymeacoffee",
+      "name": "Buy Me a Coffee",
+      "active": true,
+      "guidelinesUrl": "https://buymeacoffee.com/brand",
+      "badgeLabel": "Support on"
+    },
+    {
+      "id": "venmo",
+      "name": "Venmo",
+      "active": true,
+      "guidelinesUrl": "https://newsroom.paypal-corp.com/media-resources",
+      "badgeLabel": "Support on"
+    },
+    {
+      "id": "cashapp",
+      "name": "Cash App",
+      "active": true,
+      "guidelinesUrl": "https://cash.app/press/assets",
+      "badgeLabel": "Support on"
     }
   ]
 }

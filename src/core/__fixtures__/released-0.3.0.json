@@ -1,0 +1,1389 @@
+{
+  "commit": "a1d16f89738b3dc7ee5eec6c34ec8ee849cf3a01",
+  "coreExports": [
+    "extractSvgContent",
+    "extractViewBox",
+    "getIconData",
+    "getPlatform",
+    "hasPlatformIcon",
+    "minifySvg",
+    "platforms",
+    "prefixIds",
+    "resolveBadgeContent",
+    "resolveBadgeViewBox",
+    "resolvePlatformId",
+    "shapes"
+  ],
+  "reactExports": [
+    "PlatformBadge",
+    "PlatformIcon"
+  ],
+  "platforms": [
+    {
+      "metadata": {
+        "name": "Amazon Music",
+        "id": "amazonmusic",
+        "active": true,
+        "aliases": [
+          "amazon"
+        ],
+        "guidelinesUrl": "https://podcasters.amazon.com/promotional-tools"
+      },
+      "iconDataSha256": "d94bf231ab131b765a177192b425cbeacfe73076af94b6577f2c840779e6ab19",
+      "rendersSha256": "3e9aeeaaaa155110290a0f8c47de64e595b0d3cec99f1c63a098cd6fbdb48e70",
+      "staticSha256": [
+        "3a3731522c5abffdfb4adfff467184640170b2e902dd0cb326e4ca27baf7484a",
+        "d38fde26691bc8e1cbec4c0757a8e2a6afe521369e02b4cbdd4fb999167faf4c",
+        "e10610abdbee3128e91a0c1980e95890d2c4a8539b333f5ab99305b190095ed6"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Antennapod",
+        "id": "antennapod",
+        "active": true,
+        "guidelinesUrl": "https://github.com/AntennaPod/Branding"
+      },
+      "iconDataSha256": "9bffa4557ccd45fa9f43b210f58c6bb2e1811157be6f01d2bd24bb1ebb4a85a7",
+      "rendersSha256": "e30885c69407eed7775adc726222a16d184a9465a455948e364e910d5cc5f322",
+      "staticSha256": [
+        "9587107ba853b4020fc51f61461f2327ad573659c3ee71e2b58e0bd76a5b49d6",
+        "46b1dc2b9de1094c9ec4be08dabe348e5067ae2c6abd91d0d454c8312d6ddb43",
+        "8b6292d20ecc25ced7c0ed9711355909c4e4de78b71e84d63a1322ac5cb5f6fb"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Anytime Player",
+        "id": "anytimeplayer",
+        "active": true
+      },
+      "iconDataSha256": "bb6e792b079b9eaafb7f1b0c00ecdb9f28ea554e0b768ccb8c8b86e3e2d0eb94",
+      "rendersSha256": "fc4c03ccab37abcf07f6a5f9c3f4cfab336a30d4ac87801691fc237108a8443b",
+      "staticSha256": [
+        "53c3ebb3592a2a78c9657691d9a458b58a6d4fa589afcc59d5fa8db4489f2ff8",
+        "e25c298344e3c8cdee2ab82955165b98eca56996d9398a8eb7dbd0116e7f5d38",
+        "6ff9abf7862b73d7754fb6470eae446de4f40936a6416082b46e06b1395dd727"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Apple Podcasts",
+        "id": "apple",
+        "active": true,
+        "guidelinesUrl": "https://marketing.services.apple/apple-podcasts-identity-guidelines"
+      },
+      "iconDataSha256": "0ded2d8dbe043b0420feabe2cd2b9f89f8b8e64d998dfd5859c7bb393b2847d4",
+      "rendersSha256": "0371c69027baf3a7d07862b59d0cfb6faab30ad51d14ce61ab78221c4b25dbb2",
+      "staticSha256": [
+        "dff4b49ad53bef83077f85473f19dd16ef31f57d56d96803f367342bd2196aba",
+        "67770b0956c5c9b62a519d73f353f588e6c39e35b8a7b8aa5b728338ebedc78b",
+        "7b2a7c8647e43c04033048f6167ccbe05012e91efe49e0fc244971c8d5312bf5"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Audacy",
+        "id": "audacy",
+        "active": true
+      },
+      "iconDataSha256": "af4b05f8283bc12ef20e8cd3e6d7280c31f2670e26abc40a70820726a27b4a33",
+      "rendersSha256": "a9e7ca8cb7a05cad178f4db435d463a3827a66c04bd7e91790a512601fba6873",
+      "staticSha256": [
+        "28069d299cd77f5871372ba158b40a28db0abda284d254b4c5b7e9b73f5f9c9c",
+        "ef859384ce70144ce812e80b7ce97ad37a216c3decb44dc8b17cdea80645b665",
+        "d3b052812da0869fd74797daaca98284921ec0bacb93d62dc7b16abc611c62f5"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Audible",
+        "id": "audible",
+        "active": true,
+        "guidelinesUrl": "https://www.audible.com/about/newsroom/audible-assets"
+      },
+      "iconDataSha256": "a70f68f6b7f512c2239f3d2532952cc56908f55570fba1ffc0eef87467e2cf5f",
+      "rendersSha256": "bfe040eafa02bc3f4bd19d71e30a4dd9561ce8da54ba7b5b3a5d2bc8130c8ae8",
+      "staticSha256": [
+        "2ac3779cca5e655d947bf21add4f7098a966e5cc2cd8c38b98e268824353e229",
+        "8aa1217a17617b74cc65f0007c6837d0ab7a33001c8396ad995c2c2b87a250e2",
+        "87def19fdbb5b6cbaf65f7b5ee6ac15bcbe656ba30b56c8e299a7b6c6ae4b6bc"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Breez",
+        "id": "breez",
+        "active": true
+      },
+      "iconDataSha256": "505780ca052ddd57301650129272beccef3a666cb5752eadbe2b2ecba50f0aec",
+      "rendersSha256": "ede53287f36efd492cf752e613c2289d2dffef328b5fc0acebe5cbab69cb4a3f",
+      "staticSha256": [
+        "1f3620d676dc390ab850b3af7a5fdb26b8c222c34f9762aaed77b6d1e07ec8aa",
+        "df0d34c7a64585319e1e2914862fc4760fd155f1e12ff1a9026b1f080d5406ce",
+        "ca90a977852d6dc8b2de13a113d2695138bba6f9d36a6636a25605ae25bfa072"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Castamatic",
+        "id": "castamatic",
+        "active": true
+      },
+      "iconDataSha256": "0ea0c8698d8155c0a85cee2dd00736c9f8c1d7061c59ca7b9dfeb74fc0c0ed97",
+      "rendersSha256": "a1d30e213f3ed94f1627fc498f9d97fed1ba613bc5ff9cdace7243eea7fd9dfe",
+      "staticSha256": [
+        "05a13ceb5d0365851a96f16c23065b84914cb54cf4e2ea8e788390d29d84bda5",
+        "76b2312d190fa35aad774963e6820dfd7f1f544eb154853c6aa24945a4957cb6",
+        "bb206d3e633a03c1d936d311643a0eb853c893382b71d6f973c188af408f5167"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Castbox",
+        "id": "castbox",
+        "active": true,
+        "guidelinesUrl": "https://helpcenter.castbox.fm/portal/en/kb/articles/add-castb"
+      },
+      "iconDataSha256": "226319a712cf815c198efb860839181fbd808fd20cc0be22b392997c3297fc90",
+      "rendersSha256": "12f26dbe351ccb182d01ad9084659e2cc44aefab9eb0843e4e0ea8b99d7f0caa",
+      "staticSha256": [
+        "45d801982f66d5f29d121c32d4ddc4be96f708f0be671bf72e4f5a68ffb22af1",
+        "bcaaf29590d712b2151ff112c242392c560af4e6046b58b7dab88b8790477ae3",
+        "af3e5080025b0a0463961ea63a13ee378e91e0c759eab2071f6c46e6f315c66f"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Castro",
+        "id": "castro",
+        "active": true,
+        "guidelinesUrl": "https://castro.fm/support/link-to-your-podcast-in-castro"
+      },
+      "iconDataSha256": "7930b5548a608a610e18a48bb7177433e32ed8c7a3bc68c0ae7c47e73c4c54b8",
+      "rendersSha256": "f2cb7a550a2d91769505916dbd60e7db6f3011c15ef4599c36cfacecfe574e0e",
+      "staticSha256": [
+        "9e683a0fe577d203a582ba4b7ccb4201a46c8a1a6805cbbadd8de0cfe48ab896",
+        "cd832edc28f8528ba195df2f7d5385aaf29faab006175c9269f2317edd850ddd",
+        "0ad124c21f147528c88fdf114cd87392e54c09b2f42af7f10189129990b58f67"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "CurioCaster",
+        "id": "curiocaster",
+        "active": true
+      },
+      "iconDataSha256": "05696af8f8c766a2546a5ba4983eb6cb9f75d6a5f5b76aaaeba5b23eb74aa960",
+      "rendersSha256": "36beb275e4e31089566b82473f9b846705b8a6b8e2b2bacb0b1b11de7d08e0d3",
+      "staticSha256": [
+        "ee56445f63267a9008531dd20b92adef5d9a04d4e535d6dc6feed93b90792111",
+        "e69dd82a905930c6a0fb7c3fb4650d4dfcb632c724b67e024cbbae6219776333",
+        "51521fbd5bd0a83474ca00f1eef399e550bc093e1069fe413f13241072d75a91"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Deezer",
+        "id": "deezer",
+        "active": true,
+        "guidelinesUrl": "https://deezerbrand.com/"
+      },
+      "iconDataSha256": "0138196c33eee98920d1ba6e39c1bb515239a54cc22169dd29377c4c8e896add",
+      "rendersSha256": "cd2dea56b54c72ed3341a81a64fe5a88931b912e100262f83be4eed77e14fea0",
+      "staticSha256": [
+        "69ddfdd9e6352441359c460a2a87d3fb3d8d34dbbcfb0045a7c5aa4993a26111",
+        "ce03f0333beef3fffb887ad28ed138d0d8dfd52dd1212b8c98972a2bd743d8c6",
+        "553471306bb5f962a1e74e3b6ab4c75db89c30918f20ce0088ca264ab0fbae37"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Downcast",
+        "id": "downcast",
+        "active": true
+      },
+      "iconDataSha256": "de55361faeaf25401cc91254a0ba0ac64790bcd1477cde85226e5c0900da35f7",
+      "rendersSha256": "89cc74598158ed16e42b153581ce0c0070260a41310f6cd63e6c4adce00b53cc",
+      "staticSha256": [
+        "daef87a8d07c10180b4b9ba03bcada72f9c2d6362da33e842f176746e6caa210",
+        "07509afc96106004862a3a67a1e931d1fee7562ef8e4f971eb7e0177df509bb5",
+        "df9a73c5ba2189d43158b237e0a7d34e5633091a759483b82c39f089d38ddd00"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Fathom",
+        "id": "fathom",
+        "active": true
+      },
+      "iconDataSha256": "57f5bdd8f8549d01c3236c88bfc21b81bd021d75a83cf698bf7e57c7bf3ed6f2",
+      "rendersSha256": "4296dc653c569863d385011a7398e476149799e991984ea4d7bb1c3141c20e33",
+      "staticSha256": [
+        "88333dd51de6ff6b058167ffc555d448c45b412b7fda223c0d8291b79166be3a",
+        "006678ecdd15de0c4512f8d075a93f30dfed618bfa30a108e75ba6a3c82af602",
+        "092dad22e6c057e58db2912ec4d819f62d73a07ad780bf1b1916f4bb407df838"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Fountain",
+        "id": "fountain",
+        "active": true,
+        "guidelinesUrl": "https://www.fountain.fm/podcaster-guide#:~:text=Listen%20on%20Fountain%20badges"
+      },
+      "iconDataSha256": "8ec0385d8edf4331fa5aeaaff1e1082ed956e9f5056e79ac3637be0b37d26497",
+      "rendersSha256": "01731179d94b3b9918c7a5fa98ac432a7591d207df61e4fe4ba33cfd686d0ac4",
+      "staticSha256": [
+        "7909a15288036d682afa5bdec47e6dcc5bec39204b3613759db1818827258c67",
+        "a73594cd6c1d629bccc63fa79251650eaa9f3565aa50b08271c2066d200de650",
+        "e9661a94abc8725fe0df938db3c2cc439a2d5922602bd2cceb5121e6b6ceeec8"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Gaana",
+        "id": "gaana",
+        "active": true
+      },
+      "iconDataSha256": "6fd28ff2e77af339823a193f337fcd4e8b664e1f8005595daf760827f060dd0e",
+      "rendersSha256": "c111f534e3bdf9f26fdc0b460d8b2341e904c96b575b65821e0c45592383a329",
+      "staticSha256": [
+        "d9736d62099e7df696b141fae32a877716db11389edac959ed0a5653475c38cf",
+        "07a4d97934f9452ac314624ee77e09d2b58ad2a3b50f6ab09f96ab0a89f7cf58",
+        "f401329c82722660850c8fd0b5163e3e5258c52d7d1665915a2ea93a664cfc6c"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Global Player",
+        "id": "globalplayer",
+        "active": true
+      },
+      "iconDataSha256": "1fb467114f93149b7aad25ded68eae831dd22ffca2bf0a78e27b3c60e0aea82f",
+      "rendersSha256": "04dac3d93cb8f1513fa885f545a4e33be26d655597891d32bd7a71638e841744",
+      "staticSha256": [
+        "1f757effd605b4d0da4e626dfae4c3f8f4a78ee8a23d770cafd2365dc40d8c4e",
+        "5f6562518361fa00ea1de26cbf90d2e8f8808ebe997e06464eb5d0e726a9ef76",
+        "13cd6b0ea45e7226e43c6c9b20be3a9a4f7f0e331c2c8396466bb628b20c8c72"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Goodpods",
+        "id": "goodpods",
+        "active": true,
+        "guidelinesUrl": "https://goodpods.com/badges"
+      },
+      "iconDataSha256": "d880202617c5a27c9a0126bc7515dc7723a78f211b1cc018a21eafc7744acf48",
+      "rendersSha256": "cf8dd2a0aebf6839fc67c6f42e0a08dc51cbea334952770b6c946e804f469774",
+      "staticSha256": [
+        "c7f8bdb1a3ec19fe7195d55d599dac784e4fc835019e418220e52cc3798e561a",
+        "c576255451e07a98db0f50b7f1227c3a2d94cc8a9f52e8dbca7740fb38b342cb",
+        "fdf904a13fa49982a7c7c2a1de4a1e1b0fc7bb6352cb7a968929e864dc6ae6ff"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Great Pods",
+        "id": "greatpods",
+        "active": true
+      },
+      "iconDataSha256": "4e419287a57ac3a062ee297ad6704fc1bd750f3bedd24d2e4ad577d61ba65827",
+      "rendersSha256": "eeb7a72819e9fba8ffb2bf7dc4dbdd40271fee0d86ffd83c60529484083073f4",
+      "staticSha256": [
+        "e9cfee6f2d858892f3f9d843950c9bbf04c3f6d51121076f315e67560642c694",
+        "046085dea3987c133735016012e559aa9dbcd9d453bdda3f1a7fba07e5578e78",
+        "f8027cc4d5b525fb21c5db859c3f567b17ee0cd3ce92bf7ea998a1a093b4cb78"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Hark",
+        "id": "hark",
+        "active": true
+      },
+      "iconDataSha256": "8947d5be2d50f5f782d9d199303431a68906dff887749589aebdd2fd317f0fe0",
+      "rendersSha256": "640e262e9966a9f5572aed8a6f6ffebf0df78cdfeab6b6fda80b6f7ad75ab091",
+      "staticSha256": [
+        "cdadd2b98e71308579a8054d7373e5d5816985743234a1810c9533386025fcaa",
+        "d669d62dcb4aee788d6c118825484c6345dd11d14daf66496739143bb8e15d20",
+        "86f7bb6d9e07ce098dedc32449b4bfca92b6961f8aa86f7c44d3821477a08717"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "gPodder",
+        "id": "gpodder",
+        "active": true,
+        "guidelinesUrl": "https://gpodder.net/publisher/link/"
+      },
+      "iconDataSha256": "514e8ae0589eff8e04b1a6da7147f10c727dfb89cc5314b077d4eafe288e036b",
+      "rendersSha256": "150f572e5a205de591378d3dae17c399ea7d7fb893ca9b37a0bff28162c20543",
+      "staticSha256": [
+        "98a5105e1f92eb0c981d7abf0ae9ae171a83d6e35368cdd657476aae1597e935",
+        "088c6a4964a0659cff183bd35d5263cf3c3563bdd0b75c8a09138c9a7a1d209c",
+        "af4acc22ab5e83fbb7579f7e598ce19dda35614e955e480521dc9b38fffff672"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "iHeartRadio",
+        "id": "iheartradio",
+        "active": true,
+        "guidelinesUrl": "https://brand.iheart.com/podcastlogo"
+      },
+      "iconDataSha256": "83868e90a9405be4605629f3e6aae215f1e7104aed3f1582ea39c86b1a28821f",
+      "rendersSha256": "55af0fa4316bce0ae066012fc76970b7910143a203d804ba0d804ea9b462b3eb",
+      "staticSha256": [
+        "e46b7cd5956b7e7685435f5ace193e6c0941429632ed2f5a6fefcaaafb7f3e17",
+        "028d069a6644dfbd2dd0a50868c28dda3a19d214009247d14444aaf8c02cc1a9",
+        "955c73cfeb2e4b427ea88f6703ea2cae66082ffc86f717bc26cf35ac2a1a03aa"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "iVoox",
+        "id": "ivoox",
+        "active": true
+      },
+      "iconDataSha256": "edb24b0e11a30e303cba3792b2db78168e6d3517bc77c47f49c8cd0162f52045",
+      "rendersSha256": "2c22956394ea2fb22e8fe4b5c9fba8badf9449b2832e5265cbe66515976818fd",
+      "staticSha256": [
+        "1e55f691b940d11059e10c281ba0ed34db030b5f276ab3f9c168c56b65ea424d",
+        "8246a7f283089289886e4c77c4276f94046d0cfb7b20ffa69ae568038b2e12d6",
+        "b0e9aa0b7d5689a9900f764cd18b1a9f8ed4560f062ab7d016dad162b03f49d8"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Listen Notes",
+        "id": "listennotes",
+        "active": true,
+        "guidelinesUrl": "https://brand-assets.listennotes.com/"
+      },
+      "iconDataSha256": "c4ffc141a8f2002db8698ec343be841c308f69b900b31afa3bc8e7323c68ba33",
+      "rendersSha256": "93eab38d77fa90b05c5189520e07484f4e1997ea92f04207e107c78cd4598fc3",
+      "staticSha256": [
+        "156de5a4dbc5dea306d2da77811760439a157cbece3162add758d5fcd80382b3",
+        "3ab38ec7defeda67e2b7ac28c404da7900172f501a36c3e7f1346ddf3a22a0ad",
+        "2c992e17d9120a778d782216a81d8969b91be2e51b596944f81579170ad4f960"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "LN Beats",
+        "id": "lnbeats",
+        "active": true
+      },
+      "iconDataSha256": "f5119a8f8445aa53e0e708d7c81315a6a151675f1413b4cc5c50ed87abdff0ac",
+      "rendersSha256": "6f4faac90f96602d3fd3bd9c63167729756624e98f3dd4708ecb9f30fb6c0e4a",
+      "staticSha256": [
+        "7ad0101c514fb6800f80bbae7caeb06b22c3d15a32d2b2a578a3da655f5e064e",
+        "aa83db9b93c59fecedb8d519ad1731bbebd87cb710abc2ceb5b06005012f63e7",
+        "3c48839019bfb4cca5c12de198c2b194d2555fb6bb443bdb4a2d1109c3417569"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Luminary",
+        "id": "luminary",
+        "active": true,
+        "guidelinesUrl": "https://newsroom.luminarypodcasts.com/brandassets"
+      },
+      "iconDataSha256": "a696f95241a6cf26cc6e3b42a72743d545cd6ee9a8719f8aa9e556b477d1c42f",
+      "rendersSha256": "7890b8ec4e671632ff7c323b49bad8b99202cc08d12770a93f5acec61e8d2eab",
+      "staticSha256": [
+        "3bebfd8c86f664aa35faa1843604a5e10c356d6d20fc818b722160bdfe3182ca",
+        "5ce1ee2b58f7a81fbdddec0a8636c40a5a1be1b52714f3eef92c260a91c663bc",
+        "933b0d28b2441622006fcceb693d977bd44b047a5ded60f7779d6b2af56ac447"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Metacast",
+        "id": "metacast",
+        "active": true
+      },
+      "iconDataSha256": "0d0eba7fd46a650aff4e1810f927fd5bf63ed36395a45f5bdabb5e2cd7d9182a",
+      "rendersSha256": "b11ec35f37f021ef515f4480082640539c49f79fef7e63a1b1295c2b630b1507",
+      "staticSha256": [
+        "e385f4913b2d63ed14b20cf3fcd409a9d4b1dc4ea9b08c1684f2cf08177fdfbb",
+        "97eb74908b143495b0849a3edf202d1bb0b4f921016fc962d57301623a46f026",
+        "12c362783fa00d1d648effdd058b0c5271bb3a769f81204317c57e6d6ff3bfd8"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "MixerBox",
+        "id": "mixerbox",
+        "active": true
+      },
+      "iconDataSha256": "28728b673e33b294fec9cebfefb165c1f941ad4bc221d9d082db5212965e95fc",
+      "rendersSha256": "9c24f944a1280e7cfa5b87f5ec622947c629e8185686c56a6390b344a19c96df",
+      "staticSha256": [
+        "94ab409ac72514c9a9f42db5f4b1bbbbd413d6854dc6a51239d9168a4d319b37",
+        "9f115d2520746aa38a33a419c6f6d6e2759bac1bbf0ff130bbb25be32e801d04",
+        "a9196d8dbe764783b3d000ad3a89fff867ad854a171936c7b93c11323a9db8b6"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Moon FM",
+        "id": "moonfm",
+        "active": true
+      },
+      "iconDataSha256": "c2f0109020554dcb0be95a067b94519b437f5d536c185e26f5c50c71d634a352",
+      "rendersSha256": "824b3febbda583a7f50af70e2dd264cc7207148eb5b0319b4c9e254a5d1810f0",
+      "staticSha256": [
+        "51361b7196f522830af5fbc5add5d7575ebb8c5732db6574a19ff7317b437af1",
+        "3abd30703f76c6fcf321c4b0e1ad11ef7a55a9bcc73c33561214492cc913300a",
+        "14f93498136cb22ca05cc553b33967047a0d597311fed2ffd156e3bfe4b532ba"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Netflix",
+        "id": "netflix",
+        "active": false
+      },
+      "iconDataSha256": "31c211aa2b64b80196d83a447563a198bbc811e90224ecc2cee71621b7af632b",
+      "rendersSha256": "f00c89bc6607d8b46e711940b06058e5589fea6ae08d5335bcbc842978df7cab",
+      "staticSha256": [
+        "d46300bfd2e309172aabbabf41f4eab236e602e0f27eb72abcc3991c12178a9f",
+        "cd2281703bfd1d05269414414f9ca9318e4f4cb8408e9664b7281d2de5c09d06",
+        "0af6f39506d47bea705139534321aaad55108a7279fc5c1ad44600782316721a"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Overcast",
+        "id": "overcast",
+        "active": true,
+        "guidelinesUrl": "https://overcast.fm/podcasterinfo#:~:text=Subscribe%20on%20Overcast"
+      },
+      "iconDataSha256": "888a67df8ee1629e297b6785a62f0befdd70e70d026c65525e69a3295b2fecfc",
+      "rendersSha256": "0db170bd73b71ef7987844630d8d475b7f984b8c226d1650b8eea105710706ab",
+      "staticSha256": [
+        "0608d6e680ee6a9a7731e52e001021b142ef5b9edbba4c69e19a308b7366721e",
+        "93b9c342b3778f62576fb596bcab6d3fc4e0c976a4533bf98bfbfc4e6fda41ac",
+        "346533c6428ef233eda97cf9c3dde6549f42b9c71193f9d92b5e66c41b8c8c86"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Pandora",
+        "id": "pandora",
+        "active": true,
+        "guidelinesUrl": "https://developer.pandora.com/docs/developer-resources/brand-assets/"
+      },
+      "iconDataSha256": "3dd7c705484fc27192d0257605254688e2ed53c9f08a790cfd5f43ab0e8850d0",
+      "rendersSha256": "cf6583120b5317760e4f04093a8dbec0edfa24d8974065ae450087b18aff5987",
+      "staticSha256": [
+        "d1d724eea31fc18b82f87522dbdd90bf687cb796d60417d475259f039e913064",
+        "06f50866f97770d481a9d7d8bfdf2e936cbbfe11713978be2229ad7751abc0ec",
+        "074e18ecbde843c65932c999443510f575084db118ba0486ad15ee5f7e5746f3"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Playapod",
+        "id": "playapod",
+        "active": true
+      },
+      "iconDataSha256": "9b9b1056c9cb661042dd57a5021b035fb18ab4b8694e951675dd27709d168279",
+      "rendersSha256": "5b258066fb3dd3e04c5bfdc87926c1193c68ffc20a94efce57bdb9526dac1ca1",
+      "staticSha256": [
+        "dffec76bbfc7931ef940de3caf336a1d478f596f8135d40b25bdaf9d7cda622f",
+        "1cd0c98c92b46b8ab324656f54eb30998ad64c232741588c5bba20846c7f96d5",
+        "c54f2531e06490bf8ff287ddbde061ecec5e00d950a112dcc6fd6cae831d4e89"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Player FM",
+        "id": "playerfm",
+        "active": true
+      },
+      "iconDataSha256": "0b47d5f41537ba14ff971868ca62412585e96ef5bed0816ef54cd786f287de39",
+      "rendersSha256": "b862f9b10188ca3d6b4e074250bf9698de8da86a0639773926bb249f0360b179",
+      "staticSha256": [
+        "387462188c68adeec1ad544f99787728c7cf7e74e9e961654c2ad7e2adda00c8",
+        "9fa1eddab9274400963eccfeb717c8d5a9ff433830d0ea2489954f629949bdcb",
+        "1744cf375fb29eeec10ea28813f8928a8a7675d1933b00e1404e99e7defd4827"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Pocket Casts",
+        "id": "pocketcasts",
+        "active": true,
+        "guidelinesUrl": "https://pocketcasts.com/podcast-producers/#link-to-your-podcast"
+      },
+      "iconDataSha256": "75f903336855750bcf8693472e24c4cd4f71a00c7d65c77b12531ee5807e29a5",
+      "rendersSha256": "0a0f1b88752b16656a7597cd97d03ea0e6c2ab9539a55e1eaa5fdb648c7fbb1b",
+      "staticSha256": [
+        "fcbfc88e20757d2546322aa35c7a622c33e24f58726349fd6c2f5e153b8d904b",
+        "3d3862df12a6dc1b6fae5f28be5a23b744f4b869f9d98130cf62d8d9b132843c",
+        "a5f4c1a4b258f79548cbc8359edb698ab3990164327f99e7a4abe83c44e18100"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Podbean",
+        "id": "podbean",
+        "active": true,
+        "guidelinesUrl": "https://www.podbean.com/site/default/badges"
+      },
+      "iconDataSha256": "14408ee509d34747cc3812ec8872c53145af9d8d3234910c69dba0acc24dc56b",
+      "rendersSha256": "dbe58dd0ebde1a449852b65587d3a1f43f822d1a306075b85154862f9eb7d78b",
+      "staticSha256": [
+        "3b78204a704dd5b5f2723b46cd984f08b2a1912493f610751fd96a55ce6504ac",
+        "bef93e1514f9549ae9305bc79f764217055b1358a1efc56cc13cc7445948958e",
+        "6ae0cfa4c2ad343ad3620c9631baecb09546b7c513ba2b7c9f42af379b2b39d2"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Podcast Addict",
+        "id": "podcastaddict",
+        "active": true
+      },
+      "iconDataSha256": "8437f109efada580a3c2934a51fefc4903aace696be162f42f7e79a3aa29e0a6",
+      "rendersSha256": "7707052a19c0eeafb8017b5e23405b1b92274791413ee881f1c71f19c26385f5",
+      "staticSha256": [
+        "ad7e1a3fc1a9c5148179412776641dbcd923acf8d18442faaea84713c832b48a",
+        "917904c9c5c800d27b19cbbeb87585d13acf70eea8e5d9e14c7ecb89b6b3b509",
+        "b88cce999d8c5243ff6f89f615f3681e5717e15c4e81fac1c3f6d3d63feb9eab"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Podcast App",
+        "id": "podcastapp",
+        "active": true
+      },
+      "iconDataSha256": "b7a17dd753a428bc0560cacf496e2e37308f9ae9a1462e0bebb954ed5819038c",
+      "rendersSha256": "219edc1af35cbafa7f3e80b0cf0e235902cc6b0904e9e916def730755b40b1a4",
+      "staticSha256": [
+        "2d1a82f6d08ceeaaeeda4392150d375cc6c1a6568b7e52d3e9120538501ef7fc",
+        "a9c38e807444319e2e33ced7fe8e30dd6a60c37153852f599a6438051dc15e78",
+        "e1779bee63173a2b60e740b4df76e4147766b4db0dfbb013c1afc9732aa613db"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Podcast Guru",
+        "id": "podcastguru",
+        "active": true,
+        "guidelinesUrl": "https://podcastguru.io/podcast-guru-branding/"
+      },
+      "iconDataSha256": "7daf9a22b9fd3de9d77289255763ee03a52f0c5f0ce82676acd78d72391da846",
+      "rendersSha256": "dd5f19ff16f887f326cbe95b25a34cb4b9baeafedd11c423a36c26df4e9c8fc9",
+      "staticSha256": [
+        "25f6344816d5092b1fc21373829fc53f0d1341a6a5abc7377ee0c87b9e65c43f",
+        "5c1cb605f893779800ce736e8bca035e45b0d6977aeee86349ec6e4c64c5eed0",
+        "8c0950e7fe23e2e253b9a5dc6036557a6c65f4f4e42d9fb73dde95b9729abbf6"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Podcast Index",
+        "id": "podcastindex",
+        "active": true
+      },
+      "iconDataSha256": "6d8a44e0fbd06cff1176b9f890214d5731a0d2504edb5c797f9eed52ad4f1d71",
+      "rendersSha256": "b13cb16cb864f7717dd3c27fde9e5d3ef1e7c2ab391b574780db3dffcb0d08c3",
+      "staticSha256": [
+        "03b533dbe038d58080aa6ef364a646f21c8cd4ea77f730da38eef1980a812373",
+        "7ea81239d47bdd121ccc05a3f5ef109e266255bbd944bef73751731e0d0e8556",
+        "b717705cda34014b7ee17b91dcfd0d2d3e0853603bf670e2252d884b3c300f9a"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Podcast Republic",
+        "id": "podcastrepublic",
+        "active": true
+      },
+      "iconDataSha256": "72db8303b9619808ea0a4e04a8549a5aa90e6ec49a1cd2cc0c64bfebb2fdef47",
+      "rendersSha256": "a0a3397200857ec21191108e1482ba4cb1ea7036e2a044a2254c6d2607a9f82b",
+      "staticSha256": [
+        "1c14941174ce0dc9afc3ef3b6bdb3f091ca8b1ffbd871d59d6e5f2f133c9d0af",
+        "e8ee128ed00c6e324fe34beff2687858d7cb0ebc2b205503f41446738e35f94a",
+        "959e88000d79ef7f324e7be6d8c36a965d6af98be1bf3e838b0e49463958477a"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Podchaser",
+        "id": "podchaser",
+        "active": true,
+        "guidelinesUrl": "https://support.podchaser.com/en/articles/5253592-generating-a-podchaser-badge-for-your-podcast"
+      },
+      "iconDataSha256": "88d037c0b8ed3dc9dbdc733cd374691ed5dae976af4ea84f36f31730452580ee",
+      "rendersSha256": "1bd88393e938859445e8684becfcd5db6e778e8b856485798fa2b1888cc86810",
+      "staticSha256": [
+        "3a0f4cd79a18a481115dbe95d1555d1998e7ebe6bf063632ef2aef33a659609e",
+        "354bb9c2cedc8cbbaad4a1e69fe426834ef9533eb24ff8accb6432bc79770125",
+        "3286553a2f32eb3f97238422ba2f46b72cc40328465aed7555cb68c1f5bd8979"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Pod Engine",
+        "id": "podengine",
+        "active": true
+      },
+      "iconDataSha256": "9278a627f70dbcd01cc67a22aeeb66b54b3a565676fcfa5d6a338ddc629ca556",
+      "rendersSha256": "d2098fa4b31478644fd9fec0e178b48a049f3b97f0c2e0d9234cbc5500bc0e57",
+      "staticSha256": [
+        "adb7bbd631a02463c6b4fa79a3f128af230b8ec0ea09802a3be27d8eb15cef51",
+        "1e67ee9f4eb451ca38380430ee3de3eafb3afd331b011f50b1a0fb735b8aaab8",
+        "d6cb0410aabeb9eb2aa38b5a087a9783c0c23694e6487e85c52206cff71486f2"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Podimo",
+        "id": "podimo",
+        "active": true
+      },
+      "iconDataSha256": "f7e869d8823bd9851fa4cc3767fe2f36925a139b588a3a12bd8c3b3da66a33ad",
+      "rendersSha256": "048806000db9a41ca0c8701640ff65d51822be99da2d77fa07363276b925b0d4",
+      "staticSha256": [
+        "3200fa3eaf6cbff9490cd6394ac74e7cb70182f6130e2d9367d3da02eae645df",
+        "37ee6c69b1c1393c2808605079604efbd1d669b82a3efd4b4255920ce606cfe9",
+        "4355749a6e7e7e56f75fe54967dd28daf462975a2ab9aaa544e628a64ba6285e"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Podkicker",
+        "id": "podkicker",
+        "active": true
+      },
+      "iconDataSha256": "9a0d4c8a00ecec2af281ec91d00f33ec1ce9910123948d4a112d419540f89a6d",
+      "rendersSha256": "facdb80a16376cf961c6daf0690b6d5d04ef850a43a3c17b9ede80e2a99a1271",
+      "staticSha256": [
+        "0786298909d299115e11891e30bdfe604d092b1215df8d27bed98a461aab400b",
+        "10527c53a724cf5a030f594e21db0152c51da5315ceb9a62a71edbcbb9ef8646",
+        "47920f47e5e88d4d6a7b7a328b0be98f094ee5849628cd3f97bf000351c26e4c"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "PodLP",
+        "id": "podlp",
+        "active": true
+      },
+      "iconDataSha256": "09e5870d2587373db7f59ca7a98924324e54cece8701c8720d4808dfd04276de",
+      "rendersSha256": "cbb44379003fc48dcabecb3396f30a057d0167d5d7112e1cc60cc594882cf4e8",
+      "staticSha256": [
+        "efca03769e7617c77f60c99d317257920934b7640912f1b9df8f0fb2f68bba8e",
+        "d30c5ab6d936174a76c60b4247895be8423152e14ab85a692cc7681cf9618d81",
+        "1b48ae1e4168a26d23780e104073ce1a908ffa126cd1fe0f2e060b604dc02d0f"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Podnews",
+        "id": "podnews",
+        "active": true
+      },
+      "iconDataSha256": "024c9d8d81f39bb84b8288bc636776658d2b6abd8ea68afa3cd1c6d933a35312",
+      "rendersSha256": "b33c390cd2b0bb9f1baaf7511e8b4945cd21335d0ebbf3838b033239007d04bd",
+      "staticSha256": [
+        "b444db6485eefee8f4f09a908554fc8dd021fb95ffa66768a0a7885c0a84607e",
+        "d806950076ec787b69b3e22b2dcbd1fb26ea909d4eaf596030916c2d4498f865",
+        "e299e9a5581d034b7dc3ad960a4d11024ee0c0ad54f3ca63ef7009f90f8db68d"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "podStation",
+        "id": "podstation",
+        "active": true
+      },
+      "iconDataSha256": "531636472211883c4ca5d189b61e401c14cc22b0f3833c1b531990e6a09c983d",
+      "rendersSha256": "ba8ef20aae63fbe28d4983675fdcbfdb221b0e15edeb0e7051513b7d723e92b7",
+      "staticSha256": [
+        "f21b1b0bc990d36dce66390ffbfe09c9a1e0b7e00660aed03e956eb089b733e5",
+        "48394602861e316cf0621a2675a366fb2e76819c088bd07b47a72ba1ecdb2fa1",
+        "3d862b4f16e6d527e296a791eece6c1bd8ade4ecd61b0266cf89522a5bfc1429"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Podurama",
+        "id": "podurama",
+        "active": true
+      },
+      "iconDataSha256": "6ceee62071d909effee7193ade9e1fd829fabd9561542692cac90b9ddb95a350",
+      "rendersSha256": "bb67ea889cd3c9e82bd4c3bdd99ac11733e08b25f5f37669aea198d3028a9ffc",
+      "staticSha256": [
+        "56d71f8f0203dbc743e07b59908b725d04159799b334a5f72c7936059e8e009b",
+        "ffb8efd0bb42f07512c5397b78a3e9159913790dac2c2e2975c6360c5fda65a6",
+        "4f305731855cbe4301e1acd16809ba5ec5717acc918cc56d8e713b5b6dbc990b"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Podverse",
+        "id": "podverse",
+        "active": true
+      },
+      "iconDataSha256": "41b4afa1cb6af8b18718ffd7629816011612c98401f06225fc55badea4beb090",
+      "rendersSha256": "00ad4314b6aea9abd66e7bd0f647985bf4a5ade271c2414d197c593e91d7a186",
+      "staticSha256": [
+        "0d21d828da27c087467cd804394d496b67f77b6cb9abe61c3de93eebe0a99da1",
+        "2cef35ff9594e3a90a3c0645086d46b9973fc06380c518f1687a47bbf40c09a1",
+        "7092d49969cbdd65a67968fc1f98def6ba7888153a68afd53860fed5c7060a28"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Podyssey",
+        "id": "podyssey",
+        "active": true,
+        "guidelinesUrl": "https://podyssey.fm/podcast-creators#:~:text=Podyssey%20badge"
+      },
+      "iconDataSha256": "a04bcdd33ec3a1b2c76d885dbf3b355864707c1b0879a453f7ac0573a4ef6616",
+      "rendersSha256": "c7eea89010880172d6a15dd37c51b5d7e184f9e55ae13abfcca329fe4ec399ff",
+      "staticSha256": [
+        "ec54e1550cee8358722729f31ddc012ee5c396c8a55a037ae9e83822d9460d7d",
+        "0964ae2cdcd808ffd2345afba8556ae71e5a7ca9bae8901ddfaaf23add62c458",
+        "a2269a10f60e7bd584fd0ba7ec1f01cec3cbeaedcc05858767815db616386cb4"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Rephonic",
+        "id": "rephonic",
+        "active": true
+      },
+      "iconDataSha256": "e719929cb1affcf26f19e26a712a048bd38f25e59956750052c71b0e9ea63c22",
+      "rendersSha256": "4aec2237edf5d302e56a2f3273c7fa5e48224fb60f276a9a407887ec2511c3d6",
+      "staticSha256": [
+        "db024436e3cb14110e296160507bef0cb56db49d015bd25a820f705398e8baf8",
+        "1667e0265c7658e5a0a444c65d6f4ae76ac24f2278ffb8e3f335b5be1176121b",
+        "05933146c61392dc6072a1e1c77b4a3e94ec1e635ae61cbcbc7c517374c438d9"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "RSS",
+        "id": "rss",
+        "active": true
+      },
+      "iconDataSha256": "1a8c192a9e7c4b038a62a8ec9c83b4c3de22c426370e3eb844e90e446bc7725d",
+      "rendersSha256": "00bb454a34c80e250c02f9b80c5b7d723f7dbde7d60c8d7cd3cc53d0f6069cc5",
+      "staticSha256": [
+        "fa3102723d71e3cac67a789da4e0ead9fbe32b5753c7a66afb79a3c67db5d60e",
+        "cdd5e6189f219696613c5936fe409598712ee1153460ad1f1051b804947dc512",
+        "8106e751fadd81a970031f89e0110c83332f3ad916794224c629b306a197b9df"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "RSSRadio",
+        "id": "rssradio",
+        "active": true
+      },
+      "iconDataSha256": "90283a6ba0802fecdc8b8a6c08f81d8105e8590397b6e9a1d6565f6f55fd2309",
+      "rendersSha256": "096a8fb19e56b8e364708c78a39b6a512802d754301a638438b4272375067efb",
+      "staticSha256": [
+        "d42d4f6541b5ae7fd7a8c629ede547f73bdddb2fed27ba830958d8e77a44ccc0",
+        "356243bbe817e8cc860134fd7ebc629b8caeea2304de8c8bae5c2666253ae5d4",
+        "3b7350628fd1179cd17fff9c5610e4c03af8295db91adf66e1d3271a71a3ced6"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "SiriusXM",
+        "id": "siriusxm",
+        "active": true
+      },
+      "iconDataSha256": "574c10feb9da208c2858a87d85843b2fa3e7915cd873975ebafd8b52185b40d9",
+      "rendersSha256": "cecf83b14c350cddbb400b0f09f40bf572f0f29161935d68d6cb01a208d2350a",
+      "staticSha256": [
+        "15f7864d3bc8e1be550f9cae794e5dfff059819d6e656d8ebabe63ba9bb5042c",
+        "9cabc6d4945cb9c3c81541a86e61ee13b6f3dcad80a5bd3067bd2e6734e26377",
+        "d9f9f7f4da179b1e39b92133a53d03560f6901e4ce72c649c23415ebb2023347"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Snipd",
+        "id": "snipd",
+        "active": true
+      },
+      "iconDataSha256": "f9061b74b68e115ac3b1f098a99e61799e3e46d24164461dd0f95a6ab7b2427f",
+      "rendersSha256": "7e4203989ce55d394989b3ae76fc309678a18423e3d1f330d9afdb47dc77548e",
+      "staticSha256": [
+        "1a795f029cea88b27dce0c1cae9b21d963e8492b5b26dd705d2f1d0daf9cc682",
+        "e7772cace5393cfe39d1c35ff995fe0af9c141c82a4129c0bfacbbbb08d63b0c",
+        "2d9f6c00327c3267872893278103ebc08d0d8da032fef19687d6387a0453a248"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Sonnet",
+        "id": "sonnet",
+        "active": true,
+        "guidelinesUrl": "https://sonnet.fm/resources"
+      },
+      "iconDataSha256": "fdea76e4e9d1a320fa3fb78df808f12e61f428dd0d3d46420e041c1879d4b213",
+      "rendersSha256": "cac1d0f4c9c79c0c6f96d0697a5f8c3063d36f43e449bc469ce75a7026543f37",
+      "staticSha256": [
+        "8b58c069e9a8eaa2e222a9493e4ec0691652d13e21318d730be9fd25ac110230",
+        "1be69d57e238606841e1844f34df1dfb6ce5e5cebb6bf97c2d0510da8c96a433",
+        "af2346dc35b76a5307bb5a148648f1cb15bdd6422cd998a3b019317d00b16f8b"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Soundcloud",
+        "id": "soundcloud",
+        "active": true,
+        "guidelinesUrl": "https://press.soundcloud.com/media_kits/228462/"
+      },
+      "iconDataSha256": "f56b949ead768cbdd8137f8a48931c3b9bba8ecc886cf3b8a61ccdc4f7fd8b4e",
+      "rendersSha256": "fb7ad030c3579350765c01f0d06a20e8bdc0aba5ffa3ce5f9e8490f3b41f768b",
+      "staticSha256": [
+        "73976087df096c5ea117e9c1b6cc751de192f16a1233e7b4b953a6772963130c",
+        "6311227a92dd299c800187b63d7c94fbdf13b8fda162dae63d464685b44d5c40",
+        "d4c359cd18123c37d2083e0752cedc4bd2afec0d2138dd8400823d1812d5a456"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Spotify",
+        "id": "spotify",
+        "active": true,
+        "guidelinesUrl": "https://support.spotifyforpodcasters.com/hc/en-us/articles/360044285891-Sharing-your-podcast"
+      },
+      "iconDataSha256": "e9b99b6e716a10c48dfa8db2534644febf480e1c99f414b7b23eb0a9076aae4f",
+      "rendersSha256": "b50cb49ba96e87eb007372810898f83d95a5e31999595b161a46e3d9385b6b33",
+      "staticSha256": [
+        "d4f9cf71cd4ea3a49b408da525dc0269ec9889c97b2b8774d09befaac0986472",
+        "0b686a4d94a1cfbd1991e9d7bfdb6ae89d28f0229ca0dc46bfafdc2ed78e9e1b",
+        "8ce92cd22947f2d99456191aba73e9ab74b2a0b6b27a4a1be41d42006518e2a1"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Spreaker",
+        "id": "spreaker",
+        "active": true
+      },
+      "iconDataSha256": "6e58a065830072ce9ae163fc06511cb5ba0d08a1445e97a4e506b16a4a7ba8c5",
+      "rendersSha256": "fc7120a3eb80683b8fe413458ace0660f72a64a17b0fe5bfa078fb0d8ee8e07e",
+      "staticSha256": [
+        "c051b9e52a4db53cb7c404d12ea950c452beb81eae53d6e023de33dfdd8be033",
+        "272b972c228d3feb0ccfc5ff4571188698517a89d3a8f08117dd1d3f9b84388a",
+        "2d1d8d4a59e1c98659fc9d6290156288cc8d1e9c69bf96a6544d1b04d59774d2"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Steno.fm",
+        "id": "stenofm",
+        "active": true
+      },
+      "iconDataSha256": "13f501486672ef35e385e59587e594f4ea90ab43f2f63a6f6c2b7a1febea3161",
+      "rendersSha256": "35f09ad87dd47193a3e58145854a563575557d3988648968b9b9b64690928a70",
+      "staticSha256": [
+        "575e1f0aa914765bf723e5a393703620615057fe9087538474de57bbb672076d",
+        "f4bf63cb5a8ad6d66fc4507374acdaa7a02830a7315e859efc3c10f1265f28c1",
+        "b491f813094d3041b73fe5fb8944ec2def3c5c71d675adf3607250fff252c602"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Subscribe by Email",
+        "id": "subscribebyemail",
+        "active": true,
+        "guidelinesUrl": "https://www.subscribebyemail.com/podcasters/"
+      },
+      "iconDataSha256": "2d7412f6dbd538836b3567b655624d0f27dbdd505e2b6b2419344de08022a465",
+      "rendersSha256": "d5214526d954cf6d5f46d3c05d6be954b02f0bd9fba767012ae9e74bfb9fcbfc",
+      "staticSha256": [
+        "f459d89626aae0d2f192d3813d475c6a5c1e4ef8563933b17bf3cb61ec9096fa",
+        "a4fef4e168b095c3de8862b6636233f91f3cb3514c37d155313837f217e7b2fc",
+        "6e749de93fabb0f6cd5cd0c5b977ec9261eeaa159d08ffbcc7a8f7e2984bf090"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Subscribe on Android",
+        "id": "subscribeonandroid",
+        "active": true,
+        "guidelinesUrl": "https://www.subscribeonandroid.com/podcasters/"
+      },
+      "iconDataSha256": "7fe0d392c39d3dbbf0fadb410608088e1d79db4aef5c06d6eddd9fb5399879c2",
+      "rendersSha256": "251b51f291d6dd33405ee919dd96cf6f3c1fe394d774cc17f90caa82e1bb63df",
+      "staticSha256": [
+        "fa58ca0ec04c8cb3601a46cdde1e0156bc964cf19d3a3a387065fea72d8f0e58",
+        "3bae4e5a16dc0f12ba1d0a21ed7fa2271368b37ff2c0986ea87439444ac6dd4b",
+        "35aec7384570e8c8ef870fd321b5f2c02dfec2e39e7c074e0edcf88794c82761"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "TrueFans",
+        "id": "truefans",
+        "active": true
+      },
+      "iconDataSha256": "5524b864fb9926389f39ec92f0edae3eef385e2da102bc87b714a3a01de48215",
+      "rendersSha256": "68efe4fa50794bfc95e229a8468fe555d10616eb4de9437af42f1588e7bcf0ce",
+      "staticSha256": [
+        "84cdc6fa6333a0dd37a16e508469d891e34becf909bff9c9027a3cf087a60f5d",
+        "5f75d27e79c84641e2bcc0afe14c3ba89017c821b51cf5c773225bc878ab34c6",
+        "9c0be692aa3a62a7ba6a67792eec9163615825c297d5454e7728fde997749724"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "TuneIn",
+        "id": "tunein",
+        "active": true
+      },
+      "iconDataSha256": "4340a41053a1bc68f190a959e7d4275418078d79351b71d3d90b60a7e72c7f54",
+      "rendersSha256": "df4e1d9c60f61fad906caa98e313337c81e0614f47438299b9aa934f8efbc00b",
+      "staticSha256": [
+        "79dfc7a4ae86e391387cf26ad87bad4eb94a18af8886b9d3e0c62730cbfef0c2",
+        "a257e1e467e01a8377866db7f2f348e423e0499ff09d3a9e402de29562eabc4f",
+        "f8daf32dcb68ca94c49c2409e9fc05c9895b8ce7d075aacebf1653db48fdc7ea"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Tunestr",
+        "id": "tunestr",
+        "active": true
+      },
+      "iconDataSha256": "1e531aa0613ed4968e235bd9a9f03efd3047f3d324d4e6ea9a2d8be61cc900c9",
+      "rendersSha256": "07d95bb7a56f3d5ba9fc4fcea6e0ee6408856c702e4ed498038e6141e25203ca",
+      "staticSha256": [
+        "903b69303a71b8afaf9bbb3cd40572df9017f7b5fff4180fe37d571304cc71c3",
+        "b95099a5ac7eb6bbd50d4d7b385146f6fdfd886ffb9c195e40f42e6a1938880e",
+        "9e936751e31431d78f062e32b22df01274637d98fb070c6681bcb072360b5d09"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Wondery",
+        "id": "wondery",
+        "active": true
+      },
+      "iconDataSha256": "a5adde2ae9f059642c98252d10d780cb529d3e14de3efd40977551f9cf43aeac",
+      "rendersSha256": "a9d2277d5c46020c058a27017fb7d35acff3044aa04d34e417725f5fc4c63787",
+      "staticSha256": [
+        "f7d2a5115aad3806b05983e7b8ed5ce49d9e4fb37f2f9482d68558455941679d",
+        "7cfe872fcdc1368007fd363c07690ac9df6176d4c019c513ee9bec5d008690b0",
+        "38e05c25f486084d9494a9c4866acfc7014855cc1c2ffe3612afea17fc230cef"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "YouTube",
+        "id": "youtube",
+        "active": true,
+        "guidelinesUrl": "https://support.google.com/youtube/answer/13379217?hl=en"
+      },
+      "iconDataSha256": "72156cf22cd8c3d686150755bcf2d6cae693d79385ff71cd40745465dfe1de8f",
+      "rendersSha256": "055a5f5a223f96e657df63231907946dd7c2ecdcac400f2ea9692f286e47a312",
+      "staticSha256": [
+        "533cd424c87159f83bbde0457efeea9d04cb0ecc515ef84bb677c79fef0485c8",
+        "59511ceb6e98c502ff9d546d34173f48da173ba0c150a36ddd6a72515a60082f",
+        "b3bcdac77b119bf65ccca17e119a70fcf05c9133e13722c52759a2795c9b020a"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "YouTube Music",
+        "id": "youtubemusic",
+        "active": true,
+        "guidelinesUrl": "https://support.google.com/youtube/answer/13379217?hl=en"
+      },
+      "iconDataSha256": "4bf2b34f2a8a8f73224420c839b16ded9a5fc53d90b5121722420c2c72b47d1f",
+      "rendersSha256": "6f9db952677df41682611e84fda7005b352949b92e55254e82d680ecbd622e1d",
+      "staticSha256": [
+        "67b93c4535df02163faebc0e3559455852d682fd5531d15829d17715e00c6bec",
+        "d5177fe2f511679463e1ef7fba4bde3890ef2fd4982afc581c11d772c9c15a79",
+        "5d747b4c8659d0a0519883d6d03795160e929de9a6f630fd78a133007beee31c"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Apollo",
+        "id": "apollo",
+        "active": false
+      },
+      "iconDataSha256": "cb31daa518eba935f0ee7ccb39c1f4ea863e8d6e60fc1f36d236ea36e3caa8ac",
+      "rendersSha256": "a80945d25307ac1c49ba21ea406d5ab94dc9a244c3ce093874458062933c20d2",
+      "staticSha256": [
+        "4ab6a3f7345473f855b271f9c7ad6200a0646ac4c1acdfe67bd6499004e927b8",
+        "f957f64d545adfdb25cc6ad39275366711aad86fe4161a4f47be10c4137d2fc5",
+        "aca654054d4844f246c69678a4d7dff234c78956810428f397ef425dc9b98a8e"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Breaker",
+        "id": "breaker",
+        "active": false
+      },
+      "iconDataSha256": "f33953928d8e9f7f8605777d815589f52211558215c075e77fbb705edbcb2a21",
+      "rendersSha256": "5c23664661b48956603df6c092ed07f190626917870d3e57d99998cb1b4e4f05",
+      "staticSha256": [
+        "0804688f64fcf40c9d6c5bc4a980f49a3e91aade814f5ce06a0626d38e701d04",
+        "a96160204be5410f62bec3796f05de909885531f7d00d2bd65ee6c73d06f7c1b",
+        "e6c1122fcf6696b89b5f8099cf12fac700f34da1401369fc23e5fba67cff01ba"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Bullhorn",
+        "id": "bullhorn",
+        "active": false
+      },
+      "iconDataSha256": "e645ed81f8353c6d82ba2562d9ca29d4351920eebd0beef721190927e7eb57d7",
+      "rendersSha256": "d2da4f4feca25d36d37a3acb1a02c139d0b97ec711f3d8728a51e61d44c00a92",
+      "staticSha256": [
+        "7e67d0e281e981b4493688860b40ad562ce6c4d451a129837770b9b3ad699fa4",
+        "31cdba3f6c3073f8da8467a49d41be3998d9e80b6c87eb1544def5e48aa7a907",
+        "7bc54566c327b2366fe68bb633bedb7b8d11938d597d2c73666b5059fb8a2a0d"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Deepcast",
+        "id": "deepcast",
+        "active": false
+      },
+      "iconDataSha256": "db0f7c5fb0d31740f32902215a9e19f0013dc8969749df5c59fc952775fe2d1d",
+      "rendersSha256": "4ab69214a6d3ff1beac430d5dcc901d0600d4ca5c7109bd714a379d56b87621f",
+      "staticSha256": [
+        "c89ab78d700178e188aaf6ff180329746ed57c7b9574c6ab0226a0026de6313f",
+        "21239402c4d9aa0c662b6f960dc1607b1d4153cc936abcaef60dea1780632022",
+        "5254cdc06a7a6b912a62311f4b7e5247152e12df79611253612ee68cc001b0e9"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Google Podcasts",
+        "id": "google",
+        "active": false
+      },
+      "iconDataSha256": "9fbb163b3adacd6483980b14f31d2a0eb27406b97e93a80fabe5ef7c518ac205",
+      "rendersSha256": "57db6aabe37bd9f6e3cd2b4a457fd77f03953b441e4bf334020cb1bfca516589",
+      "staticSha256": [
+        "fba4aee3597883245b44dec35f80f2e8e0605d47e8402db120fd536fe999d2b7",
+        "9fe8dd2ca95dfa842f85a6a02fb3d46ae51a650c16d4eae23343c53af5e49e42",
+        "f02151a7edcb7ce03e1cfd9625d6b5a2b2221e3a8ebe699829f7d1ca529372b6"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Instacast",
+        "id": "instacast",
+        "active": false
+      },
+      "iconDataSha256": "6416f36ef1075a3bae01cb0bc6ab8b29769a738f9bc003a8ddeaf9b4cb082cea",
+      "rendersSha256": "707af2dcbb166c2fa8af17825478891c0273928d302b5b7c792c7f63e77b2133",
+      "staticSha256": [
+        "4fb66c84a20133e365d9b9ee74cf40db57b4085b519dec22924b32842be26f70",
+        "f9ab1c700cb62af1dda8afa55b316b794c5449d29b8ee92dc6fbc923bdcb9e83",
+        "943b771ed3a6a260729a8ccd68fb39387b863266c6a07c6729b287e90b28d21e"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "iTunes",
+        "id": "itunes",
+        "active": false
+      },
+      "iconDataSha256": "3a6ad4fedb09cb12253b94e56407a242e5c8709d941932285129d644534c7f43",
+      "rendersSha256": "4404c65d2dc5a29be3be31b36135ad76a55ce1ec7809e8c1bb860c9a3165e1fc",
+      "staticSha256": [
+        "6f32bff63eccff4ada3192f3d7466b8b97015f9985aba5ffe6d6d89e9236d5f2",
+        "3b992dc4087d2580e770800056f0a839af30cb1aebf0451ce278236763c7fa47",
+        "4201228b6020c93e058f79bd8758786fd35f83837af9562076837fba3ff3f817"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Jam",
+        "id": "jam",
+        "active": false
+      },
+      "iconDataSha256": "6edbb6107bcd96156e8ce90a7ff475d255adaec65d954075c811a8b6cb183210",
+      "rendersSha256": "b5ba72335fab8f71874e3587afaf65641c2d0208f022d01e2f5ecaa6e87eacde",
+      "staticSha256": [
+        "9cbeb6de985fccfa2e637fee6f10cfd8f4b0385a10ad6e32c26d4ae849b2f793",
+        "e5eef6cb3679275fdbcd9734c2b345a39792a61f136f8842e8b9a56b39011316",
+        "d8d481563cd4a79c1a54c719800c049a30d14e630312c3daa01b24231bc3c8b2"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Podfriend",
+        "id": "podfriend",
+        "active": false
+      },
+      "iconDataSha256": "0e3176d664fc8a406fe77c081e6d4b2742453194238bc5a717e48985c448d886",
+      "rendersSha256": "ca075da4a192608018286cff53ae8fc05a7ec52cbf69d96bd7badd7642812287",
+      "staticSha256": [
+        "0075c6a47a6e53bb02cea9938adec8ea48fdcc256abe953cfb78b9392cc4d4d2",
+        "d3a9b2db3f774e51f822d01d885e9b4ac7d0d6fd7acb3b8a126f56c6ba24b95d",
+        "2b0269a4fa9725cca8b1bec1803168074a3b27eeb6042315db21f8796e44526a"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Podhero",
+        "id": "podhero",
+        "active": false
+      },
+      "iconDataSha256": "181cd2a578074164ee002d64c1da664371cfadd44ffac638fe9c23b6aa2f67e7",
+      "rendersSha256": "7236a6a7829dfb95fa9692ef558e65dab7787d43110a2ffe80fcdfcc691c3fca",
+      "staticSha256": [
+        "73f4bd6d53215a7d2854db8b8d29670a7e0b31c0711a01d6cc04e49ad2241393",
+        "2b11aa7bce7da1d238b339ebc80636252e621992819ce71eebd38b68ef9660ab",
+        "bab11d6726589fb708f2fc6427db2a2fb749df25c67060a62730a67d0501419d"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Podknife",
+        "id": "podknife",
+        "active": false
+      },
+      "iconDataSha256": "adf70fedc8ddd31493ed793e7d8f89c88d606641d2f21f13fdae3d95f7972072",
+      "rendersSha256": "f4c39b96b4833016967ea05b6e429a5d6e67da6cc9d18d9c8bca57be5df51e92",
+      "staticSha256": [
+        "e048efb9fe8886f0a8213f0a863c7f266971538d89da593c21057c4ebf65c080",
+        "03d6d93d5f40c169d3d97fb837f72cdd182fc83fdc574d1e2d2ca2f709232f26",
+        "d905655e8690d9465bfe14c860239ca73c053d48204b316d646dc8ec95b630f0"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Podvine",
+        "id": "podvine",
+        "active": false
+      },
+      "iconDataSha256": "84ba8e45d2f1e2d9dd8a20e7cc1291721fa765da2121f2861df20752a86daf6a",
+      "rendersSha256": "482bad459a2f7b0ab7e4330f39a84c7d698f941536055539ab95d24d091c6301",
+      "staticSha256": [
+        "48dc0ced2b0268bf396dd22d282ab7fccdce727f6c8d655b3db88114db335957",
+        "ab821cf1fe2b5ce2cffd6054457e751654ba9a0fe7036f0140c9eb792136224a",
+        "c4ec821591a2fda048d8cfeb06e9ea74c1ddc38863ad12b214ec7992021a7cd6"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "RadioPublic",
+        "id": "radiopublic",
+        "active": false
+      },
+      "iconDataSha256": "957319d3a9323cd168290c0f1c6178e52f28bba44b435918df78365389fc6abd",
+      "rendersSha256": "caa771b7cf1bd234d5d3b83b152fb8e6acb51605c7351949aea19e2b3acde21d",
+      "staticSha256": [
+        "6be8dacfe1b45ab38cd1aac32da981dbbcb84b42582b9e610e2d515758a4fa0f",
+        "4701b6a435dc62efe9d76b4b69b0f91a7f156e1507c2a20ab847b1b0bba19ad1",
+        "7e898d2c086175a38120d368ca286723addfa5402e9e459a87c948582f6d9922"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Resso",
+        "id": "resso",
+        "active": false
+      },
+      "iconDataSha256": "07e9a3fe43140fa02eea4fecac71c40f7c2074281aedd134e8868a2818bacba8",
+      "rendersSha256": "baeead76d8551f4a38b7dcb4f63ac8d91fe310815eed19365ba28b313f2ad38e",
+      "staticSha256": [
+        "4f8617bc686040fa332023d5d3eb7be22eef25e91fb4273794121729066d3cad",
+        "c6a02861f18b32bc627ca5c7ba6cb2702de4d44f69ee12d77a4983aa7b76ff77",
+        "084565cfee9c04424975241bd8cf877760d53d1ce1fdc64c70dedaf3b5fced0e"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Samsung Free",
+        "id": "samsungfree",
+        "active": false
+      },
+      "iconDataSha256": "1ab82c1ef82bc08d5e29261ca690dc72a26ff1a7acc25c3c7431856a6dc4cc9f",
+      "rendersSha256": "06e0acc8f310dfc36849243ad8f6e6d4cbc3f1403cd1610cb6306ae13b5377f3",
+      "staticSha256": [
+        "4d22e02b8edfd3f4ef1985158eff666c887684585f3b3b14d29e0388db3569dd",
+        "95d49189f8d869ef3ed071b835a48fc6705e729935637898d9b8503e09fdfa49",
+        "e2f42d58efad9a6e6153dcfdf3e9d2233418a9bee2aeb18e8b484a4572ec8403"
+      ]
+    },
+    {
+      "metadata": {
+        "name": "Stitcher",
+        "id": "stitcher",
+        "active": false
+      },
+      "iconDataSha256": "b91fbc6d92cd59357d872471dee45a2f173ccc230ad367086f624a41f8aeef34",
+      "rendersSha256": "4e9fa0ffd5c5ff86a7726e96bd40ef0bf975b27e42841fb5a790977e28408bc4",
+      "staticSha256": [
+        "b1b3b00cc6ab267d9e0384fa3155b4d368d07ae61375537a0482478d4dd669a8",
+        "6583b1ef791963436f4265b51600a62d5bccb0a5be539a3744c36b310dd55249",
+        "d44dba89b01e3df72b73428c1e559a1834a1283d6c473bbcef0177eba4867c7e"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "twitch",
+        "name": "Twitch",
+        "active": true
+      },
+      "iconDataSha256": "d660adb391b825bc3f1eca74bd90be08454f0709f2cf772cbfa25d8b8933e877",
+      "rendersSha256": "34b0006cac7dde899b65dd7abd0318c36971437f2023f61738dd3cd14616abc1",
+      "staticSha256": [
+        "09de526d0df2d83aea69250262535d2d4e7f7af151dc9b8b110a46e7699f7f69",
+        "a1782bd0c215fb878283745a656e90817fcd26a38c7932a7d9dc986761e809a5",
+        "18df27e7481de5f0f6f18afb55eb1c0c1b94fb3ff1af7659bd2f7358ca50663c"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "kick",
+        "name": "Kick",
+        "active": true,
+        "guidelinesUrl": "https://about.kick.com/brand"
+      },
+      "iconDataSha256": "7af6d0c531bb1f2f98e035472a132fa14260a183fb771a432e912c8069faf799",
+      "rendersSha256": "7d7085887818e472dfae324e73f4e8cfecad6c4890fa2507707978dd51b92661",
+      "staticSha256": [
+        "5841fc7a101c8d47aca4ee6ef6703c20cf6272a1a2c05fce877ae3e270740ca1",
+        "8689ba3a292b2b0c0251429c3023a5cced19362edd0f08c28d172479f8ebe5db",
+        "7ebd74baf46fd21ef11ab3aa649d550e82f69b8730d1aad952e94ea3cc5c17e3"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "rumble",
+        "name": "Rumble",
+        "active": true
+      },
+      "iconDataSha256": "18dff789b63e777e0b4aa4959c2956045160013553cc28eae48d7de06cdf229c",
+      "rendersSha256": "fe0eae6710fba7f3b5c7c106e4519dfb3912fea47dfe32430a2b5facab0c87ca",
+      "staticSha256": [
+        "c5eb7356fc6e4fa926d74423933aca7181e32475f17f244ece056f705db1643f",
+        "4f7cb6ec62143ccd9fcde2e4a24a68542f28ae1554c53b4c4ba267d62e757e8a",
+        "39a494625ab6b93ae0c88f7ecb70aa09d27cda682a7d87adb44e7bcfa5a73b90"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "facebook",
+        "name": "Facebook",
+        "active": true
+      },
+      "iconDataSha256": "c19ffa9535f2b1ec57d63eed304ec8db738bf27e6b196b48b91f8c5fd9f5506d",
+      "rendersSha256": "e3a4700991806205d9fd6f69e19bf0668f733b14712616489298dae641e58c1d",
+      "staticSha256": [
+        "616f1e31edc134bff0429b9f75f34464c6fbd72943cc5b43676d808163f6cd6a",
+        "382ef4a755aa8bd78b2a3378230db1f01f33bc25c9b23ce901689813057fedfa",
+        "8ec3e05277d4e37220bc3b6cce3c97e8745af87b75d6d1462cf3c801cf15a12a"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "instagram",
+        "name": "Instagram",
+        "active": true
+      },
+      "iconDataSha256": "77bc4f04cba04d4f01dd0b33b4085c02e5971f4e914a7044f88a98ac2ce18b64",
+      "rendersSha256": "684a7297f093048c86971f648138381e8799d0fff0ef33a1e842b49241c33e53",
+      "staticSha256": [
+        "f39ff5ce4a7b094c77a2ecf78381aeecad76859ca4045194c00e401f3d503a79",
+        "831f5c4b8be9578bcd3245218db5a46f7f9f63111a4b3c44b343fef831364be1",
+        "36b282a251e74a42e5063157d7fc0d667c5f8da14607a5d5fa77bbf72bf4fcbe"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "linkedin",
+        "name": "LinkedIn",
+        "active": true
+      },
+      "iconDataSha256": "6e535df18715ae33a043b5d746859187b677e2fe81bfcf9d84a71703357aef7c",
+      "rendersSha256": "becbc3e4637c88ec919665fbcd8d5ca1a015a1bfa6f41b831328bc94d29b2362",
+      "staticSha256": [
+        "7aace8dd47c2bdd3cd37cb413826cfa95d1d724c8e9bc5ed65cc9564629af61d",
+        "5944338143b0f6d2410f7533e0b379150cc3e58764b4b8480e1c41776dd6a292",
+        "f8e6c7093b8eff4785244f174f330ebfc7c4bbbf3e6d0b0ca8606dc4c29e7ac0"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "tiktok",
+        "name": "TikTok",
+        "active": true
+      },
+      "iconDataSha256": "e3244187aba04f6a357ae54d8d8b03e850003dda7e4f1e705c1898b1c3886085",
+      "rendersSha256": "a9f07fff7e5251042c8c5f3ec80a025a48f92c3d7203a25163d7569618f38d40",
+      "staticSha256": [
+        "1060747aa589eb08920f51819ba37c8cc61bc838706995242451ce3ae2f0c45e",
+        "e706b9ddb1cb2960bad7565a07d037283b2955456ca01f35a789c07886db3bcc",
+        "999cbc065fa1ee97a57c8c26763a5d407892d3861b84c805288a38d5babb0300"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "x",
+        "name": "X",
+        "active": true,
+        "aliases": [
+          "twitter"
+        ]
+      },
+      "iconDataSha256": "cc4ec81dc229190532021db63f3089a69ce803419deeec34d7f15185eac43e0b",
+      "rendersSha256": "efd26369dc220ae2e1a6bf74eaac5ad280e6f2e8532aad188034b0d4f5ed0ff4",
+      "staticSha256": [
+        "2cd36fb1c59d4eda326343607cf46b3bff65295fb0b8508cafb72d91a49cee1b",
+        "1a69b27a81e0db9860c2efbb13e71b4df1ae99e80496b6829892816fa5a293c9",
+        "e5831782a9e323c745cbc1c189bcd27b7c4d7b6d8be6f9c3fff8b6bdbbb60c6e"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "substack",
+        "name": "Substack",
+        "active": true,
+        "guidelinesUrl": "https://substack.com/brand"
+      },
+      "iconDataSha256": "9b078732d9be8f87881106c4752fb28dd4533ac5e7f7330aa917d6fb05881855",
+      "rendersSha256": "f046ad72663b0c450cc9a2d744ede3e7056046df0b182ed1a9dbe615fcd41e21",
+      "staticSha256": [
+        "efbb6e6454d354fdc68808f58d529dc3a61b7a0ddf905b0fd29c1d93b2a70106",
+        "8e6a6852aae1733755d350d87cb53658f77ffc1a0e40fe7df5d05394558d931c",
+        "71d1824155f3a5bbc134b39d36cc32de0656fbf0b8abcae837a9d49f389174ce"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "patreon",
+        "name": "Patreon",
+        "active": true,
+        "guidelinesUrl": "https://www.patreon.com/brand"
+      },
+      "iconDataSha256": "2c4b255c5e9cec6a733f65f6e850b3d930e39854405ac9f6b49455fb5c67047f",
+      "rendersSha256": "bf68fc30bdd17a039b3bcc2382d4b1a3ce7292f6813344a6afe3efbf7af679b9",
+      "staticSha256": [
+        "724032d7f1e565ed848301e8dfde7d957e66a490434a17e559dfaf5c2c1c851f",
+        "47a2a738e0193018c437f60ebaf6e640330cc3108251312fd8b88b9ae06b126c",
+        "b9b035f11b3f3248dac6af8178482ce23f3fee4a0aa343aad3c2bd7b2783ebc9"
+      ]
+    }
+  ]
+}

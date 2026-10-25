@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.0
+
+- Use “Follow on” for the six new social/community badges and “Support on” for the five new supporter badges; retain React label overrides and all released outputs.
+- Add Threads, Bluesky, Mastodon, Discord, Reddit, WhatsApp, Ko-fi, PayPal, Buy Me a Coffee, Venmo, and Cash App through the existing core, React, and static APIs, preserving all 95 released platform IDs and artwork.
+
 ## 0.3.0
 
 - Add Twitch, Kick, Rumble, Facebook, Instagram, LinkedIn, TikTok, X, Substack, and Patreon through

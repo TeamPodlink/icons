@@ -1,0 +1,49 @@
+{
+  "platforms": [
+    {
+      "metadata": {
+        "id": "threads",
+        "name": "Threads",
+        "active": true,
+        "guidelinesUrl": "https://www.meta.com/brand/resources/threads/"
+      },
+      "iconDataSha256": "d74f0875140188bef2cb18665e7ad3b7fe4682f96591fd86911de8868d141c96",
+      "rendersSha256": "44fc632d76a7f85ab1950cc1aa157abfeb8f37590b0f6d0292c44bf81621daa9",
+      "staticSha256": [
+        "80ca18657144d221a7fb31276127b277d87699abfad5811c49284b89d7396473",
+        "3793169438ab9936743437ae283efde9dabddf7e8fdc6a275812b516a6a15a13",
+        "d86f2dbb9e99f1ea6a8402f71c1b98e13c2bc74d307459784c92819a5fba8f6b"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "bluesky",
+        "name": "Bluesky",
+        "active": true,
+        "guidelinesUrl": "https://bsky.social/about/support/branding"
+      },
+      "iconDataSha256": "a4484a43ee9c3af48f120484dae74fb62be6a97c465979aa148202555745a53a",
+      "rendersSha256": "df8d30168816070402ff525390e09f57a51ab78f54e38901d1f9f5efaad46a0e",
+      "staticSha256": [
+        "f804906ab6f05e9ee5aab4fd70527d474150e0bc931d79199c4f02e4f446d75a",
+        "54fc80be7e8aae621a9cfe130501e9151c2a18552c0f106b567fa3363ae5422f",
+        "33a3422679a1ee059ce36c652efa3d24bda6186114d56720c472315b9f83cc96"
+      ]
+    },
+    {
+      "metadata": {
+        "id": "mastodon",
+        "name": "Mastodon",
+        "active": true,
+        "guidelinesUrl": "https://joinmastodon.org/branding"
+      },
+      "iconDataSha256": "28a73a91ba27e2ab02062ccc04d5c3414defc63fc4a150febf25a8b7978fbd45",
+      "rendersSha256": "9646fcc07cb6ca0335221c4a82fc7dfab478f8d8f5801ff2983150cd850192f6",
+      "staticSha256": [
+        "23541ade69ec37a675c67ea89f1e2c34a294556bcb33471b9896f5690ad1577b",
+        "24c778dc4b1d4381c91dfed9414e92c00ec68e82d88b73cca80738c95e5a5d4a",
+        "f87286e6b1134d8f3b306046c3029ded65cb403ae0455d7f15fc2e2312034120"
+      ]
+    }
+  ]
+}

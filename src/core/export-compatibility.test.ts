@@ -30,10 +30,21 @@ const additions = [
   'x',
   'substack',
   'patreon',
+  'threads',
+  'bluesky',
+  'mastodon',
+  'discord',
+  'reddit',
+  'whatsapp',
+  'kofi',
+  'paypal',
+  'buymeacoffee',
+  'venmo',
+  'cashapp',
 ] as const satisfies readonly PlatformId[]
 
 describe('published 0.2.0 / current Podlink export compatibility', () => {
-  it('retains every public export and adds only the requested ten IDs', () => {
+  it('retains every public export and adds only the requested live and social IDs', () => {
     expect(Object.keys(core).sort()).toEqual(released.coreExports)
     expect(Object.keys(react).sort()).toEqual(released.reactExports)
     const available = core.platforms.filter((p) => core.hasPlatformIcon(p.id)).map((p) => p.id)
@@ -101,7 +112,7 @@ describe('published 0.2.0 / current Podlink export compatibility', () => {
   }
 })
 
-describe('additive live platform coverage', () => {
+describe('additive live and social platform coverage', () => {
   for (const id of additions) {
     it(`${id} is available through lookup, all React shapes and static exports`, () => {
       expect(core.hasPlatformIcon(id)).toBe(true)

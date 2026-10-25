@@ -6,6 +6,8 @@ export interface Platform {
   active: boolean
   aliases?: string[]
   guidelinesUrl?: string
+  /** Default badge text; omitted platforms retain "Listen on". */
+  badgeLabel?: string
 }
 
 export interface IconData {
