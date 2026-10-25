@@ -72,7 +72,7 @@ Most badges say "Listen on {Platform}". Exceptions are configured in `BADGE_TEXT
 
 ## Key conventions
 
-- Source SVGs use `fill="none"` on root `<svg>` when paths use stroke without explicit fill — this is preserved by the build scripts onto nested `<svg>` elements
+- Use explicit `fill="none"` on stroke-only paths. Static generation preserves root fill, but library codegen extracts inner SVG content and discards root attributes; inherited root fill alone does not survive into React.
 - IDs in SVG content are prefixed at build time to avoid collisions when multiple icons are embedded
 - The `static/` directory is included in the npm package (`files` in package.json) but gitignored — `prepublishOnly` runs the build before publish
 - Superellipse ratio: `1.455 / 16` (iOS 26 style squircle)

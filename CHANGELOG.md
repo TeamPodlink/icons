@@ -1,5 +1,15 @@
 # Changelog
 
+## Unreleased
+
+- Add Twitch, Kick, Rumble, Facebook, Instagram, LinkedIn, TikTok, X, Substack, and Patreon through
+  the existing core, React, and static APIs; `twitter` resolves to `x`.
+- Fix unintended black fills in gPodder and Podurama React icons/badges by
+  explicitly preserving their stroke-only paths; original colors/geometry remain.
+- Preserve all 85 published 0.2.0 IDs and metadata, and exact artwork/rendering
+  for the other 83 platforms. Add compatibility coverage against the actual published package
+  and Podlink's current consumer ID inventory.
+
 ## 0.2.0
 
 ### Breaking
