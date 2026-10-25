@@ -73,7 +73,7 @@ img{vertical-align:middle;margin:0 5px}small{display:block;font-size:11px;font-w
 #review-summary{display:none}
 </style></head><body><h1>Live platform icons — local compatibility candidate</h1>
 <p>95 icons: all 85 released IDs retained + 10 additions. Each sample is 64px / 24px.</p>
-<p>Chrome rendering preserves Display-P3 artwork. Existing React and static masks remain unchanged.</p>
+<p>Chrome renders Display-P3 SVG colors into this sRGB capture. Existing React and static masks remain unchanged.</p>
 <table><thead><tr><th>Platform</th><th>React square</th><th>React squircle</th><th>React circle</th><th>Static 0.2 mask</th></tr></thead><tbody>${rows}</tbody></table>
 <p id="review-caption">Checking image decode and color rendering…</p><pre id="review-summary"></pre>
 <script>

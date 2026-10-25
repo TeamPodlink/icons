@@ -210,7 +210,9 @@ viewBox, mask, or package export was changed to compensate for a screenshot bug.
 
 `scripts/review-live-icons.mjs` fixes the review pipeline by using installed
 Chrome with an isolated temporary profile and an sRGB screenshot output profile.
-It adds no dependency. Run after `pnpm build`:
+The capture maps Display-P3 source colors into sRGB. Its red probe and Tunestr
+coverage checks detect unsupported colors rendered black; they do not establish
+wide-gamut Display-P3 fidelity. It adds no dependency. Run after `pnpm build`:
 
 ```sh
 node scripts/review-live-icons.mjs /tmp/podlink-live-icon-review
