@@ -1,8 +1,8 @@
 {
   "name": "@podlink/icons",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "type": "module",
-  "description": "Podcast platform icons and badges — framework-agnostic SVG strings + React components",
+  "description": "Podcast platform icons and badges \u2014 framework-agnostic SVG strings + React components",
   "license": "MIT",
   "homepage": "https://github.com/TeamPodlink/icons#readme",
   "repository": {

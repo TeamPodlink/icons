@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.3.0
 
 - Add Twitch, Kick, Rumble, Facebook, Instagram, LinkedIn, TikTok, X, Substack, and Patreon through
   the existing core, React, and static APIs; `twitter` resolves to `x`.
