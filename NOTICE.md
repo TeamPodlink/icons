@@ -93,11 +93,12 @@ are not payment buttons, proof of integration, sponsorship or endorsement.
   authorized. Listed film, television and other restricted uses need permission.
 - **Ko-fi**: `kofi_symbol.svg` from the creator kit linked by
   https://more.ko-fi.com/brand-assets. The cup and heart colors are unchanged,
-  on a white plate. Ko-fi permits its assets to promote a creator's Ko-fi page,
+  on the official #72A5F2 blue plate. Ko-fi permits its assets to promote a creator's Ko-fi page,
   subject to its content guidelines; avoid stretching or distorting the mark.
 - **PayPal**: the current monogram SVG linked by https://www.paypal.com/us/home,
   https://www.paypalobjects.com/marketing/web/logos/paypal-mark-color_new.svg.
-  All three original blues and geometry are retained on white. PayPal owns its
+  Original geometry is retained with the current Android icon palette: #0E319F
+  plate, #B9C6EA rear P, #FFFFFF front P and #EAEEF9 overlap. PayPal owns its
   marks. No general redistribution license or authorization to present an
   operational payment integration is inferred from its public availability.
 - **Buy Me a Coffee**: `SVG Files/bmc-logo.svg` from the brand kit linked by
