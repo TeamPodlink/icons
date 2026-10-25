@@ -43,7 +43,8 @@
     "dist",
     "static/icons",
     "static/badges",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "NOTICE.md"
   ],
   "scripts": {
     "codegen": "tsx scripts/codegen.ts",

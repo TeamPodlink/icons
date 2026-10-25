@@ -1,0 +1,26 @@
+{
+  "gpodder": {
+    "iconDataSha256": "514e8ae0589eff8e04b1a6da7147f10c727dfb89cc5314b077d4eafe288e036b",
+    "iconRenderSha256": "ca25362b9ff9cfee8ed1b9704f66b0730208ce6413cdc0e03efe797a77d01e22",
+    "badgeRenderSha256": "0718f2b55d1a9b3b37f38a6b689b96bca3c5644d29c3cb8c8c886f5c4bc6e2df",
+    "staticIconSha256": "98a5105e1f92eb0c981d7abf0ae9ae171a83d6e35368cdd657476aae1597e935",
+    "lightBadgeSha256": "088c6a4964a0659cff183bd35d5263cf3c3563bdd0b75c8a09138c9a7a1d209c",
+    "darkBadgeSha256": "af4acc22ab5e83fbb7579f7e598ce19dda35614e955e480521dc9b38fffff672",
+    "sourceGeometrySha256": {
+      "icon": "1fc05b5f64cf687c565fef3489ae2b2c2074f9b13d2ff9f57392bba2231513fc",
+      "badge": "5f6535d41dc65ef3727f429b25011f6e4aa625f3a4a839ca88b51f188f50c8c1"
+    }
+  },
+  "podurama": {
+    "iconDataSha256": "6ceee62071d909effee7193ade9e1fd829fabd9561542692cac90b9ddb95a350",
+    "iconRenderSha256": "0c0503261cc66eb2db84777921654e8a2dde1c7863c9ce8b7be61e70eb16e0fc",
+    "badgeRenderSha256": "ff4ab9aff334ce503e2fecd286b21d0fb5fccc6b7a545b9a5102eaf6f41911a3",
+    "staticIconSha256": "56d71f8f0203dbc743e07b59908b725d04159799b334a5f72c7936059e8e009b",
+    "lightBadgeSha256": "ffb8efd0bb42f07512c5397b78a3e9159913790dac2c2e2975c6360c5fda65a6",
+    "darkBadgeSha256": "4f305731855cbe4301e1acd16809ba5ec5717acc918cc56d8e713b5b6dbc990b",
+    "sourceGeometrySha256": {
+      "icon": "e47537978d2af85dcd806a1510667bcbf3edb53c513995d6d4560580d3aa5a71",
+      "badge": "4d18ca4774ee6c69140509fa2ce5909685852527796f2b1a20e3fe9f964ad64a"
+    }
+  }
+}

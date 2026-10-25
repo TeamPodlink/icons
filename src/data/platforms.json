@@ -4,7 +4,9 @@
       "name": "Amazon Music",
       "id": "amazonmusic",
       "active": true,
-      "aliases": ["amazon"],
+      "aliases": [
+        "amazon"
+      ],
       "guidelinesUrl": "https://podcasters.amazon.com/promotional-tools"
     },
     {
@@ -452,6 +454,62 @@
       "name": "Stitcher",
       "id": "stitcher",
       "active": false
+    },
+    {
+      "id": "twitch",
+      "name": "Twitch",
+      "active": true
+    },
+    {
+      "id": "kick",
+      "name": "Kick",
+      "active": true,
+      "guidelinesUrl": "https://about.kick.com/brand"
+    },
+    {
+      "id": "rumble",
+      "name": "Rumble",
+      "active": true
+    },
+    {
+      "id": "facebook",
+      "name": "Facebook",
+      "active": true
+    },
+    {
+      "id": "instagram",
+      "name": "Instagram",
+      "active": true
+    },
+    {
+      "id": "linkedin",
+      "name": "LinkedIn",
+      "active": true
+    },
+    {
+      "id": "tiktok",
+      "name": "TikTok",
+      "active": true
+    },
+    {
+      "id": "x",
+      "name": "X",
+      "active": true,
+      "aliases": [
+        "twitter"
+      ]
+    },
+    {
+      "id": "substack",
+      "name": "Substack",
+      "active": true,
+      "guidelinesUrl": "https://substack.com/brand"
+    },
+    {
+      "id": "patreon",
+      "name": "Patreon",
+      "active": true,
+      "guidelinesUrl": "https://www.patreon.com/brand"
     }
   ]
 }
