@@ -113,6 +113,8 @@ const pngPath = join(output, 'contact-sheet.png')
 writeFileSync(htmlPath, html)
 const profile = mkdtempSync(join(tmpdir(), 'podlink-icon-review-'))
 try {
+  // A previous successful capture must not hide a missing screenshot.
+  rmSync(pngPath, { force: true })
   const rendered = spawnSync(
     chrome,
     [
@@ -138,6 +140,12 @@ try {
     throw new Error(
       `Browser review failed: ${rendered.stderr}\n${rendered.stdout.match(/<pre id="review-summary">([\s\S]*?)<\/pre>/)?.[1] ?? 'No verification result'}`,
     )
+  }
+  // Chrome versions may handle dump-DOM and screenshot flags differently.
+  // Fail rather than report success without a fresh, nonempty PNG.
+  const png = readFileSync(pngPath)
+  if (png.length < 33 || png.subarray(0, 8).toString('hex') !== '89504e470d0a1a0a') {
+    throw Error('Chrome did not create a valid PNG screenshot')
   }
   const summary = JSON.parse(rendered.stdout.match(/<pre id="review-summary">([\s\S]*?)<\/pre>/)[1])
   writeFileSync(join(output, 'visual-checks.json'), JSON.stringify(summary, null, 2) + '\n')

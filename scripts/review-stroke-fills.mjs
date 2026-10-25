@@ -102,8 +102,11 @@ document.body.dataset.status='passed';document.getElementById('result').textCont
 }catch(e){document.body.dataset.status='failed';document.getElementById('result').textContent=String(e)}})();</script></html>`
 const path = join(output, 'stroke-fills.html')
 writeFileSync(path, html)
+const screenshotPath = join(output, 'stroke-fills.png')
 const profile = mkdtempSync(join(tmpdir(), 'podlink-strokes-'))
 try {
+  // A previous successful capture must not hide a missing screenshot.
+  rmSync(screenshotPath, { force: true })
   const result = spawnSync(
     chrome,
     [
@@ -118,7 +121,7 @@ try {
       '--window-size=960,3100',
       '--virtual-time-budget=1500',
       '--dump-dom',
-      `--screenshot=${join(output, 'stroke-fills.png')}`,
+      `--screenshot=${screenshotPath}`,
       pathToFileURL(path).href,
     ],
     { encoding: 'utf8', maxBuffer: 8 * 1024 * 1024, timeout: 30000 },
@@ -126,6 +129,12 @@ try {
   const summary = result.stdout?.match(/<pre id="result">([\s\S]*?)<\/pre>/)?.[1]
   if (result.status !== 0 || !result.stdout.includes('data-status="passed"'))
     throw Error(summary ?? result.stderr)
+  // Chrome versions may handle dump-DOM and screenshot flags differently.
+  // Fail rather than report success without a fresh, nonempty PNG.
+  const png = readFileSync(screenshotPath)
+  if (png.length < 33 || png.subarray(0, 8).toString('hex') !== '89504e470d0a1a0a') {
+    throw Error('Chrome did not create a valid PNG screenshot')
+  }
   writeFileSync(
     join(output, 'stroke-checks.json'),
     JSON.stringify(JSON.parse(summary), null, 2) + '\n',
