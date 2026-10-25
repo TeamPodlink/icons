@@ -102,13 +102,13 @@ Renders a platform icon as an inline SVG.
 
 ### `<PlatformBadge>`
 
-Renders a "Listen on {Platform}" badge as an inline HTML element.
+Renders a platform badge as an inline HTML element. The eleven new social and supporter platforms default to “Follow on” or “Support on”; existing platforms retain their defaults.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `platform` | `string` | — | Platform ID (required) |
 | `theme` | `'light' \| 'dark'` | `'light'` | Color theme |
-| `label` | `string` | `'Listen on'` | Text above the platform name |
+| `label` | `string` | Platform default, otherwise `'Listen on'` | Text above the platform name; overrides the default |
 | `platformName` | `string` | Platform display name | Override the platform name |
 | `shape` | `'superellipse' \| 'circle' \| 'square'` | `'superellipse'` | Icon clip shape |
 | `dir` | `'ltr' \| 'rtl'` | `'ltr'` | Text direction |
@@ -204,3 +204,16 @@ Each platform has an `active` flag — inactive platforms are deprecated but sti
 ## License
 
 MIT
+
+### Social and supporter badges
+
+Threads, Bluesky, Mastodon, Discord, Reddit and WhatsApp default to “Follow on”.
+Ko-fi, PayPal, Buy Me a Coffee, Venmo and Cash App default to “Support on”.
+These labels apply to generated static badges and React badges; React callers
+can still supply `label` for custom or localized wording. All released platform
+defaults and static artwork remain unchanged.
+
+Venmo requires an icon plate of at least 20px (10px monogram). Its generated
+32px icon and 40px badge with a 24px icon meet this minimum. Use `size >= 20`
+for React icons and `height >= 34` for React badges; do not scale static assets
+below those limits. See `NOTICE.md` for brand context and clear-space requirements.

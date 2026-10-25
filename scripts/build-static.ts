@@ -3,7 +3,7 @@
 /**
  * Generate static SVG assets:
  * 1. Superellipse-clipped icons (32x32) → static/icons/
- * 2. "Listen on" badges (light + dark, text-to-path) → static/badges/
+ * 2. Platform badges (light + dark, text-to-path) → static/badges/
  *
  * Ported from podcast-badges/scripts/generate-assets.mjs
  */
@@ -12,6 +12,7 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync, readdirSync, statSy
 import { join, dirname } from 'path'
 import { fileURLToPath } from 'url'
 import opentype from 'opentype.js'
+import type { Platform } from '../src/core/types.js'
 import {
   extractSvgContent,
   extractViewBox,
@@ -136,6 +137,7 @@ function generateBadge(
   platformName: string,
   variant: 'light' | 'dark',
   isBadge: boolean,
+  badgeLabel?: string,
 ): string {
   const isDark = variant === 'dark'
   const bg = isDark ? '#000' : '#fff'
@@ -157,7 +159,7 @@ function generateBadge(
   const largeY = baselineY(textBlockTop + SMALL_LINE_HEIGHT, LARGE_LINE_HEIGHT, LARGE_FONT_SIZE)
 
   const override = BADGE_TEXT_OVERRIDES[name]
-  const smallText = override?.small ?? 'Listen on'
+  const smallText = override?.small ?? badgeLabel ?? 'Listen on'
   const largeText = override?.large ?? platformName
 
   const smallPath = textToPath(smallText, TEXT_X, smallY, SMALL_FONT_SIZE)
@@ -211,11 +213,11 @@ function main() {
     process.exit(1)
   }
 
-  // Load platform names
-  const platformMap = new Map<string, string>()
+  // Load platform names and optional default labels
+  const platformMap = new Map<string, Platform>()
   if (existsSync(PLATFORMS_FILE)) {
     const data = JSON.parse(readFileSync(PLATFORMS_FILE, 'utf-8'))
-    for (const p of data.platforms || []) platformMap.set(p.id, p.name)
+    for (const p of data.platforms || []) platformMap.set(p.id, p)
   }
 
   // Discover platform directories (skip _review)
@@ -233,7 +235,8 @@ function main() {
   for (const name of platformDirs) {
     const dir = join(SOURCE_DIR, name)
     const iconSvg = readFileSync(join(dir, 'icon.svg'), 'utf-8')
-    const platformName = platformMap.get(name) || name.charAt(0).toUpperCase() + name.slice(1)
+    const platform = platformMap.get(name)
+    const platformName = platform?.name || name.charAt(0).toUpperCase() + name.slice(1)
 
     try {
       writeFileSync(join(ICONS_DIR, `${name}.svg`), generateIcon(iconSvg, name))
@@ -244,11 +247,25 @@ function main() {
 
       writeFileSync(
         join(BADGES_DIR, `${name}-dark.svg`),
-        generateBadge(darkBadgeIcon.svg, name, platformName, 'dark', darkBadgeIcon.isBadge),
+        generateBadge(
+          darkBadgeIcon.svg,
+          name,
+          platformName,
+          'dark',
+          darkBadgeIcon.isBadge,
+          platform?.badgeLabel,
+        ),
       )
       writeFileSync(
         join(BADGES_DIR, `${name}-light.svg`),
-        generateBadge(lightBadgeIcon.svg, name, platformName, 'light', lightBadgeIcon.isBadge),
+        generateBadge(
+          lightBadgeIcon.svg,
+          name,
+          platformName,
+          'light',
+          lightBadgeIcon.isBadge,
+          platform?.badgeLabel,
+        ),
       )
       badges += 2
 
