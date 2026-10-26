@@ -60,7 +60,15 @@ describe('0.3.0 compatibility after social additions', () => {
     const id = metadata.id
     const isReleased = released.platforms.some((p) => p.metadata.id === id)
     it(`${id} keeps exact core data, React output and static files`, () => {
-      expect(hash(JSON.stringify(core.getIconData(id)))).toBe(iconDataSha256)
+      // Preserve every released field; viewBox metadata is the only addition.
+      const data = core.getIconData(id)!
+      const legacyData = {
+        viewBox: data.viewBox,
+        content: data.content,
+        badge: data.badge,
+        badgeDark: data.badgeDark,
+      }
+      expect(hash(JSON.stringify(legacyData))).toBe(iconDataSha256)
       const renders = shapes.flatMap((shape) =>
         [16, 24, 32, 48, 64]
           .map((size) =>
@@ -76,6 +84,9 @@ describe('0.3.0 compatibility after social additions', () => {
                   // Preserve the approved artwork while allowing its requested default label.
                   ...(isReleased ? {} : { label: 'Listen on' }),
                 }),
+              ).replace(
+                `<svg viewBox="${core.resolveBadgeViewBox(data, theme)}"`,
+                `<svg viewBox="${data.viewBox}"`,
               ),
             ),
           ),

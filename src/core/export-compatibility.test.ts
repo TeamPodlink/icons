@@ -72,7 +72,15 @@ describe('published 0.2.0 / current Podlink export compatibility', () => {
       expect(core.hasPlatformIcon(id)).toBe(true)
       expect(core.resolvePlatformId(id)).toBe(id)
       expect(hash(JSON.stringify(core.getPlatform(id)))).toBe(original.metadataSha256)
-      expect(hash(JSON.stringify(core.getIconData(id)))).toBe(expected.iconDataSha256)
+      // Only additive viewBox metadata is excluded from the historical data hash.
+      const data = core.getIconData(id)!
+      const legacyData = {
+        viewBox: data.viewBox,
+        content: data.content,
+        badge: data.badge,
+        badgeDark: data.badgeDark,
+      }
+      expect(hash(JSON.stringify(legacyData))).toBe(expected.iconDataSha256)
       for (const alias of original.aliases) {
         expect(core.resolvePlatformId(alias)).toBe(id)
         expect(core.getIconData(alias)).toBe(core.getIconData(id))
@@ -90,6 +98,11 @@ describe('published 0.2.0 / current Podlink export compatibility', () => {
           [40, 48].map((height) =>
             renderToStaticMarkup(
               createElement(react.PlatformBadge, { platform: id, shape, theme, height }),
+              // Normalize only the corrected artwork viewport for the historical hash.
+              // badge-viewbox.test.ts independently checks the actual source coordinates.
+            ).replace(
+              `<svg viewBox="${core.resolveBadgeViewBox(core.getIconData(id)!, theme)}"`,
+              `<svg viewBox="${core.getIconData(id)!.viewBox}"`,
             ),
           ),
         ),
