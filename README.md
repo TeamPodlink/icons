@@ -153,7 +153,8 @@ import { resolveBadgeContent, resolveBadgeViewBox } from '@podlink/icons'
 resolveBadgeContent(data, 'light')  // string
 resolveBadgeContent(data, 'dark')   // string
 
-resolveBadgeViewBox(data)  // string — viewBox for the badge
+resolveBadgeViewBox(data)          // string — light badge viewBox (default)
+resolveBadgeViewBox(data, 'dark')  // string — viewBox matching dark badge content
 ```
 
 ### Shapes

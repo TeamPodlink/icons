@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.1
+
+- Render React badge artwork using its own viewBox, fixing scale and placement for badges whose coordinates differ from the platform icon.
+- Preserve badge and dark-badge viewBoxes in generated icon data. `resolveBadgeViewBox(data, theme?)` follows the content fallback chain and defaults to light; existing one-argument calls and legacy `IconData` remain supported.
+
 ## 0.4.0
 
 - Use “Follow on” for the six new social/community badges and “Support on” for the five new supporter badges; retain React label overrides and all released outputs.

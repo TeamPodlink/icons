@@ -14,7 +14,11 @@ export interface IconData {
   viewBox: string
   content: string
   badge?: string
+  /** Coordinates of badge artwork; legacy data falls back to viewBox. */
+  badgeViewBox?: string
   badgeDark?: string
+  /** Coordinates of dark badge artwork; legacy data falls back to viewBox. */
+  badgeDarkViewBox?: string
 }
 
 export interface ShapeDefinition {

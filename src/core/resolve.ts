@@ -14,9 +14,14 @@ export function resolveBadgeContent(data: IconData, variant: 'light' | 'dark'): 
 }
 
 /**
- * Resolve viewBox for badge — badge SVGs may have different viewBoxes,
- * but in practice they share the same viewBox as the icon.
+ * Resolve the viewBox belonging to the selected badge content.
+ * Defaults to light for existing one-argument callers. Legacy data without
+ * badge coordinates retains the icon viewBox.
  */
-export function resolveBadgeViewBox(data: IconData): string {
+export function resolveBadgeViewBox(data: IconData, variant: 'light' | 'dark' = 'light'): string {
+  if (variant === 'dark' && data.badgeDark != null) {
+    return data.badgeDarkViewBox ?? data.viewBox
+  }
+  if (data.badge != null) return data.badgeViewBox ?? data.viewBox
   return data.viewBox
 }
