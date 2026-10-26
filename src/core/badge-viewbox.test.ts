@@ -45,7 +45,7 @@ describe('badge viewBox resolution', () => {
   for (const { id } of platforms) {
     it(`${id} retains coordinates from the selected source SVG`, () => {
       const data = getIconData(id)
-      if (!data) return
+      if (!data) throw new Error(`Missing generated icon data for ${id}`)
       for (const theme of ['light', 'dark'] as const) {
         const kinds = theme === 'dark' ? ['badge-dark', 'badge', 'icon'] : ['badge', 'icon']
         const source = kinds
