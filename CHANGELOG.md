@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Add PeerTube through the existing core, React, typed platform IDs, static icon, and “Watch on” badge APIs using its official three-triangle logo.
+
 ## 0.4.1
 
 - Render React badge artwork using its own viewBox, fixing scale and placement for badges whose coordinates differ from the platform icon.

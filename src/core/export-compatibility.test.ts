@@ -41,6 +41,7 @@ const additions = [
   'buymeacoffee',
   'venmo',
   'cashapp',
+  'peertube',
 ] as const satisfies readonly PlatformId[]
 
 describe('published 0.2.0 / current Podlink export compatibility', () => {
@@ -146,6 +147,24 @@ describe('additive live and social platform coverage', () => {
       }
     })
   }
+
+  it('retains PeerTube attribution through optimization, React and static generation', () => {
+    const outputs = [
+      core.getIconData('peertube')!.content,
+      renderToStaticMarkup(createElement(react.PlatformIcon, { platform: 'peertube' })),
+      ...(['light', 'dark'] as const).map((theme) =>
+        renderToStaticMarkup(createElement(react.PlatformBadge, { platform: 'peertube', theme })),
+      ),
+      ...['icons/peertube.svg', 'badges/peertube-light.svg', 'badges/peertube-dark.svg'].map(
+        (file) => readFileSync(join(root, `static/${file}`), 'utf8'),
+      ),
+    ]
+    for (const output of outputs) {
+      expect(output).toContain('PeerTube logo by Framasoft, CC-BY-SA 4.0')
+      expect(output).toContain('https://creativecommons.org/licenses/by-sa/4.0/')
+      expect(output).toContain('https://joinpeertube.org/press-kit.zip')
+    }
+  })
 
   it('resolves Twitter as the new X alias', () => {
     expect(core.resolvePlatformId('Twitter')).toBe('x')

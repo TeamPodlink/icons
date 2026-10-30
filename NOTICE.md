@@ -133,3 +133,20 @@ The US and UK listings supplied the same image. Its pixels were inspected only
 as a color reference; no raster logo is embedded or redistributed in the icons.
 Trademark rights remain with the owners. These are destination-link assets,
 not official login or payment buttons.
+
+## PeerTube
+
+PeerTube's three-triangle logo is by Framasoft, licensed under
+[Creative Commons Attribution-ShareAlike 4.0 International](https://creativecommons.org/licenses/by-sa/4.0/).
+The source is `press-kit/peertube-logo.svg` in the official
+[PeerTube press kit](https://joinpeertube.org/press-kit.zip), linked from
+https://joinpeertube.org/ and retrieved 2026-10-30. Its bundled `LICENCE`
+expressly credits Framasoft and specifies CC-BY-SA 4.0 for the logo.
+
+This adaptation retains all three visible paths, transforms and colors, centers
+them on a white 32×32 plate, and removes editor metadata and an invisible path.
+The adapted artwork is also licensed CC-BY-SA 4.0, independently of this
+package's MIT code. Attribution and license links are retained in the generated
+SVG artwork. Redistributors of the artwork must retain attribution, indicate
+changes, link the license and license adaptations under the same terms.
+PeerTube and Framasoft names and marks do not imply endorsement or affiliation.
