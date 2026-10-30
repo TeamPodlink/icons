@@ -208,7 +208,7 @@ MIT
 
 ### Social and supporter badges
 
-Threads, Bluesky, Mastodon, Discord, Reddit and WhatsApp default to “Follow on”.
+Threads, Bluesky, Mastodon, Discord, Reddit, WhatsApp and Nostr default to “Follow on”.
 Ko-fi, PayPal, Buy Me a Coffee, Venmo and Cash App default to “Support on”.
 These labels apply to generated static badges and React badges; React callers
 can still supply `label` for custom or localized wording. All released platform

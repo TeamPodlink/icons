@@ -38,5 +38,7 @@ node scripts/review-social-icons.mjs /tmp/nostr-preview nostr
 ```
 
 The existing compatibility fixtures remain unchanged. Tests cover Nostr's
-lookup, generated types, React shapes, static outputs and “Follow on” label
-while retaining the artwork/export checks for all existing platforms.
+catalog ordering, generated type membership and “Follow on” label in React
+and both static badge themes. The contact sheet was visually checked for
+React shapes and static icon output; Nostr has no artwork hash fixture yet.
+The existing artwork/export compatibility checks remain in place.
