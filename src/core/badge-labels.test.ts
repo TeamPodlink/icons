@@ -14,7 +14,7 @@ const font = opentype.loadSync(
   join(root, 'node_modules/@fontsource/inter/files/inter-latin-400-normal.woff'),
 )
 const labels = [
-  ['Follow on', ['threads', 'bluesky', 'mastodon', 'discord', 'reddit', 'whatsapp']],
+  ['Follow on', ['threads', 'bluesky', 'mastodon', 'discord', 'reddit', 'whatsapp', 'nostr']],
   ['Support on', ['kofi', 'paypal', 'buymeacoffee', 'venmo', 'cashapp']],
 ] as const
 
