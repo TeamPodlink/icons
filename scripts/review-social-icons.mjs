@@ -24,7 +24,7 @@ const chrome =
   ].find(existsSync)
 if (!chrome) throw new Error('Set CHROME_BIN to an installed Chrome/Chromium executable')
 mkdirSync(output, { recursive: true })
-const ids = process.argv[3]?.split(',') ?? [
+const ids = process.argv[3]?.split(',').map((id) => id.trim()) ?? [
   'threads',
   'bluesky',
   'mastodon',
