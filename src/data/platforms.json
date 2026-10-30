@@ -587,6 +587,13 @@
       "active": true,
       "guidelinesUrl": "https://cash.app/press/assets",
       "badgeLabel": "Support on"
+    },
+    {
+      "id": "peertube",
+      "name": "PeerTube",
+      "active": true,
+      "guidelinesUrl": "https://joinpeertube.org/",
+      "badgeLabel": "Watch on"
     }
   ]
 }
