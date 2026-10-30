@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Add Nostr with a white community glyph on purple through the existing core, React, typed platform IDs, static icon, and “Follow on” badge APIs.
+
 ## 0.4.1
 
 - Render React badge artwork using its own viewBox, fixing scale and placement for badges whose coordinates differ from the platform icon.

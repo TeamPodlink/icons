@@ -102,7 +102,7 @@ Renders a platform icon as an inline SVG.
 
 ### `<PlatformBadge>`
 
-Renders a platform badge as an inline HTML element. The eleven new social and supporter platforms default to “Follow on” or “Support on”; existing platforms retain their defaults.
+Renders a platform badge as an inline HTML element. Social and supporter platforms (including Nostr) default to “Follow on” or “Support on”; existing platforms retain their defaults.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
