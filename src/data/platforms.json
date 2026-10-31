@@ -344,6 +344,12 @@
       "guidelinesUrl": "https://www.subscribeonandroid.com/podcasters/"
     },
     {
+      "name": "The Podcast App",
+      "id": "thepodcastapp",
+      "active": true,
+      "guidelinesUrl": "https://thepodcastapp.dev/"
+    },
+    {
       "name": "TrueFans",
       "id": "truefans",
       "active": true
