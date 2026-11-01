@@ -15,7 +15,7 @@ const font = opentype.loadSync(
 )
 const labels = [
   ['Watch on', ['peertube']],
-  ['Follow on', ['threads', 'bluesky', 'mastodon', 'discord', 'reddit', 'whatsapp']],
+  ['Follow on', ['threads', 'bluesky', 'mastodon', 'discord', 'reddit', 'whatsapp', 'nostr']],
   ['Support on', ['kofi', 'paypal', 'buymeacoffee', 'venmo', 'cashapp']],
 ] as const
 

@@ -41,6 +41,7 @@ const additions = [
   'buymeacoffee',
   'venmo',
   'cashapp',
+  'nostr',
   'peertube',
 ] as const satisfies readonly PlatformId[]
 
@@ -152,6 +153,9 @@ describe('additive live and social platform coverage', () => {
     const source = readFileSync(join(root, 'src/source-icons/peertube/icon.svg'), 'utf8')
     const document = new DOMParser().parseFromString(source, 'image/svg+xml')
     expect(document.querySelector('image, filter, parsererror')).toBeNull()
+    expect(document.querySelector('svg > g')?.getAttribute('transform')).toBe(
+      'scale(0.85863173223290) translate(-419.89633 -221.5818735000)',
+    )
     const keys = [
       'd',
       'cx',

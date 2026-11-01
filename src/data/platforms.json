@@ -589,6 +589,13 @@
       "badgeLabel": "Support on"
     },
     {
+      "id": "nostr",
+      "name": "Nostr",
+      "active": true,
+      "guidelinesUrl": "https://github.com/mbarulli/nostr-logo",
+      "badgeLabel": "Follow on"
+    },
+    {
       "id": "peertube",
       "name": "PeerTube",
       "active": true,

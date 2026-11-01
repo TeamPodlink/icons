@@ -1,10 +1,9 @@
 # PeerTube icon
 
-Adds canonical ID `peertube` to the main package catalog (107 IDs on this branch).
+Adds canonical ID `peertube` to the main package catalog (108 IDs with Nostr).
 The normal generator includes it in `PlatformId`, core lookup, React
 `PlatformIcon` / `PlatformBadge`, and static icons and light/dark badges.
-The default badge reads “Watch on PeerTube”. Package version and dependencies
-are unchanged. This branch is independent of the unmerged Nostr addition.
+The default badge reads “Watch on PeerTube”. Available in the 0.5.0 release alongside Nostr; package dependencies are unchanged.
 
 ## Original Android app artwork and license
 
@@ -58,4 +57,4 @@ The original artwork compatibility fixtures are unchanged. The existing tests
 now cover PeerTube lookup, typed IDs, all React shapes, static output and badge
 label overrides. Consumer PR TeamPodlink/podlink-v3#260 can use
 `<PlatformIcon platform="peertube" />`, `<PlatformBadge platform="peertube" />`
-and `getIconData('peertube')` after a separately authorized package release.
+and `getIconData('peertube')` from package version 0.5.0.
