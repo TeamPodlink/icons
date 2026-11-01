@@ -41,6 +41,7 @@ const additions = [
   'buymeacoffee',
   'venmo',
   'cashapp',
+  'nostr',
 ] as const satisfies readonly PlatformId[]
 
 describe('published 0.2.0 / current Podlink export compatibility', () => {

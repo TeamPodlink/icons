@@ -587,6 +587,13 @@
       "active": true,
       "guidelinesUrl": "https://cash.app/press/assets",
       "badgeLabel": "Support on"
+    },
+    {
+      "id": "nostr",
+      "name": "Nostr",
+      "active": true,
+      "guidelinesUrl": "https://github.com/mbarulli/nostr-logo",
+      "badgeLabel": "Follow on"
     }
   ]
 }

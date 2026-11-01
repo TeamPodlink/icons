@@ -133,3 +133,15 @@ The US and UK listings supplied the same image. Its pixels were inspected only
 as a color reference; no raster logo is embedded or redistributed in the icons.
 Trademark rights remain with the owners. These are destination-link assets,
 not official login or payment buttons.
+
+## Nostr
+
+Nostr uses Andrea Nicolini (Bembureda)'s community icon from
+https://github.com/mbarulli/nostr-logo, released by its author under
+Creative Commons Zero v1.0 Universal (CC0-1.0). Retrieved 2026-10-30 from
+commit `234544f9308c48afe0f4be7c19f1406c7fe9e37c`,
+`SVG/nostr-icon-white-on-purple.svg`. The white glyph's path is unchanged,
+uniformly scaled and centered on a full-bleed plate using the supplied
+#662482 purple. The package's existing outer masks shape the plate.
+This is a community mark, not a claim of an official protocol logo or endorsement.
+Source license: https://github.com/mbarulli/nostr-logo/blob/234544f9308c48afe0f4be7c19f1406c7fe9e37c/LICENSE

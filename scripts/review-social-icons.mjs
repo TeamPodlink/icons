@@ -24,7 +24,7 @@ const chrome =
   ].find(existsSync)
 if (!chrome) throw new Error('Set CHROME_BIN to an installed Chrome/Chromium executable')
 mkdirSync(output, { recursive: true })
-const ids = [
+const ids = process.argv[3]?.split(',').map((id) => id.trim()) ?? [
   'threads',
   'bluesky',
   'mastodon',
@@ -43,7 +43,7 @@ const image = (svg, id, size) =>
 const rows = ['light', 'dark']
   .flatMap((theme) =>
     ids.map((id) => {
-      const sizes = id === 'venmo' ? [20, 24, 32, 48, 64] : [16, 24, 32, 48, 64]
+      const sizes = id === 'venmo' ? [20, 24, 32, 48, 64] : [16, 20, 24, 32, 48, 64]
       const cells = shapes.map(
         (shape) =>
           `<td>${sizes
@@ -74,7 +74,7 @@ td{height:140px;text-align:center;background:#fff;border-radius:8px}tr.dark td{b
 img{vertical-align:middle;margin:4px}small{display:block;font-size:11px;font-weight:400;color:#666}
 #review-summary{display:none}
 </style></head><body><h1>Social and supporter icons</h1>
-<p>16, 24, 32, 48 and 64px (Venmo starts at its 20px minimum) · light and dark backgrounds · static and React badges</p>
+<p>16, 20, 24, 32, 48 and 64px (Venmo starts at its 20px minimum) · light and dark backgrounds · static and React badges</p>
 <p>Chrome renders Display-P3 SVG colors into this sRGB capture. Existing React and static masks remain unchanged.</p>
 <table><thead><tr><th>Platform</th><th>React square</th><th>React squircle</th><th>React circle</th><th>Static icon</th><th>Badges</th></tr></thead><tbody>${rows}</tbody></table>
 <p id="review-caption">Checking image decode and color rendering…</p><pre id="review-summary"></pre>
@@ -118,7 +118,7 @@ try {
       '--force-color-profile=srgb',
       `--user-data-dir=${profile}`,
       '--hide-scrollbars',
-      '--window-size=1600,3600',
+      `--window-size=1800,${Math.max(600, ids.length * 300 + 300)}`,
       '--virtual-time-budget=1500',
       '--dump-dom',
       `--screenshot=${pngPath}`,
