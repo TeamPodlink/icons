@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Add PeerTube through the existing core, React, typed platform IDs, static icon, and “Watch on” badge APIs using its official three-triangle logo.
+- Add PeerTube through the existing core, React, typed platform IDs, static icon, and “Watch on” badge APIs using David Revoy’s original Sepia mobile app icon, with its white background and gradient shadow.
 
 ## 0.4.1
 

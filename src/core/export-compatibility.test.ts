@@ -148,6 +148,38 @@ describe('additive live and social platform coverage', () => {
     })
   }
 
+  it('preserves the verified original Sepia geometry and colors without raster content', () => {
+    const source = readFileSync(join(root, 'src/source-icons/peertube/icon.svg'), 'utf8')
+    const document = new DOMParser().parseFromString(source, 'image/svg+xml')
+    expect(document.querySelector('image, filter, parsererror')).toBeNull()
+    const keys = [
+      'd',
+      'cx',
+      'cy',
+      'r',
+      'x',
+      'y',
+      'width',
+      'height',
+      'ry',
+      'transform',
+      'fill',
+      'style',
+    ]
+    const geometry = [...document.querySelectorAll('[id]')]
+      .filter((element) => ['path', 'circle', 'g', 'rect'].includes(element.tagName))
+      .map((element) => [
+        element.id,
+        keys
+          .filter((key) => element.hasAttribute(key))
+          .map((key) => [key, element.getAttribute(key)]),
+      ])
+    // Computed independently from the selected elements in David Revoy's original SVG.
+    expect(hash(JSON.stringify(geometry))).toBe(
+      '0773763e4cbc105315d8c4eaf96cab41cfbac4578f3ad01d5798593319a9d17e',
+    )
+  })
+
   it('retains PeerTube attribution through optimization, React and static generation', () => {
     const outputs = [
       core.getIconData('peertube')!.content,
@@ -160,9 +192,13 @@ describe('additive live and social platform coverage', () => {
       ),
     ]
     for (const output of outputs) {
-      expect(output).toContain('PeerTube logo by Framasoft, CC-BY-SA 4.0')
-      expect(output).toContain('https://creativecommons.org/licenses/by-sa/4.0/')
-      expect(output).toContain('https://joinpeertube.org/press-kit.zip')
+      expect(output).toContain(
+        'Sepia / PeerTube mobile app icon by David Revoy, framasoft.org, CC BY 4.0',
+      )
+      expect(output).toContain('https://creativecommons.org/licenses/by/4.0/')
+      expect(output).toContain(
+        'https://www.peppercarrot.com/en/viewer/framasoft__2025-04-15_Sepia-vector_by-David-Revoy.html',
+      )
     }
   })
 
