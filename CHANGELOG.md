@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.5.0
 
 - Add Nostr with a white community glyph on purple through the existing core, React, typed platform IDs, static icon, and “Follow on” badge APIs.
+- Add PeerTube through the existing core, React, typed platform IDs, static icon, and “Watch on” badge APIs using David Revoy’s original Sepia mobile app icon, with its white background and gradient shadow.
 
 ## 0.4.1
 

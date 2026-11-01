@@ -1,10 +1,9 @@
 # Nostr icon
 
-Adds canonical ID `nostr` to the main package catalog (107 IDs).
+Adds canonical ID `nostr` to the main package catalog (108 IDs with PeerTube).
 The normal generator includes it in `PlatformId`, core lookup, React
 `PlatformIcon` / `PlatformBadge`, and static icons and light/dark badges.
-The default badge reads “Follow on Nostr”. No package version or dependencies
-change; consuming applications can adopt it after a separately approved release.
+The default badge reads “Follow on Nostr”. Available in the 0.5.0 release alongside PeerTube; package dependencies are unchanged.
 
 ## Vector provenance
 

@@ -145,3 +145,23 @@ uniformly scaled and centered on a full-bleed plate using the supplied
 #662482 purple. The package's existing outer masks shape the plate.
 This is a community mark, not a claim of an official protocol logo or endorsement.
 Source license: https://github.com/mbarulli/nostr-logo/blob/234544f9308c48afe0f4be7c19f1406c7fe9e37c/LICENSE
+
+## PeerTube
+
+The Sepia / PeerTube mobile app icon is by David Revoy, framasoft.org,
+licensed under [Creative Commons Attribution 4.0 International](https://creativecommons.org/licenses/by/4.0/).
+Source: [Sepia-vector, 2025-04-15](https://www.peppercarrot.com/en/viewer/framasoft__2025-04-15_Sepia-vector_by-David-Revoy.html),
+retrieved 2026-10-30. Framasoft's [app-v1 announcement](https://joinpeertube.org/news/app-v1)
+credits David Revoy and expressly identifies this app icon's CC BY 4.0 license.
+
+Changes: extracted the existing app-icon composition from the source sheet,
+uniformly scaled and centered it on an opaque white 32×32 canvas, and removed
+editor metadata. Original mascot paths, colors and gradient shadow are retained;
+the source gradient's linked stops are resolved directly. No tracing, redrawing
+or generative artwork was used.
+
+This artwork remains CC BY 4.0, separately from the package's MIT code.
+Attribution, source and license links and a change notice are preserved in the
+generated core, React and static SVG artwork. Retain these notices and indicate
+further modifications when redistributing. PeerTube and Framasoft names and
+marks do not imply endorsement or affiliation.
