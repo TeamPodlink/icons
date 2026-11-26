@@ -43,6 +43,8 @@ const additions = [
   'cashapp',
   'nostr',
   'peertube',
+  'npr',
+  'bbcsounds',
 ] as const satisfies readonly PlatformId[]
 
 describe('published 0.2.0 / current Podlink export compatibility', () => {

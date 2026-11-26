@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.6.0
+
+- Add NPR (the official logo on white) and BBC Sounds (the BBC blocks over the orange SOUNDS wordmark on black) through the existing core, React, typed platform IDs, static icon, and “Listen on” badge APIs.
+
 ## 0.5.0
 
 - Add Nostr with a white community glyph on purple through the existing core, React, typed platform IDs, static icon, and “Follow on” badge APIs.

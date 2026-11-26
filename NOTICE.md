@@ -165,3 +165,31 @@ Attribution, source and license links and a change notice are preserved in the
 generated core, React and static SVG artwork. Retain these notices and indicate
 further modifications when redistributing. PeerTube and Framasoft names and
 marks do not imply endorsement or affiliation.
+
+## NPR and BBC Sounds
+
+These marks identify the services. They are not licensed under this package's
+MIT code license. No affiliation, endorsement, additional permission or
+sublicense is claimed, and no permission has been requested from either owner.
+
+- **NPR**: the official logo from
+  https://prod-eks-static-assets.npr.org/chrome_svg/npr-logo-2025.svg, the file
+  npr.org serves in its site header, retrieved 2026-11-26. Paths and colors are
+  unchanged; the logo is uniformly scaled and centered on a white plate, as on
+  the NPR app icon. National Public Radio®, NPR® and NPR logos are trademarks of
+  National Public Radio, Inc. and are reserved under its terms of use,
+  https://www.npr.org/about-npr/179876898/terms-of-use.
+- **BBC Sounds**: the BBC blocks and the SOUNDS wordmark, both served inline on
+  https://www.bbc.co.uk/sounds and retrieved 2026-11-26. Paths are unchanged.
+  They are stacked as in the service's own artwork
+  (https://ichef.bbci.co.uk/images/ic/raw/p0bwmc67.jpg, "BBC blocks with Sounds
+  written underneath in orange on a black background"): white blocks over the
+  wordmark in the site's accent orange (#FA6400) on black. The BBC, the BBC
+  blocks and BBC Sounds are trade marks of the British Broadcasting
+  Corporation. Its terms of use,
+  https://www.bbc.co.uk/usingthebbc/terms-of-use, do not permit using its
+  brands, trade marks or logos without permission. Consumers must confine use
+  to identifying BBC Sounds as a listening destination, or obtain the BBC's
+  permission.
+
+See docs/npr-bbcsounds-icons.md for source hashes and placement.
