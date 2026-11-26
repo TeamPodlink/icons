@@ -601,6 +601,18 @@
       "active": true,
       "guidelinesUrl": "https://joinpeertube.org/",
       "badgeLabel": "Watch on"
+    },
+    {
+      "id": "npr",
+      "name": "NPR",
+      "active": true,
+      "guidelinesUrl": "https://www.npr.org/about-npr/179876898/terms-of-use"
+    },
+    {
+      "id": "bbcsounds",
+      "name": "BBC Sounds",
+      "active": true,
+      "guidelinesUrl": "https://www.bbc.co.uk/usingthebbc/terms-of-use"
     }
   ]
 }

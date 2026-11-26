@@ -18,7 +18,7 @@ const shapes: IconShape[] = ['square', 'circle', 'superellipse']
 // Captured from a clean build of release commit a1d16f8 before these additions.
 // Keep this fixed: it also protects the ten live platforms introduced in 0.3.0.
 describe('0.3.0 compatibility after social additions', () => {
-  it('adds the social IDs, Nostr and PeerTube while preserving exports, metadata and ordering', () => {
+  it('adds the social IDs, Nostr, PeerTube, NPR and BBC Sounds while preserving exports, metadata and ordering', () => {
     expect(Object.keys(core).sort()).toEqual(released.coreExports)
     expect(Object.keys(react).sort()).toEqual(released.reactExports)
     expect(core.platforms.slice(0, 95)).toEqual(released.platforms.map((p) => p.metadata))
@@ -36,6 +36,8 @@ describe('0.3.0 compatibility after social additions', () => {
       'cashapp',
       'nostr',
       'peertube',
+      'npr',
+      'bbcsounds',
     ])
   })
 
