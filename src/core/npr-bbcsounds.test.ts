@@ -36,12 +36,13 @@ describe('NPR and BBC Sounds', () => {
     )
   })
 
-  it('sets the NPR logo as large as the circle mask allows', () => {
+  it('sets the NPR logo at 75% of the icon width, as on NPR’s app icons', () => {
     const transform = source('npr').querySelector('svg > g')?.getAttribute('transform')
-    expect(transform).toBe('translate(1 11) scale(0.01)')
-    // 3000×1000 source units: 30×10 in the 32-unit icon, corners inside r=16.
-    const [width, height] = [3000 * 0.01, 1000 * 0.01]
-    expect(width).toBe(30)
+    expect(transform).toBe('translate(4 12) scale(0.008)')
+    // 3000×1000 source units become 24×8: 75% of 32, centred, inside r=16.
+    const [width, height] = [3000 * 0.008, 1000 * 0.008]
+    expect(width / 32).toBe(0.75)
+    expect([4 + width / 2, 12 + height / 2]).toEqual([16, 16])
     expect(Math.hypot(width / 2, height / 2)).toBeLessThan(16)
   })
 
