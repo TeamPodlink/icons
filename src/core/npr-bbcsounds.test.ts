@@ -36,6 +36,15 @@ describe('NPR and BBC Sounds', () => {
     )
   })
 
+  it('sets the NPR logo as large as the circle mask allows', () => {
+    const transform = source('npr').querySelector('svg > g')?.getAttribute('transform')
+    expect(transform).toBe('translate(1 11) scale(0.01)')
+    // 3000×1000 source units: 30×10 in the 32-unit icon, corners inside r=16.
+    const [width, height] = [3000 * 0.01, 1000 * 0.01]
+    expect(width).toBe(30)
+    expect(Math.hypot(width / 2, height / 2)).toBeLessThan(16)
+  })
+
   it('keeps the official BBC blocks and SOUNDS wordmark paths on black', () => {
     const document = source('bbcsounds')
     expect(document.querySelector('image, filter, parsererror')).toBeNull()

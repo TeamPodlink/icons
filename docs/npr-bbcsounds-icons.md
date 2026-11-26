@@ -15,8 +15,17 @@ the logo npr.org loads in its header (the same paths are inlined there as
 
 - Original SVG SHA-256: `420bdafdc238356468a313b962abe04a9771b3eda5cd75bdb0ea25bb38cae131`.
 - All six paths and their fills (#d62021, #237bbd, black, white) are copied
-  verbatim. The 3000×1000 logo is scaled uniformly by `26/3000` and translated
-  to `(3, 11.6667)`, centred on a full-bleed white plate as on the NPR app icon.
+  verbatim. The 3000×1000 logo is scaled uniformly by `30/3000` and translated
+  to `(1, 11)`, centred on a full-bleed white plate as on the NPR app icon.
+- Size: NPR's brand guide, as cited in review, sets a 40 px minimum for the
+  primary logo and 20 px for its mini logo, but NPR publishes no small-format
+  vector (npr.org serves only
+  the full logo SVG and PNG favicons). The full logo is therefore set as large
+  as every package shape allows: 30 of 32 units wide (93.75%), 10 units tall.
+  Its corners sit 15.81 units from the centre, inside the circle mask's 16.
+  Rendered widths: 30 px in a 32 px icon, 22.5 px in the 40 px badge (24 px
+  artwork), 45 px in a 48 px icon. It meets the 40 px primary minimum from a
+  43 px icon upward.
 - SHA-256 of the six `d="…"` attributes, newline-joined:
   `1e90b8d6aa3dfa05572097121d07831d0bfb0a66a79541facc1c51a4e66355d1`.
 
